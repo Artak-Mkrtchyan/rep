@@ -1,0 +1,142 @@
+---
+alwaysApply: false
+---
+
+# Figma MCP Server Integration Rules
+
+## When Working with Figma Designs
+
+When the user provides a Figma URL or node ID, follow these guidelines to effectively implement designs:
+
+### 1. Extract Node ID from Figma URLs
+- Figma URLs format: `https://figma.com/design/:fileKey/:fileName?node-id=1-2`
+- Extract node ID: `1-2` becomes `1:2` (replace dash with colon)
+- Valid node ID format: `"123:456"` or `"123-456"`
+
+### 2. Implementation Workflow
+
+#### Step 1: Get Design Context
+- Always start with `mcp_Figma_Desktop_get_design_context` to generate UI code
+- Provide `clientLanguages` and `clientFrameworks` parameters:
+  - Languages: `"typescript,html,css"`
+  - Frameworks: `"react,nextjs,tailwindcss"`
+- Review the generated code structure and styling
+
+#### Step 2: Get Screenshots (if needed)
+- Use `mcp_Figma_Desktop_get_screenshot` to visualize the design
+- Helpful for understanding layout and spacing details
+
+#### Step 3: Get Variables and Design Tokens
+- Use `mcp_Figma_Desktop_get_variable_defs` to extract design tokens
+- Map Figma variables to your Tailwind/CSS variables
+- Examples: colors, spacing, typography, etc.
+
+#### Step 4: Check Code Connect (if available)
+- Use `mcp_Figma_Desktop_get_code_connect_map` to see if components are already connected to code
+- Reuse existing components when available
+
+#### Step 5: Get Metadata for Complex Layouts
+- For pages or complex nested structures, use `mcp_Figma_Desktop_get_metadata`
+- This provides XML structure overview without full code
+- Useful for understanding component hierarchy
+
+### 3. Code Generation Best Practices
+
+When implementing Figma designs:
+
+- **Preserve Design Fidelity**: Match spacing, colors, typography from Figma
+- **Use Design Tokens**: Extract and use Figma variables for consistent styling
+- **Component Reusability**: Check existing UI components in `@workspace/ui` before creating new ones
+- **Responsive Design**: Implement mobile-first responsive layouts even if Figma shows desktop only
+- **Accessibility**: Add proper ARIA labels, keyboard navigation, and semantic HTML
+- **TailwindCSS**: Use Tailwind utility classes, avoid inline styles or CSS modules unless necessary
+
+### 4. Mapping Figma Properties to Code
+
+#### Colors
+```typescript
+// Figma: #949494
+// Tailwind: text-gray-600 or define custom color in tailwind.config
+```
+
+#### Spacing
+```typescript
+// Figma: 16px gap
+// Tailwind: gap-4 (4 * 4px = 16px)
+```
+
+#### Typography
+```typescript
+// Figma: Font size 14px, weight 500
+// Tailwind: text-sm font-medium
+```
+
+#### Shadows
+```typescript
+// Figma: Box shadow
+// Tailwind: shadow-md, shadow-lg, etc.
+```
+
+### 5. Component Structure
+
+Follow this structure when implementing Figma components:
+
+```typescript
+// 1. Import necessary dependencies
+import { ComponentProps } from 'react'
+
+// 2. Define types based on Figma variants/properties
+interface ComponentNameProps {
+  variant?: 'primary' | 'secondary'
+  size?: 'sm' | 'md' | 'lg'
+  // ... other props from Figma
+}
+
+// 3. Implement component matching Figma design
+const ComponentName = ({ variant = 'primary', size = 'md', ...props }: ComponentNameProps) => {
+  return (
+    <div className="...">
+      {/* Implementation */}
+    </div>
+  )
+}
+
+export { ComponentName }
+```
+
+### 6. Design System Rules
+
+If the project needs design system rules:
+- Use `mcp_Figma_Desktop_create_design_system_rules` to generate initial rules
+- Customize based on project requirements
+- Store in appropriate configuration files
+
+### 7. Error Handling
+
+If Figma MCP calls fail:
+- Ensure Figma Desktop app is running
+- Verify the node ID format is correct
+- Check that the file is open in Figma Desktop
+- Fallback to manual implementation if MCP is unavailable
+
+### 8. Always Provide Context
+
+When calling Figma MCP tools, always include:
+- `clientLanguages: "typescript,html,css"`
+- `clientFrameworks: "react,nextjs,tailwindcss"`
+- This ensures generated code matches the project stack
+
+### 9. Integration with Existing Components
+
+Before creating new components:
+1. Check `@workspace/ui/components` for existing UI components
+2. Extend or compose existing components when possible
+3. Follow the monorepo architecture
+4. Use paths and aliases from tsconfig.json
+
+### 10. Internationalization
+
+When Figma contains text:
+- Extract text to translation files (en.json, ru.json, uz.json)
+- Use Next.js internationalization system
+- Never hardcode display text in components

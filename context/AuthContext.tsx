@@ -1,5 +1,5 @@
-import * as SecureStore from 'expo-secure-store'
-import React from 'react'
+import * as SecureStore from 'expo-secure-store';
+import React from 'react';
 
 type AuthTokens = {
   accessToken: string;
@@ -18,12 +18,10 @@ type AuthContextValue = {
   getAuthHeader: () => Record<string, string>;
 };
 
-const ACCESS_TOKEN_KEY = "auth.accessToken";
-const REFRESH_TOKEN_KEY = "auth.refreshToken";
+const ACCESS_TOKEN_KEY = 'auth.accessToken';
+const REFRESH_TOKEN_KEY = 'auth.refreshToken';
 
-const AuthContext = React.createContext<AuthContextValue | undefined>(
-  undefined
-);
+const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = React.useState<string | null>(null);
@@ -99,7 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth(): AuthContextValue {
   const ctx = React.useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return ctx;
 }

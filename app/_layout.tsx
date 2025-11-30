@@ -1,13 +1,13 @@
-import 'react-native-reanimated'
-import '../global.css'
+import 'react-native-reanimated';
+import '../global.css';
 
-import { Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
-import { AuthProvider, useAuth } from '@/context/AuthContext'
-import { NAV_THEME } from '@/lib/theme'
-import { ThemeProvider } from '@react-navigation/native'
-import { PortalHost } from '@rn-primitives/portal'
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { NAV_THEME } from '@/lib/theme';
+import { ThemeProvider } from '@react-navigation/native';
+import { PortalHost } from '@rn-primitives/portal';
 
 export const unstable_settings = {
   anchor: '(tabs)',

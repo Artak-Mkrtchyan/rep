@@ -3,6 +3,7 @@ import '../global.css';
 
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { NAV_THEME } from '@/lib/theme';
@@ -17,9 +18,11 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <ThemeProvider value={NAV_THEME.light}>
-        <RootNavigator />
-        <StatusBar style="auto" />
-        <PortalHost />
+        <SafeAreaProvider>
+          <RootNavigator />
+          <StatusBar style="auto" />
+          <PortalHost />
+        </SafeAreaProvider>
       </ThemeProvider>
     </AuthProvider>
   );

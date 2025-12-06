@@ -1,15 +1,18 @@
 import { Image } from 'expo-image';
 import React from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { Input } from '@/components/ui/input';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function LoginScreen() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const canContinue = email.length > 0 && password.length > 0;
+  const { tokens: theme } = useTheme();
 
   return (
     <KeyboardAvoidingView
@@ -18,72 +21,60 @@ export default function LoginScreen() {
       <ThemedView className="flex-1 items-center justify-center px-4">
         <View className="w-[358px] max-w-full items-center gap-6">
           <Image
-            source={require('@/assets/images/login-illustration.svg')}
             style={{ width: 208, height: 141 }}
+            source={require('@/assets/images/login-illustration.svg')}
             contentFit="contain"
           />
 
-          <ThemedText type="title" className="text-center text-[#111111]">
+          <ThemedText type="title" className="text-center">
             Log in
           </ThemedText>
 
-          <View className="w-full gap-1">
-            <ThemedText className="text-[12px] font-bold leading-[11px] text-[#111111]">
-              Email
-            </ThemedText>
-            <View className="h-12 justify-center rounded-[12px] border border-[#E2E2E2] bg-white px-3">
-              <TextInput
-                value={email}
-                onChangeText={setEmail}
-                placeholder=""
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                className="text-base text-[#111111]"
-                placeholderTextColor="#ABABAB"
-              />
-            </View>
-          </View>
+          <Input
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder=""
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholderTextColor={theme.placeholder}
+          />
 
-          <View className="w-full gap-1">
-            <ThemedText className="text-[12px] font-bold leading-[11px] text-[#111111]">
-              Password
-            </ThemedText>
-            <View className="h-12 justify-center rounded-[12px] border border-[#E2E2E2] bg-white px-3">
-              <TextInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder=""
-                secureTextEntry
-                className="text-base text-[#111111]"
-                placeholderTextColor="#ABABAB"
-              />
-            </View>
+          <Input
+            label="Password"
+            value={password}
+            onChangeText={setPassword}
+            placeholder=""
+            secureTextEntry
+            placeholderTextColor={theme.placeholder}
+          />
 
-            <Pressable
-              className="mt-2 h-8 justify-center self-end rounded-[6px] px-1 py-2"
-              onPress={() => {}}>
-              <ThemedText className="text-[16px] text-[#13B86D]">Forgot password?</ThemedText>
-            </Pressable>
-          </View>
+          <Pressable
+            className="h-16 justify-center self-end rounded-[6px] px-1 py-2"
+            onPress={() => {}}>
+            <ThemedText className="text-[16px] text-primary">Forgot password?</ThemedText>
+          </Pressable>
 
           <Pressable
             disabled={!canContinue}
             onPress={() => {}}
-            className={`mt-3 h-[50px] w-full items-center justify-center rounded-[12px] ${canContinue ? 'bg-[#0E9457]' : 'bg-[#E2E2E2]'}`}
+            className={`mt-3 h-[50px] w-full items-center justify-center rounded-[12px] ${
+              canContinue ? 'bg-primary' : 'bg-input'
+            }`}
             style={({ pressed }) => (pressed && canContinue ? { opacity: 0.9 } : undefined)}>
             <ThemedText className="text-[16px] font-medium text-white">Continue</ThemedText>
           </Pressable>
 
           <View className="w-full flex-row items-center justify-center gap-5">
-            <View className="h-px flex-1 bg-[#ABABAB]" />
-            <ThemedText className="text-[16px] text-[#ABABAB]">OR</ThemedText>
-            <View className="h-px flex-1 bg-[#ABABAB]" />
+            <View className="h-px flex-1 bg-border" />
+            <ThemedText className="text-[16px] text-muted-foreground">OR</ThemedText>
+            <View className="h-px flex-1 bg-border" />
           </View>
 
           <View className="w-full flex-row gap-4">
             <Pressable
-              className="h-12 flex-1 justify-center rounded-[12px] border border-[#F1F1F1] bg-white px-4"
+              className="h-12 flex-1 justify-center rounded-[12px] border border-secondary bg-card px-4"
               style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
               onPress={() => {}}>
               <View className="flex-row items-center justify-center gap-2">
@@ -96,7 +87,7 @@ export default function LoginScreen() {
               </View>
             </Pressable>
             <Pressable
-              className="h-12 flex-1 justify-center rounded-[12px] border border-[#F1F1F1] bg-white px-4"
+              className="h-12 flex-1 justify-center rounded-[12px] border border-secondary bg-card px-4"
               style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
               onPress={() => {}}>
               <View className="flex-row items-center justify-center gap-2">
@@ -114,5 +105,3 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-// Converted styles to Nativewind className usage above

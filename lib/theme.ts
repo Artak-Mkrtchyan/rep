@@ -20,6 +20,9 @@ export const THEME = {
     destructive: '#ff3636',
     border: '#e2e2e2',
     input: '#e2e2e2',
+    // Additional light tokens used in UI
+    placeholder: '#ababab',
+    link: '#13b86d',
     ring: '#b5b5b5',
     radius: '0.625rem',
     chart1: '#d6652e',
@@ -47,6 +50,9 @@ export const THEME = {
     destructive: '#d24c4c',
     border: '#2b2b2b',
     input: '#2b2b2b',
+    // Additional dark tokens to mirror light
+    placeholder: '#8f8f8f',
+    link: '#13b86d',
     ring: '#8e8e8e',
     radius: '0.625rem',
     chart1: '#6e69f1',

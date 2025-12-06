@@ -1,13 +1,14 @@
 import React from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
-import { cn } from '@/lib/utils';
 import { useThemeValue } from '@/hooks/use-theme';
+import { cn } from '@/lib/utils';
 
 import { InputError } from './error';
 import { InputLabel } from './label';
 import { InputLeftView } from './left-view';
 import { InputRightView } from './right-view';
+
 import type { InputProps } from './types';
 
 export const Input = React.forwardRef(function Input(
@@ -64,8 +65,8 @@ export const Input = React.forwardRef(function Input(
     size === 'sm'
       ? 'h-10 rounded-[10px] px-3'
       : size === 'lg'
-      ? 'h-14 rounded-[14px] px-4'
-      : 'h-12 rounded-[12px] px-3';
+        ? 'h-14 rounded-[14px] px-4'
+        : 'h-12 rounded-[12px] px-3';
 
   const variantClasses = variant === 'ghost' ? 'bg-transparent' : 'bg-card';
 
@@ -92,7 +93,10 @@ export const Input = React.forwardRef(function Input(
           ref={inputRef}
           editable={!resolvedDisabled}
           placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
-          className={cn('flex-1 text-base text-foreground placeholder:text-muted-foreground', inputClassName)}
+          className={cn(
+            'h-full flex-1 text-[16px] text-foreground placeholder:text-muted-foreground',
+            inputClassName
+          )}
           onFocus={handleFocus}
           onBlur={handleBlur}
           {...props}
@@ -118,10 +122,8 @@ export const Input = React.forwardRef(function Input(
   );
 });
 
-export * from './types';
+export { InputError } from './error';
 export { InputLabel } from './label';
 export { InputLeftView } from './left-view';
 export { InputRightView } from './right-view';
-export { InputError } from './error';
-
-
+export * from './types';

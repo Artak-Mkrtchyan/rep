@@ -1,34 +1,51 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { useTheme } from '@/hooks/use-theme';
 
-export default function LoginScreen() {
+export default function CreatePasswordScreen() {
   const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-
-  const canContinue = email.length > 0 && password.length > 0;
+  const [password, setPassword] = React.useState('x');
+  const [confirmPassword, setConfirmPassword] = React.useState('x');
   const { tokens: theme } = useTheme();
+
+  const hasMin = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNum = /\d/.test(password);
+  const passwordsMatch = password.length > 0 && password === confirmPassword;
+  const canContinue = email.length > 0 && hasMin && hasUpper && hasNum && passwordsMatch;
+
+  const handleContinue = () => {
+    if (!canContinue) return;
+    router.push('/(auth)/signup/completed');
+  };
+
+  const Requirement = ({ label, ok }: { label: string; ok: boolean }) => (
+    <View className="flex-row items-center gap-2">
+      <View className={`h-2.5 w-2.5 rounded-full ${ok ? 'bg-primary' : 'bg-border'}`} />
+      <Text className={`text-[12px] ${ok ? 'text-foreground' : 'text-muted-foreground'}`}>
+        {label}
+      </Text>
+    </View>
+  );
+
+  const handleGoToLogin = () => {
+    router.replace('/(auth)');
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
-      <ThemedView className="flex-1 items-center justify-center px-4">
-        <View className="w-[358px] max-w-full items-center gap-6">
-          <Image
-            style={{ width: 208, height: 141 }}
-            source={require('@/assets/images/login-illustration.svg')}
-            contentFit="contain"
-          />
-
+      <ThemedView className="flex-1 items-center px-4">
+        <View className="w-[358px] max-w-full items-center gap-6 pt-10">
           <ThemedText type="title" className="text-center">
-            Log in
+            Sign up
           </ThemedText>
 
           <Input
@@ -46,18 +63,37 @@ export default function LoginScreen() {
             label="Password"
             value={password}
             onChangeText={setPassword}
-            placeholder=""
             secureTextEntry
+            placeholder=""
             placeholderTextColor={theme.placeholder}
           />
 
-          <Pressable className="h-16 justify-center self-end rounded-[6px] px-1" onPress={() => {}}>
-            <ThemedText className="text-[16px] text-primary">Forgot password?</ThemedText>
-          </Pressable>
+          <View className="border-default w-full rounded-[12px] border bg-card px-3 py-2">
+            <View className="w-full flex-row items-center justify-between">
+              <Requirement label="8+ characters" ok={hasMin} />
+              <Requirement label="1 uppercase" ok={hasUpper} />
+              <Requirement label="1 number" ok={hasNum} />
+            </View>
+          </View>
+
+          <Input
+            label="Confirm password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            placeholder=""
+            isInvalid={confirmPassword.length > 0 && !passwordsMatch}
+            error={
+              confirmPassword.length > 0 && !passwordsMatch ? 'Passwords do not match' : undefined
+            }
+            placeholderTextColor={theme.placeholder}
+          />
 
           <Pressable
             disabled={!canContinue}
-            onPress={() => {}}
+            onPress={handleContinue}
+            accessibilityRole="button"
+            accessibilityLabel="Continue"
             className={`h-[50px] w-full items-center justify-center rounded-[12px] ${
               canContinue ? 'bg-primary' : 'bg-input'
             }`}
@@ -74,8 +110,8 @@ export default function LoginScreen() {
           <View className="w-full flex-row gap-4">
             <Pressable
               className="h-12 flex-1 justify-center rounded-[12px] border border-secondary bg-card px-4"
-              style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
-              onPress={() => {}}>
+              accessibilityRole="button"
+              accessibilityLabel="Continue with Google">
               <View className="flex-row items-center justify-center gap-2">
                 <Image
                   source={require('@/assets/images/google-icon.svg')}
@@ -87,8 +123,8 @@ export default function LoginScreen() {
             </Pressable>
             <Pressable
               className="h-12 flex-1 justify-center rounded-[12px] border border-secondary bg-card px-4"
-              style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
-              onPress={() => {}}>
+              accessibilityRole="button"
+              accessibilityLabel="Continue with Apple">
               <View className="flex-row items-center justify-center gap-2">
                 <Image
                   source={require('@/assets/images/apple-icon.svg')}
@@ -99,12 +135,13 @@ export default function LoginScreen() {
               </View>
             </Pressable>
           </View>
+
           <Pressable
-            onPress={() => router.push('/(auth)/signup')}
+            onPress={handleGoToLogin}
             accessibilityRole="button"
-            accessibilityLabel="Don’t have an account? Sign up"
+            accessibilityLabel="Already have an account? Log in"
             className="h-12 w-full items-center justify-center rounded-[12px]">
-            <ThemedText className="text-[16px] text-primary">Don’t have an account?</ThemedText>
+            <ThemedText className="text-[16px] text-primary">Already have an account?</ThemedText>
           </Pressable>
         </View>
       </ThemedView>

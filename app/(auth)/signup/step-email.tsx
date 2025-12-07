@@ -8,12 +8,20 @@ import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { useTheme } from '@/hooks/use-theme';
 
-export default function LoginScreen() {
+export default function SignUpEmailStepScreen() {
   const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-
-  const canContinue = email.length > 0 && password.length > 0;
   const { tokens: theme } = useTheme();
+
+  const canContinue = email.length > 0;
+
+  const handleContinue = () => {
+    if (!canContinue) return;
+    router.push('/(auth)/signup/verify');
+  };
+
+  const handleGoToLogin = () => {
+    router.replace('/(auth)');
+  };
 
   return (
     <KeyboardAvoidingView
@@ -22,13 +30,13 @@ export default function LoginScreen() {
       <ThemedView className="flex-1 items-center justify-center px-4">
         <View className="w-[358px] max-w-full items-center gap-6">
           <Image
-            style={{ width: 208, height: 141 }}
-            source={require('@/assets/images/login-illustration.svg')}
+            style={{ width: 196, height: 138 }}
+            source={require('@/assets/images/icon-signup-email.svg')}
             contentFit="contain"
           />
 
           <ThemedText type="title" className="text-center">
-            Log in
+            Sign up
           </ThemedText>
 
           <Input
@@ -42,22 +50,11 @@ export default function LoginScreen() {
             placeholderTextColor={theme.placeholder}
           />
 
-          <Input
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            placeholder=""
-            secureTextEntry
-            placeholderTextColor={theme.placeholder}
-          />
-
-          <Pressable className="h-16 justify-center self-end rounded-[6px] px-1" onPress={() => {}}>
-            <ThemedText className="text-[16px] text-primary">Forgot password?</ThemedText>
-          </Pressable>
-
           <Pressable
             disabled={!canContinue}
-            onPress={() => {}}
+            onPress={handleContinue}
+            accessibilityRole="button"
+            accessibilityLabel="Continue"
             className={`h-[50px] w-full items-center justify-center rounded-[12px] ${
               canContinue ? 'bg-primary' : 'bg-input'
             }`}
@@ -75,6 +72,8 @@ export default function LoginScreen() {
             <Pressable
               className="h-12 flex-1 justify-center rounded-[12px] border border-secondary bg-card px-4"
               style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
+              accessibilityRole="button"
+              accessibilityLabel="Continue with Google"
               onPress={() => {}}>
               <View className="flex-row items-center justify-center gap-2">
                 <Image
@@ -88,6 +87,8 @@ export default function LoginScreen() {
             <Pressable
               className="h-12 flex-1 justify-center rounded-[12px] border border-secondary bg-card px-4"
               style={({ pressed }) => (pressed ? { opacity: 0.9 } : undefined)}
+              accessibilityRole="button"
+              accessibilityLabel="Continue with Apple"
               onPress={() => {}}>
               <View className="flex-row items-center justify-center gap-2">
                 <Image
@@ -99,12 +100,13 @@ export default function LoginScreen() {
               </View>
             </Pressable>
           </View>
+
           <Pressable
-            onPress={() => router.push('/(auth)/signup')}
+            onPress={handleGoToLogin}
             accessibilityRole="button"
-            accessibilityLabel="Don’t have an account? Sign up"
+            accessibilityLabel="Already have an account? Log in"
             className="h-12 w-full items-center justify-center rounded-[12px]">
-            <ThemedText className="text-[16px] text-primary">Don’t have an account?</ThemedText>
+            <ThemedText className="text-[16px] text-primary">Already have an account?</ThemedText>
           </Pressable>
         </View>
       </ThemedView>

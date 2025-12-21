@@ -13,6 +13,7 @@ When the user provides a Figma URL or node ID, follow these guidelines to effect
 - Extract node ID: `1-2` becomes `1:2` (replace dash with colon)
 - Valid node ID format: `"123:456"` or `"123-456"`
 
+
 ### 2. Implementation Workflow
 
 #### Step 1: Get Design Context

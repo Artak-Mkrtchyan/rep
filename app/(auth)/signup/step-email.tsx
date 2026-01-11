@@ -1,5 +1,7 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
@@ -11,15 +13,24 @@ import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useTheme } from '@/hooks/use-theme';
 
+import type { AccountRole } from '@/types/auth';
+
+const EmailSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email address').required('Required'),
+});
+
 export default function SignUpEmailStepScreen() {
-  const [email, setEmail] = React.useState('');
   const { tokens: theme } = useTheme();
+  const params = useLocalSearchParams<{ role: AccountRole }>();
 
-  const canContinue = email.length > 0;
-
-  const handleContinue = () => {
-    if (!canContinue) return;
-    router.push(AUTH_ROUTES.SIGNUP_VERIFY);
+  const handleContinue = (values: { email: string }) => {
+    router.push({
+      pathname: AUTH_ROUTES.SIGNUP_VERIFY,
+      params: {
+        role: params.role,
+        email: values.email,
+      },
+    });
   };
 
   const handleGoToLogin = () => {
@@ -36,38 +47,52 @@ export default function SignUpEmailStepScreen() {
 
   return (
     <AuthLayout centered>
-      <AuthHeader
-        title="Sign up"
-        imageSource={require('@/assets/images/icon-signup-email.svg')}
-        imageWidth={IMAGE_DIMENSIONS.SIGNUP_EMAIL.width}
-        imageHeight={IMAGE_DIMENSIONS.SIGNUP_EMAIL.height}
-      />
+      <Formik
+        initialValues={{ email: '' }}
+        validationSchema={EmailSchema}
+        onSubmit={handleContinue}>
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+          <>
+            <AuthHeader
+              title="Sign up"
+              imageSource={require('@/assets/images/icon-signup-email.svg')}
+              imageWidth={IMAGE_DIMENSIONS.SIGNUP_EMAIL.width}
+              imageHeight={IMAGE_DIMENSIONS.SIGNUP_EMAIL.height}
+            />
 
-      <Input
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        placeholder=""
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        placeholderTextColor={theme.placeholder}
-      />
+            <Input
+              label="Email"
+              value={values.email}
+              onChangeText={handleChange('email')}
+              onBlur={handleBlur('email')}
+              error={touched.email && errors.email ? errors.email : undefined}
+              placeholder=""
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              placeholderTextColor={theme.placeholder}
+            />
 
-      <Button disabled={!canContinue} onPress={handleContinue} accessibilityLabel="Continue">
-        Continue
-      </Button>
+            <Button
+              disabled={!values.email || !!errors.email}
+              onPress={() => handleSubmit()}
+              accessibilityLabel="Continue">
+              Continue
+            </Button>
 
-      <FormDivider />
+            <FormDivider />
 
-      <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
+            <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
 
-      <Button
-        variant="ghost"
-        onPress={handleGoToLogin}
-        accessibilityLabel="Already have an account? Log in">
-        <ThemedText className="text-[16px] text-primary">Already have an account?</ThemedText>
-      </Button>
+            <Button
+              variant="ghost"
+              onPress={handleGoToLogin}
+              accessibilityLabel="Already have an account? Log in">
+              <ThemedText className="text-[16px] text-primary">Already have an account?</ThemedText>
+            </Button>
+          </>
+        )}
+      </Formik>
     </AuthLayout>
   );
 }

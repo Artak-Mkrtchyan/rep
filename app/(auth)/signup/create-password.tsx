@@ -1,5 +1,7 @@
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
@@ -11,21 +13,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES } from '@/constants/auth';
 import { useTheme } from '@/hooks/use-theme';
-import { doPasswordsMatch, isPasswordValid, validatePassword } from '@/lib/auth-validation';
+import { validatePassword, PASSWORD_MIN_LENGTH } from '@/lib/auth-validation';
+
+import type { PasswordForm } from '@/types/auth';
+
+const PasswordSchema = Yup.object().shape({
+  email: Yup.string().email('Invalid email').required('Required'),
+  password: Yup.string()
+    .min(PASSWORD_MIN_LENGTH, 'Password too short')
+    .matches(/[A-Z]/, 'Must contain uppercase')
+    .matches(/\d/, 'Must contain number')
+    .required('Required'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password')], 'Passwords do not match')
+    .required('Required'),
+});
 
 export default function CreatePasswordScreen() {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [confirmPassword, setConfirmPassword] = React.useState('');
   const { tokens: theme } = useTheme();
+  const params = useLocalSearchParams();
 
-  const passwordRequirements = validatePassword(password);
-  const isPasswordCorrect = isPasswordValid(passwordRequirements);
-  const passwordsMatch = doPasswordsMatch(password, confirmPassword);
-  const canContinue = email.length > 0 && isPasswordCorrect && passwordsMatch;
+  const handleContinue = (values: PasswordForm) => {
+    // Here we would typically make the API call to register the user
+    // using all collected data from params + current values
+    console.log('Final Registration Data:', { ...params, ...values });
 
-  const handleContinue = () => {
-    if (!canContinue) return;
     router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
   };
 
@@ -43,64 +55,100 @@ export default function CreatePasswordScreen() {
 
   return (
     <AuthLayout>
-      <AuthHeader
-        title="Sign up"
-        imageSource={require('@/assets/images/signup-illustration.svg')}
-        imageWidth={170}
-        imageHeight={113}
-      />
+      <Formik
+        initialValues={{
+          email: '',
+          password: '',
+          confirmPassword: '',
+        }}
+        validationSchema={PasswordSchema}
+        onSubmit={handleContinue}>
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => {
+          const passwordRequirements = validatePassword(values.password);
 
-      <Input
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
-        placeholder=""
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoCorrect={false}
-        placeholderTextColor={theme.placeholder}
-      />
+          return (
+            <>
+              <AuthHeader
+                title="Sign up"
+                imageSource={require('@/assets/images/signup-illustration.svg')}
+                imageWidth={170}
+                imageHeight={113}
+              />
 
-      <Input
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholder=""
-        placeholderTextColor={theme.placeholder}
-      />
+              <Input
+                label="Email"
+                value={values.email}
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                error={touched.email && errors.email ? errors.email : undefined}
+                placeholder=""
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                placeholderTextColor={theme.placeholder}
+              />
 
-      <PasswordRequirementsList
-        hasMinLength={passwordRequirements.hasMinLength}
-        hasUpperCase={passwordRequirements.hasUpperCase}
-        hasNumber={passwordRequirements.hasNumber}
-      />
+              <Input
+                label="Password"
+                value={values.password}
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                error={touched.password && errors.password ? errors.password : undefined}
+                secureTextEntry
+                placeholder=""
+                placeholderTextColor={theme.placeholder}
+              />
 
-      <Input
-        label="Confirm password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-        placeholder=""
-        isInvalid={confirmPassword.length > 0 && !passwordsMatch}
-        error={confirmPassword.length > 0 && !passwordsMatch ? 'Passwords do not match' : undefined}
-        placeholderTextColor={theme.placeholder}
-      />
+              <PasswordRequirementsList
+                hasMinLength={passwordRequirements.hasMinLength}
+                hasUpperCase={passwordRequirements.hasUpperCase}
+                hasNumber={passwordRequirements.hasNumber}
+              />
 
-      <Button disabled={!canContinue} onPress={handleContinue} accessibilityLabel="Continue">
-        Continue
-      </Button>
+              <Input
+                label="Confirm password"
+                value={values.confirmPassword}
+                onChangeText={handleChange('confirmPassword')}
+                onBlur={handleBlur('confirmPassword')}
+                isInvalid={!!(touched.confirmPassword && errors.confirmPassword)}
+                error={
+                  touched.confirmPassword && errors.confirmPassword
+                    ? errors.confirmPassword
+                    : undefined
+                }
+                secureTextEntry
+                placeholder=""
+                placeholderTextColor={theme.placeholder}
+              />
 
-      <FormDivider />
+              <Button
+                disabled={
+                  !values.email ||
+                  !values.password ||
+                  !values.confirmPassword ||
+                  Object.keys(errors).length > 0
+                }
+                onPress={() => handleSubmit()}
+                accessibilityLabel="Continue">
+                Continue
+              </Button>
 
-      <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
+              <FormDivider />
 
-      <Button
-        variant="ghost"
-        onPress={handleGoToLogin}
-        accessibilityLabel="Already have an account? Log in">
-        <ThemedText className="text-[16px] text-primary">Already have an account?</ThemedText>
-      </Button>
+              <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
+
+              <Button
+                variant="ghost"
+                onPress={handleGoToLogin}
+                accessibilityLabel="Already have an account? Log in">
+                <ThemedText className="text-[16px] text-primary">
+                  Already have an account?
+                </ThemedText>
+              </Button>
+            </>
+          );
+        }}
+      </Formik>
     </AuthLayout>
   );
 }

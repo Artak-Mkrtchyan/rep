@@ -1,0 +1,276 @@
+import { ApiError } from '../auth.types';
+import {
+  clearAllTokens,
+  getRefreshToken,
+  getToken,
+  isRefreshTokenValid,
+  setRefreshToken,
+  setToken,
+} from './token-storage';
+
+export interface RequestConfig extends RequestInit {
+  requiresAuth?: boolean;
+  skipAuth?: boolean;
+  _isRetry?: boolean;
+}
+
+// Refresh token state management
+let isRefreshing = false;
+let refreshSubscribers: ((token: string) => void)[] = [];
+
+export const getLocale = () => {
+  return location.pathname.split('/')[1] ?? 'en';
+};
+
+const subscribeToTokenRefresh = (callback: (token: string) => void): void => {
+  refreshSubscribers.push(callback);
+};
+
+const onTokenRefreshed = (newToken: string): void => {
+  refreshSubscribers.forEach((callback) => callback(newToken));
+  refreshSubscribers = [];
+};
+
+const onRefreshFailed = (): void => {
+  refreshSubscribers = [];
+};
+
+class HttpClient {
+  private readonly baseURL: string;
+
+  constructor(baseURL: string = '/api') {
+    this.baseURL = baseURL;
+  }
+
+  private async refreshAccessToken(): Promise<string | null> {
+    const refreshToken = getRefreshToken();
+
+    if (!refreshToken || !isRefreshTokenValid()) {
+      return null;
+    }
+
+    try {
+      const response = await fetch(`${this.baseURL}/auth/users/access-and-refresh-tokens/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const data = await response.json();
+      const tokenData = data.data || data;
+
+      // Update stored tokens
+      setToken(tokenData.accessToken);
+      setRefreshToken(tokenData.refreshToken, tokenData.refreshTokenExpiresAt);
+
+      return tokenData.accessToken;
+    } catch {
+      return null;
+    }
+  }
+
+  private async handleUnauthorized<T>(endpoint: string, config: RequestConfig): Promise<T | null> {
+    // Skip refresh for auth-related endpoints or retry requests
+    if (config.skipAuth || config._isRetry) {
+      return null;
+    }
+
+    // Check if refresh token is valid
+    if (!isRefreshTokenValid()) {
+      clearAllTokens();
+      return null;
+    }
+
+    // If already refreshing, wait for the refresh to complete
+    if (isRefreshing) {
+      return new Promise<T>((resolve, reject) => {
+        subscribeToTokenRefresh(async (newToken: string) => {
+          try {
+            const retryConfig: RequestConfig = {
+              ...config,
+              _isRetry: true,
+              headers: {
+                ...config.headers,
+                Authorization: `Bearer ${newToken}`,
+              },
+            };
+            const result = await this.request<T>(endpoint, retryConfig);
+            resolve(result);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      });
+    }
+
+    // Start refreshing
+    isRefreshing = true;
+
+    try {
+      const newToken = await this.refreshAccessToken();
+
+      if (newToken) {
+        onTokenRefreshed(newToken);
+
+        // Retry the original request with new token
+        const retryConfig: RequestConfig = {
+          ...config,
+          _isRetry: true,
+          headers: {
+            ...config.headers,
+            Authorization: `Bearer ${newToken}`,
+          },
+        };
+        return await this.request<T>(endpoint, retryConfig);
+      }
+
+      // Refresh failed, clear tokens
+      clearAllTokens();
+      onRefreshFailed();
+      return null;
+    } finally {
+      isRefreshing = false;
+    }
+  }
+
+  private async handleResponse<T>(
+    response: Response,
+    endpoint: string,
+    config: RequestConfig
+  ): Promise<T> {
+    const contentType = response.headers.get('content-type');
+    const isJson = contentType?.includes('application/json');
+
+    if (!response.ok) {
+      // Handle 401 Unauthorized - attempt token refresh
+      if (response.status === 401 && !config._isRetry) {
+        const retryResult = await this.handleUnauthorized<T>(endpoint, config);
+        if (retryResult !== null) {
+          return retryResult;
+        }
+        // If refresh failed, continue to throw the error
+      }
+
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      let errors: Record<string, string[]> | undefined;
+
+      if (isJson) {
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+          errors = errorData.errors;
+        } catch {
+          // If JSON parsing fails, use default error message
+        }
+      } else {
+        try {
+          errorMessage = (await response.text()) || errorMessage;
+        } catch {
+          // If text parsing fails, use default error message
+        }
+      }
+
+      const apiError: ApiError = {
+        message: errorMessage,
+        statusCode: response.status,
+        errors,
+      };
+
+      throw apiError;
+    }
+
+    // Handle void/empty responses
+    if (response.status === 204 || (response.status === 201 && !isJson)) {
+      return undefined as T;
+    }
+
+    if (isJson) {
+      return await response.json();
+    }
+
+    return (await response.text()) as T;
+  }
+
+  private getHeaders(config: RequestConfig): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      Locale: getLocale(),
+      ...config.headers,
+    };
+
+    // Add authorization header if auth is required and not explicitly skipped
+    if (config.requiresAuth !== false && !config.skipAuth) {
+      const token = getToken();
+      if (token) {
+        (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
+    return headers;
+  }
+
+  async request<T>(endpoint: string, config: RequestConfig = {}): Promise<T> {
+    const url = `${this.baseURL}${endpoint}`;
+    const headers = this.getHeaders(config);
+
+    try {
+      const response = await fetch(url, {
+        ...config,
+        headers,
+      });
+
+      return await this.handleResponse<T>(response, endpoint, config);
+    } catch (error) {
+      if (error instanceof Error && 'statusCode' in error) {
+        throw error;
+      }
+
+      // Network or other errors
+      const apiError: ApiError = {
+        message: error instanceof Error ? error.message : 'An unknown error occurred',
+        statusCode: 0,
+      };
+      throw apiError;
+    }
+  }
+
+  async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
+    return this.request<T>(endpoint, { ...config, method: 'GET' });
+  }
+
+  async post<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'POST',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async put<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'PUT',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async patch<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'PATCH',
+      body: data ? JSON.stringify(data) : undefined,
+    });
+  }
+
+  async delete<T>(endpoint: string, config?: RequestConfig): Promise<T> {
+    return this.request<T>(endpoint, { ...config, method: 'DELETE' });
+  }
+}
+
+export const httpClient = new HttpClient();

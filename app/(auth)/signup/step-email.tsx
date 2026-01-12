@@ -1,4 +1,3 @@
-import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -11,9 +10,10 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
+import { useSignUpContext } from '@/context/SignUpContext';
+import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { useTheme } from '@/hooks/use-theme';
-
-import type { AccountRole } from '@/types/auth';
+import { useRouter } from 'expo-router';
 
 const EmailSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email address').required('Required'),
@@ -21,16 +21,13 @@ const EmailSchema = Yup.object().shape({
 
 export default function SignUpEmailStepScreen() {
   const { tokens: theme } = useTheme();
-  const params = useLocalSearchParams<{ role: AccountRole }>();
+  const { data, updateData } = useSignUpContext();
+  const { goToNext } = useSignUpFlow();
+  const router = useRouter();
 
   const handleContinue = (values: { email: string }) => {
-    router.push({
-      pathname: AUTH_ROUTES.SIGNUP_VERIFY,
-      params: {
-        role: params.role,
-        email: values.email,
-      },
-    });
+    updateData({ email: values.email });
+    goToNext();
   };
 
   const handleGoToLogin = () => {
@@ -48,7 +45,8 @@ export default function SignUpEmailStepScreen() {
   return (
     <AuthLayout centered>
       <Formik
-        initialValues={{ email: '' }}
+        initialValues={{ email: data.email || '' }}
+        enableReinitialize
         validationSchema={EmailSchema}
         onSubmit={handleContinue}>
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (

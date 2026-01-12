@@ -1,4 +1,3 @@
-import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
 import { Formik } from 'formik';
@@ -9,9 +8,10 @@ import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
-import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
+import { IMAGE_DIMENSIONS } from '@/constants/auth';
 import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
-import { AccountRole } from '@/types/auth';
+import { useSignUpContext } from '@/context/SignUpContext';
+import { useSignUpFlow } from '@/hooks/use-signup-flow';
 
 const VerifySchema = Yup.object().shape({
   otp: Yup.array()
@@ -21,7 +21,8 @@ const VerifySchema = Yup.object().shape({
 });
 
 export default function VerifyEmailScreen() {
-  const params = useLocalSearchParams<{ role: AccountRole; email: string }>();
+  const { data, updateData } = useSignUpContext();
+  const { goToNext, goToPrevious } = useSignUpFlow();
   const inputsRef = React.useRef<(TextInput | null)[]>([]);
   const [secondsLeft, setSecondsLeft] = React.useState(RESEND_CODE_TIMEOUT);
 
@@ -39,18 +40,8 @@ export default function VerifyEmailScreen() {
     const code = values.otp.join('');
     if (code.length !== OTP_LENGTH) return;
 
-    router.push({
-      pathname: AUTH_ROUTES.SIGNUP_BROKER,
-      params: {
-        role: params.role,
-        email: params.email,
-        otp: code,
-      },
-    });
-  };
-
-  const handleBack = () => {
-    router.back();
+    updateData({ otp: code });
+    goToNext();
   };
 
   const handleResend = () => {
@@ -73,7 +64,8 @@ export default function VerifyEmailScreen() {
   return (
     <AuthLayout>
       <Formik
-        initialValues={{ otp: Array(OTP_LENGTH).fill('') }}
+        initialValues={{ otp: data.otp ? data.otp.split('') : Array(OTP_LENGTH).fill('') }}
+        enableReinitialize
         validationSchema={VerifySchema}
         onSubmit={handleContinue}>
         {({ values, setFieldValue, handleSubmit, isValid }) => {
@@ -102,7 +94,7 @@ export default function VerifyEmailScreen() {
             <>
               <View className="mt-6">
                 <Pressable
-                  onPress={handleBack}
+                  onPress={goToPrevious}
                   accessibilityRole="button"
                   accessibilityLabel="Go back"
                   className="h-10 w-10 items-center justify-center rounded-full">

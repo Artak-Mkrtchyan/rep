@@ -1,4 +1,3 @@
-import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Formik } from 'formik';
@@ -12,7 +11,9 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { AUTH_ROUTES, IMAGE_DIMENSIONS, YEARS_OF_ACTIVITY_OPTIONS } from '@/constants/auth';
+import { IMAGE_DIMENSIONS, YEARS_OF_ACTIVITY_OPTIONS } from '@/constants/auth';
+import { useSignUpContext } from '@/context/SignUpContext';
+import { useSignUpFlow } from '@/hooks/use-signup-flow';
 
 import type { BrokerSignUpForm, YearsOfActivity } from '@/types/auth';
 
@@ -28,16 +29,12 @@ const BrokerSchema = Yup.object().shape({
 });
 
 export default function BrokerSignUpScreen() {
-  const params = useLocalSearchParams();
+  const { data, updateData } = useSignUpContext();
+  const { goToNext } = useSignUpFlow();
 
   const handleContinue = (values: BrokerSignUpForm) => {
-    router.push({
-      pathname: AUTH_ROUTES.SIGNUP_PASSWORD,
-      params: {
-        ...params,
-        ...values,
-      },
-    });
+    updateData({ brokerDetails: values });
+    goToNext();
   };
 
   const handleGoogleAuth = () => {
@@ -52,13 +49,14 @@ export default function BrokerSignUpScreen() {
     <AuthLayout scrollable>
       <Formik
         initialValues={{
-          fullName: '',
-          companyName: '',
-          email: '',
-          phone: '',
-          yearsOfActivity: '' as YearsOfActivity,
-          filesCount: 0,
+          fullName: data.brokerDetails?.fullName || '',
+          companyName: data.brokerDetails?.companyName || '',
+          email: data.brokerDetails?.email || '',
+          phone: data.brokerDetails?.phone || '',
+          yearsOfActivity: (data.brokerDetails?.yearsOfActivity || '') as YearsOfActivity,
+          filesCount: data.brokerDetails?.filesCount || 0,
         }}
+        enableReinitialize
         validationSchema={BrokerSchema}
         onSubmit={handleContinue}>
         {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (

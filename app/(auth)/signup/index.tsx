@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import React from 'react';
 import { View } from 'react-native';
 import { Formik } from 'formik';
@@ -10,7 +9,9 @@ import { RadioButton } from '@/components/auth/radio-button';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { ACCOUNT_TYPE_OPTIONS, AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
+import { ACCOUNT_TYPE_OPTIONS, IMAGE_DIMENSIONS } from '@/constants/auth';
+import { useSignUpContext } from '@/context/SignUpContext';
+import { useSignUpFlow } from '@/hooks/use-signup-flow';
 
 import type { AccountRole } from '@/types/auth';
 
@@ -19,17 +20,19 @@ const SignUpSchema = Yup.object().shape({
 });
 
 export default function SignUpFirstScreen() {
+  const { data, updateData } = useSignUpContext();
+  const { goToNext } = useSignUpFlow();
+
   const handleContinue = (values: { role: AccountRole }) => {
-    router.push({
-      pathname: AUTH_ROUTES.SIGNUP_EMAIL,
-      params: { role: values.role },
-    });
+    updateData({ role: values.role });
+    goToNext();
   };
 
   return (
     <AuthLayout centered>
       <Formik
-        initialValues={{ role: '' as AccountRole }}
+        initialValues={{ role: (data.role || '') as AccountRole }}
+        enableReinitialize
         validationSchema={SignUpSchema}
         onSubmit={handleContinue}>
         {({ handleSubmit, values, setFieldValue }) => (

@@ -30,4 +30,5 @@ export const IMAGE_DIMENSIONS = {
   SIGNUP_SUCCESS: { width: 212, height: 135 },
   SIGNUP_ILLUSTRATION: { width: 170, height: 113 },
   SOCIAL_ICON: { width: 24, height: 24 },
+  LOGIN_ILLUSTRATION: { width: 208, height: 141 },
 } as const;

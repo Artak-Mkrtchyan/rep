@@ -6,6 +6,7 @@ import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
+import { IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useTheme } from '@/hooks/use-theme';
 
 export default function LoginScreen() {
@@ -22,7 +23,7 @@ export default function LoginScreen() {
       <ThemedView className="flex-1 items-center justify-center px-4">
         <View className="w-[358px] max-w-full items-center gap-6">
           <Image
-            style={{ width: 208, height: 141 }}
+            style={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION}
             source={require('@/assets/images/login-illustration.svg')}
             contentFit="contain"
           />

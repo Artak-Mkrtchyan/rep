@@ -1,40 +1,59 @@
-import React from 'react';
-import { Pressable, Text, View } from 'react-native';
 import { Formik } from 'formik';
+import React from 'react';
+import { Alert, View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { FormDivider } from '@/components/auth/form-divider';
 import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
-import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
-import { IMAGE_DIMENSIONS, YEARS_OF_ACTIVITY_OPTIONS } from '@/constants/auth';
+import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
-import { useSignUpFlow } from '@/hooks/use-signup-flow';
 
-import type { BrokerSignUpForm, YearsOfActivity } from '@/types/auth';
-
-const FILE_UPLOAD_HEIGHT = 142;
+import { DatePicker } from '@/components/ui/date-picker';
+import { FileUpload } from '@/components/ui/file-upload';
+import { NumberPicker } from '@/components/ui/number-picker';
+import { applicationsService } from '@/lib/api/applications';
+import type { BrokerSignUpForm } from '@/types/auth';
+import { router } from 'expo-router';
 
 const BrokerSchema = Yup.object().shape({
-  fullName: Yup.string().required('Required'),
-  companyName: Yup.string().required('Required'),
   email: Yup.string().email('Invalid email').required('Required'),
-  phone: Yup.string().required('Required'),
-  yearsOfActivity: Yup.string().required('Required'),
-  filesCount: Yup.number().min(1, 'At least one file is required').required(),
+  fullName: Yup.string().required('Required'),
+  attachmentIds: Yup.array().min(1).required('Required'),
+  certifiedBy: Yup.string().required('Required'),
+  certifiedOn: Yup.string()
+    .required('Required')
+    .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
+  phoneNumber: Yup.string().required('Required'),
+  yearsOfActivity: Yup.number().required(),
 });
 
 export default function BrokerSignUpScreen() {
-  const { data, updateData } = useSignUpContext();
-  const { goToNext } = useSignUpFlow();
+  const { data, resetData } = useSignUpContext();
 
-  const handleContinue = (values: BrokerSignUpForm) => {
-    updateData({ brokerDetails: values });
-    goToNext();
+  const handleContinue = async (values: BrokerSignUpForm, { setSubmitting }: any) => {
+    try {
+      await applicationsService.brokerRegistration({
+        fullName: values.fullName,
+        email: values.email,
+        attachmentIds: values.attachmentIds,
+        certifiedBy: values.certifiedBy,
+        certifiedOn: values.certifiedOn,
+        phoneNumber: values.phoneNumber,
+        yearsOfActivity: values.yearsOfActivity,
+      });
+
+      resetData();
+
+      router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
+    } catch {
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleGoogleAuth = () => {
@@ -49,17 +68,27 @@ export default function BrokerSignUpScreen() {
     <AuthLayout scrollable>
       <Formik
         initialValues={{
-          fullName: data.brokerDetails?.fullName || '',
-          companyName: data.brokerDetails?.companyName || '',
-          email: data.brokerDetails?.email || '',
-          phone: data.brokerDetails?.phone || '',
-          yearsOfActivity: (data.brokerDetails?.yearsOfActivity || '') as YearsOfActivity,
-          filesCount: data.brokerDetails?.filesCount || 0,
+          fullName: '',
+          email: data.email || '',
+          attachmentIds: [],
+          certifiedBy: '',
+          certifiedOn: '',
+          phoneNumber: '',
+          yearsOfActivity: 0,
         }}
         enableReinitialize
         validationSchema={BrokerSchema}
         onSubmit={handleContinue}>
-        {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          setFieldValue,
+          values,
+          errors,
+          touched,
+          isSubmitting,
+        }) => (
           <>
             <AuthHeader
               title="Sign up"
@@ -70,6 +99,18 @@ export default function BrokerSignUpScreen() {
 
             <View className="w-full gap-4">
               <Input
+                label="Email"
+                value={values.email}
+                disabled
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                error={touched.email && errors.email ? errors.email : undefined}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+              />
+
+              <Input
                 label="Full name"
                 value={values.fullName}
                 onChangeText={handleChange('fullName')}
@@ -78,115 +119,66 @@ export default function BrokerSignUpScreen() {
                 placeholder=""
               />
 
-              <Input
-                label="Company name"
-                value={values.companyName}
-                onChangeText={handleChange('companyName')}
-                onBlur={handleBlur('companyName')}
-                error={touched.companyName && errors.companyName ? errors.companyName : undefined}
-                placeholder=""
+              <DatePicker
+                label="Certified on"
+                value={values.certifiedOn}
+                onChange={(date) => setFieldValue('certifiedOn', date)}
+                error={touched.certifiedOn && errors.certifiedOn ? errors.certifiedOn : undefined}
               />
 
               <Input
-                label="Company email"
-                value={values.email}
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
-                error={touched.email && errors.email ? errors.email : undefined}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
+                label="Certified by"
+                value={values.certifiedBy}
+                onChangeText={handleChange('certifiedBy')}
+                onBlur={handleBlur('certifiedBy')}
+                error={touched.certifiedBy && errors.certifiedBy ? errors.certifiedBy : undefined}
                 placeholder=""
               />
 
               <Input
                 label="Phone number"
-                value={values.phone}
-                onChangeText={handleChange('phone')}
-                onBlur={handleBlur('phone')}
-                error={touched.phone && errors.phone ? errors.phone : undefined}
+                value={values.phoneNumber}
+                onChangeText={handleChange('phoneNumber')}
+                onBlur={handleBlur('phoneNumber')}
+                error={touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : undefined}
                 keyboardType="phone-pad"
                 placeholder=""
               />
 
-              <View className="gap-2">
-                <View className="flex-row items-center">
-                  <ThemedText className="text-[12px] font-bold leading-[11px] text-foreground">
-                    Years of activity
-                  </ThemedText>
-                  <Text className="ml-1 text-[12px] leading-[11px] text-primary">*</Text>
-                </View>
-                <Select
-                  placeholder="Select a range"
-                  value={values.yearsOfActivity}
-                  onChange={(value) => setFieldValue('yearsOfActivity', value)}
-                  options={YEARS_OF_ACTIVITY_OPTIONS}
-                />
-                {touched.yearsOfActivity && errors.yearsOfActivity && (
-                  <ThemedText className="text-[12px] text-destructive">
-                    {errors.yearsOfActivity}
-                  </ThemedText>
-                )}
-              </View>
+              <NumberPicker
+                label="Years of activity"
+                value={values.yearsOfActivity}
+                onChange={(value) => setFieldValue('yearsOfActivity', value)}
+                min={0}
+                max={50}
+                step={1}
+                required
+                error={
+                  touched.yearsOfActivity && errors.yearsOfActivity
+                    ? String(errors.yearsOfActivity)
+                    : undefined
+                }
+              />
 
-              <View className="mt-2 gap-2">
-                <View className="flex-row items-center">
-                  <ThemedText className="text-[12px] font-bold leading-[11px] text-foreground">
-                    Files upload
-                  </ThemedText>
-                  <Text className="ml-1 text-[12px] leading-[11px] text-primary">*</Text>
-                </View>
-                <ThemedText className="text-[12px] text-muted-foreground">
-                  Please attach your brokerage license or proof of authorization
-                </ThemedText>
-
-                <View
-                  className="w-full items-center justify-center rounded-[12px] border border-default bg-card"
-                  style={{ height: FILE_UPLOAD_HEIGHT }}>
-                  <View className="items-center">
-                    <View className="mb-3 h-11 w-11 items-center justify-center rounded-full border border-default">
-                      <Text className="text-[18px] text-muted-foreground">+</Text>
-                    </View>
-                    <ThemedText className="text-[12px] text-muted-foreground">
-                      Upload your photo
-                    </ThemedText>
-                    {values.filesCount > 0 && (
-                      <ThemedText className="mt-2 text-[12px] text-primary">
-                        {values.filesCount} file(s) selected
-                      </ThemedText>
-                    )}
-                  </View>
-                </View>
-
-                <View className="items-center">
-                  <Pressable
-                    onPress={() => setFieldValue('filesCount', values.filesCount + 1)}
-                    className="mt-3 h-9 items-center justify-center rounded-[10px] border border-default bg-card px-5"
-                    accessibilityRole="button"
-                    accessibilityLabel="Upload file">
-                    <ThemedText className="text-[14px]">Choose file</ThemedText>
-                  </Pressable>
-                  {touched.filesCount && errors.filesCount && (
-                    <ThemedText className="mt-1 text-[12px] text-destructive">
-                      {errors.filesCount}
-                    </ThemedText>
-                  )}
-                </View>
-              </View>
+              <FileUpload
+                label="Files upload"
+                description="Please attach your brokerage license or proof of authorization"
+                value={values.attachmentIds}
+                onChange={(attachmentIds) => setFieldValue('attachmentIds', attachmentIds)}
+                required
+                error={
+                  touched.attachmentIds && errors.attachmentIds
+                    ? String(errors.attachmentIds)
+                    : undefined
+                }
+              />
             </View>
 
             <Button
-              disabled={
-                !values.fullName ||
-                !values.companyName ||
-                !values.email ||
-                !values.phone ||
-                !values.yearsOfActivity ||
-                values.filesCount === 0
-              }
+              disabled={Object.keys(errors).length !== 0 || isSubmitting}
               onPress={() => handleSubmit()}
               accessibilityLabel="Continue">
-              Continue
+              {isSubmitting ? 'Submitting...' : 'Continue'}
             </Button>
 
             <FormDivider />

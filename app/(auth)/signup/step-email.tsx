@@ -1,5 +1,5 @@
-import React from 'react';
 import { Formik } from 'formik';
+import React from 'react';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -13,6 +13,8 @@ import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { useTheme } from '@/hooks/use-theme';
+import { authService } from '@/lib/api/auth';
+import { ApiError } from '@/lib/api/auth.types';
 import { useRouter } from 'expo-router';
 
 const EmailSchema = Yup.object().shape({
@@ -25,9 +27,31 @@ export default function SignUpEmailStepScreen() {
   const { goToNext } = useSignUpFlow();
   const router = useRouter();
 
-  const handleContinue = (values: { email: string }) => {
-    updateData({ email: values.email });
-    goToNext();
+  const handleContinue = async (
+    values: { email: string },
+    { setFieldError, setSubmitting }: any
+  ) => {
+    try {
+      await authService.requestEmailConfirmation(values.email);
+
+      updateData({ email: values.email });
+
+      goToNext();
+    } catch (error) {
+      if (error instanceof Error && 'statusCode' in error) {
+        const apiError = error as ApiError;
+
+        if (apiError.errors?.email) {
+          setFieldError('email', apiError.errors.email[0]);
+        } else {
+          setFieldError('email', apiError.message || 'Failed to send verification code');
+        }
+      } else {
+        setFieldError('email', 'An unexpected error occurred');
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleGoToLogin = () => {
@@ -49,7 +73,7 @@ export default function SignUpEmailStepScreen() {
         enableReinitialize
         validationSchema={EmailSchema}
         onSubmit={handleContinue}>
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
           <>
             <AuthHeader
               title="Sign up"
@@ -72,10 +96,10 @@ export default function SignUpEmailStepScreen() {
             />
 
             <Button
-              disabled={!values.email || !!errors.email}
+              disabled={!values.email || !!errors.email || isSubmitting}
               onPress={() => handleSubmit()}
               accessibilityLabel="Continue">
-              Continue
+              {isSubmitting ? 'Sending...' : 'Continue'}
             </Button>
 
             <FormDivider />

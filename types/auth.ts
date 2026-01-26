@@ -1,6 +1,4 @@
 export type AccountRole = '' | 'individual' | 'company' | 'broker';
-export type YearsOfActivity = '' | '0-1' | '2-5' | '6-10' | '10+';
-
 export interface PasswordRequirements {
   hasMinLength: boolean;
   hasUpperCase: boolean;
@@ -9,11 +7,12 @@ export interface PasswordRequirements {
 
 export interface BrokerSignUpForm {
   fullName: string;
-  companyName: string;
   email: string;
-  phone: string;
-  yearsOfActivity: YearsOfActivity;
-  filesCount: number;
+  attachmentIds: string[];
+  certifiedBy: string;
+  certifiedOn: string;
+  phoneNumber: string;
+  yearsOfActivity: number;
 }
 
 export interface PasswordForm {

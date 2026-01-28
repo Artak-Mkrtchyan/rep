@@ -1,6 +1,6 @@
+import { Formik } from 'formik';
 import React from 'react';
 import { View } from 'react-native';
-import { Formik } from 'formik';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -24,8 +24,14 @@ export default function SignUpFirstScreen() {
   const { goToNext } = useSignUpFlow();
 
   const handleContinue = (values: { role: AccountRole }) => {
-    updateData({ role: values.role });
-    goToNext();
+    switch (values.role) {
+      case 'broker':
+        updateData({ role: values.role });
+        goToNext();
+        break;
+      case 'individual':
+      case 'company':
+    }
   };
 
   return (
@@ -63,13 +69,13 @@ export default function SignUpFirstScreen() {
                 {values.role === 'broker' && (
                   <View className="flex-row items-center justify-between">
                     <RadioButton
-                      value="individual"
+                      value="broker"
                       label="Individual broker"
                       selectedValue={values.role}
                       onSelect={(value) => setFieldValue('role', value)}
                     />
                     <RadioButton
-                      value="broker"
+                      value="company"
                       label="Broker company"
                       selectedValue={values.role}
                       onSelect={(value) => setFieldValue('role', value)}

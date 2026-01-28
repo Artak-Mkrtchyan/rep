@@ -1,17 +1,19 @@
-import React from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
 import { Ionicons } from '@expo/vector-icons';
+import { Formik } from 'formik';
+import React from 'react';
+import { Alert, Pressable, Text, TextInput, View } from 'react-native';
+import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { IMAGE_DIMENSIONS } from '@/constants/auth';
-import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
+import { authService } from '@/lib/api/auth';
+import { ApiError } from '@/lib/api/auth.types';
+import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
 
 const VerifySchema = Yup.object().shape({
   otp: Yup.array()
@@ -36,18 +38,47 @@ export default function VerifyEmailScreen() {
     return () => clearInterval(intervalId);
   }, [secondsLeft]);
 
-  const handleContinue = (values: { otp: string[] }) => {
+  const handleContinue = async (values: { otp: string[] }, { setSubmitting }: any) => {
     const code = values.otp.join('');
     if (code.length !== OTP_LENGTH) return;
 
-    updateData({ otp: code });
-    goToNext();
+    try {
+      await authService.confirmEmail(code);
+
+      updateData({ otp: code });
+
+      goToNext();
+    } catch (error) {
+      if (error instanceof Error && 'statusCode' in error) {
+        const apiError = error as ApiError;
+        Alert.alert(
+          'Verification Failed',
+          apiError.message || 'Invalid verification code. Please try again.'
+        );
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleResend = () => {
-    if (secondsLeft > 0) return;
-    setSecondsLeft(RESEND_CODE_TIMEOUT);
-    // TODO: Trigger resend API call
+  const handleResend = async () => {
+    if (secondsLeft > 0 || !data.email) return;
+
+    try {
+      // Повторная отправка кода подтверждения
+      await authService.requestEmailConfirmation(data.email);
+      setSecondsLeft(RESEND_CODE_TIMEOUT);
+      Alert.alert('Code Sent', 'A new verification code has been sent to your email.');
+    } catch (error) {
+      if (error instanceof Error && 'statusCode' in error) {
+        const apiError = error as ApiError;
+        Alert.alert('Error', apiError.message || 'Failed to resend code. Please try again.');
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      }
+    }
   };
 
   const formatTime = (seconds: number): string => {
@@ -68,7 +99,7 @@ export default function VerifyEmailScreen() {
         enableReinitialize
         validationSchema={VerifySchema}
         onSubmit={handleContinue}>
-        {({ values, setFieldValue, handleSubmit, isValid }) => {
+        {({ values, setFieldValue, handleSubmit, isSubmitting }) => {
           const isComplete = values.otp.every((val) => val.length === 1);
 
           const handleTextChange = (text: string, index: number) => {
@@ -150,10 +181,10 @@ export default function VerifyEmailScreen() {
               </View>
 
               <Button
-                disabled={!isComplete}
+                disabled={!isComplete || isSubmitting}
                 onPress={() => handleSubmit()}
                 accessibilityLabel="Continue">
-                Continue
+                {isSubmitting ? 'Verifying...' : 'Continue'}
               </Button>
             </>
           );

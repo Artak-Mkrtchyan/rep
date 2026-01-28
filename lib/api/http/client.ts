@@ -1,3 +1,4 @@
+import { getApiUrl } from '@/constants/env';
 import { ApiError } from '../auth.types';
 import {
   clearAllTokens,
@@ -12,6 +13,7 @@ export interface RequestConfig extends RequestInit {
   requiresAuth?: boolean;
   skipAuth?: boolean;
   _isRetry?: boolean;
+  body?: string | FormData | undefined;
 }
 
 // Refresh token state management
@@ -38,8 +40,8 @@ const onRefreshFailed = (): void => {
 class HttpClient {
   private readonly baseURL: string;
 
-  constructor(baseURL: string = '/api') {
-    this.baseURL = baseURL;
+  constructor() {
+    this.baseURL = getApiUrl();
   }
 
   private async refreshAccessToken(): Promise<string | null> {
@@ -198,11 +200,27 @@ class HttpClient {
   }
 
   private getHeaders(config: RequestConfig): HeadersInit {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      Locale: getLocale(),
-      ...config.headers,
-    };
+    const headers: HeadersInit = {};
+
+    const isFormData = config.body instanceof FormData;
+
+    if (!isFormData) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    if (config.headers) {
+      Object.entries(config.headers).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (isFormData && key.toLowerCase() === 'content-type') {
+            return;
+          }
+          (headers as Record<string, string>)[key] = String(value);
+        }
+      });
+    }
+
+    // Add locale header
+    // headers['Locale'] = getLocale();
 
     // Add authorization header if auth is required and not explicitly skipped
     if (config.requiresAuth !== false && !config.skipAuth) {
@@ -245,10 +263,13 @@ class HttpClient {
   }
 
   async post<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+    const isFormData = data instanceof FormData;
+    const body = data ? (isFormData ? data : JSON.stringify(data)) : undefined;
+
     return this.request<T>(endpoint, {
       ...config,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body,
     });
   }
 

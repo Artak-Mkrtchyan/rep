@@ -80,8 +80,7 @@ export default function LoginScreen() {
   };
 
   const handleForgotPassword = () => {
-    // TODO: Implement forgot password navigation
-    Alert.alert('Forgot Password', 'Password reset functionality coming soon.');
+    router.push('/(auth)/forgot-password');
   };
 
   const handleGoogleSignIn = () => {

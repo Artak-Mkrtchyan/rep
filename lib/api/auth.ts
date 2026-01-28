@@ -1,5 +1,5 @@
-import { httpClient } from './http/client';
 import { ApiResponse } from './auth.types';
+import { httpClient } from './http/client';
 
 export interface ConfirmEmailRequest {
   code: string;
@@ -76,6 +76,18 @@ export interface CreateUsualUserResponse {
   message?: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+  scope: AuthScope;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  scope: AuthScope;
+  newPassword: string;
+  otp: string;
+}
+
 export const authService = {
   requestEmailConfirmation: async (email: string): Promise<void> => {
     await httpClient.post<void>(
@@ -143,5 +155,21 @@ export const authService = {
       { skipAuth: true }
     );
     return response.data || (response as unknown as CreateUsualUserResponse);
+  },
+
+  requestPasswordReset: async (
+    email: string,
+    scope: AuthScope = AuthScope.USUAL
+  ): Promise<void> => {
+    const response = await httpClient.post<ApiResponse<void>>(
+      '/v1/otp/password-confirmation/send',
+      { email, scope } as ForgotPasswordRequest,
+      { skipAuth: true }
+    );
+    return response.data;
+  },
+
+  resetPassword: async (data: ResetPasswordRequest): Promise<void> => {
+    await httpClient.post<void>('/v1/users/change-password', data, { skipAuth: true });
   },
 };

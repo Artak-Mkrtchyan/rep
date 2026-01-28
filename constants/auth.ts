@@ -13,6 +13,9 @@ export const AUTH_ROUTES = {
   SIGNUP_BROKER: '/(auth)/signup/broker',
   SIGNUP_PASSWORD: '/(auth)/signup/create-password',
   SIGNUP_COMPLETED: '/(auth)/signup/completed',
+  FORGOT_PASSWORD: '/(auth)/forgot-password',
+  FORGOT_PASSWORD_RESET: '/(auth)/forgot-password/reset',
+  FORGOT_PASSWORD_SUCCESS: '/(auth)/forgot-password/success',
 } as const;
 
 export const IMAGE_DIMENSIONS = {
@@ -23,4 +26,5 @@ export const IMAGE_DIMENSIONS = {
   SIGNUP_ILLUSTRATION: { width: 170, height: 113 },
   SOCIAL_ICON: { width: 24, height: 24 },
   LOGIN_ILLUSTRATION: { width: 208, height: 141 },
+  FORGOT_PASSWORD: { width: 208, height: 147 },
 } as const;

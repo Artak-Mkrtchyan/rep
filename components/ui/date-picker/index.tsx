@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import React from 'react';
-import { Pressable, TextInputChangeEvent } from 'react-native';
+import { Modal, Platform, Pressable, Text, TextInputChangeEvent, View } from 'react-native';
 
 import { Input } from '@/components/ui/input';
 import type { InputProps } from '@/components/ui/input/types';
@@ -141,6 +142,20 @@ const applyDateMask = (input: string, previousValue: string): string => {
   return formatted;
 };
 
+const parseValueToDate = (dateString: string | undefined): Date => {
+  if (!dateString) return new Date();
+
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? new Date() : date;
+};
+
+const formatDateToAPI = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 export const DatePicker: React.FC<DatePickerProps> = ({
   value,
   onChange,
@@ -149,6 +164,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   ...inputProps
 }) => {
   const [displayValue, setDisplayValue] = React.useState(formatDateForDisplay(value));
+  const [showPicker, setShowPicker] = React.useState(false);
+  const [tempDate, setTempDate] = React.useState<Date>(parseValueToDate(value));
 
   React.useEffect(() => {
     setDisplayValue(formatDateForDisplay(value));
@@ -174,24 +191,108 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     }
   };
 
-  return (
-    <Input
-      {...inputProps}
-      value={displayValue}
-      onChangeText={handleTextChange}
-      editable={!inputProps.disabled}
-      keyboardType="number-pad"
-      maxLength={10}
-      rightIcon={
-        <Pressable
-          disabled={inputProps.disabled}
-          accessibilityRole="button"
-          accessibilityLabel="Date picker"
-          className="h-full items-center justify-center px-2">
-          <Ionicons name="calendar-outline" size={20} color="#666" />
-        </Pressable>
+  const handleIconPress = () => {
+    if (inputProps.disabled) return;
+    setTempDate(parseValueToDate(value));
+    setShowPicker(true);
+  };
+
+  const handleDateChange = (event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowPicker(false);
+      if (event.type === 'set' && selectedDate) {
+        const apiFormat = formatDateToAPI(selectedDate);
+        setDisplayValue(formatDateForDisplay(apiFormat));
+        onChange?.(apiFormat);
       }
-      placeholder={inputProps.placeholder || 'DD.MM.YYYY'}
-    />
+      return;
+    }
+
+    if (selectedDate) {
+      setTempDate(selectedDate);
+    }
+  };
+
+  const handleConfirm = () => {
+    const apiFormat = formatDateToAPI(tempDate);
+    setDisplayValue(formatDateForDisplay(apiFormat));
+    onChange?.(apiFormat);
+    setShowPicker(false);
+  };
+
+  const handleCancel = () => {
+    setShowPicker(false);
+  };
+
+  return (
+    <>
+      <Input
+        {...inputProps}
+        value={displayValue}
+        onChangeText={handleTextChange}
+        editable={!inputProps.disabled}
+        keyboardType="number-pad"
+        maxLength={10}
+        rightIcon={
+          <Pressable
+            onPress={handleIconPress}
+            disabled={inputProps.disabled}
+            accessibilityRole="button"
+            accessibilityLabel="Open date picker"
+            className="h-full items-center justify-center px-2">
+            <Ionicons name="calendar-outline" size={20} color="#666" />
+          </Pressable>
+        }
+        placeholder={inputProps.placeholder || 'DD.MM.YYYY'}
+      />
+
+      {Platform.OS === 'ios' ? (
+        <Modal visible={showPicker} transparent animationType="slide" onRequestClose={handleCancel}>
+          <View className="flex-1 justify-end">
+            <Pressable
+              className="flex-1"
+              onPress={handleCancel}
+              accessibilityRole="button"
+              accessibilityLabel="Close date picker"
+            />
+            <View className="bg-white pb-8">
+              <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-3">
+                <Pressable
+                  onPress={handleCancel}
+                  accessibilityRole="button"
+                  accessibilityLabel="Cancel">
+                  <Text className="text-base text-gray-600">Cancel</Text>
+                </Pressable>
+                <Pressable
+                  onPress={handleConfirm}
+                  accessibilityRole="button"
+                  accessibilityLabel="Done">
+                  <Text className="text-base font-semibold text-blue-600">Done</Text>
+                </Pressable>
+              </View>
+              <DateTimePicker
+                value={tempDate}
+                mode="date"
+                display="spinner"
+                onChange={handleDateChange}
+                minimumDate={minimumDate}
+                maximumDate={maximumDate}
+              />
+            </View>
+          </View>
+        </Modal>
+      ) : (
+        showPicker && (
+          <DateTimePicker
+            value={parseValueToDate(value)}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+            minimumDate={minimumDate}
+            maximumDate={maximumDate}
+          />
+        )
+      )}
+    </>
   );
 };

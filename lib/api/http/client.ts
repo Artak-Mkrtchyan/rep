@@ -289,8 +289,12 @@ class HttpClient {
     });
   }
 
-  async delete<T>(endpoint: string, config?: RequestConfig): Promise<T> {
-    return this.request<T>(endpoint, { ...config, method: 'DELETE' });
+  async delete<T>(endpoint: string, data?: unknown, config?: RequestConfig): Promise<T> {
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'DELETE',
+      body: data ? JSON.stringify(data) : undefined,
+    });
   }
 }
 

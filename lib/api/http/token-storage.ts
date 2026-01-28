@@ -1,93 +1,108 @@
+import * as SecureStore from 'expo-secure-store';
+
 const ACCESS_TOKEN_KEY = 'auth_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
 const REFRESH_TOKEN_EXPIRES_KEY = 'refresh_token_expires_at';
 
-// Custom event name for same-tab token changes
-export const AUTH_TOKEN_CHANGE_EVENT = 'auth-token-change';
+// In-memory cache for synchronous access
+let cachedAccessToken: string | null = null;
+let cachedRefreshToken: string | null = null;
+let cachedRefreshTokenExpiresAt: string | null = null;
+let isInitialized = false;
 
-const dispatchTokenChangeEvent = (): void => {
-    if (globalThis.window === undefined) {
-        return;
-    }
-    globalThis.dispatchEvent(new CustomEvent(AUTH_TOKEN_CHANGE_EVENT));
+// Initialize tokens from SecureStore (call this on app start)
+export const initializeTokenStorage = async (): Promise<void> => {
+  if (isInitialized) return;
+
+  try {
+    const [accessToken, refreshToken, expiresAt] = await Promise.all([
+      SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
+      SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
+      SecureStore.getItemAsync(REFRESH_TOKEN_EXPIRES_KEY),
+    ]);
+
+    cachedAccessToken = accessToken;
+    cachedRefreshToken = refreshToken;
+    cachedRefreshTokenExpiresAt = expiresAt;
+    isInitialized = true;
+  } catch (error) {
+    console.error('Failed to initialize token storage:', error);
+    isInitialized = true;
+  }
 };
 
 // Access Token
 export const getToken = (): string | null => {
-    if (globalThis.window === undefined) {
-        return null;
-    }
-    return localStorage.getItem(ACCESS_TOKEN_KEY);
+  return cachedAccessToken;
 };
 
 export const setToken = (token: string): void => {
-    if (globalThis.window === undefined) {
-        return;
-    }
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-    dispatchTokenChangeEvent();
+  cachedAccessToken = token;
+  SecureStore.setItemAsync(ACCESS_TOKEN_KEY, token).catch((error) => {
+    console.error('Failed to save access token:', error);
+  });
 };
 
 export const removeToken = (): void => {
-    if (globalThis.window === undefined) {
-        return;
-    }
-    localStorage.removeItem(ACCESS_TOKEN_KEY);
-    dispatchTokenChangeEvent();
+  cachedAccessToken = null;
+  SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY).catch((error) => {
+    console.error('Failed to remove access token:', error);
+  });
 };
 
 export const hasToken = (): boolean => {
-    if (globalThis.window === undefined) {
-        return false;
-    }
-    return localStorage.getItem(ACCESS_TOKEN_KEY) !== null;
+  return cachedAccessToken !== null;
 };
 
 // Refresh Token
 export const getRefreshToken = (): string | null => {
-    if (globalThis.window === undefined) {
-        return null;
-    }
-    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  return cachedRefreshToken;
 };
 
 export const setRefreshToken = (token: string, expiresAt: string): void => {
-    if (globalThis.window === undefined) {
-        return;
-    }
-    localStorage.setItem(REFRESH_TOKEN_KEY, token);
-    localStorage.setItem(REFRESH_TOKEN_EXPIRES_KEY, expiresAt);
+  cachedRefreshToken = token;
+  cachedRefreshTokenExpiresAt = expiresAt;
+
+  Promise.all([
+    SecureStore.setItemAsync(REFRESH_TOKEN_KEY, token),
+    SecureStore.setItemAsync(REFRESH_TOKEN_EXPIRES_KEY, expiresAt),
+  ]).catch((error) => {
+    console.error('Failed to save refresh token:', error);
+  });
 };
 
 export const removeRefreshToken = (): void => {
-    if (globalThis.window === undefined) {
-        return;
-    }
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_EXPIRES_KEY);
+  cachedRefreshToken = null;
+  cachedRefreshTokenExpiresAt = null;
+
+  Promise.all([
+    SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+    SecureStore.deleteItemAsync(REFRESH_TOKEN_EXPIRES_KEY),
+  ]).catch((error) => {
+    console.error('Failed to remove refresh token:', error);
+  });
 };
 
 export const isRefreshTokenValid = (): boolean => {
-    if (globalThis.window === undefined) {
-        return false;
-    }
+  if (!cachedRefreshToken || !cachedRefreshTokenExpiresAt) {
+    return false;
+  }
 
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    const expiresAt = localStorage.getItem(REFRESH_TOKEN_EXPIRES_KEY);
+  const expiryDate = new Date(cachedRefreshTokenExpiresAt);
+  const now = new Date();
 
-    if (!refreshToken || !expiresAt) {
-        return false;
-    }
-
-    const expiryDate = new Date(expiresAt);
-    const now = new Date();
-
-    // Token is valid if expiry date is in the future (with 30 second buffer)
-    return expiryDate.getTime() > now.getTime() + 30000;
+  // Token is valid if expiry date is in the future (with 30 second buffer)
+  return expiryDate.getTime() > now.getTime() + 30000;
 };
 
 // Clear all auth tokens
 export const clearAllTokens = (): void => {
-    removeRefreshToken();
-    removeToken(); // This dispatches the event
+  removeRefreshToken();
+  removeToken();
+};
+
+// Update cache from external source (e.g., AuthContext)
+export const updateTokenCache = (accessToken: string | null, refreshToken: string | null): void => {
+  cachedAccessToken = accessToken;
+  cachedRefreshToken = refreshToken;
 };

@@ -1,18 +1,15 @@
 import 'react-native-reanimated';
 import '../global.css';
 
-import { Stack } from 'expo-router';
+import { Slot, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import React from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
 
 export default function RootLayout() {
   return (
@@ -28,29 +25,28 @@ export default function RootLayout() {
   );
 }
 
-function AppStack() {
-  return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-    </Stack>
-  );
-}
-
-function AuthStack() {
-  return (
-    <Stack>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-    </Stack>
-  );
-}
-
 function RootNavigator() {
   const { user, isLoading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (isLoading) return;
+
+    const inAuthGroup = segments[0] === '(auth)';
+
+    if (user && inAuthGroup) {
+      // User is signed in but on auth screen, redirect to home
+      router.replace('/(tabs)');
+    } else if (!user && !inAuthGroup) {
+      // User is not signed in but on protected screen, redirect to login
+      router.replace('/(auth)');
+    }
+  }, [user, isLoading, segments, router]);
 
   if (isLoading) {
     return null;
   }
 
-  return user ? <AppStack /> : <AuthStack />;
+  return <Slot />;
 }

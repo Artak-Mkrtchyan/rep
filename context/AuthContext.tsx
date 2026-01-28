@@ -1,3 +1,9 @@
+import { authService } from '@/lib/api/auth';
+import {
+  clearAllTokens as clearHttpClientTokens,
+  initializeTokenStorage,
+  updateTokenCache,
+} from '@/lib/api/http/token-storage';
 import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 
@@ -28,23 +34,79 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [refreshToken, setRefreshToken] = React.useState<string | null>(null);
   const [isRestoring, setIsRestoring] = React.useState(true);
 
+  // Sync tokens with HTTP client cache whenever they change
+  React.useEffect(() => {
+    updateTokenCache(accessToken, refreshToken);
+  }, [accessToken, refreshToken]);
+
   React.useEffect(() => {
     let isMounted = true;
-    (async () => {
+
+    const restoreAndValidateSession = async () => {
       try {
-        const [storedAccess, storedRefresh] = await Promise.all([
+        // Initialize HTTP client token storage
+        await initializeTokenStorage();
+
+        // Step 1: Restore tokens from secure storage
+        const [, storedRefresh] = await Promise.all([
           SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
           SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
         ]);
+
         if (!isMounted) return;
-        setAccessToken(storedAccess ?? null);
-        setRefreshToken(storedRefresh ?? null);
+
+        // Step 2: If we have a refresh token, validate it by refreshing
+        if (storedRefresh) {
+          try {
+            const response = await authService.refreshToken(storedRefresh);
+
+            if (!isMounted) return;
+
+            // Refresh succeeded - update tokens
+            if (response.accessToken && response.refreshToken) {
+              setAccessToken(response.accessToken);
+              setRefreshToken(response.refreshToken);
+              await Promise.all([
+                SecureStore.setItemAsync(ACCESS_TOKEN_KEY, response.accessToken),
+                SecureStore.setItemAsync(REFRESH_TOKEN_KEY, response.refreshToken),
+              ]);
+            } else {
+              // Invalid response - clear tokens
+              await clearStoredTokens();
+            }
+          } catch {
+            // Refresh failed - token is invalid, clear everything
+            if (!isMounted) return;
+            await clearStoredTokens();
+          }
+        } else {
+          // No refresh token stored - user is not authenticated
+          setAccessToken(null);
+          setRefreshToken(null);
+        }
       } catch {
-        // Ignore restore errors; user will be unauthenticated
+        // Restore errors - user will be unauthenticated
+        if (isMounted) {
+          setAccessToken(null);
+          setRefreshToken(null);
+        }
       } finally {
         if (isMounted) setIsRestoring(false);
       }
-    })();
+    };
+
+    const clearStoredTokens = async () => {
+      setAccessToken(null);
+      setRefreshToken(null);
+      clearHttpClientTokens();
+      await Promise.all([
+        SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
+        SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+      ]);
+    };
+
+    restoreAndValidateSession();
+
     return () => {
       isMounted = false;
     };
@@ -62,6 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = React.useCallback(async () => {
     setAccessToken(null);
     setRefreshToken(null);
+    clearHttpClientTokens();
     await Promise.all([
       SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
       SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),

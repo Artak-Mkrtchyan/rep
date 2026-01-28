@@ -117,10 +117,14 @@ export const authService = {
     return response.data || (response as unknown as RegisterResponse);
   },
 
-  logout: async (): Promise<void> => {
-    await httpClient.post<void>('/auth/logout', undefined, {
-      requiresAuth: true,
-    });
+  logout: async (refreshToken: string): Promise<void> => {
+    await httpClient.delete<void>(
+      '/auth/users/refresh-tokens/revoke',
+      { refreshToken },
+      {
+        requiresAuth: true,
+      }
+    );
   },
 
   refreshToken: async (refreshToken: string): Promise<RefreshTokenResponse> => {

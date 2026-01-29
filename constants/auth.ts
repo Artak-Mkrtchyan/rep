@@ -4,6 +4,7 @@ export const ACCOUNT_TYPE_OPTIONS = [
   { label: 'Individual user', value: 'individual' as AccountRole },
   { label: 'Construction company', value: 'company' as AccountRole },
   { label: 'Broker', value: 'broker' as AccountRole },
+  { label: 'Broker company', value: 'broker_company' as AccountRole },
 ];
 export const AUTH_ROUTES = {
   LOGIN: '/(auth)',
@@ -11,6 +12,7 @@ export const AUTH_ROUTES = {
   SIGNUP_EMAIL: '/(auth)/signup/step-email',
   SIGNUP_VERIFY: '/(auth)/signup/verify',
   SIGNUP_BROKER: '/(auth)/signup/broker',
+  SIGNUP_BROKER_COMPANY: '/(auth)/signup/broker-company',
   SIGNUP_PASSWORD: '/(auth)/signup/create-password',
   SIGNUP_COMPLETED: '/(auth)/signup/completed',
   FORGOT_PASSWORD: '/(auth)/forgot-password',

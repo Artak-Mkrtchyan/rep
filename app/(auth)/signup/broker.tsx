@@ -15,6 +15,7 @@ import { useSignUpContext } from '@/context/SignUpContext';
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
 import { NumberPicker } from '@/components/ui/number-picker';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { applicationsService } from '@/lib/api/applications';
 import type { BrokerSignUpForm } from '@/types/auth';
 import { router } from 'expo-router';
@@ -27,7 +28,9 @@ const BrokerSchema = Yup.object().shape({
   certifiedOn: Yup.string()
     .required('Required')
     .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
-  phoneNumber: Yup.string().required('Required'),
+  phoneNumber: Yup.string()
+    .required('Required')
+    .matches(/^\+998\d{9}$/, 'Invalid phone number'),
   yearsOfActivity: Yup.number().required(),
 });
 
@@ -135,14 +138,12 @@ export default function BrokerSignUpScreen() {
                 placeholder=""
               />
 
-              <Input
+              <PhoneInput
                 label="Phone number"
                 value={values.phoneNumber}
-                onChangeText={handleChange('phoneNumber')}
+                onChangeText={(text) => setFieldValue('phoneNumber', text)}
                 onBlur={handleBlur('phoneNumber')}
                 error={touched.phoneNumber && errors.phoneNumber ? errors.phoneNumber : undefined}
-                keyboardType="phone-pad"
-                placeholder=""
               />
 
               <NumberPicker

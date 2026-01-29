@@ -36,6 +36,39 @@ export interface BrokerRegistrationResponse {
   yearsOfActivity: number;
 }
 
+export interface CompanyInfo {
+  certifiedBy: string;
+  certifiedOn: string; // ISO date string: "2026-01-29"
+  email: string;
+  name: string;
+  phoneNumber: string;
+  yearsOfActivity: number;
+}
+
+export interface ManagerInfo {
+  email: string;
+  fullName: string;
+  phoneNumber: string;
+}
+
+export interface BrokerCompanyRegistrationRequest {
+  attachmentIds: string[];
+  companyInfo: CompanyInfo;
+  managerInfo: ManagerInfo;
+}
+
+export interface BrokerCompanyRegistrationResponse {
+  id: string;
+  applicantEmail: string;
+  createdAt: string; // ISO datetime string
+  createdBy: string;
+  reviewerId?: string;
+  status: ApplicationStatus;
+  type: string; // e.g., "ANNOUNCEMENT_PUBLICATION"
+  companyInfo: CompanyInfo;
+  managerInfo: ManagerInfo;
+}
+
 export type FileInput = { uri: string; type: string; name: string }; // React Native format
 
 export const applicationsService = {
@@ -73,5 +106,24 @@ export const applicationsService = {
     );
 
     return response.data || (response as unknown as BrokerRegistrationResponse);
+  },
+
+  /**
+   * Register a broker company application
+   * @param data - Broker company registration data
+   * @returns Broker company registration response with application details
+   */
+  brokerCompanyRegistration: async (
+    data: BrokerCompanyRegistrationRequest
+  ): Promise<BrokerCompanyRegistrationResponse> => {
+    const response = await httpClient.post<ApiResponse<BrokerCompanyRegistrationResponse>>(
+      '/v1/applications/broker-company-registration',
+      data,
+      {
+        skipAuth: true,
+      }
+    );
+
+    return response.data || (response as unknown as BrokerCompanyRegistrationResponse);
   },
 };

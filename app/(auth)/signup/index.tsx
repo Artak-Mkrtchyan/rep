@@ -24,14 +24,8 @@ export default function SignUpFirstScreen() {
   const { goToNext } = useSignUpFlow();
 
   const handleContinue = (values: { role: AccountRole }) => {
-    switch (values.role) {
-      case 'broker':
-        updateData({ role: values.role });
-        goToNext();
-        break;
-      case 'individual':
-      case 'company':
-    }
+    updateData({ role: values.role });
+    goToNext();
   };
 
   return (
@@ -66,7 +60,7 @@ export default function SignUpFirstScreen() {
                   options={ACCOUNT_TYPE_OPTIONS}
                 />
 
-                {values.role === 'broker' && (
+                {(values.role === 'broker' || values.role === 'broker_company') && (
                   <View className="flex-row items-center justify-between">
                     <RadioButton
                       value="broker"
@@ -75,7 +69,7 @@ export default function SignUpFirstScreen() {
                       onSelect={(value) => setFieldValue('role', value)}
                     />
                     <RadioButton
-                      value="company"
+                      value="broker_company"
                       label="Broker company"
                       selectedValue={values.role}
                       onSelect={(value) => setFieldValue('role', value)}

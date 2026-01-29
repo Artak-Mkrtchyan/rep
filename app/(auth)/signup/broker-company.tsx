@@ -28,13 +28,17 @@ const BrokerCompanySchema = Yup.object().shape({
       .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
     email: Yup.string().email('Invalid email').required('Required'),
     name: Yup.string().required('Required'),
-    phoneNumber: Yup.string().required('Required'),
+    phoneNumber: Yup.string()
+      .required('Required')
+      .matches(/^\+998\d{9}$/, 'Invalid phone number'),
     yearsOfActivity: Yup.number().required('Required'),
   }),
   managerInfo: Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Required'),
     fullName: Yup.string().required('Required'),
-    phoneNumber: Yup.string().required('Required'),
+    phoneNumber: Yup.string()
+      .required('Required')
+      .matches(/^\+998\d{9}$/, 'Invalid phone number'),
   }),
 });
 

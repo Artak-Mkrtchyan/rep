@@ -28,7 +28,9 @@ const BrokerSchema = Yup.object().shape({
   certifiedOn: Yup.string()
     .required('Required')
     .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
-  phoneNumber: Yup.string().required('Required'),
+  phoneNumber: Yup.string()
+    .required('Required')
+    .matches(/^\+998\d{9}$/, 'Invalid phone number'),
   yearsOfActivity: Yup.number().required(),
 });
 

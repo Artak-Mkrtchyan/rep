@@ -1,4 +1,4 @@
-export type AccountRole = '' | 'individual' | 'company' | 'broker';
+export type AccountRole = '' | 'individual' | 'company' | 'broker' | 'broker_company';
 export interface PasswordRequirements {
   hasMinLength: boolean;
   hasUpperCase: boolean;

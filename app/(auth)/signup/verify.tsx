@@ -8,12 +8,13 @@ import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
-import { IMAGE_DIMENSIONS } from '@/constants/auth';
+import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { authService } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/auth.types';
 import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
+import { router } from 'expo-router';
 
 const VerifySchema = Yup.object().shape({
   otp: Yup.array()
@@ -24,7 +25,7 @@ const VerifySchema = Yup.object().shape({
 
 export default function VerifyEmailScreen() {
   const { data, updateData } = useSignUpContext();
-  const { goToNext, goToPrevious } = useSignUpFlow();
+  const { goToPrevious } = useSignUpFlow();
   const inputsRef = React.useRef<(TextInput | null)[]>([]);
   const [secondsLeft, setSecondsLeft] = React.useState(RESEND_CODE_TIMEOUT);
 
@@ -47,7 +48,14 @@ export default function VerifyEmailScreen() {
 
       updateData({ otp: code });
 
-      goToNext();
+      switch (data.role) {
+        case 'broker':
+          router.push(AUTH_ROUTES.SIGNUP_BROKER);
+          break;
+        case 'broker_company':
+          router.push(AUTH_ROUTES.SIGNUP_BROKER_COMPANY);
+        case 'individual':
+      }
     } catch (error) {
       if (error instanceof Error && 'statusCode' in error) {
         const apiError = error as ApiError;

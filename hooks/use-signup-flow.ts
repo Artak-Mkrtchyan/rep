@@ -1,7 +1,7 @@
 import { useRouter, useSegments } from 'expo-router';
 
-import { useSignUpContext } from '@/context/SignUpContext';
 import { AUTH_ROUTES } from '@/constants/auth';
+import { useSignUpContext } from '@/context/SignUpContext';
 
 const FLOW_ORDER = [
   AUTH_ROUTES.SIGNUP, // 1. Role Selection

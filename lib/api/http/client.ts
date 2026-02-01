@@ -20,8 +20,14 @@ export interface RequestConfig extends RequestInit {
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
-export const getLocale = () => {
-  return location.pathname.split('/')[1] ?? 'en';
+/**
+ * Gets the current locale for API requests
+ * Returns 'en' as default - can be extended to use expo-localization if needed
+ */
+export const getLocale = (): string => {
+  // In React Native, we can use expo-localization for proper locale detection
+  // For now, return default locale
+  return 'en';
 };
 
 const subscribeToTokenRefresh = (callback: (token: string) => void): void => {

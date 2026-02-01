@@ -23,6 +23,10 @@ export const getEnvironment = (): Environment => {
 
 /**
  * Gets the API URL based on the current environment
+ * Note: Using dev API for both environments until production API is ready
  */
-export const getApiUrl = (): string =>
-  isProduction() ? 'https://rep.utspdev.com/api' : 'https://rep-dev.utspdev.com/api';
+export const getApiUrl = (): string => 'https://rep-dev.utspdev.com/api';
+
+// TODO: Restore when production API is ready:
+// export const getApiUrl = (): string =>
+//   isProduction() ? 'https://rep.utspdev.com/api' : 'https://rep-dev.utspdev.com/api';

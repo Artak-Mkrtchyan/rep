@@ -100,7 +100,7 @@ export const Input = React.forwardRef(function Input(
           editable={!resolvedDisabled}
           placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
           className={cn(
-            'h-full flex-1 text-[16px] placeholder:text-muted-foreground',
+            'h-full flex-1 text-[16px] text-foreground placeholder:text-muted-foreground',
             inputClassName
           )}
           onFocus={handleFocus}

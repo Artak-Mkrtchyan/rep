@@ -7,7 +7,7 @@ export interface TemporaryAttachmentResponse {
 
 export interface BrokerRegistrationRequest {
   attachmentIds: string[];
-  certifiedBy: string;
+  certifiedBy?: string;
   certifiedOn: string; // ISO date string: "2026-01-17"
   email: string;
   fullName: string;

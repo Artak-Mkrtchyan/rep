@@ -1,6 +1,6 @@
-import { router, useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import { router } from 'expo-router';
 import { Formik } from 'formik';
+import React from 'react';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -13,12 +13,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES } from '@/constants/auth';
 import { useTheme } from '@/hooks/use-theme';
-import { validatePassword, PASSWORD_MIN_LENGTH } from '@/lib/auth-validation';
+import { PASSWORD_MIN_LENGTH, validatePassword } from '@/lib/auth-validation';
 
+import { PhoneInput } from '@/components/ui/phone-input';
+import { useSignUpContext } from '@/context/SignUpContext';
+import { authService } from '@/lib/api/auth';
 import type { PasswordForm } from '@/types/auth';
+import { Alert } from 'react-native';
 
 const PasswordSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
+  fullName: Yup.string().required('Required'),
+  phone: Yup.string()
+    .required('Required')
+    .matches(/^\+998\d{9}$/, 'Invalid phone number'),
   password: Yup.string()
     .min(PASSWORD_MIN_LENGTH, 'Password too short')
     .matches(/[A-Z]/, 'Must contain uppercase')
@@ -31,14 +39,25 @@ const PasswordSchema = Yup.object().shape({
 
 export default function CreatePasswordScreen() {
   const { tokens: theme } = useTheme();
-  const params = useLocalSearchParams();
+  const { data, resetData } = useSignUpContext();
 
-  const handleContinue = (values: PasswordForm) => {
-    // Here we would typically make the API call to register the user
-    // using all collected data from params + current values
-    console.log('Final Registration Data:', { ...params, ...values });
+  const handleContinue = async (values: PasswordForm, { setSubmitting }: any) => {
+    try {
+      await authService.createUsualUser({
+        fullName: values.fullName,
+        email: values.email,
+        password: values.password,
+        phone: values.phone,
+      });
 
-    router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
+      resetData();
+
+      router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
+    } catch {
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleGoToLogin = () => {
@@ -57,13 +76,15 @@ export default function CreatePasswordScreen() {
     <AuthLayout>
       <Formik
         initialValues={{
-          email: '',
+          email: data.email || '',
           password: '',
           confirmPassword: '',
+          fullName: '',
+          phone: '',
         }}
         validationSchema={PasswordSchema}
         onSubmit={handleContinue}>
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => {
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => {
           const passwordRequirements = validatePassword(values.password);
 
           return (
@@ -82,10 +103,28 @@ export default function CreatePasswordScreen() {
                 onBlur={handleBlur('email')}
                 error={touched.email && errors.email ? errors.email : undefined}
                 placeholder=""
+                disabled
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
                 placeholderTextColor={theme.placeholder}
+              />
+
+              <Input
+                label="Full name"
+                value={values.fullName}
+                onChangeText={handleChange('fullName')}
+                onBlur={handleBlur('fullName')}
+                error={touched.fullName && errors.fullName ? errors.fullName : undefined}
+                placeholder=""
+              />
+
+              <PhoneInput
+                label="Phone number"
+                value={values.phone}
+                onChangeText={(text) => handleChange('phone')(text)}
+                onBlur={handleBlur('phone')}
+                error={touched.phone && errors.phone ? errors.phone : undefined}
               />
 
               <Input
@@ -122,12 +161,7 @@ export default function CreatePasswordScreen() {
               />
 
               <Button
-                disabled={
-                  !values.email ||
-                  !values.password ||
-                  !values.confirmPassword ||
-                  Object.keys(errors).length > 0
-                }
+                disabled={Object.keys(errors).length !== 0 || isSubmitting}
                 onPress={() => handleSubmit()}
                 accessibilityLabel="Continue">
                 Continue

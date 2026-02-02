@@ -18,6 +18,8 @@ export interface BrokerSignUpForm {
 export interface PasswordForm {
   email: string;
   password: string;
+  fullName: string;
+  phone?: string;
   confirmPassword: string;
 }
 

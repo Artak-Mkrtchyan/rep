@@ -54,8 +54,10 @@ export default function VerifyEmailScreen() {
           break;
         case 'broker_company':
           router.push(AUTH_ROUTES.SIGNUP_BROKER_COMPANY);
+          break;
         case 'individual':
           router.push(AUTH_ROUTES.SIGNUP_PASSWORD);
+          break;
       }
     } catch (error) {
       if (error instanceof Error && 'statusCode' in error) {

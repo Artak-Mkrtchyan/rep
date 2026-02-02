@@ -37,7 +37,7 @@ export interface BrokerRegistrationResponse {
 }
 
 export interface CompanyInfo {
-  certifiedBy: string;
+  certifiedBy?: string;
   certifiedOn: string; // ISO date string: "2026-01-29"
   email: string;
   name: string;

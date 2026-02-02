@@ -1,10 +1,10 @@
-import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import React from 'react';
 import { Modal, Platform, Pressable, Text, TextInputChangeEvent, View } from 'react-native';
 
 import { Input } from '@/components/ui/input';
 import type { InputProps } from '@/components/ui/input/types';
+import { Image } from 'expo-image';
 
 export interface DatePickerProps extends Omit<InputProps, 'value' | 'onChangeText' | 'editable'> {
   value?: string; // Format: "YYYY-MM-DD" (API format)
@@ -240,7 +240,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             accessibilityRole="button"
             accessibilityLabel="Open date picker"
             className="h-full items-center justify-center px-2">
-            <Ionicons name="calendar-outline" size={20} color="#666" />
+            <Image
+              source={require('@/assets/images/calendar-days.svg')}
+              style={{ width: 20, height: 20 }}
+              contentFit="contain"
+            />
           </Pressable>
         }
         placeholder={inputProps.placeholder || 'DD.MM.YYYY'}

@@ -24,7 +24,6 @@ const BrokerSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Required'),
   fullName: Yup.string().required('Required'),
   attachmentIds: Yup.array().min(1).required('Required'),
-  certifiedBy: Yup.string().required('Required'),
   certifiedOn: Yup.string()
     .required('Required')
     .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
@@ -92,7 +91,7 @@ export default function BrokerSignUpScreen() {
           touched,
           isSubmitting,
         }) => (
-          <>
+          <View className="mb-10 mt-10 w-full">
             <AuthHeader
               title="Sign up"
               imageSource={require('@/assets/images/icon-broker-illustration.svg')}
@@ -100,7 +99,7 @@ export default function BrokerSignUpScreen() {
               imageHeight={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.height}
             />
 
-            <View className="w-full gap-4">
+            <View className="w-full gap-5">
               <Input
                 label="Email"
                 value={values.email}
@@ -115,6 +114,7 @@ export default function BrokerSignUpScreen() {
 
               <Input
                 label="Full name"
+                required
                 value={values.fullName}
                 onChangeText={handleChange('fullName')}
                 onBlur={handleBlur('fullName')}
@@ -124,6 +124,7 @@ export default function BrokerSignUpScreen() {
 
               <DatePicker
                 label="Certified on"
+                required
                 value={values.certifiedOn}
                 onChange={(date) => setFieldValue('certifiedOn', date)}
                 error={touched.certifiedOn && errors.certifiedOn ? errors.certifiedOn : undefined}
@@ -140,6 +141,7 @@ export default function BrokerSignUpScreen() {
 
               <PhoneInput
                 label="Phone number"
+                required
                 value={values.phoneNumber}
                 onChangeText={(text) => setFieldValue('phoneNumber', text)}
                 onBlur={handleBlur('phoneNumber')}
@@ -173,19 +175,19 @@ export default function BrokerSignUpScreen() {
                     : undefined
                 }
               />
+
+              <Button
+                disabled={Object.keys(errors).length !== 0 || isSubmitting}
+                onPress={() => handleSubmit()}
+                accessibilityLabel="Continue">
+                {isSubmitting ? 'Submitting...' : 'Continue'}
+              </Button>
+
+              <FormDivider />
+
+              <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
             </View>
-
-            <Button
-              disabled={Object.keys(errors).length !== 0 || isSubmitting}
-              onPress={() => handleSubmit()}
-              accessibilityLabel="Continue">
-              {isSubmitting ? 'Submitting...' : 'Continue'}
-            </Button>
-
-            <FormDivider />
-
-            <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
-          </>
+          </View>
         )}
       </Formik>
     </AuthLayout>

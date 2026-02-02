@@ -22,7 +22,6 @@ import { router } from 'expo-router';
 const BrokerCompanySchema = Yup.object().shape({
   attachmentIds: Yup.array().min(1, 'At least one file is required').required('Required'),
   companyInfo: Yup.object().shape({
-    certifiedBy: Yup.string().required('Required'),
     certifiedOn: Yup.string()
       .required('Required')
       .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
@@ -106,7 +105,7 @@ export default function BrokerSignUpScreen() {
           touched,
           isSubmitting,
         }) => (
-          <>
+          <View className="mb-10 mt-10 w-full">
             <AuthHeader
               title="Sign up"
               imageSource={require('@/assets/images/icon-broker-illustration.svg')}
@@ -114,9 +113,10 @@ export default function BrokerSignUpScreen() {
               imageHeight={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.height}
             />
 
-            <View className="w-full gap-4">
+            <View className="mt-10 w-full gap-5">
               <Input
                 label="Manager e-mail"
+                required
                 value={values.managerInfo.email}
                 disabled
                 onChangeText={handleChange('email')}
@@ -133,6 +133,7 @@ export default function BrokerSignUpScreen() {
 
               <Input
                 label="Manager name"
+                required
                 value={values.managerInfo.fullName}
                 onChangeText={handleChange('managerInfo.fullName')}
                 onBlur={handleBlur('managerInfo.fullName')}
@@ -173,6 +174,7 @@ export default function BrokerSignUpScreen() {
 
               <Input
                 label="Company name"
+                required
                 value={values.companyInfo.name}
                 onChangeText={handleChange('companyInfo.name')}
                 onBlur={handleBlur('companyInfo.name')}
@@ -198,6 +200,7 @@ export default function BrokerSignUpScreen() {
 
               <DatePicker
                 label="Company certification date"
+                required
                 value={values.companyInfo.certifiedOn}
                 onChange={(date) => setFieldValue('companyInfo.certifiedOn', date)}
                 error={
@@ -246,19 +249,19 @@ export default function BrokerSignUpScreen() {
                     : undefined
                 }
               />
+
+              <Button
+                disabled={Object.keys(errors).length !== 0 || isSubmitting}
+                onPress={() => handleSubmit()}
+                accessibilityLabel="Continue">
+                {isSubmitting ? 'Submitting...' : 'Continue'}
+              </Button>
+
+              <FormDivider />
+
+              <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
             </View>
-
-            <Button
-              disabled={Object.keys(errors).length !== 0 || isSubmitting}
-              onPress={() => handleSubmit()}
-              accessibilityLabel="Continue">
-              {isSubmitting ? 'Submitting...' : 'Continue'}
-            </Button>
-
-            <FormDivider />
-
-            <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
-          </>
+          </View>
         )}
       </Formik>
     </AuthLayout>

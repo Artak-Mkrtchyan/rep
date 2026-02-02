@@ -24,6 +24,7 @@ export type InputProps = TextInputProps & {
 
 export type InputLabelProps = {
   required?: boolean;
+  disabled?: boolean;
   children?: React.ReactNode;
 };
 

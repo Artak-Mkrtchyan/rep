@@ -68,23 +68,29 @@ export const Input = React.forwardRef(function Input(
         ? 'h-14 rounded-[14px] px-4'
         : 'h-12 rounded-[12px] px-3';
 
-  const variantClasses = variant === 'ghost' ? 'bg-transparent' : 'bg-card';
+  const variantClasses =
+    variant === 'ghost' ? 'bg-transparent' : resolvedDisabled ? 'bg-muted' : 'bg-card';
 
   const wrapperClassName = cn(
     'flex-row items-center border',
     sizeClasses,
     variantClasses,
-    resolvedDisabled && 'opacity-50',
-    hasError ? 'border-destructive' : isFocused ? 'border-primary' : 'border-default'
+    resolvedDisabled && 'border-default',
+    !resolvedDisabled &&
+      (hasError ? 'border-destructive' : isFocused ? 'border-primary' : 'border-default')
   );
 
   return (
     <View className={cn('w-full gap-1', containerClassName)}>
-      {label ? <InputLabel required={required}>{label}</InputLabel> : null}
+      {label ? (
+        <InputLabel required={required} disabled={resolvedDisabled}>
+          {label}
+        </InputLabel>
+      ) : null}
 
       <Pressable
         className={wrapperClassName}
-        onPress={() => inputRef.current?.focus()}
+        onPress={resolvedDisabled ? undefined : () => inputRef.current?.focus()}
         accessibilityRole="button"
         accessibilityLabel={label}
         accessibilityState={{ disabled: resolvedDisabled, selected: isFocused }}>
@@ -94,7 +100,7 @@ export const Input = React.forwardRef(function Input(
           editable={!resolvedDisabled}
           placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
           className={cn(
-            'h-full flex-1 text-[16px] text-foreground placeholder:text-muted-foreground',
+            'h-full flex-1 text-[16px] placeholder:text-muted-foreground',
             inputClassName
           )}
           onFocus={handleFocus}

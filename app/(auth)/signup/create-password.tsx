@@ -3,7 +3,6 @@ import { Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { FormDivider } from '@/components/auth/form-divider';
 import { PasswordRequirementsList } from '@/components/auth/password-requirements';
@@ -73,7 +72,7 @@ export default function CreatePasswordScreen() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout scrollable>
       <Formik
         initialValues={{
           email: data.email || '',
@@ -89,12 +88,9 @@ export default function CreatePasswordScreen() {
 
           return (
             <>
-              <AuthHeader
-                title="Sign up"
-                imageSource={require('@/assets/images/signup-illustration.svg')}
-                imageWidth={170}
-                imageHeight={113}
-              />
+              <ThemedText type="title" className="mt-10 text-center">
+                Sign up
+              </ThemedText>
 
               <Input
                 label="Email"
@@ -130,6 +126,7 @@ export default function CreatePasswordScreen() {
               <Input
                 label="Password"
                 value={values.password}
+                showPasswordToggle
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 error={touched.password && errors.password ? errors.password : undefined}
@@ -156,6 +153,7 @@ export default function CreatePasswordScreen() {
                     : undefined
                 }
                 secureTextEntry
+                showPasswordToggle
                 placeholder=""
                 placeholderTextColor={theme.placeholder}
               />

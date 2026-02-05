@@ -29,7 +29,9 @@ const PasswordSchema = Yup.object().shape({
   password: Yup.string()
     .min(PASSWORD_MIN_LENGTH, 'Password too short')
     .matches(/[A-Z]/, 'Must contain uppercase')
+    .matches(/[a-z]/, 'Must contain lowercase')
     .matches(/\d/, 'Must contain number')
+    .matches(/[^A-Za-z0-9]/, 'Must contain symbol')
     .required('Required'),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Passwords do not match')
@@ -138,7 +140,9 @@ export default function CreatePasswordScreen() {
               <PasswordRequirementsList
                 hasMinLength={passwordRequirements.hasMinLength}
                 hasUpperCase={passwordRequirements.hasUpperCase}
+                hasLowerCase={passwordRequirements.hasLowerCase}
                 hasNumber={passwordRequirements.hasNumber}
+                hasSymbol={passwordRequirements.hasSymbol}
               />
 
               <Input

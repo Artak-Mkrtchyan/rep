@@ -22,7 +22,7 @@ export default function SignUpCompletedScreen() {
       />
 
       <Button onPress={handleContinue} accessibilityLabel="Go to login">
-        Continue
+        Go to home page
       </Button>
     </AuthLayout>
   );

@@ -9,6 +9,7 @@ import { InputLabel } from './label';
 import { InputLeftView } from './left-view';
 import { InputRightView } from './right-view';
 
+import { Image } from 'expo-image';
 import type { InputProps } from './types';
 
 export const Input = React.forwardRef(function Input(
@@ -33,6 +34,7 @@ export const Input = React.forwardRef(function Input(
     showPasswordToggle,
     onFocus,
     onBlur,
+    secureTextEntry,
     ...props
   }: InputProps,
   ref: React.Ref<TextInput>
@@ -41,6 +43,7 @@ export const Input = React.forwardRef(function Input(
   React.useImperativeHandle(ref, () => inputRef.current as TextInput);
 
   const [isFocused, setIsFocused] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(!!secureTextEntry);
   const resolvedDisabled = Boolean(isDisabled ?? disabled);
   const hasError = Boolean(isInvalid ?? invalid ?? error);
   const placeholderColor = useThemeValue('placeholder');
@@ -105,15 +108,18 @@ export const Input = React.forwardRef(function Input(
           )}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          secureTextEntry={showPassword}
           {...props}
         />
-        {showPasswordToggle && props.secureTextEntry ? (
+        {showPasswordToggle ? (
           <Pressable
             accessibilityLabel="Toggle password visibility"
-            onPress={() => {
-              if (inputRef.current) inputRef.current.focus();
-            }}>
-            <Text className="ml-2 text-muted-foreground">•••</Text>
+            onPress={() => setShowPassword(!showPassword)}>
+            <Image
+              source={require('@/assets/images/eye-icon.svg')}
+              style={{ width: 20, height: 20 }}
+              contentFit="contain"
+            />
           </Pressable>
         ) : null}
         <InputRightView>{right ?? rightIcon}</InputRightView>

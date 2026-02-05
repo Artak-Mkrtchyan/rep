@@ -1,43 +1,58 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
+
+import { ThemedText } from '@/components/themed-text';
 
 interface PasswordRequirementItemProps {
+  icon: string;
   label: string;
   isValid: boolean;
 }
 
-export const PasswordRequirementItem: React.FC<PasswordRequirementItemProps> = ({
+const PasswordRequirementItem: React.FC<PasswordRequirementItemProps> = ({
+  icon,
   label,
   isValid,
 }) => {
   return (
-    <View className="flex-row items-center gap-2">
-      <View className={`h-2.5 w-2.5 rounded-full ${isValid ? 'bg-primary' : 'bg-border'}`} />
-      <Text className={`text-[12px] ${isValid ? 'text-foreground' : 'text-muted-foreground'}`}>
+    <View className="items-center gap-1.5">
+      <View
+        className={`h-[26px] w-[26px] items-center justify-center rounded-full ${isValid ? 'bg-[#5EBC39]' : 'bg-muted'}`}>
+        <ThemedText
+          className={`text-[12px] font-medium ${isValid ? 'text-white' : 'text-muted-foreground'}`}
+          numberOfLines={1}>
+          {icon}
+        </ThemedText>
+      </View>
+      <ThemedText className="text-[12px] text-muted-foreground" numberOfLines={1}>
         {label}
-      </Text>
+      </ThemedText>
     </View>
   );
 };
 
-interface PasswordRequirementsListProps {
+export interface PasswordRequirementsListProps {
   hasMinLength: boolean;
   hasUpperCase: boolean;
+  hasLowerCase: boolean;
   hasNumber: boolean;
+  hasSymbol: boolean;
 }
 
 export const PasswordRequirementsList: React.FC<PasswordRequirementsListProps> = ({
   hasMinLength,
   hasUpperCase,
+  hasLowerCase,
   hasNumber,
+  hasSymbol,
 }) => {
   return (
-    <View className="w-full rounded-[12px] border border-default bg-card px-3 py-2">
-      <View className="w-full flex-row items-center justify-between">
-        <PasswordRequirementItem label="8+ characters" isValid={hasMinLength} />
-        <PasswordRequirementItem label="1 uppercase" isValid={hasUpperCase} />
-        <PasswordRequirementItem label="1 number" isValid={hasNumber} />
-      </View>
+    <View className="w-full flex-row flex-wrap items-start justify-between gap-4">
+      <PasswordRequirementItem icon="A" label="uppercase" isValid={hasUpperCase} />
+      <PasswordRequirementItem icon="a" label="lowercase" isValid={hasLowerCase} />
+      <PasswordRequirementItem icon="123" label="number" isValid={hasNumber} />
+      <PasswordRequirementItem icon="#&?" label="symbol" isValid={hasSymbol} />
+      <PasswordRequirementItem icon="8+" label="8 characters" isValid={hasMinLength} />
     </View>
   );
 };

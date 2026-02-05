@@ -57,7 +57,7 @@ export default function BrokerSignUpScreen() {
 
       resetData();
 
-      router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
+      router.push(AUTH_ROUTES.APPLICATION_SUBMITTED);
     } catch {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     } finally {
@@ -118,6 +118,7 @@ export default function BrokerSignUpScreen() {
                 label="Manager e-mail"
                 required
                 value={values.managerInfo.email}
+                helper="E-mail for verification and access"
                 disabled
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
@@ -169,6 +170,7 @@ export default function BrokerSignUpScreen() {
                 }
                 keyboardType="email-address"
                 autoCapitalize="none"
+                helper="Company e-mail for contact purposes"
                 autoCorrect={false}
               />
 

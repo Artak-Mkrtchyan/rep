@@ -18,9 +18,11 @@ export const AUTH_ROUTES = {
   FORGOT_PASSWORD: '/(auth)/forgot-password',
   FORGOT_PASSWORD_RESET: '/(auth)/forgot-password/reset',
   FORGOT_PASSWORD_SUCCESS: '/(auth)/forgot-password/success',
+  APPLICATION_SUBMITTED: '/(auth)/signup/application-submitted',
 } as const;
 
 export const IMAGE_DIMENSIONS = {
+  SUBMITTED_ILLUSTRATION: { width: 208, height: 138 },
   BROKER_ILLUSTRATION: { width: 196, height: 138 },
   EMAIL_VERIFY: { width: 102, height: 102 },
   SIGNUP_EMAIL: { width: 196, height: 138 },

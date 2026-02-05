@@ -3,7 +3,6 @@ import { Formik } from 'formik';
 import React from 'react';
 import * as Yup from 'yup';
 
-import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { FormDivider } from '@/components/auth/form-divider';
 import { PasswordRequirementsList } from '@/components/auth/password-requirements';
@@ -30,7 +29,9 @@ const PasswordSchema = Yup.object().shape({
   password: Yup.string()
     .min(PASSWORD_MIN_LENGTH, 'Password too short')
     .matches(/[A-Z]/, 'Must contain uppercase')
+    .matches(/[a-z]/, 'Must contain lowercase')
     .matches(/\d/, 'Must contain number')
+    .matches(/[^A-Za-z0-9]/, 'Must contain symbol')
     .required('Required'),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Passwords do not match')
@@ -73,7 +74,7 @@ export default function CreatePasswordScreen() {
   };
 
   return (
-    <AuthLayout>
+    <AuthLayout scrollable>
       <Formik
         initialValues={{
           email: data.email || '',
@@ -89,12 +90,9 @@ export default function CreatePasswordScreen() {
 
           return (
             <>
-              <AuthHeader
-                title="Sign up"
-                imageSource={require('@/assets/images/signup-illustration.svg')}
-                imageWidth={170}
-                imageHeight={113}
-              />
+              <ThemedText type="title" className="mt-10 text-center">
+                Sign up
+              </ThemedText>
 
               <Input
                 label="Email"
@@ -130,6 +128,7 @@ export default function CreatePasswordScreen() {
               <Input
                 label="Password"
                 value={values.password}
+                showPasswordToggle
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
                 error={touched.password && errors.password ? errors.password : undefined}
@@ -141,7 +140,9 @@ export default function CreatePasswordScreen() {
               <PasswordRequirementsList
                 hasMinLength={passwordRequirements.hasMinLength}
                 hasUpperCase={passwordRequirements.hasUpperCase}
+                hasLowerCase={passwordRequirements.hasLowerCase}
                 hasNumber={passwordRequirements.hasNumber}
+                hasSymbol={passwordRequirements.hasSymbol}
               />
 
               <Input
@@ -156,6 +157,7 @@ export default function CreatePasswordScreen() {
                     : undefined
                 }
                 secureTextEntry
+                showPasswordToggle
                 placeholder=""
                 placeholderTextColor={theme.placeholder}
               />

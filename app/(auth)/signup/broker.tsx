@@ -50,7 +50,7 @@ export default function BrokerSignUpScreen() {
 
       resetData();
 
-      router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
+      router.push(AUTH_ROUTES.APPLICATION_SUBMITTED);
     } catch {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     } finally {

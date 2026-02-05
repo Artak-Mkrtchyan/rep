@@ -14,15 +14,15 @@ export default function SignUpCompletedScreen() {
   return (
     <AuthLayout centered>
       <AuthHeader
-        title=""
-        imageSource={require('@/assets/images/icon-signup-success.svg')}
-        imageWidth={IMAGE_DIMENSIONS.SIGNUP_SUCCESS.width}
-        imageHeight={IMAGE_DIMENSIONS.SIGNUP_SUCCESS.height}
-        description="You've successfully registered. Welcome aboard!"
+        title="Application has been submitted!"
+        imageSource={require('@/assets/images/submitted-illustration.svg')}
+        imageWidth={IMAGE_DIMENSIONS.SUBMITTED_ILLUSTRATION.width}
+        imageHeight={IMAGE_DIMENSIONS.SUBMITTED_ILLUSTRATION.height}
+        description="Your application has been submitted for review. It is currently pending administrator approval. You will be notified once the review is completed."
       />
 
       <Button onPress={handleContinue} accessibilityLabel="Go to login">
-        Go to home page
+        Ok
       </Button>
     </AuthLayout>
   );

@@ -2,7 +2,9 @@ export type AccountRole = '' | 'individual' | 'company' | 'broker' | 'broker_com
 export interface PasswordRequirements {
   hasMinLength: boolean;
   hasUpperCase: boolean;
+  hasLowerCase: boolean;
   hasNumber: boolean;
+  hasSymbol: boolean;
 }
 
 export interface BrokerSignUpForm {

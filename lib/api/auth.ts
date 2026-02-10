@@ -76,16 +76,19 @@ export interface CreateUsualUserResponse {
   message?: string;
 }
 
-export interface ForgotPasswordRequest {
+export interface SendPasswordOtpRequest {
   email: string;
-  scope: AuthScope;
+}
+
+export interface ConfirmPasswordOtpRequest {
+  code: string;
 }
 
 export interface ResetPasswordRequest {
   email: string;
   scope: AuthScope;
   newPassword: string;
-  otp: string;
+  usingOtp: boolean;
 }
 
 export const authService = {
@@ -157,19 +160,23 @@ export const authService = {
     return response.data || (response as unknown as CreateUsualUserResponse);
   },
 
-  requestPasswordReset: async (
-    email: string,
-    scope: AuthScope = AuthScope.USUAL
-  ): Promise<void> => {
-    const response = await httpClient.post<ApiResponse<void>>(
+  sendPasswordOtp: async (email: string): Promise<void> => {
+    await httpClient.post<ApiResponse<void>>(
       '/v1/otp/password-confirmation/send',
-      { email, scope } as ForgotPasswordRequest,
+      { email } as SendPasswordOtpRequest,
       { skipAuth: true }
     );
-    return response.data;
+  },
+
+  confirmPasswordOtp: async (code: string): Promise<void> => {
+    await httpClient.post<ApiResponse<void>>(
+      '/v1/otp/password-confirmation/confirm',
+      { code } as ConfirmPasswordOtpRequest,
+      { skipAuth: true }
+    );
   },
 
   resetPassword: async (data: ResetPasswordRequest): Promise<void> => {
-    await httpClient.post<void>('/v1/users/change-password', data, { skipAuth: true });
+    await httpClient.patch<void>('/v1/users/change-password', data, { skipAuth: true });
   },
 };

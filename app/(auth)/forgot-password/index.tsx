@@ -51,9 +51,9 @@ export default function ForgotPasswordEmailScreen() {
 
     setIsLoading(true);
     try {
-      await authService.requestPasswordReset(email.trim(), data.scope);
+      await authService.sendPasswordOtp(email.trim());
       updateData({ email: email.trim() });
-      router.push(AUTH_ROUTES.FORGOT_PASSWORD_RESET);
+      router.push(AUTH_ROUTES.FORGOT_PASSWORD_VERIFY);
     } catch (error) {
       console.error('Password reset error:', error);
 

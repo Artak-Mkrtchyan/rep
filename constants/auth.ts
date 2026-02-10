@@ -16,6 +16,7 @@ export const AUTH_ROUTES = {
   SIGNUP_PASSWORD: '/(auth)/signup/create-password',
   SIGNUP_COMPLETED: '/(auth)/signup/completed',
   FORGOT_PASSWORD: '/(auth)/forgot-password',
+  FORGOT_PASSWORD_VERIFY: '/(auth)/forgot-password/verify',
   FORGOT_PASSWORD_RESET: '/(auth)/forgot-password/reset',
   FORGOT_PASSWORD_SUCCESS: '/(auth)/forgot-password/success',
   APPLICATION_SUBMITTED: '/(auth)/signup/application-submitted',

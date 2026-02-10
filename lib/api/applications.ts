@@ -98,7 +98,7 @@ export const applicationsService = {
     data: BrokerRegistrationRequest
   ): Promise<BrokerRegistrationResponse> => {
     const response = await httpClient.post<ApiResponse<BrokerRegistrationResponse>>(
-      '/v1/applications/broker-registration',
+      '/v1/applications/individual-broker-registration',
       data,
       {
         skipAuth: true,

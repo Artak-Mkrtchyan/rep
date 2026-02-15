@@ -8,8 +8,10 @@ const FLOW_ORDER = [
   AUTH_ROUTES.SIGNUP_EMAIL, // 2. Email Input
   AUTH_ROUTES.SIGNUP_VERIFY, // 3. OTP Verification
   AUTH_ROUTES.SIGNUP_BROKER, // 4. Broker Details (Conditional)
-  AUTH_ROUTES.SIGNUP_PASSWORD, // 5. Password Creation
-  AUTH_ROUTES.SIGNUP_COMPLETED, // 6. Completion
+  AUTH_ROUTES.SIGNUP_BROKER_COMPANY, // 5. Broker Company Details (Conditional)
+  AUTH_ROUTES.SIGNUP_CONSTRUCTION_COMPANY, // 6. Construction Company Details (Conditional)
+  AUTH_ROUTES.SIGNUP_PASSWORD, // 7. Password Creation
+  AUTH_ROUTES.SIGNUP_COMPLETED, // 8. Completion
 ];
 
 export function useSignUpFlow() {
@@ -44,7 +46,21 @@ export function useSignUpFlow() {
     // If next step is BROKER but role is NOT broker, skip it
     if (FLOW_ORDER[nextIndex] === AUTH_ROUTES.SIGNUP_BROKER) {
       if (data.role !== 'broker') {
-        nextIndex++; // Skip to Password
+        nextIndex++;
+      }
+    }
+
+    // If next step is BROKER_COMPANY but role is NOT broker_company, skip it
+    if (FLOW_ORDER[nextIndex] === AUTH_ROUTES.SIGNUP_BROKER_COMPANY) {
+      if (data.role !== 'broker_company') {
+        nextIndex++;
+      }
+    }
+
+    // If next step is CONSTRUCTION_COMPANY but role is NOT company, skip it
+    if (FLOW_ORDER[nextIndex] === AUTH_ROUTES.SIGNUP_CONSTRUCTION_COMPANY) {
+      if (data.role !== 'company') {
+        nextIndex++;
       }
     }
 
@@ -67,6 +83,18 @@ export function useSignUpFlow() {
     let prevIndex = currentIndex - 1;
 
     // Logic to skip steps backwards
+    if (FLOW_ORDER[prevIndex] === AUTH_ROUTES.SIGNUP_CONSTRUCTION_COMPANY) {
+      if (data.role !== 'company') {
+        prevIndex--;
+      }
+    }
+
+    if (FLOW_ORDER[prevIndex] === AUTH_ROUTES.SIGNUP_BROKER_COMPANY) {
+      if (data.role !== 'broker_company') {
+        prevIndex--;
+      }
+    }
+
     if (FLOW_ORDER[prevIndex] === AUTH_ROUTES.SIGNUP_BROKER) {
       if (data.role !== 'broker') {
         prevIndex--;

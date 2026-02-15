@@ -13,6 +13,7 @@ export const AUTH_ROUTES = {
   SIGNUP_VERIFY: '/(auth)/signup/verify',
   SIGNUP_BROKER: '/(auth)/signup/broker',
   SIGNUP_BROKER_COMPANY: '/(auth)/signup/broker-company',
+  SIGNUP_CONSTRUCTION_COMPANY: '/(auth)/signup/construction-company',
   SIGNUP_PASSWORD: '/(auth)/signup/create-password',
   SIGNUP_COMPLETED: '/(auth)/signup/completed',
   FORGOT_PASSWORD: '/(auth)/forgot-password',
@@ -25,6 +26,7 @@ export const AUTH_ROUTES = {
 export const IMAGE_DIMENSIONS = {
   SUBMITTED_ILLUSTRATION: { width: 208, height: 138 },
   BROKER_ILLUSTRATION: { width: 196, height: 138 },
+  CONSTRUCTION_ILLUSTRATION: { width: 196, height: 138 },
   EMAIL_VERIFY: { width: 102, height: 102 },
   SIGNUP_EMAIL: { width: 196, height: 138 },
   SIGNUP_SUCCESS: { width: 212, height: 135 },

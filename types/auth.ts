@@ -17,6 +17,23 @@ export interface BrokerSignUpForm {
   yearsOfActivity: number;
 }
 
+export interface ConstructionCompanySignUpForm {
+  attachmentIds: string[];
+  companyInfo: {
+    certifiedBy?: string;
+    certifiedOn: string;
+    email: string;
+    name: string;
+    phoneNumber: string;
+    yearsOfActivity: number;
+  };
+  managerInfo: {
+    email: string;
+    fullName: string;
+    phoneNumber?: string;
+  };
+}
+
 export interface PasswordForm {
   email: string;
   password: string;

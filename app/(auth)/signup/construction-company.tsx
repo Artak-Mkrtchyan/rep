@@ -20,31 +20,26 @@ import {
   applicationsService,
   ConstructionCompanyRegistrationRequest,
 } from '@/lib/api/applications';
+import { yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const ConstructionCompanySchema = Yup.object().shape({
   attachmentIds: Yup.array().min(1, 'At least one file is required').required('Required'),
   companyInfo: Yup.object().shape({
-    certifiedOn: Yup.string()
-      .required('Required')
-      .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
+    certifiedOn: yupSchemas.certifiedOn,
     certifiedBy: Yup.string().optional(),
-    email: Yup.string().email('Invalid email').required('Required'),
+    email: yupSchemas.email,
     name: Yup.string().required('Required'),
-    phoneNumber: Yup.string()
-      .required('Required')
-      .matches(/^\+998\d{9}$/, 'Invalid phone number'),
+    phoneNumber: yupSchemas.phone,
     yearsOfActivity: Yup.number()
       .required('Required')
       .min(0, 'Must be at least 0')
       .max(100, 'Must be at most 100'),
   }),
   managerInfo: Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('Required'),
-    fullName: Yup.string().required('Required'),
-    phoneNumber: Yup.string()
-      .matches(/^\+998\d{9}$/, 'Invalid phone number')
-      .optional(),
+    email: yupSchemas.email,
+    fullName: yupSchemas.fullName,
+    phoneNumber: yupSchemas.phoneOptional,
   }),
 });
 

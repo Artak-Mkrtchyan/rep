@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES } from '@/constants/auth';
 import { useTheme } from '@/hooks/use-theme';
-import { PASSWORD_MIN_LENGTH, validatePassword } from '@/lib/auth-validation';
+import { validatePassword, yupSchemas } from '@/lib/auth-validation';
 
 import { PhoneInput } from '@/components/ui/phone-input';
 import { useSignUpContext } from '@/context/SignUpContext';
@@ -21,21 +21,11 @@ import type { PasswordForm } from '@/types/auth';
 import { Alert } from 'react-native';
 
 const PasswordSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email').required('Required'),
-  fullName: Yup.string().required('Required'),
-  phone: Yup.string()
-    .required('Required')
-    .matches(/^\+998\d{9}$/, 'Invalid phone number'),
-  password: Yup.string()
-    .min(PASSWORD_MIN_LENGTH, 'Password too short')
-    .matches(/[A-Z]/, 'Must contain uppercase')
-    .matches(/[a-z]/, 'Must contain lowercase')
-    .matches(/\d/, 'Must contain number')
-    .matches(/[^A-Za-z0-9]/, 'Must contain symbol')
-    .required('Required'),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Passwords do not match')
-    .required('Required'),
+  email: yupSchemas.email,
+  fullName: yupSchemas.fullName,
+  phone: yupSchemas.phone,
+  password: yupSchemas.password,
+  confirmPassword: yupSchemas.confirmPassword,
 });
 
 export default function CreatePasswordScreen() {

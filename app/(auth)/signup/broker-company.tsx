@@ -17,27 +17,22 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { NumberPicker } from '@/components/ui/number-picker';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { applicationsService, BrokerCompanyRegistrationRequest } from '@/lib/api/applications';
+import { yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const BrokerCompanySchema = Yup.object().shape({
   attachmentIds: Yup.array().min(1, 'At least one file is required').required('Required'),
   companyInfo: Yup.object().shape({
-    certifiedOn: Yup.string()
-      .required('Required')
-      .matches(/^\d{4}-\d{2}-\d{2}$/, 'Date in incorrect format'),
-    email: Yup.string().email('Invalid email').required('Required'),
+    certifiedOn: yupSchemas.certifiedOn,
+    email: yupSchemas.email,
     name: Yup.string().required('Required'),
-    phoneNumber: Yup.string()
-      .required('Required')
-      .matches(/^\+998\d{9}$/, 'Invalid phone number'),
+    phoneNumber: yupSchemas.phone,
     yearsOfActivity: Yup.number().required('Required'),
   }),
   managerInfo: Yup.object().shape({
-    email: Yup.string().email('Invalid email').required('Required'),
-    fullName: Yup.string().required('Required'),
-    phoneNumber: Yup.string()
-      .required('Required')
-      .matches(/^\+998\d{9}$/, 'Invalid phone number'),
+    email: yupSchemas.email,
+    fullName: yupSchemas.fullName,
+    phoneNumber: yupSchemas.phone,
   }),
 });
 

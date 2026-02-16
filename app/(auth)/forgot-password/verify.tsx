@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -110,7 +110,8 @@ export default function ForgotPasswordVerifyScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
-      <ThemedView className="flex-1 px-4">
+      <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
+        <ThemedView className="flex-1 px-4">
         <View className="mt-6">
           <Pressable
             onPress={handleBack}
@@ -190,7 +191,8 @@ export default function ForgotPasswordVerifyScreen() {
             </Button>
           </View>
         </View>
-      </ThemedView>
+        </ThemedView>
+      </Pressable>
     </KeyboardAvoidingView>
   );
 }

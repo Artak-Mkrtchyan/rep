@@ -4,9 +4,8 @@ import React from 'react';
 import * as Yup from 'yup';
 
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { FormDivider } from '@/components/auth/form-divider';
 import { PasswordRequirementsList } from '@/components/auth/password-requirements';
-import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
+import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +16,7 @@ import { PASSWORD_MIN_LENGTH, validatePassword } from '@/lib/auth-validation';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { authService } from '@/lib/api/auth';
+import { ApiError } from '@/lib/api/auth.types';
 import type { PasswordForm } from '@/types/auth';
 import { Alert } from 'react-native';
 
@@ -42,7 +42,7 @@ export default function CreatePasswordScreen() {
   const { tokens: theme } = useTheme();
   const { data, resetData } = useSignUpContext();
 
-  const handleContinue = async (values: PasswordForm, { setSubmitting }: any) => {
+  const handleContinue = async (values: PasswordForm, { setSubmitting, setFieldError }: any) => {
     try {
       await authService.createUsualUser({
         fullName: values.fullName,
@@ -54,8 +54,25 @@ export default function CreatePasswordScreen() {
       resetData();
 
       router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
-    } catch {
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } catch (error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
+        const apiError = error as ApiError;
+
+        if (apiError.errors) {
+          (Object.entries(apiError.errors) as [string, string[]][]).forEach(([field, messages]) => {
+            if (messages?.[0]) {
+              setFieldError(field, messages[0]);
+            }
+          });
+        } else {
+          Alert.alert(
+            'Error',
+            apiError.message || 'An unexpected error occurred. Please try again.'
+          );
+        }
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -169,18 +186,12 @@ export default function CreatePasswordScreen() {
                 Continue
               </Button>
 
-              <FormDivider />
-
-              <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
-
-              <Button
-                variant="ghost"
-                onPress={handleGoToLogin}
-                accessibilityLabel="Already have an account? Log in">
-                <ThemedText className="text-[16px] text-primary">
-                  Already have an account?
-                </ThemedText>
-              </Button>
+              <SignInFooter
+                onGooglePress={handleGoogleAuth}
+                onApplePress={handleAppleAuth}
+                onSignInPress={handleGoToLogin}
+                showSignInLink
+              />
             </>
           );
         }}

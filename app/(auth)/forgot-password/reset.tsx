@@ -64,7 +64,7 @@ export default function ForgotPasswordResetScreen() {
         },
       ]);
     } catch (error) {
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
         Alert.alert(
           'Reset Failed',

@@ -251,7 +251,7 @@ class HttpClient {
 
       return await this.handleResponse<T>(response, endpoint, config);
     } catch (error) {
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         throw error;
       }
 

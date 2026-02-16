@@ -9,6 +9,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/button';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
+import { useCountdown } from '@/hooks/use-countdown';
 import { authService } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/auth.types';
 import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
@@ -16,27 +17,13 @@ import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
 export default function ForgotPasswordVerifyScreen() {
   const [otp, setOtp] = React.useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [isLoading, setIsLoading] = React.useState(false);
-  const [secondsLeft, setSecondsLeft] = React.useState(RESEND_CODE_TIMEOUT);
+  const { secondsLeft, restart: restartCountdown, formatTime } = useCountdown(RESEND_CODE_TIMEOUT);
 
   const inputsRef = React.useRef<(TextInput | null)[]>([]);
   const { data } = useForgotPasswordContext();
 
   const isOtpComplete = otp.every((val) => val.length === 1);
   const canSubmit = isOtpComplete && !isLoading;
-
-  React.useEffect(() => {
-    if (secondsLeft <= 0) return;
-
-    const intervalId = setInterval(() => {
-      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [secondsLeft]);
-
-  const formatTime = (seconds: number): string => {
-    return `00:${seconds.toString().padStart(2, '0')}`;
-  };
 
   const handleInputFocus = (index: number) => {
     const ref = inputsRef.current[index];
@@ -69,10 +56,10 @@ export default function ForgotPasswordVerifyScreen() {
 
     try {
       await authService.sendPasswordOtp(data.email);
-      setSecondsLeft(RESEND_CODE_TIMEOUT);
+      restartCountdown();
       Alert.alert('Code Sent', 'A new reset code has been sent to your email.');
     } catch (error) {
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
         Alert.alert('Error', apiError.message || 'Failed to resend code. Please try again.');
       } else {
@@ -92,7 +79,7 @@ export default function ForgotPasswordVerifyScreen() {
     } catch (error) {
       console.error('OTP confirmation error:', error);
 
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
 
         let errorMessage = apiError.message || 'Invalid verification code. Please try again.';

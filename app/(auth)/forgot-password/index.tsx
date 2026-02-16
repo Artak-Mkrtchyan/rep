@@ -57,7 +57,7 @@ export default function ForgotPasswordEmailScreen() {
     } catch (error) {
       console.error('Password reset error:', error);
 
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
 
         // More detailed error messages

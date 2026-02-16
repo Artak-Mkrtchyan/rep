@@ -10,6 +10,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
+import { useCountdown } from '@/hooks/use-countdown';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { authService } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/auth.types';
@@ -27,17 +28,7 @@ export default function VerifyEmailScreen() {
   const { data, updateData } = useSignUpContext();
   const { goToPrevious } = useSignUpFlow();
   const inputsRef = React.useRef<(TextInput | null)[]>([]);
-  const [secondsLeft, setSecondsLeft] = React.useState(RESEND_CODE_TIMEOUT);
-
-  React.useEffect(() => {
-    if (secondsLeft <= 0) return;
-
-    const intervalId = setInterval(() => {
-      setSecondsLeft((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [secondsLeft]);
+  const { secondsLeft, restart: restartCountdown, formatTime } = useCountdown(RESEND_CODE_TIMEOUT);
 
   const handleContinue = async (values: { otp: string[] }, { setSubmitting }: any) => {
     const code = values.otp.join('');
@@ -60,7 +51,7 @@ export default function VerifyEmailScreen() {
           break;
       }
     } catch (error) {
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
         Alert.alert(
           'Verification Failed',
@@ -80,20 +71,16 @@ export default function VerifyEmailScreen() {
     try {
       // Повторная отправка кода подтверждения
       await authService.requestEmailConfirmation(data.email);
-      setSecondsLeft(RESEND_CODE_TIMEOUT);
+      restartCountdown();
       Alert.alert('Code Sent', 'A new verification code has been sent to your email.');
     } catch (error) {
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
         Alert.alert('Error', apiError.message || 'Failed to resend code. Please try again.');
       } else {
         Alert.alert('Error', 'An unexpected error occurred. Please try again.');
       }
     }
-  };
-
-  const formatTime = (seconds: number): string => {
-    return `00:${seconds.toString().padStart(2, '0')}`;
   };
 
   const handleInputFocus = (index: number) => {

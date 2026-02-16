@@ -17,7 +17,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   scrollable = false,
 }) => {
   const content = (
-    <View className={`w-[${CONTAINER_WIDTH}px] max-w-full items-center gap-6`}>{children}</View>
+    <View className={`w-[${CONTAINER_WIDTH}px] max-w-full items-center gap-4`}>{children}</View>
   );
 
   return (
@@ -39,7 +39,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
         ) : centered ? (
           content
         ) : (
-          <View className="w-[358px] max-w-full items-center gap-6 pt-10">{content}</View>
+          <View className="w-[358px] max-w-full items-center gap-4 pt-10">{content}</View>
         )}
       </ThemedView>
     </KeyboardAvoidingView>

@@ -93,13 +93,18 @@ export interface ResetPasswordRequest {
 
 export const authService = {
   requestEmailConfirmation: async (email: string): Promise<void> => {
-    await httpClient.post<void>(
-      '/v1/otp/email-confirmation/send',
-      { email } as RequestEmailConfirmationRequest,
-      {
-        skipAuth: true,
-      }
-    );
+    try {
+      const result = await httpClient.post<void>(
+        '/v1/otp/email-confirmation/send',
+        { email } as RequestEmailConfirmationRequest,
+        {
+          skipAuth: true,
+        }
+      );
+      return result;
+    } catch (error) {
+      throw error;
+    }
   },
 
   confirmEmail: async (code: string): Promise<void> => {

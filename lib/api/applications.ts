@@ -69,6 +69,35 @@ export interface BrokerCompanyRegistrationResponse {
   managerInfo: ManagerInfo;
 }
 
+export interface ConstructionCompanyRegistrationRequest {
+  attachmentIds: string[];
+  companyInfo: {
+    certifiedBy?: string;
+    certifiedOn: string;
+    name: string;
+    email: string;
+    phoneNumber: string;
+    yearsOfActivity: number;
+  };
+  managerInfo: {
+    email?: string;
+    fullName: string;
+    phoneNumber?: string;
+  };
+}
+
+export interface ConstructionCompanyRegistrationResponse {
+  id: string;
+  applicantEmail: string;
+  createdAt: string;
+  createdBy: string;
+  reviewerId?: string;
+  status: ApplicationStatus;
+  type: string;
+  companyInfo: CompanyInfo;
+  managerInfo: ManagerInfo;
+}
+
 export type FileInput = { uri: string; type: string; name: string }; // React Native format
 
 export const applicationsService = {
@@ -125,5 +154,24 @@ export const applicationsService = {
     );
 
     return response.data || (response as unknown as BrokerCompanyRegistrationResponse);
+  },
+
+  /**
+   * Register a construction company application
+   * @param data - Construction company registration data
+   * @returns Construction company registration response with application details
+   */
+  constructionCompanyRegistration: async (
+    data: ConstructionCompanyRegistrationRequest
+  ): Promise<ConstructionCompanyRegistrationResponse> => {
+    const response = await httpClient.post<ApiResponse<ConstructionCompanyRegistrationResponse>>(
+      '/v1/applications/construction-company-registration',
+      data,
+      {
+        skipAuth: true,
+      }
+    );
+
+    return response.data || (response as unknown as ConstructionCompanyRegistrationResponse);
   },
 };

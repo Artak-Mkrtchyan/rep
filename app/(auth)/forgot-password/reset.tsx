@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { PasswordRequirementsList } from '@/components/auth/password-requirements';
 import { ThemedText } from '@/components/themed-text';
@@ -64,7 +64,7 @@ export default function ForgotPasswordResetScreen() {
         },
       ]);
     } catch (error) {
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
         Alert.alert(
           'Reset Failed',
@@ -86,7 +86,8 @@ export default function ForgotPasswordResetScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
-      <ThemedView className="flex-1 px-4">
+      <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
+        <ThemedView className="flex-1 px-4">
         <View className="mt-6">
           <Pressable
             onPress={handleBack}
@@ -158,7 +159,8 @@ export default function ForgotPasswordResetScreen() {
             </Button>
           </View>
         </View>
-      </ThemedView>
+        </ThemedView>
+      </Pressable>
     </KeyboardAvoidingView>
   );
 }

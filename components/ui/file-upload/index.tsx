@@ -69,7 +69,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleUploadError = (error: unknown) => {
-    if (error instanceof Error && 'statusCode' in error) {
+    if (error && typeof error === 'object' && 'statusCode' in error) {
       const apiError = error as ApiError;
       Alert.alert('Upload Failed', apiError.message || 'Failed to upload file. Please try again.');
     } else {

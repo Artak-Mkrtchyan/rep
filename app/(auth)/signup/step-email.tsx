@@ -4,9 +4,7 @@ import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { FormDivider } from '@/components/auth/form-divider';
-import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
-import { ThemedText } from '@/components/themed-text';
+import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
@@ -34,11 +32,11 @@ export default function SignUpEmailStepScreen() {
     try {
       await authService.requestEmailConfirmation(values.email);
 
-      updateData({ email: values.email });
+      updateData({ email: values.email, otp: undefined });
 
       goToNext();
     } catch (error) {
-      if (error instanceof Error && 'statusCode' in error) {
+      if (error && typeof error === 'object' && 'statusCode' in error) {
         const apiError = error as ApiError;
 
         if (apiError.errors?.email) {
@@ -102,16 +100,12 @@ export default function SignUpEmailStepScreen() {
               {isSubmitting ? 'Sending...' : 'Continue'}
             </Button>
 
-            <FormDivider />
-
-            <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
-
-            <Button
-              variant="ghost"
-              onPress={handleGoToLogin}
-              accessibilityLabel="Already have an account? Log in">
-              <ThemedText className="text-[16px] text-primary">Already have an account?</ThemedText>
-            </Button>
+            <SignInFooter
+              onGooglePress={handleGoogleAuth}
+              onApplePress={handleAppleAuth}
+              onSignInPress={handleGoToLogin}
+              showSignInLink
+            />
           </>
         )}
       </Formik>

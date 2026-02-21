@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 
 import { ThemedView } from '@/components/themed-view';
 
@@ -17,31 +17,32 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   scrollable = false,
 }) => {
   const content = (
-    <View className={`w-[${CONTAINER_WIDTH}px] max-w-full items-center gap-6`}>{children}</View>
+    <View className={`w-[${CONTAINER_WIDTH}px] max-w-full flex-1 items-center gap-4`}>
+      {children}
+    </View>
   );
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
-      <ThemedView className={`flex-1 px-4 ${centered ? 'items-center justify-center' : ''}`}>
-        {scrollable ? (
+      <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
+        <ThemedView className="flex-1 px-4">
           <ScrollView
             className="flex-1"
             contentContainerStyle={{
+              flexGrow: 1,
               alignItems: 'center',
+              justifyContent: centered ? 'center' : undefined,
               paddingBottom: 24,
-              paddingTop: centered ? 0 : 32,
+              paddingTop: centered || scrollable ? 0 : 32,
             }}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled">
             {content}
           </ScrollView>
-        ) : centered ? (
-          content
-        ) : (
-          <View className="w-[358px] max-w-full items-center gap-6 pt-10">{content}</View>
-        )}
-      </ThemedView>
+        </ThemedView>
+      </Pressable>
     </KeyboardAvoidingView>
   );
 };

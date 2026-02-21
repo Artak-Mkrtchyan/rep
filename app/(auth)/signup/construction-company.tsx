@@ -16,35 +16,42 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
 import { NumberPicker } from '@/components/ui/number-picker';
 import { PhoneInput } from '@/components/ui/phone-input';
-import { applicationsService, BrokerCompanyRegistrationRequest } from '@/lib/api/applications';
+import {
+  applicationsService,
+  ConstructionCompanyRegistrationRequest,
+} from '@/lib/api/applications';
 import { yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
-const BrokerCompanySchema = Yup.object().shape({
+const ConstructionCompanySchema = Yup.object().shape({
   attachmentIds: Yup.array().min(1, 'At least one file is required').required('Required'),
   companyInfo: Yup.object().shape({
     certifiedOn: yupSchemas.certifiedOn,
+    certifiedBy: Yup.string().optional(),
     email: yupSchemas.email,
     name: Yup.string().required('Required'),
     phoneNumber: yupSchemas.phone,
-    yearsOfActivity: Yup.number().required('Required'),
+    yearsOfActivity: Yup.number()
+      .required('Required')
+      .min(0, 'Must be at least 0')
+      .max(100, 'Must be at most 100'),
   }),
   managerInfo: Yup.object().shape({
     email: yupSchemas.email,
     fullName: yupSchemas.fullName,
-    phoneNumber: yupSchemas.phone,
+    phoneNumber: yupSchemas.phoneOptional,
   }),
 });
 
-export default function BrokerSignUpScreen() {
+export default function ConstructionCompanySignUpScreen() {
   const { data, resetData } = useSignUpContext();
 
   const handleContinue = async (
-    values: BrokerCompanyRegistrationRequest,
+    values: ConstructionCompanyRegistrationRequest,
     { setSubmitting }: any
   ) => {
     try {
-      await applicationsService.brokerCompanyRegistration({
+      await applicationsService.constructionCompanyRegistration({
         attachmentIds: values.attachmentIds,
         companyInfo: values.companyInfo,
         managerInfo: values.managerInfo,
@@ -88,7 +95,7 @@ export default function BrokerSignUpScreen() {
           },
         }}
         enableReinitialize
-        validationSchema={BrokerCompanySchema}
+        validationSchema={ConstructionCompanySchema}
         onSubmit={handleContinue}>
         {({
           handleChange,
@@ -104,8 +111,8 @@ export default function BrokerSignUpScreen() {
             <AuthHeader
               title="Sign up"
               imageSource={require('@/assets/images/icon-broker-illustration.svg')}
-              imageWidth={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.width}
-              imageHeight={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.height}
+              imageWidth={IMAGE_DIMENSIONS.CONSTRUCTION_ILLUSTRATION.width}
+              imageHeight={IMAGE_DIMENSIONS.CONSTRUCTION_ILLUSTRATION.height}
             />
 
             <View className="mt-10 w-full gap-5">
@@ -155,6 +162,7 @@ export default function BrokerSignUpScreen() {
 
               <Input
                 label="Company e-mail"
+                required
                 value={values.companyInfo.email}
                 onChangeText={handleChange('companyInfo.email')}
                 onBlur={handleBlur('companyInfo.email')}
@@ -185,6 +193,7 @@ export default function BrokerSignUpScreen() {
 
               <PhoneInput
                 label="Mobile number"
+                required
                 value={values.companyInfo.phoneNumber}
                 onChangeText={(text) => setFieldValue('companyInfo.phoneNumber', text)}
                 onBlur={handleBlur('companyInfo.phoneNumber')}
@@ -225,7 +234,7 @@ export default function BrokerSignUpScreen() {
                 value={values.companyInfo.yearsOfActivity}
                 onChange={(value) => setFieldValue('companyInfo.yearsOfActivity', value)}
                 min={0}
-                max={50}
+                max={100}
                 step={1}
                 required
                 error={

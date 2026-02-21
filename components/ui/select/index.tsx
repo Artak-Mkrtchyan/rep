@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Pressable, ScrollView, Text, View } from 'react-native';
 
+import { InputError } from '@/components/ui/input/error';
 import { InputLabel } from '@/components/ui/input/label';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +17,7 @@ type SelectProps<T extends string = string> = {
   onChange?: (value: T) => void;
   options: SelectOption<T>[];
   disabled?: boolean;
+  error?: string;
   containerClassName?: string;
 };
 
@@ -26,6 +28,7 @@ export function Select<T extends string = string>({
   onChange,
   options,
   disabled,
+  error,
   containerClassName,
 }: SelectProps<T>) {
   const [open, setOpen] = React.useState(false);
@@ -55,13 +58,16 @@ export function Select<T extends string = string>({
           'h-12 flex-row items-center justify-between rounded-[12px] border px-3',
           'bg-card',
           disabled && 'opacity-50',
-          open ? 'border-primary' : 'border-default'
+          error && 'border-destructive',
+          !error && (open ? 'border-primary' : 'border-default')
         )}>
         <Text className={cn('text-[16px]', selected ? 'text-foreground' : 'text-muted-foreground')}>
           {selected ? selected.label : placeholder}
         </Text>
         <Text className="text-[16px] text-muted-foreground">▾</Text>
       </Pressable>
+
+      {error ? <InputError>{error}</InputError> : null}
 
       <Modal transparent animationType="fade" visible={open} onRequestClose={handleClose}>
         <Pressable

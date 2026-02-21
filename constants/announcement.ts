@@ -5,6 +5,14 @@ export const LISTING_TYPE_OPTIONS: SelectOption<string>[] = [
   { label: 'For sale', value: 'sale' },
 ];
 
+export const PROPERTY_TYPE_OPTIONS: SelectOption<string>[] = [
+  { label: 'Apartment', value: 'APARTMENT' },
+  { label: 'Commercial space', value: 'COMMERCIAL_SPACE' },
+  { label: 'Garage', value: 'GARAGE' },
+  { label: 'House', value: 'HOUSE' },
+  { label: 'Land', value: 'LAND' },
+  { label: 'Parking space', value: 'PARKING_SPACE' },
+];
 export const BATHROOMS_OPTIONS: SelectOption<string>[] = [
   { label: '1', value: '1' },
   { label: '2', value: '2' },
@@ -20,8 +28,8 @@ export const BEDROOMS_OPTIONS: SelectOption<string>[] = [
 ];
 
 export const PROCESS_OPTIONS: SelectOption<string>[] = [
-  { label: 'As individual', value: 'individual' },
-  { label: 'As company', value: 'company' },
+  { label: 'As individual', value: 'AS_INDIVIDUAL' },
+  { label: 'As broker', value: 'AS_BROKER' },
 ];
 
 export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 20 }, (_, i) => ({

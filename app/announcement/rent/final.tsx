@@ -1,54 +1,134 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { PlacedByItem } from '@/components/announcement/placed-by-item';
+import { PropertyAnnouncementDetail } from '@/components/announcement/property-announcement-detail';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Button } from '@/components/ui/button';
-import {
-  BUILDING_TYPE_OPTIONS,
-  CONDITION_OPTIONS,
-  LISTING_TYPE_OPTIONS,
-  OWNERSHIP_TYPE_OPTIONS,
-} from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
-import { cn } from '@/lib/utils';
+import type { RentForApartmentsForm } from '@/types/announcement';
 
-const FOOTER_APPROX_HEIGHT = 152;
-const CARD_CLASS = 'rounded-[12px] bg-card p-4';
 const SECTION_TITLE_CLASS = 'mb-3 text-[16px] font-semibold text-foreground';
 
-const getLabelFromValue = (
-  options: { label: string; value: string }[],
-  value: string
-): string => (options.find((o) => o.value === value)?.label ?? value) || '—';
+const CHARACTERISTIC_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+  floors: 'layers-outline',
+  area: 'resize-outline',
+  bedroom: 'bed-outline',
+  bathroom: 'water-outline',
+  condition: 'snow-outline',
+  buildingType: 'business-outline',
+  yearBuilt: 'calendar-outline',
+  ownershipType: 'key-outline',
+  offStreetParking: 'car-outline',
+  attachedGarage: 'car-outline',
+  detachedGarage: 'car-outline',
+  washerAndLaundry: 'water-outline',
+  disabledAccess: 'accessibility-outline',
+  bicycleStorage: 'bicycle-outline',
+};
+
+const PET_ICON_COLOR = '#6B7280';
+
+const PET_ITEMS_CONFIG: {
+  key: string;
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  getAllowed: (formData: RentForApartmentsForm) => boolean;
+}[] = [
+  { key: 'cat', icon: 'paw-outline', label: 'Cat', getAllowed: (f) => !!f.catsAllowed },
+  {
+    key: 'smallDogs',
+    icon: 'paw-outline',
+    label: 'Small dogs\n(under 40 kg)',
+    getAllowed: (f) => !!f.smallDogsAllowed,
+  },
+  {
+    key: 'largeDogs',
+    icon: 'paw-outline',
+    label: 'Large dogs\n(over 40 kg)',
+    getAllowed: (f) => !!f.largeDogsAllowed,
+  },
+];
+
+type CharacteristicConfig = {
+  iconKey: keyof typeof CHARACTERISTIC_ICONS;
+  label: string;
+  getValue: (
+    formData: RentForApartmentsForm,
+    helpers: {
+      conditionLabel: string;
+      buildingTypeLabel: string;
+      ownershipLabel: string;
+      formatYesNo: (v: boolean | undefined) => string;
+    }
+  ) => string;
+};
+
+const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
+  {
+    iconKey: 'floors',
+    label: 'Floors',
+    getValue: (fd) =>
+      fd.floorNo && fd.numberOfFloors ? `${fd.floorNo} of ${fd.numberOfFloors}` : '—',
+  },
+  { iconKey: 'area', label: 'Area (m²)', getValue: (fd) => fd.area || '—' },
+  { iconKey: 'bedroom', label: 'Bedroom', getValue: (fd) => fd.bedrooms || '—' },
+  { iconKey: 'bathroom', label: 'Bathroom', getValue: (fd) => fd.bathrooms || '—' },
+  {
+    iconKey: 'condition',
+    label: 'Condition',
+    getValue: (_, h) => h.conditionLabel,
+  },
+  {
+    iconKey: 'buildingType',
+    label: 'Building type',
+    getValue: (_, h) => h.buildingTypeLabel,
+  },
+  { iconKey: 'yearBuilt', label: 'Year built', getValue: (fd) => fd.yearBuilt || '—' },
+  {
+    iconKey: 'ownershipType',
+    label: 'Ownership type',
+    getValue: (_, h) => h.ownershipLabel,
+  },
+  {
+    iconKey: 'offStreetParking',
+    label: 'Off-street parking',
+    getValue: (fd, h) => h.formatYesNo(fd.offStreetParking),
+  },
+  {
+    iconKey: 'attachedGarage',
+    label: 'Attached garage',
+    getValue: (fd, h) => h.formatYesNo(fd.attachedGarage),
+  },
+  {
+    iconKey: 'detachedGarage',
+    label: 'Detached garage',
+    getValue: (fd, h) => h.formatYesNo(fd.detachedGarage),
+  },
+  {
+    iconKey: 'washerAndLaundry',
+    label: 'Washer and laundry',
+    getValue: (fd, h) => h.formatYesNo(fd.washerAndLaundry),
+  },
+  {
+    iconKey: 'disabledAccess',
+    label: 'Disabled access',
+    getValue: (fd, h) => h.formatYesNo(fd.disabledAccess),
+  },
+  {
+    iconKey: 'bicycleStorage',
+    label: 'Bicycle storage',
+    getValue: (fd, h) => h.formatYesNo(fd.bicycleStorage),
+  },
+];
 
 export default function FinalScreen() {
-  const insets = useSafeAreaInsets();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const { resetForm } = useAnnouncementForRentFormStore();
-
-  const footerPaddingBottom = insets.bottom > 0 ? insets.bottom : 24;
-  const scrollPaddingBottom = FOOTER_APPROX_HEIGHT + footerPaddingBottom + 24;
-
-  const listingTypeLabel = getLabelFromValue(
-    LISTING_TYPE_OPTIONS,
-    formData.listingType
-  );
-  const buildingTypeLabel = getLabelFromValue(
-    BUILDING_TYPE_OPTIONS,
-    formData.buildingType
-  );
-  const conditionLabel = getLabelFromValue(
-    CONDITION_OPTIONS,
-    formData.condition
-  );
-  const ownershipLabel = getLabelFromValue(
-    OWNERSHIP_TYPE_OPTIONS,
-    formData.ownershipType
-  );
 
   const handlePublish = () => {
     resetForm();
@@ -63,13 +143,13 @@ export default function FinalScreen() {
     // Placeholder: open map with address
   };
 
-  const formatYesNo = (v: boolean | undefined) => (v ? 'Yes' : 'No');
+  const allowedPets = PET_ITEMS_CONFIG.filter((c) => c.getAllowed(formData));
 
   return (
     <ThemedView className="flex-1">
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingBottom: scrollPaddingBottom }}
+        contentContainerStyle={{ paddingBottom: 31 }}
         showsVerticalScrollIndicator={false}>
         <View className="px-4 pt-6">
           {/* Image placeholder */}
@@ -77,183 +157,104 @@ export default function FinalScreen() {
             className="mb-4 aspect-[4/3] w-full overflow-hidden rounded-[12px] bg-muted"
             accessibilityLabel="Property image">
             <View className="flex-1 items-center justify-center">
-              <ThemedText className="text-[14px] text-muted-foreground">
-                No image
-              </ThemedText>
+              <ThemedText className="text-[14px] text-muted-foreground">No image</ThemedText>
             </View>
           </View>
 
-          {/* Property summary card */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
-            <View className="mb-2 flex-row items-center justify-between">
-              <View className="rounded-full bg-primary/20 px-3 py-1">
-                <ThemedText className="text-[12px] font-medium text-primary">
-                  Draft
-                </ThemedText>
-              </View>
-            </View>
-            <ThemedText className="mb-1 text-[12px] text-muted-foreground">
-              ID: —
-            </ThemedText>
-            <ThemedText className="mb-1 text-[14px] text-muted-foreground">
-              {listingTypeLabel}
-            </ThemedText>
-            <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-              {formData.title || '—'}
-            </ThemedText>
-            <ThemedText className="text-[20px] font-bold text-primary">
-              {formData.monthlyRent
-                ? `$${Number(formData.monthlyRent).toLocaleString()}/month`
-                : '—'}
-            </ThemedText>
-          </View>
-
-          {/* Announcement information */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
-            <ThemedText className={SECTION_TITLE_CLASS}>
-              Announcement information
-            </ThemedText>
-            <ThemedText className="text-[14px] text-muted-foreground">
-              Placed by —
-            </ThemedText>
-            <ThemedText className="mt-1 text-[12px] text-muted-foreground">
-              Posted — · Updated —
-            </ThemedText>
-          </View>
-
-          {/* Location */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
-            <ThemedText className={SECTION_TITLE_CLASS}>Location</ThemedText>
-            <ThemedText className="text-[14px] text-foreground">
-              {formData.address || '—'}
-            </ThemedText>
-          </View>
-
-          {/* Notable distances */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
-            <ThemedText className={SECTION_TITLE_CLASS}>
-              Notable distances
-            </ThemedText>
-            <ThemedText className="mb-3 text-[14px] text-muted-foreground">
-              —
-            </ThemedText>
-            <Button
-              variant="secondary"
-              onPress={handleViewOnMap}
-              accessibilityLabel="View on map"
-              style={{ borderColor: '#22c55e', borderWidth: 1 }}>
-              <ThemedText className="text-[16px] font-medium text-primary">
-                View on map
-              </ThemedText>
-            </Button>
-          </View>
+          <PropertyAnnouncementDetail
+            title="White house villa"
+            id="RH000230"
+            typeLabel="Apartment for sale"
+            price="$2,399,000"
+            location={{
+              country: 'Argentina',
+              city: 'Buenos Aires',
+              district: 'Buenos Aires',
+              address: 'Av. Corrientes 1234',
+            }}
+            distances={{
+              metro: '10 min',
+              hospital: '10 min',
+              school: '10 min',
+              grocery: '10 min',
+            }}
+            placedBy={{
+              name: 'John Doe',
+            }}
+            postedDate="10.02.2024"
+            updatedDate="10.02.2024 10:42"
+            onViewMap={handleViewOnMap}
+          />
 
           {/* Description */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
+          <View className="my-4">
             <ThemedText className={SECTION_TITLE_CLASS}>Description</ThemedText>
             <ThemedText className="text-[14px] leading-5 text-foreground">
-              {formData.description || '—'}
+              Welcome to The Dracena Apartments, where Los Feliz living meets luxury and
+              convenience. Nestled in the heart of one of Los Angeles most vibrant neighborhoods,
+              our apartments offer an unparalleled blend of urban excitement and suburban
+              tranquility.
             </ThemedText>
           </View>
 
-          {/* Object characteristics */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
-            <ThemedText className={SECTION_TITLE_CLASS}>
-              Object characteristics
-            </ThemedText>
-            <View className="gap-2">
-              <Row
-                label="Floors"
-                value={
-                  formData.floorNo && formData.numberOfFloors
-                    ? `${formData.floorNo} of ${formData.numberOfFloors}`
-                    : '—'
-                }
-              />
-              <Row label="Area (m²)" value={formData.area || '—'} />
-              <Row label="Bedroom" value={formData.bedrooms || '—'} />
-              <Row label="Bathroom" value={formData.bathrooms || '—'} />
-              <Row label="Condition" value={conditionLabel} />
-              <Row label="Building type" value={buildingTypeLabel} />
-              <Row label="Year built" value={formData.yearBuilt || '—'} />
-              <Row label="Ownership type" value={ownershipLabel} />
-              <Row
-                label="Off-street parking"
-                value={formatYesNo(formData.offStreetParking)}
-              />
-              <Row
-                label="Attached garage"
-                value={formatYesNo(formData.attachedGarage)}
-              />
-              <Row
-                label="Detached garage"
-                value={formatYesNo(formData.detachedGarage)}
-              />
-              <Row
-                label="Washer and laundry"
-                value={formatYesNo(formData.washerAndLaundry)}
-              />
-              <Row
-                label="Disabled access"
-                value={formatYesNo(formData.disabledAccess)}
-              />
-              <Row
-                label="Bicycle storage"
-                value={formatYesNo(formData.bicycleStorage)}
-              />
+          {/* Object characteristics + Security deposit */}
+          <AnnouncementCard title="Object characteristics" className="mb-4 gap-[24px]">
+            <View className="flex-row flex-wrap gap-y-4">
+              {OBJECT_CHARACTERISTICS.map((config) => (
+                <View key={config.iconKey} className="w-1/2 pr-2">
+                  <PlacedByItem
+                    icon={
+                      <View className="h-8 w-8 items-center justify-center rounded-full bg-muted">
+                        <Ionicons
+                          name={CHARACTERISTIC_ICONS[config.iconKey]}
+                          size={16}
+                          color="#6B7280"
+                        />
+                      </View>
+                    }
+                    name={'-'}
+                    label={config.label}
+                    nameClassName="text-foreground"
+                  />
+                </View>
+              ))}
             </View>
-          </View>
-
-          {/* Security deposit */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
-            <View className="flex-row items-center justify-between">
-              <ThemedText className="text-[16px] font-medium text-foreground">
+            <View className="mt-4 flex-row items-center justify-center gap-[12px] rounded-[12px] bg-muted px-[16px] py-[12px]">
+              <ThemedText className="text-[16px] font-semibold text-foreground">
                 Security deposit
               </ThemedText>
-              <View className="rounded-[8px] bg-primary/20 px-3 py-2">
-                <ThemedText className="text-[16px] font-semibold text-primary">
-                  {formData.securityDeposit
-                    ? `$ ${Number(formData.securityDeposit).toLocaleString()}`
-                    : '—'}
-                </ThemedText>
+              <View className="flex-row items-center gap-2">
+                <Ionicons name="cash-outline" size={22} color="#087443" />
+                <ThemedText className="text-[16px] font-semibold text-[#087443]">500 $</ThemedText>
               </View>
             </View>
-          </View>
+          </AnnouncementCard>
 
           {/* Pets allowed */}
-          <View className={cn(CARD_CLASS, 'mb-4')}>
-            <ThemedText className={SECTION_TITLE_CLASS}>Pets allowed</ThemedText>
-            <View className="flex-row flex-wrap gap-2">
-              {formData.catsAllowed ? (
-                <View className="rounded-[8px] bg-muted px-3 py-2">
-                  <ThemedText className="text-[14px] text-foreground">
-                    Cat
-                  </ThemedText>
-                </View>
-              ) : null}
-              {formData.smallDogsAllowed ? (
-                <View className="rounded-[8px] bg-muted px-3 py-2">
-                  <ThemedText className="text-[14px] text-foreground">
-                    Small dogs (under 40 kg)
-                  </ThemedText>
-                </View>
-              ) : null}
-              {formData.largeDogsAllowed ? (
-                <View className="rounded-[8px] bg-muted px-3 py-2">
-                  <ThemedText className="text-[14px] text-foreground">
-                    Large dogs (over 40 kg)
-                  </ThemedText>
-                </View>
-              ) : null}
-              {!formData.catsAllowed &&
-                !formData.smallDogsAllowed &&
-                !formData.largeDogsAllowed && (
-                  <ThemedText className="text-[14px] text-muted-foreground">
-                    —
-                  </ThemedText>
-                )}
+          <AnnouncementCard title="Pets allowed" className="gap-[12px]">
+            <View className="flex-row gap-2">
+              {allowedPets.length > 0 ? (
+                allowedPets.map((config) => (
+                  <View
+                    key={config.key}
+                    className="flex-1 items-center justify-center gap-2 rounded-[8px] bg-muted px-3 py-4">
+                    <Ionicons
+                      name={config.icon}
+                      size={24}
+                      color={PET_ICON_COLOR}
+                      accessible
+                      accessibilityLabel={config.label.replace('\n', ' ')}
+                    />
+                    <ThemedText className="text-center text-[14px] text-foreground">
+                      {config.label}
+                    </ThemedText>
+                  </View>
+                ))
+              ) : (
+                <ThemedText className="text-[14px] text-muted-foreground">—</ThemedText>
+              )}
             </View>
-          </View>
+          </AnnouncementCard>
         </View>
       </ScrollView>
 
@@ -264,16 +265,5 @@ export default function FinalScreen() {
         onSaveAndExitPress={handleSaveAndExit}
       />
     </ThemedView>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <View className="flex-row justify-between gap-2 border-b border-default pb-2">
-      <ThemedText className="text-[14px] text-muted-foreground">{label}</ThemedText>
-      <ThemedText className="text-[14px] font-medium text-foreground">
-        {value}
-      </ThemedText>
-    </View>
   );
 }

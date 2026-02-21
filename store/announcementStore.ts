@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import { RentForApartmentsForm } from '../types/announcement';
 
-const PERSIST_KEY = 'announcement-rent-form';
+const PERSIST_KEY = 'announcement-rent-form-one';
 
 type PersistedState = {
   formData: RentForApartmentsForm;
@@ -35,9 +35,15 @@ interface AnnouncementForRentFormStore {
 
 const initialFormData: RentForApartmentsForm = {
   listingType: '',
-  address: '',
+  geo: {
+    country: '',
+    formattedAddress: '',
+    locality: '',
+    province: '',
+    street: '',
+  },
   propertyType: '',
-  processAnnouncement: '',
+  processType: '',
   needPhotographer: false,
   needAssessmentExpert: false,
   photographerDateTime: '',

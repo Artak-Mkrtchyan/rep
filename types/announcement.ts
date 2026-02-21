@@ -12,9 +12,18 @@ export type RentForApartmentsFormStep5 = {
 export type RentForApartmentsFormStep1 = {
   // Step 1 - Basic Info
   listingType: string;
-  address: string;
+  geo: {
+    country: string;
+    formattedAddress: string;
+    house?: string;
+    latitude?: number;
+    locality: string;
+    longitude?: number;
+    province: string;
+    street: string;
+  };
   propertyType: string;
-  processAnnouncement: string;
+  processType: string;
   // Step 1 - Additional services
   needPhotographer?: boolean;
   needAssessmentExpert?: boolean;

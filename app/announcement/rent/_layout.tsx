@@ -1,9 +1,16 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 
 import { AnnouncementHeader } from '@/components/announcement/announcement-header';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
+import { useStepRedirect } from '@/hooks/use-announcement';
 
-export default function AnnouncementLayout() {
+export default function AnnouncementRentLayout() {
+  const { shouldRedirect, targetRoute } = useStepRedirect();
+
+  if (shouldRedirect && targetRoute) {
+    return <Redirect href={targetRoute} />;
+  }
+
   return (
     <Stack
       screenOptions={{

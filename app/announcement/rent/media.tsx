@@ -6,7 +6,6 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
-import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 
 const SCREEN_TITLE = 'Add photos';
@@ -14,7 +13,8 @@ const SCREEN_SUBTITLE = 'Photos help renters imagine living in your place.';
 
 export default function MediaScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const { updateFormData } = useAnnouncementForRentFormStore();
+  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
 
   const mediaFileIds = formData.mediaFileIds ?? [];
 
@@ -23,7 +23,7 @@ export default function MediaScreen() {
   };
 
   const handleNext = () => {
-    router.push(ANNOUNCEMENT_ROUTES.RENT_CHARACTERISTICS.path);
+    nextStep();
   };
 
   const handleSaveAndExit = () => {

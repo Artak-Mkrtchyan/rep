@@ -20,6 +20,10 @@ export type InputProps = TextInputProps & {
   leftIcon?: React.ReactNode; // alias for left
   rightIcon?: React.ReactNode; // alias for right
   showPasswordToggle?: boolean;
+  /** When true, only digits are allowed. Use with value/onChangeText as usual (string). */
+  numericOnly?: boolean;
+  /** When true and numericOnly, allows one decimal point (e.g. "45.5"). */
+  allowDecimal?: boolean;
 };
 
 export type InputLabelProps = {

@@ -7,7 +7,6 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
-import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep4 } from '@/types/announcement';
 
@@ -21,28 +20,40 @@ type RentDetailsFormValues = RentForApartmentsFormStep4;
 
 export default function RentDetailsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const { updateFormData } = useAnnouncementForRentFormStore();
+  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
+  let isNext = true;
 
   const initialValues: RentDetailsFormValues = {
-    monthlyRent: formData.monthlyRent,
-    securityDeposit: formData.securityDeposit ?? '',
+    rentDetails: {
+      monthlyRent: formData.rentDetails?.monthlyRent || 0,
+      securityDeposit: formData.rentDetails?.securityDeposit || 0,
+    },
   };
 
   const saveRentDetails = (values: RentDetailsFormValues) => {
     updateFormData({
-      monthlyRent: values.monthlyRent,
-      securityDeposit: values.securityDeposit || undefined,
+      rentDetails: {
+        monthlyRent: values.rentDetails?.monthlyRent || 0,
+        securityDeposit: values.rentDetails?.securityDeposit || 0,
+      },
     });
+
+    if (isNext) {
+      nextStep();
+    } else {
+      router.push('/(tabs)');
+    }
   };
 
   const handleNext = (handleSubmit: () => void) => {
+    isNext = true;
     handleSubmit();
-    router.push(ANNOUNCEMENT_ROUTES.RENT_MEDIA.path);
   };
 
   const handleSaveAndExit = (handleSubmit: () => void) => {
+    isNext = false;
     handleSubmit();
-    router.push('/(tabs)');
   };
 
   return (
@@ -69,13 +80,11 @@ export default function RentDetailsScreen() {
                 <View className="gap-4">
                   <Input
                     label="Monthly rent"
+                    numericOnly
                     placeholder=""
-                    value={values.monthlyRent}
-                    onChangeText={handleChange('monthlyRent')}
-                    onBlur={handleBlur('monthlyRent')}
-                    error={
-                      touched.monthlyRent && errors.monthlyRent ? errors.monthlyRent : undefined
-                    }
+                    value={`${values.rentDetails?.monthlyRent}`}
+                    onChangeText={handleChange('rentDetails.monthlyRent')}
+                    onBlur={handleBlur('rentDetails.monthlyRent')}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}
@@ -95,14 +104,10 @@ export default function RentDetailsScreen() {
                   <Input
                     label="Security deposit"
                     placeholder=""
-                    value={values.securityDeposit ?? ''}
-                    onChangeText={handleChange('securityDeposit')}
-                    onBlur={handleBlur('securityDeposit')}
-                    error={
-                      touched.securityDeposit && errors.securityDeposit
-                        ? errors.securityDeposit
-                        : undefined
-                    }
+                    numericOnly
+                    value={`${values.rentDetails?.securityDeposit}`}
+                    onChangeText={handleChange('rentDetails.securityDeposit')}
+                    onBlur={handleBlur('rentDetails.securityDeposit')}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}

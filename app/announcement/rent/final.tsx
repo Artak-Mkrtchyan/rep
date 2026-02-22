@@ -39,18 +39,18 @@ const PET_ITEMS_CONFIG: {
   label: string;
   getAllowed: (formData: RentForApartmentsForm) => boolean;
 }[] = [
-  { key: 'cat', icon: 'paw-outline', label: 'Cat', getAllowed: (f) => !!f.catsAllowed },
+  { key: 'cat', icon: 'paw-outline', label: 'Cat', getAllowed: (f) => !!f.property?.attributes?.pets?.cat },
   {
     key: 'smallDogs',
     icon: 'paw-outline',
     label: 'Small dogs\n(under 40 kg)',
-    getAllowed: (f) => !!f.smallDogsAllowed,
+    getAllowed: (f) => !!f.property?.attributes?.pets?.smallDogs,
   },
   {
     key: 'largeDogs',
     icon: 'paw-outline',
     label: 'Large dogs\n(over 40 kg)',
-    getAllowed: (f) => !!f.largeDogsAllowed,
+    getAllowed: (f) => !!f.property?.attributes?.pets?.largeDogs,
   },
 ];
 
@@ -72,12 +72,35 @@ const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
   {
     iconKey: 'floors',
     label: 'Floors',
-    getValue: (fd) =>
-      fd.floorNo && fd.numberOfFloors ? `${fd.floorNo} of ${fd.numberOfFloors}` : '—',
+    getValue: (fd) => {
+      const b = fd.property?.attributes?.building;
+      return b?.floorNo != null && b?.numberOfFloors != null
+        ? `${b.floorNo} of ${b.numberOfFloors}`
+        : '—';
+    },
   },
-  { iconKey: 'area', label: 'Area (m²)', getValue: (fd) => fd.area || '—' },
-  { iconKey: 'bedroom', label: 'Bedroom', getValue: (fd) => fd.bedrooms || '—' },
-  { iconKey: 'bathroom', label: 'Bathroom', getValue: (fd) => fd.bathrooms || '—' },
+  {
+    iconKey: 'area',
+    label: 'Area (m²)',
+    getValue: (fd) =>
+      fd.property?.areaM2 != null ? String(fd.property.areaM2) : '—',
+  },
+  {
+    iconKey: 'bedroom',
+    label: 'Bedroom',
+    getValue: (fd) =>
+      fd.property?.attributes?.bedroomCount != null
+        ? String(fd.property.attributes.bedroomCount)
+        : '—',
+  },
+  {
+    iconKey: 'bathroom',
+    label: 'Bathroom',
+    getValue: (fd) =>
+      fd.property?.attributes?.bathroomCount != null
+        ? String(fd.property.attributes.bathroomCount)
+        : '—',
+  },
   {
     iconKey: 'condition',
     label: 'Condition',
@@ -88,7 +111,14 @@ const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
     label: 'Building type',
     getValue: (_, h) => h.buildingTypeLabel,
   },
-  { iconKey: 'yearBuilt', label: 'Year built', getValue: (fd) => fd.yearBuilt || '—' },
+  {
+    iconKey: 'yearBuilt',
+    label: 'Year built',
+    getValue: (fd) =>
+      fd.property?.attributes?.building?.yearBuilt != null
+        ? String(fd.property.attributes.building.yearBuilt)
+        : '—',
+  },
   {
     iconKey: 'ownershipType',
     label: 'Ownership type',
@@ -97,32 +127,38 @@ const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
   {
     iconKey: 'offStreetParking',
     label: 'Off-street parking',
-    getValue: (fd, h) => h.formatYesNo(fd.offStreetParking),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.amenities?.offStreetParking),
   },
   {
     iconKey: 'attachedGarage',
     label: 'Attached garage',
-    getValue: (fd, h) => h.formatYesNo(fd.attachedGarage),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.amenities?.attachedGarage),
   },
   {
     iconKey: 'detachedGarage',
     label: 'Detached garage',
-    getValue: (fd, h) => h.formatYesNo(fd.detachedGarage),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.amenities?.detachedGarage),
   },
   {
     iconKey: 'washerAndLaundry',
     label: 'Washer and laundry',
-    getValue: (fd, h) => h.formatYesNo(fd.washerAndLaundry),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.amenities?.washerLaundry),
   },
   {
     iconKey: 'disabledAccess',
     label: 'Disabled access',
-    getValue: (fd, h) => h.formatYesNo(fd.disabledAccess),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.amenities?.disabledAccess),
   },
   {
     iconKey: 'bicycleStorage',
     label: 'Bicycle storage',
-    getValue: (fd, h) => h.formatYesNo(fd.bicycleStorage),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
   },
 ];
 
@@ -144,6 +180,42 @@ export default function FinalScreen() {
   };
 
   const allowedPets = PET_ITEMS_CONFIG.filter((c) => c.getAllowed(formData));
+
+  const conditionRaw = formData.property?.attributes?.ownershipAndCondition?.condition;
+  const conditionLabel =
+    conditionRaw === 'EXCELLENT'
+      ? 'Excellent'
+      : conditionRaw === 'RENOVATED'
+        ? 'Renovated'
+        : conditionRaw === 'NEEDS_RENOVATION'
+          ? 'Needs renovation'
+          : conditionRaw === 'UNDER_CONSTRUCTION'
+            ? 'Under construction'
+            : '—';
+
+  const buildingTypeRaw = formData.property?.attributes?.building?.buildingType;
+  const buildingTypeLabel = buildingTypeRaw
+    ? buildingTypeRaw.charAt(0).toUpperCase() + buildingTypeRaw.slice(1)
+    : '—';
+
+  const ownershipRaw = formData.property?.attributes?.ownershipAndCondition?.ownershipType;
+  const ownershipLabel =
+    ownershipRaw === 'FULL'
+      ? 'Full'
+      : ownershipRaw === 'SHARED'
+        ? 'Shared'
+        : ownershipRaw === 'JOINT'
+          ? 'Joint'
+          : '—';
+
+  const formatYesNo = (v: boolean | undefined) => (v ? 'Yes' : 'No');
+
+  const characteristicHelpers = {
+    conditionLabel,
+    buildingTypeLabel,
+    ownershipLabel,
+    formatYesNo,
+  };
 
   return (
     <ThemedView className="flex-1">
@@ -212,7 +284,7 @@ export default function FinalScreen() {
                         />
                       </View>
                     }
-                    name={'-'}
+                    name={config.getValue(formData, characteristicHelpers)}
                     label={config.label}
                     nameClassName="text-foreground"
                   />

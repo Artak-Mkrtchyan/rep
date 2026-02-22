@@ -1,8 +1,8 @@
 import type { SelectOption } from '@/components/ui/select';
 
 export const LISTING_TYPE_OPTIONS: SelectOption<string>[] = [
-  { label: 'For rent', value: 'rent' },
-  { label: 'For sale', value: 'sale' },
+  { label: 'For rent', value: 'FOR_RENT' },
+  { label: 'For sale', value: 'FOR_SALE' },
 ];
 
 export const PROPERTY_TYPE_OPTIONS: SelectOption<string>[] = [
@@ -17,14 +17,14 @@ export const BATHROOMS_OPTIONS: SelectOption<string>[] = [
   { label: '1', value: '1' },
   { label: '2', value: '2' },
   { label: '3', value: '3' },
-  { label: '4+', value: '4+' },
+  { label: '4+', value: '4' },
 ];
 
 export const BEDROOMS_OPTIONS: SelectOption<string>[] = [
   { label: '1', value: '1' },
   { label: '2', value: '2' },
   { label: '3', value: '3' },
-  { label: '4+', value: '4+' },
+  { label: '4+', value: '4' },
 ];
 
 export const PROCESS_OPTIONS: SelectOption<string>[] = [
@@ -69,49 +69,49 @@ export const YEAR_BUILT_OPTIONS: SelectOption<string>[] = Array.from(
 
 export const ANNOUNCEMENT_ROUTES = {
   RENT_BASIC_INFO: {
-    name: 'rent/basic-info',
+    name: 'basic-info',
     label: 'List',
     completedStep: 1,
     path: '/announcement/rent/basic-info',
   },
   RENT_ANNOUNCEMENT_TITLE: {
-    name: 'rent/announcement-title',
+    name: 'announcement-title',
     label: 'Announcement title',
     completedStep: 2,
     path: '/announcement/rent/announcement-title',
   },
   RENT_PROPERTY_INFO_FIRST: {
-    name: 'rent/property-info-first',
+    name: 'property-info-first',
     label: 'Property info(1/2)',
     completedStep: 3,
     path: '/announcement/rent/property-info-first',
   },
   RENT_PROPERTY_INFO_SECOND: {
-    name: 'rent/property-info-second',
+    name: 'property-info-second',
     label: 'Property info(2/2)',
     completedStep: 3,
     path: '/announcement/rent/property-info-second',
   },
   RENT_RENT_DETAILS: {
-    name: 'rent/rent-details',
+    name: 'rent-details',
     label: 'Rent details',
     completedStep: 4,
     path: '/announcement/rent/rent-details',
   },
   RENT_MEDIA: {
-    name: 'rent/media',
+    name: 'media',
     label: 'Media',
     completedStep: 5,
     path: '/announcement/rent/media',
   },
   RENT_CHARACTERISTICS: {
-    name: 'rent/characteristics',
+    name: 'characteristics',
     label: 'Characteristics',
     completedStep: 6,
     path: '/announcement/rent/characteristics',
   },
   RENT_FINAL: {
-    name: 'rent/final',
+    name: 'final',
     label: 'Review and publish',
     completedStep: 7,
     path: '/announcement/rent/final',

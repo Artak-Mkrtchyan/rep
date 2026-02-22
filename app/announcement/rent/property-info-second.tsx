@@ -7,7 +7,6 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { InputLabel } from '@/components/ui/input/label';
-import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { RentForApartmentsFormStep3 } from '@/types/announcement';
@@ -21,7 +20,9 @@ type DescriptionFormValues = { description: RentForApartmentsFormStep3['descript
 export default function PropertyInfoSecondScreen() {
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const { updateFormData } = useAnnouncementForRentFormStore();
+  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
+  let isNext = true;
 
   const initialValues: DescriptionFormValues = {
     description: formData.description,
@@ -29,16 +30,22 @@ export default function PropertyInfoSecondScreen() {
 
   const saveTitle = (values: DescriptionFormValues) => {
     updateFormData({ description: values.description });
+
+    if (isNext) {
+      nextStep();
+    } else {
+      router.push('/(tabs)');
+    }
   };
 
   const handleNext = (handleSubmit: () => void) => {
+    isNext = true;
     handleSubmit();
-    router.push(ANNOUNCEMENT_ROUTES.RENT_RENT_DETAILS.path);
   };
 
   const handleSaveAndExit = (handleSubmit: () => void) => {
+    isNext = false;
     handleSubmit();
-    router.push('/(tabs)');
   };
 
   return (

@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
@@ -11,13 +10,13 @@ import { AddressInput } from '@/components/ui/address-input';
 import { CheckboxRow } from '@/components/ui/checkbox';
 import { Select } from '@/components/ui/select';
 import {
-  ANNOUNCEMENT_ROUTES,
   LISTING_TYPE_OPTIONS,
   PROCESS_OPTIONS,
   PROPERTY_TYPE_OPTIONS,
 } from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
+import { router } from 'expo-router';
 
 type BasicInfoFormValues = RentForApartmentsFormStep1;
 
@@ -37,8 +36,10 @@ const BasicInfoSchema = Yup.object().shape({
 });
 
 export default function BasicInfoScreen() {
-  const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const { updateFormData } = useAnnouncementForRentFormStore();
+  const formData = useAnnouncementForRentFormStore((state) => state.formData);
+  const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
+  const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
+  let isNext = true;
 
   const initialValues: BasicInfoFormValues = {
     listingType: formData.listingType,
@@ -58,16 +59,22 @@ export default function BasicInfoScreen() {
       needPhotographer: values.needPhotographer,
       needAssessmentExpert: values.needAssessmentExpert,
     });
+
+    if (isNext) {
+      nextStep();
+    } else {
+      router.push('/(tabs)');
+    }
   };
 
   const handleNext = (handleSubmit: () => void) => {
+    isNext = true;
     handleSubmit();
-    router.push(ANNOUNCEMENT_ROUTES.RENT_ANNOUNCEMENT_TITLE.path);
   };
 
   const handleSaveAndExit = (handleSubmit: () => void) => {
+    isNext = false;
     handleSubmit();
-    router.push('/(tabs)');
   };
 
   return (

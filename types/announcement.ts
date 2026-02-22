@@ -1,17 +1,13 @@
-export type RentForApartmentsForm = RentForApartmentsFormStep1 &
+export type RentForApartmentsForm = { stepNumber: number } & RentForApartmentsFormStep1 &
   RentForApartmentsFormStep2 &
   RentForApartmentsFormStep3 &
   RentForApartmentsFormStep4 &
-  RentForApartmentsFormStep5 &
-  RentForApartmentsFormStep6;
+  RentForApartmentsFormStep5;
 
-export type RentForApartmentsFormStep5 = {
-  mediaFileIds?: string[];
-};
+type Property = 'APARTMENT' | 'COMMERCIAL_SPACE' | 'GARAGE' | 'HOUSE' | 'LAND' | 'PARKING_SPACE';
 
 export type RentForApartmentsFormStep1 = {
-  // Step 1 - Basic Info
-  listingType: string;
+  listingType: 'FOR_RENT' | 'FOR_SALE';
   geo: {
     country: string;
     formattedAddress: string;
@@ -22,51 +18,64 @@ export type RentForApartmentsFormStep1 = {
     province: string;
     street: string;
   };
-  propertyType: string;
-  processType: string;
-  // Step 1 - Additional services
+  propertyType: Property;
+  processType: 'AS_INDIVIDUAL' | 'AS_BROKER';
   needPhotographer?: boolean;
   needAssessmentExpert?: boolean;
-  photographerDateTime?: string;
-  assessmentExpertDateTime?: string;
 };
 
 export type RentForApartmentsFormStep2 = {
-  title: string;
+  title?: string;
 };
 
 export type RentForApartmentsFormStep3 = {
-  area: string;
-  bedrooms: string;
-  bathrooms: string;
-  description: string;
+  property?: {
+    areaM2: number;
+    attributes?: {
+      type: Property;
+      bathroomCount?: number;
+      bedroomCount?: number;
+      building?: {
+        buildingType?: string;
+        floorNo?: string;
+        numberOfFloors?: number;
+        yearBuilt?: number;
+      };
+      amenities?: {
+        hvac?: boolean;
+        balcony?: boolean;
+        elevator?: boolean;
+        offStreetParking?: boolean;
+        attachedGarage?: boolean;
+        detachedGarage?: boolean;
+        washerLaundry?: boolean;
+        disabledAccess?: boolean;
+        evChargingStation?: boolean;
+        bicycleStorage?: boolean;
+      };
+      ownershipAndCondition?: {
+        condition?: 'EXCELLENT' | 'RENOVATED' | 'NEEDS_RENOVATION' | 'UNDER_CONSTRUCTION';
+        ownershipType?: 'FULL' | 'SHARED' | 'JOINT';
+      };
+      pets?: {
+        cat?: boolean;
+        largeDogs?: boolean;
+        smallDogs?: boolean;
+      };
+    };
+    propertyType: Property;
+    description?: string;
+  };
+  description?: string;
 };
 
 export interface RentForApartmentsFormStep4 {
-  monthlyRent: string;
-  securityDeposit?: string;
+  rentDetails?: {
+    monthlyRent: number;
+    securityDeposit: number;
+  };
 }
-export interface RentForApartmentsFormStep6 {
-  numberOfFloors: string;
-  floorNo: string;
-  buildingType: string;
-  // Amenities checkboxes
-  hvac?: boolean;
-  balcony?: boolean;
-  elevator?: boolean;
-  offStreetParking?: boolean;
-  attachedGarage?: boolean;
-  detachedGarage?: boolean;
-  washerAndLaundry?: boolean;
-  disabledAccess?: boolean;
-  evChargingStation?: boolean;
-  bicycleStorage?: boolean;
-  // Condition
-  condition: string; // TODO: need to change to enum later
-  yearBuilt: string;
-  ownershipType: string; // TODO: need to change to enum later
-  // Pets allowed checkboxes
-  catsAllowed?: boolean;
-  smallDogsAllowed?: boolean;
-  largeDogsAllowed?: boolean;
-}
+
+export type RentForApartmentsFormStep5 = {
+  mediaFileIds?: string[];
+};

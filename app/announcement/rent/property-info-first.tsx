@@ -3,7 +3,6 @@ import { Formik } from 'formik';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ThemedText } from '@/components/themed-text';
@@ -22,12 +21,6 @@ const FOOTER_APPROX_HEIGHT = 152;
 
 type PropertyInfoFormValues = RentForApartmentsFormStep3;
 
-const PropertyInfoSchema = Yup.object().shape({
-  //   area: Yup.string().required('Square footage is required'),
-  //   bedrooms: Yup.string().required('Total bedrooms is required'),
-  //   bathrooms: Yup.string().required('Total bathrooms is required'),
-});
-
 export default function PropertyInfoFirstScreen() {
   const insets = useSafeAreaInsets();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
@@ -36,29 +29,48 @@ export default function PropertyInfoFirstScreen() {
   const footerPaddingBottom = insets.bottom > 0 ? insets.bottom : 24;
   const scrollPaddingBottom = FOOTER_APPROX_HEIGHT + footerPaddingBottom + 24;
 
+  let isNext = true;
+
   const initialValues: PropertyInfoFormValues = {
-    area: formData.area,
-    bedrooms: formData.bedrooms,
-    bathrooms: formData.bathrooms,
-    description: formData.description,
+    property: {
+      areaM2: formData.property?.areaM2 || 1200,
+      attributes: {
+        type: formData.propertyType,
+        bathroomCount: formData.property?.attributes?.bathroomCount,
+        bedroomCount: formData.property?.attributes?.bedroomCount,
+      },
+      propertyType: formData.propertyType,
+    },
   };
 
   const savePropertyInfo = (values: PropertyInfoFormValues) => {
     updateFormData({
-      area: values.area,
-      bedrooms: values.bedrooms,
-      bathrooms: values.bathrooms,
+      property: {
+        areaM2: values.property?.areaM2 || 1200,
+        attributes: {
+          type: formData.propertyType,
+          bathroomCount: values.property?.attributes?.bathroomCount,
+          bedroomCount: values.property?.attributes?.bedroomCount,
+        },
+        propertyType: formData.propertyType,
+      },
     });
+
+    if (isNext) {
+      router.replace(ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path);
+    } else {
+      router.push('/(tabs)');
+    }
   };
 
   const handleNext = (handleSubmit: () => void) => {
+    isNext = true;
     handleSubmit();
-    router.push(ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path);
   };
 
   const handleSaveAndExit = (handleSubmit: () => void) => {
+    isNext = false;
     handleSubmit();
-    router.push('/(tabs)');
   };
 
   return (
@@ -66,7 +78,6 @@ export default function PropertyInfoFirstScreen() {
       <Formik<PropertyInfoFormValues>
         initialValues={initialValues}
         enableReinitialize
-        validationSchema={PropertyInfoSchema}
         onSubmit={savePropertyInfo}>
         {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
           <>
@@ -86,11 +97,11 @@ export default function PropertyInfoFirstScreen() {
                 <View className="gap-4">
                   <Input
                     label="Square footage"
+                    numericOnly
                     placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
-                    value={values.area}
-                    onChangeText={handleChange('area')}
-                    onBlur={handleBlur('area')}
-                    error={touched.area && errors.area ? errors.area : undefined}
+                    value={`${values.property?.areaM2}`}
+                    onChangeText={handleChange('property.areaM2')}
+                    onBlur={handleBlur('property.areaM2')}
                     right={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {SQUARE_FOOTAGE_UNIT}
@@ -105,8 +116,8 @@ export default function PropertyInfoFirstScreen() {
                   <Select
                     label="Total bedrooms"
                     placeholder="Select"
-                    value={values.bedrooms}
-                    onChange={(v) => setFieldValue('bedrooms', v)}
+                    value={`${values.property?.attributes?.bedroomCount}`}
+                    onChange={(v) => setFieldValue('property.attributes.bedroomCount', Number(v))}
                     options={BEDROOMS_OPTIONS}
                     containerClassName="mb-1"
                   />
@@ -114,8 +125,8 @@ export default function PropertyInfoFirstScreen() {
                   <Select
                     label="Total bathrooms"
                     placeholder="Select"
-                    value={values.bathrooms}
-                    onChange={(v) => setFieldValue('bathrooms', v)}
+                    value={`${values.property?.attributes?.bathroomCount}`}
+                    onChange={(v) => setFieldValue('property.attributes.bathroomCount', Number(v))}
                     options={BATHROOMS_OPTIONS}
                     containerClassName="mb-1"
                   />

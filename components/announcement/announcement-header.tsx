@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 
+import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { StepProgressProps } from './step-progress';
 import { StepProgress } from './step-progress';
 
@@ -25,9 +26,14 @@ export const AnnouncementHeader: React.FC<Props> = ({
   stepProgressContainerClassName,
 }) => {
   const insets = useSafeAreaInsets();
+  const setCurrentStep = useAnnouncementForRentFormStore((s) => s.setCurrentStep);
 
   const handleBackPress = () => {
-    router.back();
+    if (completedStep === 1) {
+      router.push('/(tabs)');
+    } else {
+      setCurrentStep(--completedStep);
+    }
   };
 
   const stepProgressProps: StepProgressProps = {

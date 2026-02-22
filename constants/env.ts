@@ -27,6 +27,13 @@ export const getEnvironment = (): Environment => {
  */
 export const getApiUrl = (): string => 'https://rep-dev.utspdev.com/api';
 
+/**
+ * Yandex Geosuggest API key for address autocomplete.
+ * Set EXPO_PUBLIC_YANDEX_SUGGEST_API_KEY in .env or app config.
+ */
+export const YANDEX_SUGGEST_API_KEY =
+  typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_YANDEX_SUGGEST_API_KEY : undefined;
+
 // TODO: Restore when production API is ready:
 // export const getApiUrl = (): string =>
 //   isProduction() ? 'https://rep.utspdev.com/api' : 'https://rep-dev.utspdev.com/api';

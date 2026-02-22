@@ -29,14 +29,17 @@ export const Input = React.forwardRef(function Input(
     inputClassName,
     left,
     right,
-    leftIcon,
-    rightIcon,
-    showPasswordToggle,
-    onFocus,
-    onBlur,
-    secureTextEntry,
-    ...props
-  }: InputProps,
+  leftIcon,
+  rightIcon,
+  showPasswordToggle,
+  numericOnly,
+  allowDecimal,
+  onFocus,
+  onBlur,
+  secureTextEntry,
+  onChangeText,
+  ...props
+}: InputProps,
   ref: React.Ref<TextInput>
 ) {
   const inputRef = React.useRef<TextInput>(null);
@@ -62,6 +65,29 @@ export const Input = React.forwardRef(function Input(
       onBlur?.(e);
     },
     [onBlur]
+  );
+
+  const filterNumeric = React.useCallback(
+    (text: string): string => {
+      if (!numericOnly) return text;
+      const filtered = text.replace(
+        new RegExp(`[^${allowDecimal ? '0-9.' : '0-9'}]`, 'g'),
+        ''
+      );
+      if (!allowDecimal) return filtered;
+      const parts = filtered.split('.');
+      if (parts.length <= 2) return filtered;
+      return `${parts[0]}.${parts.slice(1).join('')}`;
+    },
+    [numericOnly, allowDecimal]
+  );
+
+  const handleChangeText = React.useCallback(
+    (text: string) => {
+      const next = numericOnly ? filterNumeric(text) : text;
+      onChangeText?.(next);
+    },
+    [onChangeText, numericOnly, filterNumeric]
   );
 
   const sizeClasses =
@@ -110,6 +136,10 @@ export const Input = React.forwardRef(function Input(
           onBlur={handleBlur}
           secureTextEntry={showPassword}
           {...props}
+          onChangeText={handleChangeText}
+          keyboardType={
+            numericOnly ? (allowDecimal ? 'decimal-pad' : 'number-pad') : props.keyboardType
+          }
         />
         {showPasswordToggle ? (
           <Pressable

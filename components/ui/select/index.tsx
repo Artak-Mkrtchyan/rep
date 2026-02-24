@@ -1,5 +1,6 @@
 import React from 'react';
 import { Keyboard, Modal, Platform, Pressable, Text, View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
 import { InputError } from '@/components/ui/input/error';
 import { InputLabel } from '@/components/ui/input/label';
@@ -97,7 +98,20 @@ export function Select<T extends string = string>({
         <Text className={cn('text-[16px]', selected ? 'text-foreground' : 'text-muted-foreground')}>
           {selected ? selected.label : placeholder}
         </Text>
-        <Text className="text-[16px] text-muted-foreground">▾</Text>
+        <Svg
+          width={12}
+          height={7}
+          viewBox="0 0 12 7"
+          fill="none"
+          style={{ transform: [{ rotate: open ? '0deg' : '180deg' }] }}>
+          <Path
+            d="M11 6L6 1L1 6"
+            stroke="#111111"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </Svg>
       </Pressable>
       {error ? <InputError>{error}</InputError> : null}
 

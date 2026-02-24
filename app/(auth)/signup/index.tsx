@@ -53,7 +53,7 @@ export default function SignUpFirstScreen() {
 
               <View className="gap-3">
                 <Select
-                  label="Account type"
+                  label="Register as"
                   placeholder="Select"
                   value={values.role}
                   onChange={(value) => setFieldValue('role', value)}

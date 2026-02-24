@@ -13,10 +13,11 @@ import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/auth.types';
+import { yupSchemas } from '@/lib/auth-validation';
 import { useRouter } from 'expo-router';
 
 const EmailSchema = Yup.object().shape({
-  email: Yup.string().email('Invalid email address').required('Required'),
+  email: yupSchemas.email,
 });
 
 export default function SignUpEmailStepScreen() {
@@ -41,11 +42,13 @@ export default function SignUpEmailStepScreen() {
 
         if (apiError.errors?.email) {
           setFieldError('email', apiError.errors.email[0]);
+        } else if (apiError.statusCode === 400) {
+          setFieldError('email', apiError.message || 'Please enter a valid email address');
         } else {
           setFieldError('email', apiError.message || 'Failed to send verification code');
         }
       } else {
-        setFieldError('email', 'An unexpected error occurred');
+        setFieldError('email', 'Something went wrong. Please try again.');
       }
     } finally {
       setSubmitting(false);

@@ -171,7 +171,12 @@ class HttpClient {
       if (isJson) {
         try {
           const errorData = await response.json();
-          errorMessage = errorData.message || errorData.error || errorMessage;
+          const rawMessage = errorData.message || errorData.error;
+          if (Array.isArray(rawMessage)) {
+            errorMessage = rawMessage[0] || errorMessage;
+          } else if (rawMessage) {
+            errorMessage = rawMessage;
+          }
           errors = errorData.errors;
         } catch {
           // If JSON parsing fails, use default error message

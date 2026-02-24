@@ -11,6 +11,8 @@ interface SignInFooterProps {
   onApplePress?: () => void;
   onSignInPress?: () => void;
   showSignInLink?: boolean;
+  signInLabel?: string;
+  signInActionLabel?: string;
 }
 
 export const SignInFooter: React.FC<SignInFooterProps> = ({
@@ -18,6 +20,8 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
   onApplePress,
   onSignInPress,
   showSignInLink = false,
+  signInLabel = 'Already have an account?',
+  signInActionLabel = 'Sign in',
 }) => {
   return (
     <>
@@ -29,11 +33,11 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
         <Button
           variant="ghost"
           onPress={onSignInPress}
-          accessibilityLabel="Already have an account? Log in">
+          accessibilityLabel={`${signInLabel} ${signInActionLabel}`}>
           <ThemedText className="text-[18px] font-[400] leading-[24px] text-[#ABABAB]">
-            Already have an account?{' '}
+            {signInLabel}{' '}
             <ThemedText className="text-[18px] font-[500] leading-[24px] text-primary">
-              Sign in
+              {signInActionLabel}
             </ThemedText>
           </ThemedText>
         </Button>

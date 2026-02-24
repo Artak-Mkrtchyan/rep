@@ -5,8 +5,7 @@ import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { FormDivider } from '@/components/auth/form-divider';
-import { SocialAuthButtons } from '@/components/auth/social-auth-buttons';
+import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
@@ -65,6 +64,10 @@ export default function ConstructionCompanySignUpScreen() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleGoToLogin = () => {
+    router.replace(AUTH_ROUTES.LOGIN);
   };
 
   const handleGoogleAuth = () => {
@@ -263,9 +266,12 @@ export default function ConstructionCompanySignUpScreen() {
                 {isSubmitting ? 'Submitting...' : 'Continue'}
               </Button>
 
-              <FormDivider />
-
-              <SocialAuthButtons onGooglePress={handleGoogleAuth} onApplePress={handleAppleAuth} />
+              <SignInFooter
+                onGooglePress={handleGoogleAuth}
+                onApplePress={handleAppleAuth}
+                onSignInPress={handleGoToLogin}
+                showSignInLink
+              />
             </View>
           </View>
         )}

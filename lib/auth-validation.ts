@@ -43,7 +43,9 @@ export const yupSchemas = {
       }
 
       if (!EMAIL_REGEX.test(trimmed)) {
-        return ctx.createError({ message: 'Please enter a valid email address (e.g. name@example.com)' });
+        return ctx.createError({
+          message: 'Please enter a valid email address (e.g. name@example.com)',
+        });
       }
 
       return true;

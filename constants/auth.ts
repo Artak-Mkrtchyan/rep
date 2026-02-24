@@ -8,6 +8,7 @@ export const ACCOUNT_TYPE_OPTIONS = [
 ];
 export const AUTH_ROUTES = {
   LOGIN: '/(auth)',
+  LOGIN_FORM: '/(auth)/login-form',
   SIGNUP: '/(auth)/signup',
   SIGNUP_EMAIL: '/(auth)/signup/step-email',
   SIGNUP_VERIFY: '/(auth)/signup/verify',

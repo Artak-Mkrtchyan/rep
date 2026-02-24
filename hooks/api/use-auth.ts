@@ -4,7 +4,7 @@ import { ApiError } from '@/lib/api/auth.types';
 import { useCallback, useState } from 'react';
 
 export interface UseLoginResult {
-  login: (email: string, password: string, scope?: AuthScope) => Promise<void>;
+  login: (email: string, password: string, scope: AuthScope) => Promise<void>;
   isLoading: boolean;
   error: ApiError | null;
   reset: () => void;

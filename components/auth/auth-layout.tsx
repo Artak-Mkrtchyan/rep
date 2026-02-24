@@ -17,7 +17,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   scrollable = false,
 }) => {
   const content = (
-    <View className={`w-[${CONTAINER_WIDTH}px] max-w-full flex-1 items-center gap-4`}>
+    <View
+      className={`w-[${CONTAINER_WIDTH}px] max-w-full flex-1 items-center gap-4${centered ? ' justify-center' : ''}`}>
       {children}
     </View>
   );

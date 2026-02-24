@@ -62,6 +62,9 @@ export default function VerifyEmailScreen() {
           case 'broker_company':
             router.push(AUTH_ROUTES.SIGNUP_BROKER_COMPANY);
             break;
+          case 'company':
+            router.push(AUTH_ROUTES.SIGNUP_CONSTRUCTION_COMPANY);
+            break;
           case 'individual':
             router.push(AUTH_ROUTES.SIGNUP_PASSWORD);
             break;

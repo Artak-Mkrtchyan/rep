@@ -4,10 +4,16 @@ export type RentForApartmentsForm = { stepNumber: number } & RentForApartmentsFo
   RentForApartmentsFormStep4 &
   RentForApartmentsFormStep5;
 
-type Property = 'APARTMENT' | 'COMMERCIAL_SPACE' | 'GARAGE' | 'HOUSE' | 'LAND' | 'PARKING_SPACE';
+export type Property =
+  | 'APARTMENT'
+  | 'COMMERCIAL_SPACE'
+  | 'GARAGE'
+  | 'HOUSE'
+  | 'LAND'
+  | 'PARKING_SPACE';
 
 export type RentForApartmentsFormStep1 = {
-  listingType: 'FOR_RENT' | 'FOR_SALE';
+  listingType: 'FOR_RENT' | 'FOR_SALE' | '';
   geo: {
     country: string;
     formattedAddress: string;
@@ -18,8 +24,8 @@ export type RentForApartmentsFormStep1 = {
     province: string;
     street: string;
   };
-  propertyType: Property;
-  processType: 'AS_INDIVIDUAL' | 'AS_BROKER';
+  propertyType: Property | '';
+  processType: 'AS_INDIVIDUAL' | 'AS_BROKER' | '';
   needPhotographer?: boolean;
   needAssessmentExpert?: boolean;
 };
@@ -31,51 +37,53 @@ export type RentForApartmentsFormStep2 = {
 export type RentForApartmentsFormStep3 = {
   property?: {
     areaM2: number;
-    attributes?: {
-      type: Property;
-      bathroomCount?: number;
-      bedroomCount?: number;
-      building?: {
-        buildingType?: string;
-        floorNo?: string;
-        numberOfFloors?: number;
-        yearBuilt?: number;
-      };
-      amenities?: {
-        hvac?: boolean;
-        balcony?: boolean;
-        elevator?: boolean;
-        offStreetParking?: boolean;
-        attachedGarage?: boolean;
-        detachedGarage?: boolean;
-        washerLaundry?: boolean;
-        disabledAccess?: boolean;
-        evChargingStation?: boolean;
-        bicycleStorage?: boolean;
-      };
-      ownershipAndCondition?: {
-        condition?: 'EXCELLENT' | 'RENOVATED' | 'NEEDS_RENOVATION' | 'UNDER_CONSTRUCTION';
-        ownershipType?: 'FULL' | 'SHARED' | 'JOINT';
-      };
-      pets?: {
-        cat?: boolean;
-        largeDogs?: boolean;
-        smallDogs?: boolean;
-      };
-    };
+    attributes?: Attributes;
     propertyType: Property;
     description?: string;
   };
   description?: string;
 };
 
-export interface RentForApartmentsFormStep4 {
+export type RentForApartmentsFormStep4 = {
   rentDetails?: {
     monthlyRent: number;
     securityDeposit: number;
   };
-}
+};
 
 export type RentForApartmentsFormStep5 = {
   mediaFileIds?: string[];
+};
+
+export type Attributes = {
+  type: Property;
+  bathroomCount?: number;
+  bedroomCount?: number;
+  building?: {
+    buildingType?: 'PANEL' | 'BRICK' | 'MONOLITH' | 'FRAME' | 'OTHER';
+    floorNo?: string;
+    numberOfFloors?: number;
+    yearBuilt?: number;
+  };
+  amenities?: {
+    hvac?: boolean;
+    balcony?: boolean;
+    elevator?: boolean;
+    offStreetParking?: boolean;
+    attachedGarage?: boolean;
+    detachedGarage?: boolean;
+    washerLaundry?: boolean;
+    disabledAccess?: boolean;
+    evChargingStation?: boolean;
+    bicycleStorage?: boolean;
+  };
+  ownershipAndCondition?: {
+    condition?: 'EXCELLENT' | 'RENOVATED' | 'NEEDS_RENOVATION' | 'UNDER_CONSTRUCTION';
+    ownershipType?: 'FULL' | 'SHARED' | 'JOINT';
+  };
+  pets?: {
+    cat?: boolean;
+    largeDogs?: boolean;
+    smallDogs?: boolean;
+  };
 };

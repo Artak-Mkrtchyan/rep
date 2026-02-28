@@ -3,6 +3,7 @@ import { Formik } from 'formik';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ThemedText } from '@/components/themed-text';
@@ -21,6 +22,22 @@ const FOOTER_APPROX_HEIGHT = 152;
 
 type PropertyInfoFormValues = RentForApartmentsFormStep3;
 
+const isFilled = (v: unknown) => v !== undefined && v !== null && v !== '';
+
+const PropertyInfoSchema = Yup.object().shape({
+  property: Yup.object().shape({
+    areaM2: Yup.number().when(
+      ['attributes.bedroomCount', 'attributes.bathroomCount'],
+      (values: unknown[], schema: Yup.NumberSchema) => {
+        const [bedroomCount, bathroomCount] = values;
+        return isFilled(bedroomCount) || isFilled(bathroomCount)
+          ? schema.required('Required').typeError('Must be a number')
+          : schema;
+      }
+    ),
+  }),
+});
+
 export default function PropertyInfoFirstScreen() {
   const insets = useSafeAreaInsets();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
@@ -31,30 +48,21 @@ export default function PropertyInfoFirstScreen() {
 
   let isNext = true;
 
-  const initialValues: PropertyInfoFormValues = {
-    property: {
-      areaM2: formData.property?.areaM2 || 1200,
-      attributes: {
-        type: formData.propertyType,
-        bathroomCount: formData.property?.attributes?.bathroomCount,
-        bedroomCount: formData.property?.attributes?.bedroomCount,
-      },
-      propertyType: formData.propertyType,
-    },
-  };
+  const initialValues: PropertyInfoFormValues = { property: formData.property };
 
-  const savePropertyInfo = (values: PropertyInfoFormValues) => {
-    updateFormData({
-      property: {
-        areaM2: values.property?.areaM2 || 1200,
-        attributes: {
-          type: formData.propertyType,
-          bathroomCount: values.property?.attributes?.bathroomCount,
-          bedroomCount: values.property?.attributes?.bedroomCount,
+  const savePropertyInfo = ({ property }: PropertyInfoFormValues) => {
+    if (property && formData.propertyType) {
+      updateFormData({
+        property: {
+          areaM2: property.areaM2 || 0,
+          attributes: {
+            ...property.attributes,
+            type: formData.propertyType,
+          },
+          propertyType: formData.propertyType,
         },
-        propertyType: formData.propertyType,
-      },
-    });
+      });
+    }
 
     if (isNext) {
       router.replace(ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path);
@@ -77,6 +85,7 @@ export default function PropertyInfoFirstScreen() {
     <ThemedView className="flex-1">
       <Formik<PropertyInfoFormValues>
         initialValues={initialValues}
+        validationSchema={PropertyInfoSchema}
         enableReinitialize
         onSubmit={savePropertyInfo}>
         {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
@@ -99,7 +108,7 @@ export default function PropertyInfoFirstScreen() {
                     label="Square footage"
                     numericOnly
                     placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
-                    value={`${values.property?.areaM2}`}
+                    value={`${values.property?.areaM2 || ''}`}
                     onChangeText={handleChange('property.areaM2')}
                     onBlur={handleBlur('property.areaM2')}
                     right={
@@ -111,6 +120,7 @@ export default function PropertyInfoFirstScreen() {
                     keyboardType="numeric"
                     accessibilityLabel="Square footage"
                     accessibilityHint="Enter property area in square meters"
+                    error={touched.property && errors.property ? 'Required' : undefined}
                   />
 
                   <Select

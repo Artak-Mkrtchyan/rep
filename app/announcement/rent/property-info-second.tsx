@@ -29,7 +29,9 @@ export default function PropertyInfoSecondScreen() {
   };
 
   const saveTitle = (values: DescriptionFormValues) => {
-    updateFormData({ description: values.description });
+    if (values.description) {
+      updateFormData({ description: values.description });
+    }
 
     if (isNext) {
       nextStep();

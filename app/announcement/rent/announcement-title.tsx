@@ -27,7 +27,9 @@ export default function AnnouncementTitleScreen() {
   };
 
   const saveTitle = (values: RentForApartmentsFormStep2) => {
-    updateFormData({ title: values.title });
+    if (values.title) {
+      updateFormData({ title: values.title });
+    }
 
     if (isNext) {
       nextStep();

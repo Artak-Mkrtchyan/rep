@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
+import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ThemedText } from '@/components/themed-text';
@@ -18,26 +19,34 @@ const SQUARE_METERS_SUFFIX = 'm²';
 
 type RentDetailsFormValues = RentForApartmentsFormStep4;
 
+/** When rentDetails is present, monthlyRent and securityDeposit are required. */
+const RentDetailsSchema = Yup.object().shape({
+  rentDetails: Yup.object()
+    .optional()
+    .nullable()
+    .shape({
+      monthlyRent: Yup.number().required('Required').typeError('Must be a number'),
+      securityDeposit: Yup.number().required('Required').typeError('Must be a number'),
+    }),
+});
+
 export default function RentDetailsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
   let isNext = true;
 
-  const initialValues: RentDetailsFormValues = {
-    rentDetails: {
-      monthlyRent: formData.rentDetails?.monthlyRent || 0,
-      securityDeposit: formData.rentDetails?.securityDeposit || 0,
-    },
-  };
+  const initialValues: RentDetailsFormValues = { rentDetails: formData.rentDetails };
 
-  const saveRentDetails = (values: RentDetailsFormValues) => {
-    updateFormData({
-      rentDetails: {
-        monthlyRent: values.rentDetails?.monthlyRent || 0,
-        securityDeposit: values.rentDetails?.securityDeposit || 0,
-      },
-    });
+  const saveRentDetails = ({ rentDetails }: RentDetailsFormValues) => {
+    if (rentDetails) {
+      updateFormData({
+        rentDetails: {
+          monthlyRent: rentDetails.monthlyRent,
+          securityDeposit: rentDetails.securityDeposit,
+        },
+      });
+    }
 
     if (isNext) {
       nextStep();
@@ -60,6 +69,7 @@ export default function RentDetailsScreen() {
     <ThemedView className="flex-1">
       <Formik<RentDetailsFormValues>
         initialValues={initialValues}
+        validationSchema={RentDetailsSchema}
         enableReinitialize
         onSubmit={saveRentDetails}>
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
@@ -82,9 +92,10 @@ export default function RentDetailsScreen() {
                     label="Monthly rent"
                     numericOnly
                     placeholder=""
-                    value={`${values.rentDetails?.monthlyRent}`}
+                    value={`${values.rentDetails?.monthlyRent ?? ''}`}
                     onChangeText={handleChange('rentDetails.monthlyRent')}
                     onBlur={handleBlur('rentDetails.monthlyRent')}
+                    error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}
@@ -105,9 +116,10 @@ export default function RentDetailsScreen() {
                     label="Security deposit"
                     placeholder=""
                     numericOnly
-                    value={`${values.rentDetails?.securityDeposit}`}
+                    value={`${values.rentDetails?.securityDeposit ?? ''}`}
                     onChangeText={handleChange('rentDetails.securityDeposit')}
                     onBlur={handleBlur('rentDetails.securityDeposit')}
+                    error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}

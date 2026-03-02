@@ -20,13 +20,14 @@ export default function AnnouncementTitleScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
+  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
   const initialValues: RentForApartmentsFormStep2 = {
     title: formData.title,
   };
 
-  const saveTitle = (values: RentForApartmentsFormStep2) => {
+  const saveTitle = async (values: RentForApartmentsFormStep2) => {
     if (values.title) {
       updateFormData({ title: values.title });
     }
@@ -34,6 +35,8 @@ export default function AnnouncementTitleScreen() {
     if (isNext) {
       nextStep();
     } else {
+      await sendFormData();
+
       router.push('/(tabs)');
     }
   };

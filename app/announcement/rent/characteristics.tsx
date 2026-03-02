@@ -28,13 +28,14 @@ export default function CharacteristicsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
+  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
   const initialValues: CharacteristicsFormValues = formData.property?.attributes || {
     type: formData.propertyType as Property,
   };
 
-  const saveCharacteristics = (values: CharacteristicsFormValues) => {
+  const saveCharacteristics = async (values: CharacteristicsFormValues) => {
     if (formData.property) {
       updateFormData({
         property: {
@@ -47,6 +48,7 @@ export default function CharacteristicsScreen() {
     if (isNext) {
       nextStep();
     } else {
+      await sendFormData();
       router.push('/(tabs)');
     }
   };

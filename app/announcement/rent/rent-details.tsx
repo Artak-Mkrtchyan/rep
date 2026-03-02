@@ -34,11 +34,12 @@ export default function RentDetailsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
+  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
   const initialValues: RentDetailsFormValues = { rentDetails: formData.rentDetails };
 
-  const saveRentDetails = ({ rentDetails }: RentDetailsFormValues) => {
+  const saveRentDetails = async ({ rentDetails }: RentDetailsFormValues) => {
     if (rentDetails) {
       updateFormData({
         rentDetails: {
@@ -51,6 +52,7 @@ export default function RentDetailsScreen() {
     if (isNext) {
       nextStep();
     } else {
+      await sendFormData();
       router.push('/(tabs)');
     }
   };
@@ -72,7 +74,7 @@ export default function RentDetailsScreen() {
         validationSchema={RentDetailsSchema}
         enableReinitialize
         onSubmit={saveRentDetails}>
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+        {({ setFieldValue, handleSubmit, values, errors, touched }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -93,8 +95,7 @@ export default function RentDetailsScreen() {
                     numericOnly
                     placeholder=""
                     value={`${values.rentDetails?.monthlyRent ?? ''}`}
-                    onChangeText={handleChange('rentDetails.monthlyRent')}
-                    onBlur={handleBlur('rentDetails.monthlyRent')}
+                    onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', Number(v))}
                     error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
@@ -117,8 +118,7 @@ export default function RentDetailsScreen() {
                     placeholder=""
                     numericOnly
                     value={`${values.rentDetails?.securityDeposit ?? ''}`}
-                    onChangeText={handleChange('rentDetails.securityDeposit')}
-                    onBlur={handleBlur('rentDetails.securityDeposit')}
+                    onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', Number(v))}
                     error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">

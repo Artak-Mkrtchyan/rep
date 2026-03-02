@@ -41,7 +41,8 @@ const PropertyInfoSchema = Yup.object().shape({
 export default function PropertyInfoFirstScreen() {
   const insets = useSafeAreaInsets();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const { updateFormData } = useAnnouncementForRentFormStore();
+  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
+  const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
 
   const footerPaddingBottom = insets.bottom > 0 ? insets.bottom : 24;
   const scrollPaddingBottom = FOOTER_APPROX_HEIGHT + footerPaddingBottom + 24;
@@ -50,7 +51,7 @@ export default function PropertyInfoFirstScreen() {
 
   const initialValues: PropertyInfoFormValues = { property: formData.property };
 
-  const savePropertyInfo = ({ property }: PropertyInfoFormValues) => {
+  const savePropertyInfo = async ({ property }: PropertyInfoFormValues) => {
     if (property && formData.propertyType) {
       updateFormData({
         property: {
@@ -67,6 +68,7 @@ export default function PropertyInfoFirstScreen() {
     if (isNext) {
       router.replace(ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path);
     } else {
+      await sendFormData();
       router.push('/(tabs)');
     }
   };
@@ -109,8 +111,7 @@ export default function PropertyInfoFirstScreen() {
                     numericOnly
                     placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
                     value={`${values.property?.areaM2 || ''}`}
-                    onChangeText={handleChange('property.areaM2')}
-                    onBlur={handleBlur('property.areaM2')}
+                    onChangeText={(v) => setFieldValue('property.areaM2', Number(v))}
                     right={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {SQUARE_FOOTAGE_UNIT}

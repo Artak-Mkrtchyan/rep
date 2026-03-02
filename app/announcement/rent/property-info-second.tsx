@@ -22,18 +22,23 @@ export default function PropertyInfoSecondScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
+  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
   const initialValues: DescriptionFormValues = {
     description: formData.description,
   };
 
-  const saveTitle = (values: DescriptionFormValues) => {
-    updateFormData({ description: values.description });
+  const saveTitle = async (values: DescriptionFormValues) => {
+    if (values.description) {
+      updateFormData({ description: values.description });
+    }
 
     if (isNext) {
       nextStep();
     } else {
+      await sendFormData();
+
       router.push('/(tabs)');
     }
   };

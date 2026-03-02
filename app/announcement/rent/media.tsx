@@ -15,6 +15,7 @@ export default function MediaScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
+  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
 
   const mediaFileIds = formData.mediaFileIds ?? [];
 
@@ -26,7 +27,8 @@ export default function MediaScreen() {
     nextStep();
   };
 
-  const handleSaveAndExit = () => {
+  const handleSaveAndExit = async () => {
+    await sendFormData();
     router.push('/(tabs)');
   };
 

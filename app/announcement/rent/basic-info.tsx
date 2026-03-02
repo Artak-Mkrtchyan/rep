@@ -38,6 +38,7 @@ const BasicInfoSchema = Yup.object().shape({
 export default function BasicInfoScreen() {
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
+  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
   let isNext = true;
 
@@ -50,7 +51,7 @@ export default function BasicInfoScreen() {
     needAssessmentExpert: formData.needAssessmentExpert,
   };
 
-  const saveBasicInfo = (values: BasicInfoFormValues) => {
+  const saveBasicInfo = async (values: BasicInfoFormValues) => {
     updateFormData({
       listingType: values.listingType,
       geo: values.geo,
@@ -63,6 +64,8 @@ export default function BasicInfoScreen() {
     if (isNext) {
       nextStep();
     } else {
+      await sendFormData();
+
       router.push('/(tabs)');
     }
   };

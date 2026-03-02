@@ -91,6 +91,14 @@ export interface ResetPasswordRequest {
   usingOtp: boolean;
 }
 
+export interface ChangePasswordRequest {
+  email: string;
+  scope: AuthScope;
+  newPassword: string;
+  oldPassword: string;
+  usingOtp: false;
+}
+
 export const authService = {
   requestEmailConfirmation: async (email: string): Promise<void> => {
     try {
@@ -181,7 +189,7 @@ export const authService = {
     );
   },
 
-  resetPassword: async (data: ResetPasswordRequest): Promise<void> => {
+  resetPassword: async (data: ResetPasswordRequest | ChangePasswordRequest): Promise<void> => {
     await httpClient.patch<void>('/v1/users/change-password', data, { skipAuth: true });
   },
 };

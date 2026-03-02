@@ -32,7 +32,7 @@ function useProfileMenuItems(
       id: 'change-password',
       label: 'Change password',
       icon: <Ionicons name="settings-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/(tabs)/profile'),
+      onPress: () => router.push('/profile/change-password'),
     },
     {
       id: 'notifications',

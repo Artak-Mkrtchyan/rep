@@ -88,77 +88,77 @@ export default function ForgotPasswordResetScreen() {
       style={{ flex: 1 }}>
       <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
         <ThemedView className="flex-1 px-4">
-        <View className="mt-6">
-          <Pressable
-            onPress={handleBack}
-            accessibilityRole="button"
-            accessibilityLabel="Go back"
-            className="h-10 w-10 items-center justify-center rounded-full">
-            <Ionicons name="chevron-back" size={24} color="black" />
-          </Pressable>
-        </View>
-
-        <View className="flex-1 items-center pt-6">
-          <View className="w-[358px] max-w-full items-center gap-5">
-            <Image
-              style={{
-                width: IMAGE_DIMENSIONS.FORGOT_PASSWORD.width,
-                height: IMAGE_DIMENSIONS.FORGOT_PASSWORD.height,
-              }}
-              source={require('@/assets/images/forgot-password-illustration.svg')}
-              contentFit="contain"
-            />
-
-            <View className="items-center gap-2">
-              <ThemedText type="title" className="text-center">
-                Reset Password
-              </ThemedText>
-            </View>
-
-            {/* New Password */}
-            <Input
-              label="New Password"
-              value={newPassword}
-              onChangeText={handlePasswordChange}
-              placeholder="Enter new password"
-              secureTextEntry
-              autoComplete="new-password"
-              placeholderTextColor={theme.placeholder}
-              editable={!isLoading}
-            />
-
-            <PasswordRequirementsList
-              hasMinLength={passwordRequirements.hasMinLength}
-              hasUpperCase={passwordRequirements.hasUpperCase}
-              hasLowerCase={passwordRequirements.hasLowerCase}
-              hasNumber={passwordRequirements.hasNumber}
-              hasSymbol={passwordRequirements.hasSymbol}
-            />
-
-            {/* Confirm Password */}
-            <Input
-              label="Confirm Password"
-              value={confirmPassword}
-              onChangeText={handleConfirmPasswordChange}
-              placeholder="Confirm new password"
-              secureTextEntry
-              autoComplete="new-password"
-              placeholderTextColor={theme.placeholder}
-              error={
-                passwordError ||
-                (confirmPassword && !passwordsMatch ? 'Passwords do not match' : undefined)
-              }
-              editable={!isLoading}
-            />
-
-            <Button
-              disabled={!canSubmit}
-              onPress={handleSubmit}
-              accessibilityLabel="Reset password">
-              {isLoading ? 'Resetting...' : 'Reset Password'}
-            </Button>
+          <View className="mt-6">
+            <Pressable
+              onPress={handleBack}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+              className="h-10 w-10 items-center justify-center rounded-full">
+              <Ionicons name="chevron-back" size={24} color="black" />
+            </Pressable>
           </View>
-        </View>
+
+          <View className="flex-1 items-center pt-6">
+            <View className="w-[358px] max-w-full items-center gap-5">
+              <Image
+                style={{
+                  width: IMAGE_DIMENSIONS.FORGOT_PASSWORD.width,
+                  height: IMAGE_DIMENSIONS.FORGOT_PASSWORD.height,
+                }}
+                source={require('@/assets/images/forgot-password-illustration.svg')}
+                contentFit="contain"
+              />
+
+              <View className="items-center gap-2">
+                <ThemedText type="title" className="text-center">
+                  Reset Password
+                </ThemedText>
+              </View>
+
+              {/* New Password */}
+              <Input
+                label="New Password"
+                value={newPassword}
+                onChangeText={handlePasswordChange}
+                placeholder="Enter new password"
+                secureTextEntry
+                autoComplete="new-password"
+                placeholderTextColor={theme.placeholder}
+                editable={!isLoading}
+              />
+
+              <PasswordRequirementsList
+                hasMinLength={passwordRequirements.hasMinLength}
+                hasUpperCase={passwordRequirements.hasUpperCase}
+                hasLowerCase={passwordRequirements.hasLowerCase}
+                hasNumber={passwordRequirements.hasNumber}
+                hasSymbol={passwordRequirements.hasSymbol}
+              />
+
+              {/* Confirm Password */}
+              <Input
+                label="Confirm Password"
+                value={confirmPassword}
+                onChangeText={handleConfirmPasswordChange}
+                placeholder="Confirm new password"
+                secureTextEntry
+                autoComplete="new-password"
+                placeholderTextColor={theme.placeholder}
+                error={
+                  passwordError ||
+                  (confirmPassword && !passwordsMatch ? 'Passwords do not match' : undefined)
+                }
+                editable={!isLoading}
+              />
+
+              <Button
+                disabled={!canSubmit}
+                onPress={handleSubmit}
+                accessibilityLabel="Reset password">
+                {isLoading ? 'Resetting...' : 'Reset Password'}
+              </Button>
+            </View>
+          </View>
         </ThemedView>
       </Pressable>
     </KeyboardAvoidingView>

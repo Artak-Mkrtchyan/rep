@@ -1,51 +1,41 @@
-import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
-import { ActivityIndicator, Pressable, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Href, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 
-import { ThemedText } from '@/components/themed-text';
+import { HeroSection } from '@/components/home/hero-section';
+import { SearchModal } from '@/components/search/search-modal';
 import { ThemedView } from '@/components/themed-view';
-import { useLogout } from '@/hooks/api/use-auth';
+import type { SearchFilters } from '@/types/search';
 
 export default function HomeScreen() {
-  const { logout, isLoading } = useLogout();
+  const router = useRouter();
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
 
-  const handleSignOut = async () => {
-    await logout();
-  };
+  const handleMenuPress = useCallback(() => {
+    router.push('/menu' as Href);
+  }, [router]);
+
+  const handleSearchPress = useCallback(() => {
+    setIsSearchVisible(true);
+  }, []);
+
+  const handleSearchClose = useCallback(() => {
+    setIsSearchVisible(false);
+  }, []);
+
+  const handleSearch = useCallback((filters: SearchFilters) => {
+    setIsSearchVisible(false);
+    // TODO: Navigate to search results with filters
+  }, []);
 
   return (
     <ThemedView className="flex-1">
-      <SafeAreaView className="flex-1" edges={['top']}>
-        <View className="flex-1 items-center justify-center px-4">
-          <View className="h-20 w-20 items-center justify-center rounded-full bg-main-50">
-            <Ionicons name="home" size={40} color="#087443" />
-          </View>
-          <ThemedText type="title" className="mt-6 text-center">
-            Home
-          </ThemedText>
-          <ThemedText className="mt-2 text-center text-muted-foreground">
-            Welcome to Real Estate App
-          </ThemedText>
+      <HeroSection onMenuPress={handleMenuPress} onSearchPress={handleSearchPress} />
 
-          <Pressable
-            onPress={handleSignOut}
-            disabled={isLoading}
-            className="mt-10 h-12 w-full max-w-xs items-center justify-center rounded-xl border border-neutral-200 bg-white"
-            style={({ pressed }) => (pressed ? { opacity: 0.8 } : undefined)}
-            accessibilityRole="button"
-            accessibilityLabel="Sign out">
-            {isLoading ? (
-              <ActivityIndicator color="#087443" />
-            ) : (
-              <View className="flex-row items-center gap-2">
-                <Ionicons name="log-out-outline" size={20} color="#d80101" />
-                <ThemedText className="text-base font-medium text-red-600">Sign Out</ThemedText>
-              </View>
-            )}
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      <SearchModal
+        visible={isSearchVisible}
+        onClose={handleSearchClose}
+        onSearch={handleSearch}
+      />
     </ThemedView>
   );
 }

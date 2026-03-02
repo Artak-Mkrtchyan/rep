@@ -42,7 +42,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       setIsUploading(true);
 
       const result = await DocumentPicker.getDocumentAsync({
-        type: '*/*',
+        type: ['application/pdf', 'image/jpeg', 'image/png'],
         copyToCacheDirectory: true,
       });
 

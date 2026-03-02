@@ -1,3 +1,5 @@
+import type { RentForApartmentsForm } from '@/types/announcement';
+
 import { ApiResponse } from './auth.types';
 import { httpClient } from './http/client';
 
@@ -101,6 +103,64 @@ export interface ConstructionCompanyRegistrationResponse {
 
 export type FileInput = { uri: string; type: string; name: string }; // React Native format
 
+/** Response for POST /api/v1/applications/announcement-publication */
+export interface AnnouncementPublicationResponse {
+  applicantEmail: string;
+  createdAt: string;
+  createdBy: string;
+  id: string;
+  reviewerId: string;
+  status: ApplicationStatus;
+  type: 'ANNOUNCEMENT_PUBLICATION';
+  assignedBrokerCompanyId: string;
+  assignedBrokerId: string;
+  description: string;
+  documentIds: string[];
+  geo: {
+    country: string;
+    district: string;
+    formattedAddress: string;
+    house: string;
+    latitude: number;
+    locality: string;
+    longitude: number;
+    province: string;
+    street: string;
+  };
+  initiallySubmittedAt: string;
+  listingType: string;
+  mediaFiles: {
+    createdAt: string;
+    fileName: string;
+    fileType: string;
+    id: string;
+    sizeInBytes: number;
+    thumbnailUrl: string;
+    url: string;
+  }[];
+  needAssessmentExpert: boolean;
+  needPhotographer: boolean;
+  processType: string;
+  property: {
+    areaM2: number;
+    attributes: Record<string, unknown>;
+    description: string;
+    propertyType: string;
+  };
+  propertyType: string;
+  publicId: string;
+  publishedAnnouncementId: string;
+  rentDetails: {
+    monthlyRent: number;
+    securityDeposit: number;
+  };
+  saleDetails: {
+    price: number;
+  };
+  stepNumber: number;
+  title: string;
+}
+
 export const applicationsService = {
   /**
    * Upload a temporary attachment file
@@ -174,5 +234,37 @@ export const applicationsService = {
     );
 
     return response.data || (response as unknown as ConstructionCompanyRegistrationResponse);
+  },
+
+  /**
+   * Submit announcement publication application
+   * @param data - RentForApartmentsForm (full form data from announcement flow)
+   * @returns Announcement publication application response
+   */
+  announcementPublication: async (
+    data: RentForApartmentsForm
+  ): Promise<AnnouncementPublicationResponse> => {
+    const response = await httpClient.post<ApiResponse<AnnouncementPublicationResponse>>(
+      '/v1/applications/announcement-publication',
+      data
+    );
+
+    return response.data ?? (response as unknown as AnnouncementPublicationResponse);
+  },
+
+  /**
+   * Update announcement publication application by id
+   * @param id - Application id
+   * @param data - RentForApartmentsForm (full form data from announcement flow)
+   * @returns Resolves on 200 success
+   */
+  updateAnnouncementPublication: async (
+    id: string,
+    data: RentForApartmentsForm
+  ): Promise<void> => {
+    await httpClient.put<void>(
+      `/v1/applications/announcement-publication/${encodeURIComponent(id)}`,
+      data
+    );
   },
 };

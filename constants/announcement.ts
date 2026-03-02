@@ -38,18 +38,18 @@ export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 20 },
 }));
 
 export const BUILDING_TYPE_OPTIONS: SelectOption<string>[] = [
-  { label: 'Panel', value: 'panel' },
-  { label: 'Brick', value: 'brick' },
-  { label: 'Monolith', value: 'monolith' },
-  { label: 'Frame', value: 'frame' },
-  { label: 'Other', value: 'other' },
+  { label: 'Panel', value: 'PANEL' },
+  { label: 'Brick', value: 'BRICK' },
+  { label: 'Monolith', value: 'MONOLITH' },
+  { label: 'Frame', value: 'FRAME' },
+  { label: 'Other', value: 'OTHER' },
 ];
 
 export const CONDITION_OPTIONS: SelectOption<string>[] = [
-  { label: 'Excellent', value: 'excellent' },
-  { label: 'Renovated', value: 'renovated' },
-  { label: 'Needs renovation', value: 'needs_renovation' },
-  { label: 'Under construction', value: 'under_construction' },
+  { label: 'Excellent', value: 'EXCELLENT' },
+  { label: 'Renovated', value: 'RENOVATED' },
+  { label: 'Needs renovation', value: 'NEEDS_RENOVATION' },
+  { label: 'Under construction', value: 'UNDER_CONSTRUCTION' },
 ];
 
 export const OWNERSHIP_TYPE_OPTIONS: SelectOption<string>[] = [

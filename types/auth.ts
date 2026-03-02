@@ -25,7 +25,8 @@ export interface ConstructionCompanySignUpForm {
     email: string;
     name: string;
     phoneNumber: string;
-    yearsOfActivity: number;
+    constructionYearsStart: number;
+    constructionYearsEnd: number;
   };
   managerInfo: {
     email: string;

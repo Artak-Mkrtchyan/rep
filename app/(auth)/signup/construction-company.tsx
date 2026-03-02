@@ -13,7 +13,6 @@ import { useSignUpContext } from '@/context/SignUpContext';
 
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
-import { NumberPicker } from '@/components/ui/number-picker';
 import { PhoneInput } from '@/components/ui/phone-input';
 import {
   applicationsService,
@@ -22,18 +21,42 @@ import {
 import { yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
+const CURRENT_YEAR = new Date().getFullYear();
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
 const ConstructionCompanySchema = Yup.object().shape({
   attachmentIds: Yup.array().min(1, 'At least one file is required').required('Required'),
   companyInfo: Yup.object().shape({
-    certifiedOn: yupSchemas.certifiedOn,
-    certifiedBy: Yup.string().optional(),
-    email: yupSchemas.email,
-    name: Yup.string().required('Required'),
-    phoneNumber: yupSchemas.phone,
-    yearsOfActivity: Yup.number()
+    certifiedOn: Yup.string()
       .required('Required')
-      .min(0, 'Must be at least 0')
-      .max(100, 'Must be at most 100'),
+      .matches(DATE_REGEX, 'Date in incorrect format')
+      .test('not-future-date', 'Date cannot be in the future', (value) => {
+        if (!value || !DATE_REGEX.test(value)) return true;
+        return new Date(value) <= new Date();
+      }),
+    certifiedBy: Yup.string().optional().max(255, 'Must be no more than 255 characters'),
+    email: yupSchemas.email,
+    name: Yup.string().required('Required').max(255, 'Must be no more than 255 characters'),
+    phoneNumber: yupSchemas.phone,
+    constructionYearsStart: Yup.number()
+      .required('Required')
+      .min(1900, 'Must be at least 1900')
+      .max(CURRENT_YEAR, `Must be no more than ${CURRENT_YEAR}`)
+      .integer('Must be a whole number'),
+    constructionYearsEnd: Yup.number()
+      .required('Required')
+      .min(1900, 'Must be at least 1900')
+      .max(CURRENT_YEAR, `Must be no more than ${CURRENT_YEAR}`)
+      .integer('Must be a whole number')
+      .test(
+        'end-after-start',
+        'End year must be greater than or equal to start year',
+        function (value) {
+          const { constructionYearsStart } = this.parent;
+          if (!value || !constructionYearsStart) return true;
+          return value >= constructionYearsStart;
+        }
+      ),
   }),
   managerInfo: Yup.object().shape({
     email: yupSchemas.email,
@@ -89,7 +112,8 @@ export default function ConstructionCompanySignUpScreen() {
             email: '',
             name: '',
             phoneNumber: '',
-            yearsOfActivity: 0,
+            constructionYearsStart: '' as unknown as number,
+            constructionYearsEnd: '' as unknown as number,
           },
           managerInfo: {
             email: data.email || '',
@@ -212,6 +236,7 @@ export default function ConstructionCompanySignUpScreen() {
                 required
                 value={values.companyInfo.certifiedOn}
                 onChange={(date) => setFieldValue('companyInfo.certifiedOn', date)}
+                maximumDate={new Date()}
                 error={
                   touched.companyInfo?.certifiedOn && errors.companyInfo?.certifiedOn
                     ? errors.companyInfo.certifiedOn
@@ -232,20 +257,63 @@ export default function ConstructionCompanySignUpScreen() {
                 placeholder=""
               />
 
-              <NumberPicker
-                label="Company's years of activity"
-                value={values.companyInfo.yearsOfActivity}
-                onChange={(value) => setFieldValue('companyInfo.yearsOfActivity', value)}
-                min={0}
-                max={100}
-                step={1}
-                required
-                error={
-                  touched.companyInfo?.yearsOfActivity && errors.companyInfo?.yearsOfActivity
-                    ? String(errors.companyInfo.yearsOfActivity)
-                    : undefined
-                }
-              />
+              <View className="gap-2">
+                <View className="flex-row gap-3">
+                  <View className="flex-1">
+                    <Input
+                      label="Construction years"
+                      required
+                      placeholder="From"
+                      value={
+                        values.companyInfo.constructionYearsStart !== ('' as unknown as number)
+                          ? String(values.companyInfo.constructionYearsStart)
+                          : ''
+                      }
+                      onChangeText={(text) =>
+                        setFieldValue(
+                          'companyInfo.constructionYearsStart',
+                          text === '' ? ('' as unknown as number) : Number(text)
+                        )
+                      }
+                      onBlur={handleBlur('companyInfo.constructionYearsStart')}
+                      keyboardType="number-pad"
+                      maxLength={4}
+                      error={
+                        touched.companyInfo?.constructionYearsStart &&
+                        errors.companyInfo?.constructionYearsStart
+                          ? String(errors.companyInfo.constructionYearsStart)
+                          : undefined
+                      }
+                    />
+                  </View>
+                  <View className="flex-1">
+                    <Input
+                      label=" "
+                      placeholder="To"
+                      value={
+                        values.companyInfo.constructionYearsEnd !== ('' as unknown as number)
+                          ? String(values.companyInfo.constructionYearsEnd)
+                          : ''
+                      }
+                      onChangeText={(text) =>
+                        setFieldValue(
+                          'companyInfo.constructionYearsEnd',
+                          text === '' ? ('' as unknown as number) : Number(text)
+                        )
+                      }
+                      onBlur={handleBlur('companyInfo.constructionYearsEnd')}
+                      keyboardType="number-pad"
+                      maxLength={4}
+                      error={
+                        touched.companyInfo?.constructionYearsEnd &&
+                        errors.companyInfo?.constructionYearsEnd
+                          ? String(errors.companyInfo.constructionYearsEnd)
+                          : undefined
+                      }
+                    />
+                  </View>
+                </View>
+              </View>
 
               <FileUpload
                 label="Files upload"

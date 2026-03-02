@@ -77,7 +77,8 @@ export interface ConstructionCompanyRegistrationRequest {
     name: string;
     email: string;
     phoneNumber: string;
-    yearsOfActivity: number;
+    constructionYearsStart: number;
+    constructionYearsEnd: number;
   };
   managerInfo: {
     email?: string;

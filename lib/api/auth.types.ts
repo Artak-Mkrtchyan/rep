@@ -1,7 +1,14 @@
+export interface ValidationError {
+  fieldName: string;
+  errorMessage: string;
+  errorCode: string;
+}
+
 export interface ApiError {
   message: string;
   statusCode?: number;
   errors?: Record<string, string[]>;
+  validationErrors?: ValidationError[];
 }
 
 export interface ApiResponse<T> {

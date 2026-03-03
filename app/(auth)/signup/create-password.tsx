@@ -35,8 +35,8 @@ export default function CreatePasswordScreen() {
   const handleContinue = async (values: PasswordForm, { setSubmitting, setFieldError }: any) => {
     try {
       await authService.createUsualUser({
-        fullName: values.fullName,
-        email: values.email,
+        fullName: values.fullName.trim(),
+        email: values.email.trim(),
         password: values.password,
         phone: values.phone,
       });
@@ -53,6 +53,10 @@ export default function CreatePasswordScreen() {
             if (messages?.[0]) {
               setFieldError(field, messages[0]);
             }
+          });
+        } else if (apiError.validationErrors?.length) {
+          apiError.validationErrors.forEach(({ fieldName, errorMessage }) => {
+            setFieldError(fieldName, errorMessage);
           });
         } else {
           Alert.alert(

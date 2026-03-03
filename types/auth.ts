@@ -11,7 +11,7 @@ export interface BrokerSignUpForm {
   fullName: string;
   email: string;
   attachmentIds: string[];
-  certifiedBy?: string;
+  certifiedBy: string;
   certifiedOn: string;
   phoneNumber: string;
   yearsOfActivity: number;

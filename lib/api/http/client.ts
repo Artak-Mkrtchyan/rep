@@ -1,5 +1,5 @@
 import { getApiUrl } from '@/constants/env';
-import { ApiError } from '../auth.types';
+import { ApiError, ValidationError } from '../auth.types';
 import {
   clearAllTokens,
   getRefreshToken,
@@ -167,6 +167,7 @@ class HttpClient {
 
       let errorMessage = `HTTP error! status: ${response.status}`;
       let errors: Record<string, string[]> | undefined;
+      let validationErrors: ValidationError[] | undefined;
 
       if (isJson) {
         try {
@@ -178,6 +179,11 @@ class HttpClient {
             errorMessage = rawMessage;
           }
           errors = errorData.errors;
+
+          if (!errors && errorData.validationErrors?.length) {
+            errorMessage = errorData.validationErrors[0].errorMessage;
+            validationErrors = errorData.validationErrors;
+          }
         } catch {
           // If JSON parsing fails, use default error message
         }
@@ -193,6 +199,7 @@ class HttpClient {
         message: errorMessage,
         statusCode: response.status,
         errors,
+        validationErrors,
       };
 
       throw apiError;
@@ -231,7 +238,7 @@ class HttpClient {
     }
 
     // Add locale header
-    // headers['Locale'] = getLocale();
+    headers['Locale'] = getLocale();
 
     // Add authorization header if auth is required and not explicitly skipped
     if (config.requiresAuth !== false && !config.skipAuth) {

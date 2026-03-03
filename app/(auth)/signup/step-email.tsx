@@ -11,10 +11,24 @@ import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { useTheme } from '@/hooks/use-theme';
-import { authService } from '@/lib/api/auth';
+import { authService, AuthScope } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/auth.types';
+import { usersService } from '@/lib/api/users';
 import { yupSchemas } from '@/lib/auth-validation';
+import type { AccountRole } from '@/types/auth';
 import { useRouter } from 'expo-router';
+
+const roleToScope = (role?: AccountRole): AuthScope => {
+  switch (role) {
+    case 'broker':
+    case 'broker_company':
+      return AuthScope.BROKER;
+    case 'company':
+      return AuthScope.CONSTRUCTION;
+    default:
+      return AuthScope.USUAL;
+  }
+};
 
 const EmailSchema = Yup.object().shape({
   email: yupSchemas.email,
@@ -31,6 +45,15 @@ export default function SignUpEmailStepScreen() {
     { setFieldError, setSubmitting }: any
   ) => {
     try {
+      // Check if user with this email and role already exists
+      const scope = roleToScope(data.role);
+      const existsResponse = await usersService.checkUserExists(values.email, scope);
+
+      if (existsResponse.exists) {
+        setFieldError('email', 'An account with this email already exists');
+        return;
+      }
+
       await authService.requestEmailConfirmation(values.email);
 
       updateData({ email: values.email, otp: undefined });

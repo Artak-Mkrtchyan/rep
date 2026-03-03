@@ -170,7 +170,7 @@ export const authService = {
       data,
       { skipAuth: true }
     );
-    return response.data || (response as unknown as CreateUsualUserResponse);
+    return response?.data ?? (response as unknown as CreateUsualUserResponse);
   },
 
   sendPasswordOtp: async (email: string): Promise<void> => {

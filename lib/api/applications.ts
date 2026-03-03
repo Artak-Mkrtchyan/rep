@@ -9,7 +9,7 @@ export interface TemporaryAttachmentResponse {
 
 export interface BrokerRegistrationRequest {
   attachmentIds: string[];
-  certifiedBy?: string;
+  certifiedBy: string;
   certifiedOn: string; // ISO date string: "2026-01-17"
   email: string;
   fullName: string;
@@ -258,10 +258,7 @@ export const applicationsService = {
    * @param data - RentForApartmentsForm (full form data from announcement flow)
    * @returns Resolves on 200 success
    */
-  updateAnnouncementPublication: async (
-    id: string,
-    data: RentForApartmentsForm
-  ): Promise<void> => {
+  updateAnnouncementPublication: async (id: string, data: RentForApartmentsForm): Promise<void> => {
     await httpClient.put<void>(
       `/v1/applications/announcement-publication/${encodeURIComponent(id)}`,
       data

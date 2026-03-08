@@ -13,7 +13,7 @@ import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
-import { ApiError } from '@/lib/api/auth.types';
+import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { isPasswordValid, validatePassword } from '@/lib/auth-validation';
 
 export default function ForgotPasswordResetScreen() {
@@ -64,15 +64,7 @@ export default function ForgotPasswordResetScreen() {
         },
       ]);
     } catch (error) {
-      if (error && typeof error === 'object' && 'statusCode' in error) {
-        const apiError = error as ApiError;
-        Alert.alert(
-          'Reset Failed',
-          apiError.message || 'Failed to reset password. Please try again.'
-        );
-      } else {
-        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-      }
+      showErrorAlert(error, { title: 'Reset Failed', fallback: ERROR_MESSAGES.RESET_PASSWORD_FAILED });
     } finally {
       setIsLoading(false);
     }

@@ -11,7 +11,7 @@ import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
 import { useCountdown } from '@/hooks/use-countdown';
 import { authService } from '@/lib/api/auth';
-import { ApiError } from '@/lib/api/auth.types';
+import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
 
 export default function ForgotPasswordVerifyScreen() {
@@ -59,12 +59,7 @@ export default function ForgotPasswordVerifyScreen() {
       restartCountdown();
       Alert.alert('Code Sent', 'A new reset code has been sent to your email.');
     } catch (error) {
-      if (error && typeof error === 'object' && 'statusCode' in error) {
-        const apiError = error as ApiError;
-        Alert.alert('Error', apiError.message || 'Failed to resend code. Please try again.');
-      } else {
-        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-      }
+      showErrorAlert(error, { fallback: ERROR_MESSAGES.RESEND_CODE_FAILED });
     }
   };
 
@@ -77,26 +72,14 @@ export default function ForgotPasswordVerifyScreen() {
       await authService.confirmPasswordOtp(code);
       router.push(AUTH_ROUTES.FORGOT_PASSWORD_RESET);
     } catch (error) {
-      console.error('OTP confirmation error:', error);
-
-      if (error && typeof error === 'object' && 'statusCode' in error) {
-        const apiError = error as ApiError;
-
-        let errorMessage = apiError.message || 'Invalid verification code. Please try again.';
-
-        if (apiError.statusCode === 0) {
-          errorMessage =
-            'Network error: Unable to reach the server. Please check your internet connection and try again.';
-        } else if (apiError.statusCode === 400) {
-          errorMessage = 'Invalid or expired verification code. Please try again.';
-        } else if (apiError.statusCode === 500) {
-          errorMessage = 'Server error occurred. Please try again later.';
-        }
-
-        Alert.alert('Error', errorMessage);
-      } else {
-        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-      }
+      showErrorAlert(error, {
+        fallback: ERROR_MESSAGES.INVALID_CODE,
+        statusMessages: {
+          0: ERROR_MESSAGES.NETWORK,
+          400: ERROR_MESSAGES.INVALID_CODE,
+          500: ERROR_MESSAGES.SERVER,
+        },
+      });
     } finally {
       setIsLoading(false);
     }

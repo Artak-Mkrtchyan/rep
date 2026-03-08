@@ -8,7 +8,7 @@ import { InputError } from '@/components/ui/input/error';
 import { InputLabel } from '@/components/ui/input/label';
 import { useThemeValue } from '@/hooks/use-theme';
 import { applicationsService } from '@/lib/api/applications';
-import { ApiError } from '@/lib/api/auth.types';
+import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { Image } from 'expo-image';
 
 export interface FileUploadProps {
@@ -21,6 +21,8 @@ export interface FileUploadProps {
   disabled?: boolean;
   containerClassName?: string;
 }
+
+const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 
 export const FileUpload: React.FC<FileUploadProps> = ({
   label,
@@ -49,6 +51,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
 
+        if (asset.size && asset.size > MAX_FILE_SIZE) {
+          Alert.alert('File Too Large', 'Please select a file smaller than 15MB.');
+          return;
+        }
+
         let formData = new FormData();
 
         formData.append('file', {
@@ -69,12 +76,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleUploadError = (error: unknown) => {
-    if (error && typeof error === 'object' && 'statusCode' in error) {
-      const apiError = error as ApiError;
-      Alert.alert('Upload Failed', apiError.message || 'Failed to upload file. Please try again.');
-    } else {
-      Alert.alert('Error', 'An unexpected error occurred while uploading the file.');
-    }
+    showErrorAlert(error, { title: 'Upload Failed', fallback: ERROR_MESSAGES.UPLOAD_FAILED });
   };
 
   const handleRemoveFile = (indexToRemove: number) => {

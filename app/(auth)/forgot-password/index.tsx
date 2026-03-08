@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -12,7 +12,7 @@ import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
-import { ApiError } from '@/lib/api/auth.types';
+import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { validateEmail } from '@/lib/auth-validation';
 
 export default function ForgotPasswordEmailScreen() {
@@ -55,28 +55,14 @@ export default function ForgotPasswordEmailScreen() {
       updateData({ email: email.trim() });
       router.push(AUTH_ROUTES.FORGOT_PASSWORD_VERIFY);
     } catch (error) {
-      console.error('Password reset error:', error);
-
-      if (error && typeof error === 'object' && 'statusCode' in error) {
-        const apiError = error as ApiError;
-
-        // More detailed error messages
-        let errorMessage = apiError.message || 'Failed to send reset code. Please try again.';
-
-        if (apiError.statusCode === 0) {
-          errorMessage =
-            'Network error: Unable to reach the server. Please check your internet connection and try again.';
-        } else if (apiError.statusCode === 404) {
-          errorMessage =
-            'The password reset service is currently unavailable. Please try again later.';
-        } else if (apiError.statusCode === 500) {
-          errorMessage = 'Server error occurred. Please try again later.';
-        }
-
-        Alert.alert('Error', errorMessage);
-      } else {
-        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-      }
+      showErrorAlert(error, {
+        fallback: ERROR_MESSAGES.SEND_RESET_CODE_FAILED,
+        statusMessages: {
+          0: ERROR_MESSAGES.NETWORK,
+          404: ERROR_MESSAGES.SERVICE_UNAVAILABLE,
+          500: ERROR_MESSAGES.SERVER,
+        },
+      });
     } finally {
       setIsLoading(false);
     }

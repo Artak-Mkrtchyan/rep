@@ -16,9 +16,8 @@ import { validatePassword, yupSchemas } from '@/lib/auth-validation';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { authService } from '@/lib/api/auth';
-import { ApiError } from '@/lib/api/auth.types';
+import { isApiError, showErrorAlert } from '@/lib/error-handler';
 import type { PasswordForm } from '@/types/auth';
-import { Alert } from 'react-native';
 
 const PasswordSchema = Yup.object().shape({
   email: yupSchemas.email,
@@ -45,27 +44,22 @@ export default function CreatePasswordScreen() {
 
       router.push(AUTH_ROUTES.SIGNUP_COMPLETED);
     } catch (error) {
-      if (error && typeof error === 'object' && 'statusCode' in error) {
-        const apiError = error as ApiError;
-
-        if (apiError.errors) {
-          (Object.entries(apiError.errors) as [string, string[]][]).forEach(([field, messages]) => {
+      if (isApiError(error)) {
+        if (error.errors) {
+          (Object.entries(error.errors) as [string, string[]][]).forEach(([field, messages]) => {
             if (messages?.[0]) {
               setFieldError(field, messages[0]);
             }
           });
-        } else if (apiError.validationErrors?.length) {
-          apiError.validationErrors.forEach(({ fieldName, errorMessage }) => {
+        } else if (error.validationErrors?.length) {
+          error.validationErrors.forEach(({ fieldName, errorMessage }) => {
             setFieldError(fieldName, errorMessage);
           });
         } else {
-          Alert.alert(
-            'Error',
-            apiError.message || 'An unexpected error occurred. Please try again.'
-          );
+          showErrorAlert(error);
         }
       } else {
-        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+        showErrorAlert(error);
       }
     } finally {
       setSubmitting(false);

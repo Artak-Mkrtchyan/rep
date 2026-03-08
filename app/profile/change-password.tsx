@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { useTheme } from '@/hooks/use-theme';
 import { useUserClaims } from '@/hooks/use-user-claims';
 import { authService } from '@/lib/api/auth';
-import { ApiError } from '@/lib/api/auth.types';
+import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { doPasswordsMatch, isPasswordValid, validatePassword } from '@/lib/auth-validation';
 
 export default function ChangePasswordScreen() {
@@ -61,15 +61,7 @@ export default function ChangePasswordScreen() {
         { text: 'OK', onPress: () => router.back() },
       ]);
     } catch (error) {
-      if (error && typeof error === 'object' && 'statusCode' in error) {
-        const apiError = error as ApiError;
-        Alert.alert(
-          'Change Password Failed',
-          apiError.message || 'Failed to change password. Please try again.'
-        );
-      } else {
-        Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-      }
+      showErrorAlert(error, { title: 'Change Password Failed', fallback: ERROR_MESSAGES.CHANGE_PASSWORD_FAILED });
     } finally {
       setIsLoading(false);
     }

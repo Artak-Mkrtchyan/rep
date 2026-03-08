@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
 import React from 'react';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
+import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
@@ -47,8 +48,8 @@ export default function BrokerSignUpScreen() {
       resetData();
 
       router.push(AUTH_ROUTES.APPLICATION_SUBMITTED);
-    } catch {
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } catch (error) {
+      showErrorAlert(error, { fallback: ERROR_MESSAGES.SUBMIT_FAILED });
     } finally {
       setSubmitting(false);
     }

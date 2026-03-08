@@ -10,7 +10,7 @@ import { useSignUpContext } from '@/context/SignUpContext';
 import { useCountdown } from '@/hooks/use-countdown';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { authService } from '@/lib/api/auth';
-import { ApiError } from '@/lib/api/auth.types';
+import { ERROR_MESSAGES, getApiErrorMessage, isApiError } from '@/lib/error-handler';
 import { OTP_EXPIRATION_TIMEOUT, OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
@@ -70,9 +70,8 @@ export default function VerifyEmailScreen() {
             break;
         }
       } catch (err) {
-        if (err && typeof err === 'object' && 'statusCode' in err) {
-          const apiError = err as ApiError;
-          const message = apiError.message?.toLowerCase() || '';
+        if (isApiError(err)) {
+          const message = err.message?.toLowerCase() || '';
           if (message.includes('expired')) {
             setError('Invalid code expired. Please request a new code. Please try again');
           } else {
@@ -127,12 +126,7 @@ export default function VerifyEmailScreen() {
       setOtp(Array(OTP_LENGTH).fill(''));
       inputsRef.current[0]?.focus();
     } catch (err) {
-      if (err && typeof err === 'object' && 'statusCode' in err) {
-        const apiError = err as ApiError;
-        setError(apiError.message || 'Failed to resend code. Please try again.');
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
+      setError(getApiErrorMessage(err, ERROR_MESSAGES.RESEND_CODE_FAILED));
     }
   };
 

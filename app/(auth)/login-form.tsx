@@ -140,6 +140,7 @@ export default function LoginFormScreen() {
             onChangeText={handlePasswordChange}
             placeholder=""
             secureTextEntry
+            showPasswordToggle
             autoComplete="password"
             placeholderTextColor={theme.placeholder}
             error={passwordError || (loginError ? loginError.message : undefined)}

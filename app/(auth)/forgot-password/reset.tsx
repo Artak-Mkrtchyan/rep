@@ -114,6 +114,7 @@ export default function ForgotPasswordResetScreen() {
                 onChangeText={handlePasswordChange}
                 placeholder="Enter new password"
                 secureTextEntry
+                showPasswordToggle
                 autoComplete="new-password"
                 placeholderTextColor={theme.placeholder}
                 editable={!isLoading}
@@ -134,6 +135,7 @@ export default function ForgotPasswordResetScreen() {
                 onChangeText={handleConfirmPasswordChange}
                 placeholder="Confirm new password"
                 secureTextEntry
+                showPasswordToggle
                 autoComplete="new-password"
                 placeholderTextColor={theme.placeholder}
                 error={

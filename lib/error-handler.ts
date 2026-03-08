@@ -4,7 +4,8 @@ import { ApiError } from '@/lib/api/auth.types';
 
 export const ERROR_MESSAGES = {
   UNEXPECTED: 'An unexpected error occurred. Please try again.',
-  NETWORK: 'Network error: Unable to reach the server. Please check your internet connection and try again.',
+  NETWORK:
+    'Network error: Unable to reach the server. Please check your internet connection and try again.',
   SERVER: 'Server error occurred. Please try again later.',
   UPLOAD_FAILED: 'Failed to upload file. Please try again.',
   UPLOAD_UNEXPECTED: 'An unexpected error occurred while uploading the file.',
@@ -14,14 +15,18 @@ export const ERROR_MESSAGES = {
   CHANGE_PASSWORD_FAILED: 'Failed to change password. Please try again.',
   SEND_RESET_CODE_FAILED: 'Failed to send reset code. Please try again.',
   INVALID_CODE: 'Invalid or expired verification code. Please try again.',
-  SERVICE_UNAVAILABLE: 'The password reset service is currently unavailable. Please try again later.',
+  SERVICE_UNAVAILABLE:
+    'The password reset service is currently unavailable. Please try again later.',
 } as const;
 
 export function isApiError(error: unknown): error is ApiError {
   return error !== null && typeof error === 'object' && 'statusCode' in error;
 }
 
-export function getApiErrorMessage(error: unknown, fallback: string = ERROR_MESSAGES.UNEXPECTED): string {
+export function getApiErrorMessage(
+  error: unknown,
+  fallback: string = ERROR_MESSAGES.UNEXPECTED
+): string {
   if (isApiError(error)) {
     return error.message || fallback;
   }
@@ -34,6 +39,10 @@ export function showErrorAlert(
 ) {
   const { title = 'Error', fallback = ERROR_MESSAGES.UNEXPECTED, statusMessages } = options ?? {};
 
+  console.log('error', error);
+  console.log('statusMessages', statusMessages);
+  console.log('fallback', fallback);
+  console.log('title', title);
   if (statusMessages && isApiError(error) && error.statusCode !== undefined) {
     const statusMessage = statusMessages[error.statusCode];
     if (statusMessage) {

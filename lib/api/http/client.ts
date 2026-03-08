@@ -172,7 +172,7 @@ class HttpClient {
       if (isJson) {
         try {
           const errorData = await response.json();
-          const rawMessage = errorData.message || errorData.error;
+          const rawMessage = errorData.message || errorData.errorMessage || errorData.error;
           if (Array.isArray(rawMessage)) {
             errorMessage = rawMessage[0] || errorMessage;
           } else if (rawMessage) {

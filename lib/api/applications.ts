@@ -277,4 +277,23 @@ export const applicationsService = {
     );
     return response.data || (response as unknown as AnnouncementPublicationResponse);
   },
+
+  /**
+   * Download media file (photo/video) of application by id
+   * @param applicationId Application ID
+   * @param fileId Media file ID
+   * @param thumbnail Whether to download thumbnail version
+   * @returns A promise that resolves to the file blob
+   */
+  downloadApplicationMediaFile: async (
+    applicationId: string,
+    fileId: string,
+    thumbnail: boolean = false
+  ): Promise<Blob> => {
+    const url = `/v1/applications/announcement-publication/${applicationId}/media-files/${fileId}/download${thumbnail ? '?thumbnail=true' : ''}`;
+    const response = await httpClient.getFile(url, {
+      requiresAuth: true,
+    });
+    return response;
+  },
 };

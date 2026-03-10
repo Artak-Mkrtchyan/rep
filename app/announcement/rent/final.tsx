@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -158,11 +158,18 @@ const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
 
 export default function FinalScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const { resetForm } = useAnnouncementForRentFormStore();
+  const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
+  const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
 
-  const handlePublish = () => {
-    resetForm();
-    router.replace('/(tabs)');
+  const handlePublish = async () => {
+    try {
+      await publishFormData();
+      resetForm();
+    } catch {
+      Alert.alert('Error', 'Failed to publish');
+    } finally {
+      router.replace('/(tabs)');
+    }
   };
 
   const handleSaveAndExit = () => {

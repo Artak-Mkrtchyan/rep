@@ -263,4 +263,18 @@ export const applicationsService = {
       data
     );
   },
+
+  /**
+   * Submit application for moderator review
+   * @param id Application ID
+   * @returns A promise that resolves to the updated application data
+   */
+  publishApplication: async (id: string): Promise<AnnouncementPublicationResponse> => {
+    const response = await httpClient.patch<ApiResponse<AnnouncementPublicationResponse>>(
+      `/v1/applications/announcement-publication/${id}/submit`,
+      {},
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as AnnouncementPublicationResponse);
+  },
 };

@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -52,8 +52,13 @@ export default function RentDetailsScreen() {
     if (isNext) {
       nextStep();
     } else {
-      await sendFormData();
-      router.push('/(tabs)');
+      try {
+        await sendFormData();
+      } catch {
+        Alert.alert('Error', 'Failed to send form data');
+      } finally {
+        router.push('/(tabs)');
+      }
     }
   };
 

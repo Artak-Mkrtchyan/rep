@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ThemedText } from '@/components/themed-text';
@@ -45,10 +45,16 @@ export default function CharacteristicsScreen() {
       });
     }
 
-    if (isNext) {
-      nextStep();
-    } else {
+    try {
       await sendFormData();
+
+      if (isNext) {
+        nextStep();
+      } else {
+        router.push('/(tabs)');
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to send form data');
       router.push('/(tabs)');
     }
   };

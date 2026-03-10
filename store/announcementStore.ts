@@ -1,6 +1,5 @@
 import { applicationsService } from '@/lib/api/applications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import { RentForApartmentsForm } from '../types/announcement';
@@ -17,6 +16,7 @@ interface AnnouncementForRentFormStore {
   formData: RentForApartmentsForm;
   nextStep: () => void;
   sendFormData: () => Promise<void>;
+  publishFormData: () => Promise<void>;
   setCurrentStep: (step: number) => void;
   updateFormData: (data: Partial<RentForApartmentsForm>) => void;
   resetForm: () => void;
@@ -62,15 +62,26 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
             await applicationsService.updateAnnouncementPublication(announcementId, formData);
           } else {
             const response = await applicationsService.announcementPublication(formData);
-            set((state) => {
-              return {
-                announcementId: response.id,
-                formData: { ...state.formData, response },
-              };
-            });
+            set((state) => ({
+              announcementId: response.id,
+              formData: { ...state.formData, response },
+            }));
           }
-        } catch {
-          Alert.alert('Error', 'Failed to send form data');
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      publishFormData: async () => {
+        try {
+          const { announcementId } = get();
+          if (!announcementId) {
+            const error = new Error('Save the form first before publishing');
+            throw error;
+          }
+          await applicationsService.publishApplication(announcementId);
+        } catch (error) {
+          throw error;
         }
       },
 
@@ -81,6 +92,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
 
       resetForm: () =>
         set({
+          announcementId: undefined,
           formData: initialFormData,
         }),
     })),

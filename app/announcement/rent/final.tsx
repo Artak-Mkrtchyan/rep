@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import { ScrollView, View } from 'react-native';
@@ -11,44 +10,46 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsForm } from '@/types/announcement';
+import { Image } from 'expo-image';
 
-const SECTION_TITLE_CLASS = 'mb-3 text-[16px] font-semibold text-foreground';
-
-const CHARACTERISTIC_ICONS: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
-  floors: 'layers-outline',
-  area: 'resize-outline',
-  bedroom: 'bed-outline',
-  bathroom: 'water-outline',
-  condition: 'snow-outline',
-  buildingType: 'business-outline',
-  yearBuilt: 'calendar-outline',
-  ownershipType: 'key-outline',
-  offStreetParking: 'car-outline',
-  attachedGarage: 'car-outline',
-  detachedGarage: 'car-outline',
-  washerAndLaundry: 'water-outline',
-  disabledAccess: 'accessibility-outline',
-  bicycleStorage: 'bicycle-outline',
+const CHARACTERISTIC_ICONS: Record<string, string> = {
+  floors: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  area: require('@/assets/images/announcement-icons/size-icon.svg'),
+  bedroom: require('@/assets/images/announcement-icons/bed-icon.svg'),
+  bathroom: require('@/assets/images/announcement-icons/bath-icon.svg'),
+  condition: require('@/assets/images/announcement-icons/condition-icon.svg'),
+  buildingType: require('@/assets/images/announcement-icons/buildingType-icon.svg'),
+  yearBuilt: require('@/assets/images/announcement-icons/yearBuilt-icon.svg'),
+  ownershipType: require('@/assets/images/announcement-icons/ownershipType-icon.svg'),
+  offStreetParking: require('@/assets/images/announcement-icons/parking-icon.svg'),
+  attachedGarage: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  detachedGarage: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  washerAndLaundry: require('@/assets/images/announcement-icons/washer-icon.svg'),
+  disabledAccess: require('@/assets/images/announcement-icons/disabledAccess-icon.svg'),
+  bicycleStorage: require('@/assets/images/announcement-icons/bike-icon.svg'),
 };
-
-const PET_ICON_COLOR = '#6B7280';
 
 const PET_ITEMS_CONFIG: {
   key: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: string;
   label: string;
   getAllowed: (formData: RentForApartmentsForm) => boolean;
 }[] = [
-  { key: 'cat', icon: 'paw-outline', label: 'Cat', getAllowed: (f) => !!f.property?.attributes?.pets?.cat },
+  {
+    key: 'cat',
+    icon: require('@/assets/images/announcement-icons/cat-icon.svg'),
+    label: 'Cat',
+    getAllowed: (f) => !!f.property?.attributes?.pets?.cat,
+  },
   {
     key: 'smallDogs',
-    icon: 'paw-outline',
+    icon: require('@/assets/images/announcement-icons/small-dog-icon.svg'),
     label: 'Small dogs\n(under 40 kg)',
     getAllowed: (f) => !!f.property?.attributes?.pets?.smallDogs,
   },
   {
     key: 'largeDogs',
-    icon: 'paw-outline',
+    icon: require('@/assets/images/announcement-icons/large-dog-icon.svg'),
     label: 'Large dogs\n(over 40 kg)',
     getAllowed: (f) => !!f.property?.attributes?.pets?.largeDogs,
   },
@@ -82,8 +83,7 @@ const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
   {
     iconKey: 'area',
     label: 'Area (m²)',
-    getValue: (fd) =>
-      fd.property?.areaM2 != null ? String(fd.property.areaM2) : '—',
+    getValue: (fd) => (fd.property?.areaM2 != null ? String(fd.property.areaM2) : '—'),
   },
   {
     iconKey: 'bedroom',
@@ -127,38 +127,32 @@ const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
   {
     iconKey: 'offStreetParking',
     label: 'Off-street parking',
-    getValue: (fd, h) =>
-      h.formatYesNo(fd.property?.attributes?.amenities?.offStreetParking),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.offStreetParking),
   },
   {
     iconKey: 'attachedGarage',
     label: 'Attached garage',
-    getValue: (fd, h) =>
-      h.formatYesNo(fd.property?.attributes?.amenities?.attachedGarage),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.attachedGarage),
   },
   {
     iconKey: 'detachedGarage',
     label: 'Detached garage',
-    getValue: (fd, h) =>
-      h.formatYesNo(fd.property?.attributes?.amenities?.detachedGarage),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.detachedGarage),
   },
   {
     iconKey: 'washerAndLaundry',
     label: 'Washer and laundry',
-    getValue: (fd, h) =>
-      h.formatYesNo(fd.property?.attributes?.amenities?.washerLaundry),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.washerLaundry),
   },
   {
     iconKey: 'disabledAccess',
     label: 'Disabled access',
-    getValue: (fd, h) =>
-      h.formatYesNo(fd.property?.attributes?.amenities?.disabledAccess),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.disabledAccess),
   },
   {
     iconKey: 'bicycleStorage',
     label: 'Bicycle storage',
-    getValue: (fd, h) =>
-      h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
   },
 ];
 
@@ -210,6 +204,9 @@ export default function FinalScreen() {
 
   const formatYesNo = (v: boolean | undefined) => (v ? 'Yes' : 'No');
 
+  const typeLabel =
+    formData.listingType === 'FOR_RENT' ? 'Apartment for rent' : 'Apartment for sale';
+
   const characteristicHelpers = {
     conditionLabel,
     buildingTypeLabel,
@@ -234,9 +231,9 @@ export default function FinalScreen() {
           </View>
 
           <PropertyAnnouncementDetail
-            title="White house villa"
+            title={formData.title || ''}
             id="RH000230"
-            typeLabel="Apartment for sale"
+            typeLabel={typeLabel}
             price="$2,399,000"
             location={{
               country: 'Argentina',
@@ -260,8 +257,10 @@ export default function FinalScreen() {
 
           {/* Description */}
           <View className="my-4">
-            <ThemedText className={SECTION_TITLE_CLASS}>Description</ThemedText>
-            <ThemedText className="text-[14px] leading-5 text-foreground">
+            <ThemedText className="mb-3 text-[20px] font-semibold text-neutral-950">
+              Description
+            </ThemedText>
+            <ThemedText className="text-neutaral-800 text-[14px] leading-5">
               Welcome to The Dracena Apartments, where Los Feliz living meets luxury and
               convenience. Nestled in the heart of one of Los Angeles most vibrant neighborhoods,
               our apartments offer an unparalleled blend of urban excitement and suburban
@@ -276,11 +275,14 @@ export default function FinalScreen() {
                 <View key={config.iconKey} className="w-1/2 pr-2">
                   <PlacedByItem
                     icon={
-                      <View className="h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        <Ionicons
-                          name={CHARACTERISTIC_ICONS[config.iconKey]}
-                          size={16}
-                          color="#6B7280"
+                      <View className="h-[32px] w-[32px] items-center justify-center rounded-full bg-muted">
+                        <Image
+                          source={CHARACTERISTIC_ICONS[config.iconKey]}
+                          style={{
+                            width: 20,
+                            height: 20,
+                          }}
+                          contentFit="contain"
                         />
                       </View>
                     }
@@ -291,13 +293,20 @@ export default function FinalScreen() {
                 </View>
               ))}
             </View>
-            <View className="mt-4 flex-row items-center justify-center gap-[12px] rounded-[12px] bg-muted px-[16px] py-[12px]">
-              <ThemedText className="text-[16px] font-semibold text-foreground">
+            <View className="mt-4 h-[56px] flex-row items-center justify-center gap-[12px] rounded-[12px] bg-muted">
+              <ThemedText className="text-[16px] font-semibold text-neutral-950">
                 Security deposit
               </ThemedText>
               <View className="flex-row items-center gap-2">
-                <Ionicons name="cash-outline" size={22} color="#087443" />
-                <ThemedText className="text-[16px] font-semibold text-[#087443]">500 $</ThemedText>
+                <Image
+                  source={require('@/assets/images/announcement-icons/hand-icon.svg')}
+                  style={{
+                    width: 32,
+                    height: 32,
+                  }}
+                  contentFit="contain"
+                />
+                <ThemedText className="text-[20px] font-semibold text-main-500">500 $</ThemedText>
               </View>
             </View>
           </AnnouncementCard>
@@ -310,12 +319,13 @@ export default function FinalScreen() {
                   <View
                     key={config.key}
                     className="flex-1 items-center justify-center gap-2 rounded-[8px] bg-muted px-3 py-4">
-                    <Ionicons
-                      name={config.icon}
-                      size={24}
-                      color={PET_ICON_COLOR}
-                      accessible
-                      accessibilityLabel={config.label.replace('\n', ' ')}
+                    <Image
+                      source={config.icon}
+                      style={{
+                        width: 24,
+                        height: 24,
+                      }}
+                      contentFit="contain"
                     />
                     <ThemedText className="text-center text-[14px] text-foreground">
                       {config.label}

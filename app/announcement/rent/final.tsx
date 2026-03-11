@@ -8,6 +8,7 @@ import { PlacedByItem } from '@/components/announcement/placed-by-item';
 import { PropertyAnnouncementDetail } from '@/components/announcement/property-announcement-detail';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ImageSlider } from '@/components/ui/image-slider';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsForm } from '@/types/announcement';
 import { Image } from 'expo-image';
@@ -214,6 +215,19 @@ export default function FinalScreen() {
   const typeLabel =
     formData.listingType === 'FOR_RENT' ? 'Apartment for rent' : 'Apartment for sale';
 
+  // Resolve mediaFileIds to image sources; when API provides URLs use: .map(id => ({ uri: getMediaFileUrl(id) }))
+  const imageSources: { uri: string }[] = [
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
+  ];
+
   const characteristicHelpers = {
     conditionLabel,
     buildingTypeLabel,
@@ -228,13 +242,12 @@ export default function FinalScreen() {
         contentContainerStyle={{ paddingBottom: 31 }}
         showsVerticalScrollIndicator={false}>
         <View className="px-4 pt-6">
-          {/* Image placeholder */}
-          <View
-            className="mb-4 aspect-[4/3] w-full overflow-hidden rounded-[12px] bg-muted"
-            accessibilityLabel="Property image">
-            <View className="flex-1 items-center justify-center">
-              <ThemedText className="text-[14px] text-muted-foreground">No image</ThemedText>
-            </View>
+          <View className="mb-4">
+            <ImageSlider
+              images={imageSources}
+              accessibilityLabel="Property images"
+              className="h-[345px] bg-red-500"
+            />
           </View>
 
           <PropertyAnnouncementDetail

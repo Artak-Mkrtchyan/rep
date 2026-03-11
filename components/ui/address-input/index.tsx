@@ -67,6 +67,7 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
         locality: '',
         province: '',
         street: '',
+        house: '',
       });
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => loadSuggestions(text), DEBOUNCE_MS);
@@ -93,6 +94,7 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
         locality: suggestion.locality,
         province: suggestion.province,
         street: suggestion.street,
+        house: suggestion.house,
       });
       setSuggestions([]);
       Keyboard.dismiss();

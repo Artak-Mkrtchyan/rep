@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import { RentForApartmentsForm } from '../types/announcement';
 
-const PERSIST_KEY = 'announcement-rent-form-five';
+const PERSIST_KEY = 'announcement-rent-form-six';
 
 type PersistedState = {
   formData: RentForApartmentsForm;
@@ -13,6 +13,7 @@ type PersistedState = {
 
 interface AnnouncementForRentFormStore {
   announcementId?: string;
+  publicId?: string;
   formData: RentForApartmentsForm;
   nextStep: () => void;
   sendFormData: () => Promise<void>;
@@ -40,6 +41,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
   persist(
     subscribeWithSelector((set, get) => ({
       announcementId: undefined,
+      publicId: undefined,
       formData: initialFormData,
 
       setCurrentStep: (step) =>
@@ -64,6 +66,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
             const response = await applicationsService.announcementPublication(formData);
             set((state) => ({
               announcementId: response.id,
+              publicId: response.publicId,
               formData: { ...state.formData, response },
             }));
           }

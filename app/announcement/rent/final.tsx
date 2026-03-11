@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -9,156 +9,17 @@ import { PropertyAnnouncementDetail } from '@/components/announcement/property-a
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
+import {
+  CHARACTERISTIC_ICONS,
+  OBJECT_CHARACTERISTICS,
+  PET_ITEMS_CONFIG,
+} from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
-import type { RentForApartmentsForm } from '@/types/announcement';
 import { Image } from 'expo-image';
-
-const CHARACTERISTIC_ICONS: Record<string, string> = {
-  floors: require('@/assets/images/announcement-icons/floors-icon.svg'),
-  area: require('@/assets/images/announcement-icons/size-icon.svg'),
-  bedroom: require('@/assets/images/announcement-icons/bed-icon.svg'),
-  bathroom: require('@/assets/images/announcement-icons/bath-icon.svg'),
-  condition: require('@/assets/images/announcement-icons/condition-icon.svg'),
-  buildingType: require('@/assets/images/announcement-icons/buildingType-icon.svg'),
-  yearBuilt: require('@/assets/images/announcement-icons/yearBuilt-icon.svg'),
-  ownershipType: require('@/assets/images/announcement-icons/ownershipType-icon.svg'),
-  offStreetParking: require('@/assets/images/announcement-icons/parking-icon.svg'),
-  attachedGarage: require('@/assets/images/announcement-icons/garage-icon.svg'),
-  detachedGarage: require('@/assets/images/announcement-icons/garage-icon.svg'),
-  washerAndLaundry: require('@/assets/images/announcement-icons/washer-icon.svg'),
-  disabledAccess: require('@/assets/images/announcement-icons/disabledAccess-icon.svg'),
-  bicycleStorage: require('@/assets/images/announcement-icons/bike-icon.svg'),
-};
-
-const PET_ITEMS_CONFIG: {
-  key: string;
-  icon: string;
-  label: string;
-  getAllowed: (formData: RentForApartmentsForm) => boolean;
-}[] = [
-  {
-    key: 'cat',
-    icon: require('@/assets/images/announcement-icons/cat-icon.svg'),
-    label: 'Cat',
-    getAllowed: (f) => !!f.property?.attributes?.pets?.cat,
-  },
-  {
-    key: 'smallDogs',
-    icon: require('@/assets/images/announcement-icons/small-dog-icon.svg'),
-    label: 'Small dogs\n(under 40 kg)',
-    getAllowed: (f) => !!f.property?.attributes?.pets?.smallDogs,
-  },
-  {
-    key: 'largeDogs',
-    icon: require('@/assets/images/announcement-icons/large-dog-icon.svg'),
-    label: 'Large dogs\n(over 40 kg)',
-    getAllowed: (f) => !!f.property?.attributes?.pets?.largeDogs,
-  },
-];
-
-type CharacteristicConfig = {
-  iconKey: keyof typeof CHARACTERISTIC_ICONS;
-  label: string;
-  getValue: (
-    formData: RentForApartmentsForm,
-    helpers: {
-      conditionLabel: string;
-      buildingTypeLabel: string;
-      ownershipLabel: string;
-      formatYesNo: (v: boolean | undefined) => string;
-    }
-  ) => string;
-};
-
-const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
-  {
-    iconKey: 'floors',
-    label: 'Floors',
-    getValue: (fd) => {
-      const b = fd.property?.attributes?.building;
-      return b?.floorNo != null && b?.numberOfFloors != null
-        ? `${b.floorNo} of ${b.numberOfFloors}`
-        : '—';
-    },
-  },
-  {
-    iconKey: 'area',
-    label: 'Area (m²)',
-    getValue: (fd) => (fd.property?.areaM2 != null ? String(fd.property.areaM2) : '—'),
-  },
-  {
-    iconKey: 'bedroom',
-    label: 'Bedroom',
-    getValue: (fd) =>
-      fd.property?.attributes?.bedroomCount != null
-        ? String(fd.property.attributes.bedroomCount)
-        : '—',
-  },
-  {
-    iconKey: 'bathroom',
-    label: 'Bathroom',
-    getValue: (fd) =>
-      fd.property?.attributes?.bathroomCount != null
-        ? String(fd.property.attributes.bathroomCount)
-        : '—',
-  },
-  {
-    iconKey: 'condition',
-    label: 'Condition',
-    getValue: (_, h) => h.conditionLabel,
-  },
-  {
-    iconKey: 'buildingType',
-    label: 'Building type',
-    getValue: (_, h) => h.buildingTypeLabel,
-  },
-  {
-    iconKey: 'yearBuilt',
-    label: 'Year built',
-    getValue: (fd) =>
-      fd.property?.attributes?.building?.yearBuilt != null
-        ? String(fd.property.attributes.building.yearBuilt)
-        : '—',
-  },
-  {
-    iconKey: 'ownershipType',
-    label: 'Ownership type',
-    getValue: (_, h) => h.ownershipLabel,
-  },
-  {
-    iconKey: 'offStreetParking',
-    label: 'Off-street parking',
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.offStreetParking),
-  },
-  {
-    iconKey: 'attachedGarage',
-    label: 'Attached garage',
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.attachedGarage),
-  },
-  {
-    iconKey: 'detachedGarage',
-    label: 'Detached garage',
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.detachedGarage),
-  },
-  {
-    iconKey: 'washerAndLaundry',
-    label: 'Washer and laundry',
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.washerLaundry),
-  },
-  {
-    iconKey: 'disabledAccess',
-    label: 'Disabled access',
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.disabledAccess),
-  },
-  {
-    iconKey: 'bicycleStorage',
-    label: 'Bicycle storage',
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
-  },
-];
 
 export default function FinalScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
+  const publicId = useAnnouncementForRentFormStore((s) => s.publicId);
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
 
@@ -215,18 +76,7 @@ export default function FinalScreen() {
   const typeLabel =
     formData.listingType === 'FOR_RENT' ? 'Apartment for rent' : 'Apartment for sale';
 
-  // Resolve mediaFileIds to image sources; when API provides URLs use: .map(id => ({ uri: getMediaFileUrl(id) }))
-  const imageSources: { uri: string }[] = [
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-    { uri: require('@/assets/images/announcement-icons/bath-icon.svg') },
-  ];
+  const imageSources: { uri: string }[] = [];
 
   const characteristicHelpers = {
     conditionLabel,
@@ -246,32 +96,56 @@ export default function FinalScreen() {
             <ImageSlider
               images={imageSources}
               accessibilityLabel="Property images"
-              className="h-[345px] bg-red-500"
+              className="h-[345px]"
             />
+            <View className="absolute right-[16px] top-[16px]  flex-row items-center gap-[8px]">
+              <Pressable className="h-[44px] w-[44px] items-center justify-center rounded-[31px] bg-[#1111114d]">
+                <Image
+                  source={require('@/assets/images/heart-icon.svg')}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    tintColor: 'white',
+                  }}
+                  contentFit="contain"
+                />
+              </Pressable>
+              <Pressable className="h-[44px] w-[44px] items-center justify-center rounded-[31px] bg-[#1111114d]">
+                <Image
+                  source={require('@/assets/images/menu-icon.svg')}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    tintColor: 'white',
+                  }}
+                  contentFit="contain"
+                />
+              </Pressable>
+            </View>
           </View>
 
           <PropertyAnnouncementDetail
             title={formData.title || ''}
-            id="RH000230"
+            id={publicId}
             typeLabel={typeLabel}
-            price="$2,399,000"
+            price="-"
             location={{
-              country: 'Argentina',
-              city: 'Buenos Aires',
-              district: 'Buenos Aires',
-              address: 'Av. Corrientes 1234',
+              country: formData.geo.country,
+              city: formData.geo.locality,
+              district: formData.geo.province,
+              address: `${formData.geo.street} ${formData.geo.house || ''}`,
             }}
             distances={{
-              metro: '10 min',
-              hospital: '10 min',
-              school: '10 min',
-              grocery: '10 min',
+              metro: '-',
+              hospital: '-',
+              school: '-',
+              grocery: '-',
             }}
             placedBy={{
-              name: 'John Doe',
+              name: '-',
             }}
-            postedDate="10.02.2024"
-            updatedDate="10.02.2024 10:42"
+            postedDate="-"
+            updatedDate="-"
             onViewMap={handleViewOnMap}
           />
 
@@ -281,10 +155,7 @@ export default function FinalScreen() {
               Description
             </ThemedText>
             <ThemedText className="text-neutaral-800 text-[14px] leading-5">
-              Welcome to The Dracena Apartments, where Los Feliz living meets luxury and
-              convenience. Nestled in the heart of one of Los Angeles most vibrant neighborhoods,
-              our apartments offer an unparalleled blend of urban excitement and suburban
-              tranquility.
+              {formData.description || '-'}
             </ThemedText>
           </View>
 
@@ -313,29 +184,35 @@ export default function FinalScreen() {
                 </View>
               ))}
             </View>
-            <View className="mt-4 h-[56px] flex-row items-center justify-center gap-[12px] rounded-[12px] bg-muted">
-              <ThemedText className="text-[16px] font-semibold text-neutral-950">
-                Security deposit
-              </ThemedText>
-              <View className="flex-row items-center gap-2">
-                <Image
-                  source={require('@/assets/images/announcement-icons/hand-icon.svg')}
-                  style={{
-                    width: 32,
-                    height: 32,
-                  }}
-                  contentFit="contain"
-                />
-                <ThemedText className="text-[20px] font-semibold text-main-500">500 $</ThemedText>
+            {formData.rentDetails?.securityDeposit ? (
+              <View className="mt-4 h-[56px] flex-row items-center justify-center gap-[12px] rounded-[12px] bg-muted">
+                <ThemedText className="text-[16px] font-semibold text-neutral-950">
+                  Security deposit
+                </ThemedText>
+                <View className="flex-row items-center gap-2">
+                  <Image
+                    source={require('@/assets/images/announcement-icons/hand-icon.svg')}
+                    style={{
+                      width: 32,
+                      height: 32,
+                    }}
+                    contentFit="contain"
+                  />
+                  <ThemedText className="text-[20px] font-semibold text-main-500">
+                    {formData.rentDetails?.securityDeposit} $
+                  </ThemedText>
+                </View>
               </View>
-            </View>
+            ) : (
+              <></>
+            )}
           </AnnouncementCard>
 
           {/* Pets allowed */}
-          <AnnouncementCard title="Pets allowed" className="gap-[12px]">
-            <View className="flex-row gap-2">
-              {allowedPets.length > 0 ? (
-                allowedPets.map((config) => (
+          {allowedPets.length > 0 ? (
+            <AnnouncementCard title="Pets allowed" className="gap-[12px]">
+              <View className="flex-row gap-2">
+                {allowedPets.map((config) => (
                   <View
                     key={config.key}
                     className="flex-1 items-center justify-center gap-2 rounded-[8px] bg-muted px-3 py-4">
@@ -351,12 +228,12 @@ export default function FinalScreen() {
                       {config.label}
                     </ThemedText>
                   </View>
-                ))
-              ) : (
-                <ThemedText className="text-[14px] text-muted-foreground">—</ThemedText>
-              )}
-            </View>
-          </AnnouncementCard>
+                ))}
+              </View>
+            </AnnouncementCard>
+          ) : (
+            <></>
+          )}
         </View>
       </ScrollView>
 

@@ -249,7 +249,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                       />
                     </View>
                   }
-                  name="1.2km"
+                  name={distances.metro}
                   label="Metro"
                   nameClassName="text-foreground"
                 />
@@ -268,7 +268,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                       />
                     </View>
                   }
-                  name="10km"
+                  name={distances.hospital}
                   label="Hospital"
                   nameClassName="text-foreground"
                 />
@@ -287,7 +287,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                       />
                     </View>
                   }
-                  name="2km"
+                  name={distances.school}
                   label="School"
                   nameClassName="text-foreground"
                 />
@@ -306,7 +306,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                       />
                     </View>
                   }
-                  name="3km"
+                  name={distances.grocery}
                   label="Grocery shop"
                   nameClassName="text-foreground"
                 />

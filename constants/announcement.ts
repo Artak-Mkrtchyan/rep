@@ -205,6 +205,12 @@ export const ANNOUNCEMENT_ROUTES = {
     completedStep: 1,
     path: '/announcement/rent/basic-info',
   },
+  RENT_BROKER_LIST: {
+    name: 'broker-list',
+    label: 'List',
+    completedStep: 1,
+    path: '/announcement/rent/broker-list',
+  },
   RENT_ANNOUNCEMENT_TITLE: {
     name: 'announcement-title',
     label: 'Announcement title',

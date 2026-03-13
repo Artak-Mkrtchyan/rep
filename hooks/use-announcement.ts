@@ -8,6 +8,10 @@ export function useStepRedirect() {
 
   const currentStep = getTargetStep(pathname);
 
+  if (!currentStep) {
+    return { shouldRedirect: false };
+  }
+
   if (currentStep !== targetStep) {
     const targetRoute = getTargetRoute(targetStep);
     return { shouldRedirect: true, targetRoute, currentStep };

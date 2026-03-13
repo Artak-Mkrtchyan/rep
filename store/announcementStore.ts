@@ -9,6 +9,7 @@ const PERSIST_KEY = 'announcement-rent-form-six';
 type PersistedState = {
   formData: RentForApartmentsForm;
   announcementId?: string;
+  publicId?: string;
 };
 
 interface AnnouncementForRentFormStore {
@@ -64,10 +65,9 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
             await applicationsService.updateAnnouncementPublication(announcementId, formData);
           } else {
             const response = await applicationsService.announcementPublication(formData);
-            set((state) => ({
+            set(() => ({
               announcementId: response.id,
               publicId: response.publicId,
-              formData: { ...state.formData, response },
             }));
           }
         } catch (error) {
@@ -96,6 +96,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
       resetForm: () =>
         set({
           announcementId: undefined,
+          publicId: undefined,
           formData: initialFormData,
         }),
     })),
@@ -106,6 +107,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         ({
           formData: state.formData,
           announcementId: state.announcementId,
+          publicId: state.publicId,
         }) as PersistedState,
       merge: (persistedState, currentState) => {
         const persisted = persistedState as PersistedState | undefined;

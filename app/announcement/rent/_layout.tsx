@@ -1,33 +1,68 @@
-import { Redirect, Stack } from 'expo-router';
+import { Redirect, router, Stack } from 'expo-router';
 
 import { AnnouncementHeader } from '@/components/announcement/announcement-header';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useStepRedirect } from '@/hooks/use-announcement';
+import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
+import { Image } from 'expo-image';
+import { Pressable } from 'react-native';
 
 export default function AnnouncementRentLayout() {
   const { shouldRedirect, targetRoute } = useStepRedirect();
+  const setCurrentStep = useAnnouncementForRentFormStore((s) => s.setCurrentStep);
 
   if (shouldRedirect && targetRoute) {
     return <Redirect href={targetRoute} />;
   }
 
+  const handleBackPress = (step: number) => {
+    if (step === 1) {
+      router.push('/(tabs)');
+    } else {
+      setCurrentStep(--step);
+    }
+  };
+
   return (
-    <Stack
-      screenOptions={{
-        headerShown: true,
-        header: () => <AnnouncementHeader />,
-      }}>
+    <Stack>
       {Object.values(ANNOUNCEMENT_ROUTES).map((route) => (
         <Stack.Screen
           key={route.name}
           name={route.name}
           options={{
+            headerShown: true,
             header: () => (
-              <AnnouncementHeader label={route.label} completedStep={route.completedStep} />
+              <AnnouncementHeader
+                label={route.label}
+                completedStep={route.completedStep}
+                onHandleBackPress={() => handleBackPress(route.completedStep)}
+              />
             ),
           }}
         />
       ))}
+
+      <Stack.Screen
+        key="broker/[id]"
+        name="broker/[id]"
+        options={{
+          headerShown: true,
+          header: () => (
+            <AnnouncementHeader
+              headerTitle="Broker details"
+              isStepProgressVisible={false}
+              rightComponent={
+                <Pressable onPress={() => {}}>
+                  <Image
+                    style={{ width: 24, height: 24 }}
+                    source={require('@/assets/images/share-two-icon.svg')}
+                  />
+                </Pressable>
+              }
+            />
+          ),
+        }}
+      />
     </Stack>
   );
 }

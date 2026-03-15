@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import { RentForApartmentsForm } from '../types/announcement';
 
-const PERSIST_KEY = 'announcement-rent-form-six';
+const PERSIST_KEY = 'announcement-rent-form-seven';
 
 type PersistedState = {
   formData: RentForApartmentsForm;

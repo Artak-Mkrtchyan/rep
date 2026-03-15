@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 
+import { HeartIcon } from '@/components/icons/heart-icon';
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
 
@@ -14,6 +15,8 @@ export type AnnouncementSmallCardProps = {
   sizeLabel: string;
   priceLabel: string;
   className?: string;
+  isArrowUpRight?: boolean;
+  isFavourite?: boolean;
 };
 
 export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
@@ -25,7 +28,11 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
   sizeLabel,
   priceLabel,
   className,
+  isArrowUpRight = true,
+  isFavourite = false,
 }) => {
+  const bgHeartIcon = isFavourite ? 'bg-[#11111199]' : 'bg-[#1111114d]';
+
   return (
     <View
       className={cn('w-full rounded-[16px] bg-card px-[12px] py-[8px]', className)}
@@ -50,15 +57,16 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
               contentFit="contain"
             />
           </Pressable>
-          <Pressable className="h-[20px] w-[20px] items-center justify-center rounded-[36px] bg-[#1111114d]">
-            <Image
-              source={require('@/assets/images/heart-icon.svg')}
-              style={{
-                width: 16,
-                height: 16,
-                tintColor: 'white',
-              }}
-              contentFit="contain"
+          <Pressable
+            className={cn(
+              'h-[20px] w-[20px] items-center justify-center rounded-[36px]',
+              bgHeartIcon
+            )}>
+            <HeartIcon
+              width={16}
+              height={16}
+              stroke={isFavourite ? '#13B86D' : 'white'}
+              fill={isFavourite ? '#13B86D' : 'none'}
             />
           </Pressable>
         </View>
@@ -72,7 +80,7 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
           <ThemedText className="text-[8px] text-muted-foreground">{address}</ThemedText>
         </View>
 
-        <View className="flex-row flex-wrap items-center justify-between gap-2">
+        <View className="flex-row flex-wrap items-center gap-2">
           <View className="flex-row items-center gap-1">
             <Image
               source={require('@/assets/images/announcement-icons/bed-icon.svg')}
@@ -103,13 +111,15 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
           <ThemedText className="text-[14px] font-bold leading-[17px] text-foreground">
             {priceLabel}
           </ThemedText>
-          <View className="h-[18px] w-[18px] items-center justify-center rounded-full bg-main-500">
-            <Image
-              source={require('@/assets/images/arrow-up-right-icon.svg')}
-              style={{ width: 16, height: 16 }}
-              contentFit="contain"
-            />
-          </View>
+          {isArrowUpRight && (
+            <View className="h-[18px] w-[18px] items-center justify-center rounded-full bg-main-500">
+              <Image
+                source={require('@/assets/images/arrow-up-right-icon.svg')}
+                style={{ width: 16, height: 16 }}
+                contentFit="contain"
+              />
+            </View>
+          )}
         </View>
       </View>
     </View>

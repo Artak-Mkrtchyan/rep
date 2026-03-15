@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
@@ -14,10 +15,7 @@ import { ANNOUNCEMENT_ROUTES, BATHROOMS_OPTIONS, BEDROOMS_OPTIONS } from '@/cons
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep3 } from '@/types/announcement';
 
-const SCREEN_TITLE = "Let's start creating your listing";
-const SCREEN_SUBTITLE = "Add or review details about your property's size.";
 const SQUARE_FOOTAGE_PLACEHOLDER = '1200';
-const SQUARE_FOOTAGE_UNIT = 'm²';
 const FOOTER_APPROX_HEIGHT = 152;
 
 type PropertyInfoFormValues = RentForApartmentsFormStep3;
@@ -39,6 +37,7 @@ const PropertyInfoSchema = Yup.object().shape({
 });
 
 export default function PropertyInfoFirstScreen() {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
@@ -71,7 +70,7 @@ export default function PropertyInfoFirstScreen() {
       try {
         await sendFormData();
       } catch {
-        Alert.alert('Error', 'Failed to send form data');
+        Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       } finally {
         router.push('/(tabs)');
       }
@@ -104,22 +103,22 @@ export default function PropertyInfoFirstScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="px-4 pt-6">
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-                  {SCREEN_TITLE}
+                  {t('announcement.rent.property_info_first_title')}
                 </ThemedText>
                 <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-                  {SCREEN_SUBTITLE}
+                  {t('announcement.rent.property_info_first_subtitle')}
                 </ThemedText>
 
                 <View className="gap-4">
                   <Input
-                    label="Square footage"
+                    label={t('announcement.rent.square_footage')}
                     numericOnly
                     placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
                     value={`${values.property?.areaM2 || ''}`}
                     onChangeText={(v) => setFieldValue('property.areaM2', Number(v))}
                     right={
                       <ThemedText className="text-[16px] text-muted-foreground">
-                        {SQUARE_FOOTAGE_UNIT}
+                        {t('announcement.rent.square_meters_unit')}
                       </ThemedText>
                     }
                     containerClassName="mb-1"
@@ -130,8 +129,8 @@ export default function PropertyInfoFirstScreen() {
                   />
 
                   <Select
-                    label="Total bedrooms"
-                    placeholder="Select"
+                    label={t('announcement.rent.total_bedrooms')}
+                    placeholder={t('common.select')}
                     value={`${values.property?.attributes?.bedroomCount}`}
                     onChange={(v) => setFieldValue('property.attributes.bedroomCount', Number(v))}
                     options={BEDROOMS_OPTIONS}
@@ -139,8 +138,8 @@ export default function PropertyInfoFirstScreen() {
                   />
 
                   <Select
-                    label="Total bathrooms"
-                    placeholder="Select"
+                    label={t('announcement.rent.total_bathrooms')}
+                    placeholder={t('common.select')}
                     value={`${values.property?.attributes?.bathroomCount}`}
                     onChange={(v) => setFieldValue('property.attributes.bathroomCount', Number(v))}
                     options={BATHROOMS_OPTIONS}
@@ -151,8 +150,8 @@ export default function PropertyInfoFirstScreen() {
             </ScrollView>
 
             <AnnouncementFooter
-              firstButtonLabel="Next"
-              secondButtonLabel="Save & exit"
+              firstButtonLabel={t('common.next')}
+              secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
             />

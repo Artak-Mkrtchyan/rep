@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -11,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
+import i18n from '@/lib/i18n/i18n';
 
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
@@ -26,20 +28,20 @@ import { router } from 'expo-router';
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 const ConstructionCompanySchema = Yup.object().shape({
-  attachmentIds: Yup.array().min(1, 'At least one file is required').required('Required'),
+  attachmentIds: Yup.array().min(1, () => i18n.t('validation.at_least_one_file')).required(() => i18n.t('validation.required')),
   companyInfo: Yup.object().shape({
     certifiedOn: Yup.string()
-      .required('Required')
-      .matches(DATE_REGEX, 'Date in incorrect format')
-      .test('not-future-date', 'Date cannot be in the future', (value) => {
+      .required(() => i18n.t('validation.required'))
+      .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format'))
+      .test('not-future-date', () => i18n.t('validation.date_cannot_be_future'), (value) => {
         if (!value || !DATE_REGEX.test(value)) return true;
         return new Date(value) <= new Date();
       }),
-    certifiedBy: Yup.string().optional().max(255, 'Must be no more than 255 characters'),
+    certifiedBy: Yup.string().optional().max(255, () => i18n.t('validation.max_length_255')),
     email: yupSchemas.email,
-    name: Yup.string().required('Required').max(255, 'Must be no more than 255 characters'),
+    name: Yup.string().required(() => i18n.t('validation.required')).max(255, () => i18n.t('validation.max_length_255')),
     phoneNumber: yupSchemas.phone,
-    yearsOfActivity: Yup.number().required('Required'),
+    yearsOfActivity: Yup.number().required(() => i18n.t('validation.required')),
   }),
   managerInfo: Yup.object().shape({
     email: yupSchemas.email,
@@ -49,6 +51,7 @@ const ConstructionCompanySchema = Yup.object().shape({
 });
 
 export default function ConstructionCompanySignUpScreen() {
+  const { t } = useTranslation();
   const { data, resetData } = useSignUpContext();
 
   const handleContinue = async (
@@ -118,7 +121,7 @@ export default function ConstructionCompanySignUpScreen() {
         }) => (
           <View className="mb-10 mt-10 w-full">
             <AuthHeader
-              title="Sign up"
+              title={t('signup.title')}
               imageSource={require('@/assets/images/icon-broker-illustration.svg')}
               imageWidth={IMAGE_DIMENSIONS.CONSTRUCTION_ILLUSTRATION.width}
               imageHeight={IMAGE_DIMENSIONS.CONSTRUCTION_ILLUSTRATION.height}
@@ -126,10 +129,10 @@ export default function ConstructionCompanySignUpScreen() {
 
             <View className="mt-10 w-full gap-5">
               <Input
-                label="Manager e-mail"
+                label={t('signup.construction_company.manager_email')}
                 required
                 value={values.managerInfo.email}
-                helper="E-mail for verification and access"
+                helper={t('signup.construction_company.manager_email_helper')}
                 disabled
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
@@ -144,7 +147,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <Input
-                label="Manager name"
+                label={t('signup.construction_company.manager_name')}
                 required
                 value={values.managerInfo.fullName}
                 onChangeText={handleChange('managerInfo.fullName')}
@@ -158,7 +161,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <PhoneInput
-                label="Manager mobile number"
+                label={t('signup.construction_company.manager_mobile_number')}
                 value={values.managerInfo.phoneNumber}
                 onChangeText={(text) => setFieldValue('managerInfo.phoneNumber', text)}
                 onBlur={handleBlur('managerInfo.phoneNumber')}
@@ -170,7 +173,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <Input
-                label="Company e-mail"
+                label={t('signup.construction_company.company_email')}
                 required
                 value={values.companyInfo.email}
                 onChangeText={handleChange('companyInfo.email')}
@@ -182,12 +185,12 @@ export default function ConstructionCompanySignUpScreen() {
                 }
                 keyboardType="email-address"
                 autoCapitalize="none"
-                helper="Company e-mail for contact purposes"
+                helper={t('signup.construction_company.company_email_helper')}
                 autoCorrect={false}
               />
 
               <Input
-                label="Company name"
+                label={t('signup.construction_company.company_name')}
                 required
                 value={values.companyInfo.name}
                 onChangeText={handleChange('companyInfo.name')}
@@ -201,7 +204,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <PhoneInput
-                label="Mobile number"
+                label={t('signup.construction_company.mobile_number')}
                 required
                 value={values.companyInfo.phoneNumber}
                 onChangeText={(text) => setFieldValue('companyInfo.phoneNumber', text)}
@@ -214,7 +217,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <DatePicker
-                label="Company certification date"
+                label={t('signup.construction_company.certification_date')}
                 required
                 value={values.companyInfo.certifiedOn}
                 onChange={(date) => setFieldValue('companyInfo.certifiedOn', date)}
@@ -227,7 +230,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <Input
-                label="Certified by"
+                label={t('signup.construction_company.certified_by')}
                 value={values.companyInfo.certifiedBy}
                 onChangeText={handleChange('companyInfo.certifiedBy')}
                 onBlur={handleBlur('companyInfo.certifiedBy')}
@@ -240,7 +243,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <NumberPicker
-                label="Company's years of activity"
+                label={t('signup.construction_company.years_of_activity')}
                 value={values.companyInfo.yearsOfActivity}
                 onChange={(value) => setFieldValue('companyInfo.yearsOfActivity', value)}
                 min={0}
@@ -255,7 +258,7 @@ export default function ConstructionCompanySignUpScreen() {
               />
 
               <FileUpload
-                label="Files upload"
+                label={t('signup.construction_company.files_upload')}
                 value={values.attachmentIds}
                 onChange={(attachmentIds) => setFieldValue('attachmentIds', attachmentIds)}
                 required
@@ -269,8 +272,8 @@ export default function ConstructionCompanySignUpScreen() {
               <Button
                 disabled={Object.keys(errors).length !== 0 || isSubmitting}
                 onPress={() => handleSubmit()}
-                accessibilityLabel="Continue">
-                {isSubmitting ? 'Submitting...' : 'Continue'}
+                accessibilityLabel={t('common.continue')}>
+                {isSubmitting ? t('common.submitting') : t('common.continue')}
               </Button>
 
               <SignInFooter

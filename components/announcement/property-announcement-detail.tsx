@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
@@ -54,7 +55,7 @@ export type PropertyAnnouncementDetailProps = {
 };
 
 export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProps> = ({
-  status = 'Active',
+  status,
   onStatusPress,
   onFavoritePress,
   onMenuPress,
@@ -72,6 +73,8 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
 
   containerClassName,
 }) => {
+  const { t } = useTranslation();
+  const resolvedStatus = status ?? t('announcement.detail.status_active');
   const hasDistances =
     distances && (distances.metro || distances.hospital || distances.school || distances.grocery);
 
@@ -86,7 +89,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
             onPress={onStatusPress}
             className="flex-row items-center gap-2 rounded-[4px] bg-[#E3FEDE] px-3 py-2"
             accessibilityRole="button"
-            accessibilityLabel={`Status: ${status}`}>
+            accessibilityLabel={`Status: ${resolvedStatus}`}>
             <Image
               source={require('@/assets/images/success-icon.svg')}
               style={{
@@ -95,7 +98,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               }}
               contentFit="contain"
             />
-            <ThemedText className="text-[12px] text-primary">{status}</ThemedText>
+            <ThemedText className="text-[12px] text-primary">{resolvedStatus}</ThemedText>
             <Image
               source={require('@/assets/images/chevron-down-icon.svg')}
               style={{
@@ -162,12 +165,12 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
       {/* Announcement information */}
       <AnnouncementCard
         className="gap-[16px] rounded-[8px] px-[16px] py-[12px]"
-        title="Announcement information">
+        title={t('announcement.detail.announcement_info')}>
         <View className="flex-row flex-wrap items-start gap-x-8 gap-y-4">
           {placedBy ? (
             <PlacedByItem
               name={placedBy.name}
-              label="Placed by"
+              label={t('announcement.detail.placed_by')}
               nameClassName="text-main-500"
               icon={
                 placedBy.avatarUri ? (
@@ -184,12 +187,12 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
             />
           ) : null}
           {postedDate != null ? (
-            <PlacedByItem name={`(${postedDate})`} label="Posted" nameClassName="text-foreground" />
+            <PlacedByItem name={`(${postedDate})`} label={t('announcement.detail.posted')} nameClassName="text-foreground" />
           ) : null}
           {updatedDate != null ? (
             <PlacedByItem
               name={`(${updatedDate})`}
-              label="Updated"
+              label={t('announcement.detail.updated')}
               nameClassName="text-foreground"
             />
           ) : null}
@@ -198,29 +201,29 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
 
       {/* Location */}
       {location && (location.country || location.city || location.district || location.address) ? (
-        <AnnouncementCard className="gap-[16px] rounded-[8px] px-[16px] py-[12px]" title="Location">
+        <AnnouncementCard className="gap-[16px] rounded-[8px] px-[16px] py-[12px]" title={t('announcement.detail.location')}>
           <View className="flex-row flex-wrap gap-x-8 gap-y-4">
             {location.country ? (
               <PlacedByItem
                 name={location.country}
-                label="Country"
+                label={t('announcement.detail.country')}
                 nameClassName="text-foreground"
               />
             ) : null}
             {location.city ? (
-              <PlacedByItem name={location.city} label="City" nameClassName="text-foreground" />
+              <PlacedByItem name={location.city} label={t('announcement.detail.city')} nameClassName="text-foreground" />
             ) : null}
             {location.district ? (
               <PlacedByItem
                 name={location.district}
-                label="District"
+                label={t('announcement.detail.district')}
                 nameClassName="text-foreground"
               />
             ) : null}
             {location.address ? (
               <PlacedByItem
                 name={location.address}
-                label="Address"
+                label={t('announcement.detail.address')}
                 nameClassName="text-foreground"
               />
             ) : null}
@@ -231,7 +234,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
       {/* Notable distances */}
       <AnnouncementCard
         className="gap-[16px] rounded-[8px] px-[16px] py-[12px]"
-        title="Notable distances">
+        title={t('announcement.detail.notable_distances')}>
         {hasDistances ? (
           <>
             <View className="flex-row flex-wrap gap-x-6 gap-y-6">
@@ -250,7 +253,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                     </View>
                   }
                   name={distances.metro}
-                  label="Metro"
+                  label={t('announcement.detail.metro')}
                   nameClassName="text-foreground"
                 />
               ) : null}
@@ -269,7 +272,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                     </View>
                   }
                   name={distances.hospital}
-                  label="Hospital"
+                  label={t('announcement.detail.hospital')}
                   nameClassName="text-foreground"
                 />
               ) : null}
@@ -288,7 +291,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                     </View>
                   }
                   name={distances.school}
-                  label="School"
+                  label={t('announcement.detail.school')}
                   nameClassName="text-foreground"
                 />
               ) : null}
@@ -307,7 +310,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                     </View>
                   }
                   name={distances.grocery}
-                  label="Grocery shop"
+                  label={t('announcement.detail.grocery_shop')}
                   nameClassName="text-foreground"
                 />
               ) : null}
@@ -316,7 +319,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               <Button
                 variant="secondary"
                 onPress={onViewMap}
-                accessibilityLabel="View on map"
+                accessibilityLabel={t('announcement.detail.view_on_map')}
                 style={{
                   marginTop: 20,
                   borderWidth: 0,
@@ -324,7 +327,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                   alignSelf: 'center',
                 }}>
                 <ThemedText className="text-[16px] font-medium text-primary">
-                  View on map
+                  {t('announcement.detail.view_on_map')}
                 </ThemedText>
               </Button>
             ) : null}

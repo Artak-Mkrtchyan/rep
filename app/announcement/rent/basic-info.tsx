@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -10,9 +11,9 @@ import { AddressInput } from '@/components/ui/address-input';
 import { CheckboxRow } from '@/components/ui/checkbox';
 import { Select } from '@/components/ui/select';
 import {
-  LISTING_TYPE_OPTIONS,
-  PROCESS_OPTIONS,
-  PROPERTY_TYPE_OPTIONS,
+  getListingTypeOptions,
+  getProcessOptions,
+  getPropertyTypeOptions,
 } from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
@@ -36,6 +37,7 @@ const BasicInfoSchema = Yup.object().shape({
 });
 
 export default function BasicInfoScreen() {
+  const { t } = useTranslation();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
@@ -67,7 +69,7 @@ export default function BasicInfoScreen() {
       try {
         await sendFormData();
       } catch {
-        Alert.alert('Error', 'Failed to send form data');
+        Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       } finally {
         router.push('/(tabs)');
       }
@@ -100,16 +102,16 @@ export default function BasicInfoScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="px-4 pt-[24px]">
                 <ThemedText className="mb-6 text-[20px] font-bold text-foreground">
-                  Basic info
+                  {t('announcement.rent.basic_info')}
                 </ThemedText>
 
                 <View className="gap-4">
                   <Select
-                    label="Listing type"
-                    placeholder="For rent"
+                    label={t('announcement.rent.listing_type')}
+                    placeholder={t('announcement.rent.for_rent_placeholder')}
                     value={values.listingType}
                     onChange={(v) => setFieldValue('listingType', v)}
-                    options={LISTING_TYPE_OPTIONS}
+                    options={getListingTypeOptions(t)}
                     containerClassName="mb-1"
                     error={
                       touched.listingType && errors.listingType ? errors.listingType : undefined
@@ -117,21 +119,21 @@ export default function BasicInfoScreen() {
                   />
 
                   <AddressInput
-                    label="Address"
-                    placeholder="Enter address"
+                    label={t('announcement.rent.address')}
+                    placeholder={t('announcement.rent.enter_address')}
                     value={values.geo.formattedAddress}
                     onChangeText={handleChange('geo.formattedAddress')}
                     onSelectAddress={(geo) => setFieldValue('geo', geo)}
-                    error={touched.geo && errors.geo ? 'Address is required' : undefined}
+                    error={touched.geo && errors.geo ? t('validation.address_required') : undefined}
                     containerClassName="mb-1"
                   />
 
                   <Select
-                    label="Property type"
-                    placeholder="Apartments"
+                    label={t('announcement.rent.property_type')}
+                    placeholder={t('announcement.rent.apartments_placeholder')}
                     value={values.propertyType}
                     onChange={(v) => setFieldValue('propertyType', v)}
-                    options={PROPERTY_TYPE_OPTIONS}
+                    options={getPropertyTypeOptions(t)}
                     containerClassName="mb-1"
                     error={
                       touched.propertyType && errors.propertyType ? errors.propertyType : undefined
@@ -139,11 +141,11 @@ export default function BasicInfoScreen() {
                   />
 
                   <Select
-                    label="Process announcement"
-                    placeholder="As individual"
+                    label={t('announcement.rent.process_announcement')}
+                    placeholder={t('announcement.rent.as_individual_placeholder')}
                     value={values.processType}
                     onChange={(v) => setFieldValue('processType', v)}
-                    options={PROCESS_OPTIONS}
+                    options={getProcessOptions(t)}
                     containerClassName="mb-1"
                     error={
                       touched.processType && errors.processType ? errors.processType : undefined
@@ -152,12 +154,12 @@ export default function BasicInfoScreen() {
 
                   <View className="mt-1">
                     <CheckboxRow
-                      label="Do you need photographer services?"
+                      label={t('announcement.rent.need_photographer')}
                       checked={values.needPhotographer ?? false}
                       onToggle={() => setFieldValue('needPhotographer', !values.needPhotographer)}
                     />
                     <CheckboxRow
-                      label="Do you need assessment expert services?"
+                      label={t('announcement.rent.need_assessment_expert')}
                       checked={values.needAssessmentExpert ?? false}
                       onToggle={() =>
                         setFieldValue('needAssessmentExpert', !values.needAssessmentExpert)
@@ -169,8 +171,8 @@ export default function BasicInfoScreen() {
             </ScrollView>
 
             <AnnouncementFooter
-              firstButtonLabel="Next"
-              secondButtonLabel="Save & exit"
+              firstButtonLabel={t('common.next')}
+              secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
             />

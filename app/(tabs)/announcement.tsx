@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,6 +10,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 
 export default function AnnouncementScreen() {
+  const { t } = useTranslation();
   const handleAddPress = () => {
     router.push(ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path);
   };
@@ -21,14 +23,14 @@ export default function AnnouncementScreen() {
             onPress={handleAddPress}
             style={({ pressed }) => (pressed ? { opacity: 0.8 } : undefined)}
             accessibilityRole="button"
-            accessibilityLabel="Create announcement">
+            accessibilityLabel={t('announcement.create')}>
             <Ionicons name="add-circle-outline" size={64} color="#ABABAB" />
           </Pressable>
           <ThemedText type="title" className="mt-4 text-center">
-            Announcement
+            {t('announcement.title')}
           </ThemedText>
           <ThemedText className="mt-2 text-center text-muted-foreground">
-            Create and manage your property listings
+            {t('announcement.subtitle')}
           </ThemedText>
         </View>
       </SafeAreaView>

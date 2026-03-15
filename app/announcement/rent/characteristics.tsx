@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -10,21 +11,19 @@ import { CheckboxRow } from '@/components/ui/checkbox';
 import { ChipGroup } from '@/components/ui/chip-group';
 import { Select } from '@/components/ui/select';
 import {
-  BUILDING_TYPE_OPTIONS,
-  CONDITION_OPTIONS,
+  getBuildingTypeOptions,
+  getConditionOptions,
   FLOORS_OPTIONS,
-  OWNERSHIP_TYPE_OPTIONS,
+  getOwnershipTypeOptions,
   YEAR_BUILT_OPTIONS,
 } from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Attributes, Property } from '@/types/announcement';
 
-const SCREEN_TITLE = 'Now tell us more about your property';
-const SCREEN_SUBTITLE = 'Sharing more will help renters see themselves in your home.';
-
 type CharacteristicsFormValues = Attributes;
 
 export default function CharacteristicsScreen() {
+  const { t } = useTranslation();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
@@ -54,7 +53,7 @@ export default function CharacteristicsScreen() {
         router.push('/(tabs)');
       }
     } catch {
-      Alert.alert('Error', 'Failed to send form data');
+      Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       router.push('/(tabs)');
     }
   };
@@ -84,15 +83,15 @@ export default function CharacteristicsScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="px-4 pt-6">
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-                  {SCREEN_TITLE}
+                  {t('announcement.rent.characteristics_title')}
                 </ThemedText>
                 <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-                  {SCREEN_SUBTITLE}
+                  {t('announcement.rent.characteristics_subtitle')}
                 </ThemedText>
 
                 <View className="gap-6">
                   <Select
-                    label="Number of floors"
+                    label={t('announcement.rent.number_of_floors')}
                     placeholder=""
                     value={`${values.building?.numberOfFloors || ''}`}
                     onChange={(v) => setFieldValue('building.numberOfFloors', Number(v))}
@@ -101,7 +100,7 @@ export default function CharacteristicsScreen() {
                   />
 
                   <Select
-                    label="Floor no:"
+                    label={t('announcement.rent.floor_no')}
                     placeholder=""
                     value={`${values.building?.floorNo || ''}`}
                     onChange={(v) => setFieldValue('building.floorNo', Number(v))}
@@ -111,8 +110,8 @@ export default function CharacteristicsScreen() {
 
                   <View className="rounded-[12px] bg-muted p-4">
                     <ChipGroup
-                      label="Parking"
-                      options={BUILDING_TYPE_OPTIONS}
+                      label={t('announcement.rent.parking')}
+                      options={getBuildingTypeOptions(t)}
                       value={values.building?.buildingType || ''}
                       onChange={(v) => setFieldValue('building.buildingType', v)}
                     />
@@ -120,19 +119,19 @@ export default function CharacteristicsScreen() {
 
                   <View className="gap-1">
                     <CheckboxRow
-                      label="HVAC"
+                      label={t('announcement.rent.hvac')}
                       checked={values.amenities?.hvac ?? false}
                       onToggle={() => setFieldValue('amenities.hvac', !values.amenities?.hvac)}
                     />
                     <CheckboxRow
-                      label="Balcony"
+                      label={t('announcement.rent.balcony')}
                       checked={values.amenities?.balcony ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.balcony', !values.amenities?.balcony)
                       }
                     />
                     <CheckboxRow
-                      label="Off-street parking"
+                      label={t('announcement.rent.off_street_parking')}
                       checked={values.amenities?.offStreetParking ?? false}
                       onToggle={() =>
                         setFieldValue(
@@ -142,7 +141,7 @@ export default function CharacteristicsScreen() {
                       }
                     />
                     <CheckboxRow
-                      label="Attached garage"
+                      label={t('announcement.rent.attached_garage')}
                       checked={values.amenities?.attachedGarage ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.attachedGarage', !values.amenities?.attachedGarage)
@@ -152,28 +151,28 @@ export default function CharacteristicsScreen() {
 
                   <View className="gap-1">
                     <CheckboxRow
-                      label="Detached garage"
+                      label={t('announcement.rent.detached_garage')}
                       checked={values.amenities?.detachedGarage ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.detachedGarage', !values.amenities?.detachedGarage)
                       }
                     />
                     <CheckboxRow
-                      label="Washer and laundry"
+                      label={t('announcement.rent.washer_and_laundry')}
                       checked={values.amenities?.washerLaundry ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.washerLaundry', !values.amenities?.washerLaundry)
                       }
                     />
                     <CheckboxRow
-                      label="Elevator"
+                      label={t('announcement.rent.elevator')}
                       checked={values.amenities?.elevator ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.elevator', !values.amenities?.elevator)
                       }
                     />
                     <CheckboxRow
-                      label="Disabled access"
+                      label={t('announcement.rent.disabled_access')}
                       checked={values.amenities?.disabledAccess ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.disabledAccess', !values.amenities?.disabledAccess)
@@ -183,7 +182,7 @@ export default function CharacteristicsScreen() {
 
                   <View className="gap-1">
                     <CheckboxRow
-                      label="EV charging station"
+                      label={t('announcement.rent.ev_charging_station')}
                       checked={values.amenities?.evChargingStation ?? false}
                       onToggle={() =>
                         setFieldValue(
@@ -193,7 +192,7 @@ export default function CharacteristicsScreen() {
                       }
                     />
                     <CheckboxRow
-                      label="Bicycle storage"
+                      label={t('announcement.rent.bicycle_storage')}
                       checked={values.amenities?.bicycleStorage ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.bicycleStorage', !values.amenities?.bicycleStorage)
@@ -203,15 +202,15 @@ export default function CharacteristicsScreen() {
 
                   <View className="rounded-[12px] bg-muted p-4">
                     <ChipGroup
-                      label="Condition"
-                      options={CONDITION_OPTIONS}
+                      label={t('announcement.rent.condition')}
+                      options={getConditionOptions(t)}
                       value={values.ownershipAndCondition?.condition || ''}
                       onChange={(v) => setFieldValue('ownershipAndCondition.condition', v)}
                     />
                   </View>
 
                   <Select
-                    label="Year build"
+                    label={t('announcement.rent.year_built')}
                     placeholder=""
                     value={`${values.building?.yearBuilt || ''}`}
                     onChange={(v) => setFieldValue('building.yearBuilt', Number(v))}
@@ -221,8 +220,8 @@ export default function CharacteristicsScreen() {
 
                   <View className="rounded-[12px] bg-muted p-4">
                     <ChipGroup
-                      label="Ownership type"
-                      options={OWNERSHIP_TYPE_OPTIONS}
+                      label={t('announcement.rent.ownership_type')}
+                      options={getOwnershipTypeOptions(t)}
                       value={values.ownershipAndCondition?.ownershipType || ''}
                       onChange={(v) => setFieldValue('ownershipAndCondition.ownershipType', v)}
                     />
@@ -230,20 +229,20 @@ export default function CharacteristicsScreen() {
 
                   <View className="gap-1">
                     <ThemedText className="mb-2 text-[16px] font-semibold text-foreground">
-                      Condition
+                      {t('announcement.rent.condition')}
                     </ThemedText>
                     <CheckboxRow
-                      label="Cat"
+                      label={t('announcement.rent.pet_cat')}
                       checked={values.pets?.cat ?? false}
                       onToggle={() => setFieldValue('pets.cat', !values.pets?.cat)}
                     />
                     <CheckboxRow
-                      label="Small dogs (under 40 kg)"
+                      label={t('announcement.rent.pet_small_dogs')}
                       checked={values.pets?.smallDogs ?? false}
                       onToggle={() => setFieldValue('pets.smallDogs', !values.pets?.smallDogs)}
                     />
                     <CheckboxRow
-                      label="Large dogs (over 40 kg)"
+                      label={t('announcement.rent.pet_large_dogs')}
                       checked={values.pets?.largeDogs ?? false}
                       onToggle={() => setFieldValue('pets.largeDogs', !values.pets?.largeDogs)}
                     />
@@ -253,8 +252,8 @@ export default function CharacteristicsScreen() {
             </ScrollView>
 
             <AnnouncementFooter
-              firstButtonLabel="Next"
-              secondButtonLabel="Save & exit"
+              firstButtonLabel={t('common.next')}
+              secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
             />

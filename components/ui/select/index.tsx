@@ -1,5 +1,6 @@
 import React from 'react';
 import { Keyboard, Modal, Platform, Pressable, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Svg, { Path } from 'react-native-svg';
 
 import { InputError } from '@/components/ui/input/error';
@@ -28,7 +29,7 @@ const DROPDOWN_GAP = 4;
 
 export function Select<T extends string = string>({
   label,
-  placeholder = 'Select…',
+  placeholder,
   value,
   onChange,
   options,
@@ -36,6 +37,7 @@ export function Select<T extends string = string>({
   error,
   containerClassName,
 }: SelectProps<T>) {
+  const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
   const [triggerLayout, setTriggerLayout] = React.useState({ x: 0, y: 0, width: 0, height: 0 });
   const [keyboardVisible, setKeyboardVisible] = React.useState(false);
@@ -96,7 +98,7 @@ export function Select<T extends string = string>({
           !error && (open ? 'border-primary' : 'border-default')
         )}>
         <Text className={cn('text-[16px]', selected ? 'text-foreground' : 'text-muted-foreground')}>
-          {selected ? selected.label : placeholder}
+          {selected ? selected.label : (placeholder ?? t('common.select_placeholder'))}
         </Text>
         <Svg
           width={12}

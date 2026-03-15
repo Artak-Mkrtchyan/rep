@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -9,8 +10,6 @@ import { SearchInput } from '@/components/ui/search-input';
 import { SegmentedControl } from '@/components/ui/segmented-control';
 import { router } from 'expo-router';
 
-const BROKER_SEGMENTS = ['Individual broker', 'Broker company'];
-
 const EXAMPLE_BROKER = [
   {
     id: 1,
@@ -19,8 +18,8 @@ const EXAMPLE_BROKER = [
     rating: 5.0,
     reviewCount: 1024,
     stats: [
-      { value: '538', label: 'sales last 12 months' },
-      { value: '5248', label: 'sales in Chicago' },
+      { value: '538', labelKey: 'announcement.rent.broker_list.sales_last_12_months' },
+      { value: '5248', labelKey: 'announcement.rent.broker_list.sales_in_city' },
     ],
   },
   {
@@ -30,8 +29,8 @@ const EXAMPLE_BROKER = [
     rating: 5.0,
     reviewCount: 1024,
     stats: [
-      { value: '538', label: 'sales last 12 months' },
-      { value: '5248', label: 'sales in Chicago' },
+      { value: '538', labelKey: 'announcement.rent.broker_list.sales_last_12_months' },
+      { value: '5248', labelKey: 'announcement.rent.broker_list.sales_in_city' },
     ],
   },
   {
@@ -41,8 +40,8 @@ const EXAMPLE_BROKER = [
     rating: 5.0,
     reviewCount: 1024,
     stats: [
-      { value: '538', label: 'sales last 12 months' },
-      { value: '5248', label: 'sales in Chicago' },
+      { value: '538', labelKey: 'announcement.rent.broker_list.sales_last_12_months' },
+      { value: '5248', labelKey: 'announcement.rent.broker_list.sales_in_city' },
     ],
   },
 ];
@@ -55,8 +54,8 @@ const EXAMPLE_BROKER_COMPANY = [
     rating: 5.0,
     reviewCount: 1024,
     stats: [
-      { value: '538', label: 'sales last 12 months' },
-      { value: '5248', label: 'sales in Chicago' },
+      { value: '538', labelKey: 'announcement.rent.broker_list.sales_last_12_months' },
+      { value: '5248', labelKey: 'announcement.rent.broker_list.sales_in_city' },
     ],
   },
   {
@@ -66,8 +65,8 @@ const EXAMPLE_BROKER_COMPANY = [
     rating: 5.0,
     reviewCount: 1024,
     stats: [
-      { value: '538', label: 'sales last 12 months' },
-      { value: '5248', label: 'sales in Chicago' },
+      { value: '538', labelKey: 'announcement.rent.broker_list.sales_last_12_months' },
+      { value: '5248', labelKey: 'announcement.rent.broker_list.sales_in_city' },
     ],
   },
   {
@@ -77,15 +76,18 @@ const EXAMPLE_BROKER_COMPANY = [
     rating: 5.0,
     reviewCount: 1024,
     stats: [
-      { value: '538', label: 'sales last 12 months' },
-      { value: '5248', label: 'sales in Chicago' },
+      { value: '538', labelKey: 'announcement.rent.broker_list.sales_last_12_months' },
+      { value: '5248', labelKey: 'announcement.rent.broker_list.sales_in_city' },
     ],
   },
 ];
 
 export default function BrokerListScreen() {
+  const { t } = useTranslation();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const BROKER_SEGMENTS = [t('announcement.rent.broker_list.individual_broker'), t('announcement.rent.broker_list.broker_company')];
 
   const brokers = selectedIndex === 0 ? EXAMPLE_BROKER : EXAMPLE_BROKER_COMPANY;
 
@@ -96,17 +98,17 @@ export default function BrokerListScreen() {
   return (
     <ThemedView className="flex-1">
       <View className="gap-4 px-4 pt-[24px]">
-        <ThemedText className="text-[16px] font-bold text-foreground">Basic info</ThemedText>
+        <ThemedText className="text-[16px] font-bold text-foreground">{t('announcement.rent.broker_list.heading')}</ThemedText>
 
         <SegmentedControl
           segments={BROKER_SEGMENTS}
           selectedIndex={selectedIndex}
           onSelect={setSelectedIndex}
-          accessibilityLabel="Broker type"
+          accessibilityLabel={t('announcement.rent.broker_list.broker_type')}
         />
 
         <SearchInput
-          placeholder="Search your broker"
+          placeholder={t('announcement.rent.broker_list.search_placeholder')}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -124,15 +126,15 @@ export default function BrokerListScreen() {
             name={broker.name}
             rating={broker.rating}
             reviewCount={broker.reviewCount}
-            stats={broker.stats}
+            stats={broker.stats.map((s) => ({ ...s, label: t(s.labelKey) }))}
             onPress={() => router.push(`/announcement/rent/broker/${broker.id}`)}
           />
         ))}
       </ScrollView>
 
       <AnnouncementFooter
-        firstButtonLabel="Next"
-        secondButtonLabel="Save & exit"
+        firstButtonLabel={t('common.next')}
+        secondButtonLabel={t('common.save_and_exit')}
         onNextPress={() => handleNext()}
         onSaveAndExitPress={() => handleSaveAndExit()}
       />

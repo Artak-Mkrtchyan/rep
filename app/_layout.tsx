@@ -1,5 +1,6 @@
 import 'react-native-reanimated';
 import '../global.css';
+import i18n from '../lib/i18n/i18n';
 
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -8,6 +9,7 @@ import { Appearance } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { loadSavedLanguage } from '@/hooks/use-language';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
@@ -15,6 +17,12 @@ import { PortalHost } from '@rn-primitives/portal';
 Appearance.setColorScheme('light');
 
 export default function RootLayout() {
+  React.useEffect(() => {
+    loadSavedLanguage().then((lang) => {
+      if (lang) i18n.changeLanguage(lang);
+    });
+  }, []);
+
   return (
     <AuthProvider>
       <ThemeProvider value={NAV_THEME.light}>

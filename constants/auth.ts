@@ -1,10 +1,12 @@
+import type { TFunction } from 'i18next';
+
 import type { AccountRole } from '@/types/auth';
 
-export const ACCOUNT_TYPE_OPTIONS = [
-  { label: 'Individual user', value: 'individual' as AccountRole },
-  { label: 'Construction company', value: 'company' as AccountRole },
-  { label: 'Broker', value: 'broker' as AccountRole },
-  { label: 'Broker company', value: 'broker_company' as AccountRole },
+export const getAccountTypeOptions = (t: TFunction) => [
+  { label: t('auth.account_type.individual'), value: 'individual' as AccountRole },
+  { label: t('auth.account_type.company'), value: 'company' as AccountRole },
+  { label: t('auth.account_type.broker'), value: 'broker' as AccountRole },
+  { label: t('auth.account_type.broker_company'), value: 'broker_company' as AccountRole },
 ];
 export const AUTH_ROUTES = {
   LOGIN: '/(auth)',

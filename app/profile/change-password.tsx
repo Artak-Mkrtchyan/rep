@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,6 +17,7 @@ import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { doPasswordsMatch, isPasswordValid, validatePassword } from '@/lib/auth-validation';
 
 export default function ChangePasswordScreen() {
+  const { t } = useTranslation();
   const [currentPassword, setCurrentPassword] = React.useState('');
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
@@ -57,11 +59,11 @@ export default function ChangePasswordScreen() {
         usingOtp: false,
       });
 
-      Alert.alert('Success', 'Your password has been changed successfully.', [
-        { text: 'OK', onPress: () => router.back() },
+      Alert.alert(t('common.success'), t('change_password.success_message'), [
+        { text: t('common.ok'), onPress: () => router.back() },
       ]);
     } catch (error) {
-      showErrorAlert(error, { title: 'Change Password Failed', fallback: ERROR_MESSAGES.CHANGE_PASSWORD_FAILED });
+      showErrorAlert(error, { title: t('change_password.failed_title'), fallback: ERROR_MESSAGES.CHANGE_PASSWORD_FAILED });
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +80,7 @@ export default function ChangePasswordScreen() {
               <Pressable
                 onPress={() => router.back()}
                 accessibilityRole="button"
-                accessibilityLabel="Go back"
+                accessibilityLabel={t('common.go_back')}
                 className="h-10 w-10 items-center justify-center rounded-full">
                 <Ionicons name="chevron-back" size={24} color={theme.foreground} />
               </Pressable>
@@ -87,14 +89,14 @@ export default function ChangePasswordScreen() {
             <View className="flex-1 items-center pt-4">
               <View className="w-full max-w-full items-center gap-5">
                 <ThemedText type="title" className="text-center">
-                  Change Password
+                  {t('change_password.title')}
                 </ThemedText>
 
                 <Input
-                  label="Current Password"
+                  label={t('change_password.current_password')}
                   value={currentPassword}
                   onChangeText={handleCurrentPasswordChange}
-                  placeholder="Enter current password"
+                  placeholder={t('change_password.enter_current_password')}
                   secureTextEntry
                   showPasswordToggle
                   autoComplete="current-password"
@@ -103,10 +105,10 @@ export default function ChangePasswordScreen() {
                 />
 
                 <Input
-                  label="New Password"
+                  label={t('change_password.new_password')}
                   value={newPassword}
                   onChangeText={handleNewPasswordChange}
-                  placeholder="Enter new password"
+                  placeholder={t('change_password.enter_new_password')}
                   secureTextEntry
                   showPasswordToggle
                   autoComplete="new-password"
@@ -123,23 +125,23 @@ export default function ChangePasswordScreen() {
                 />
 
                 <Input
-                  label="Confirm Password"
+                  label={t('change_password.confirm_password')}
                   value={confirmPassword}
                   onChangeText={handleConfirmPasswordChange}
-                  placeholder="Confirm new password"
+                  placeholder={t('change_password.confirm_new_password')}
                   secureTextEntry
                   showPasswordToggle
                   autoComplete="new-password"
                   placeholderTextColor={theme.placeholder}
-                  error={confirmPassword && !passwordsMatch ? 'Passwords do not match' : undefined}
+                  error={confirmPassword && !passwordsMatch ? t('validation.passwords_do_not_match') : undefined}
                   editable={!isLoading}
                 />
 
                 <Button
                   disabled={!canSubmit}
                   onPress={handleSubmit}
-                  accessibilityLabel="Change password">
-                  {isLoading ? 'Changing...' : 'Change Password'}
+                  accessibilityLabel={t('change_password.title')}>
+                  {isLoading ? t('change_password.changing') : t('change_password.title')}
                 </Button>
               </View>
             </View>

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -15,6 +16,7 @@ import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
 
 export default function ForgotPasswordVerifyScreen() {
+  const { t } = useTranslation();
   const [otp, setOtp] = React.useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [isLoading, setIsLoading] = React.useState(false);
   const { secondsLeft, restart: restartCountdown, formatTime } = useCountdown(RESEND_CODE_TIMEOUT);
@@ -57,7 +59,7 @@ export default function ForgotPasswordVerifyScreen() {
     try {
       await authService.sendPasswordOtp(data.email);
       restartCountdown();
-      Alert.alert('Code Sent', 'A new reset code has been sent to your email.');
+      Alert.alert(t('forgot_password.verify.code_sent_title'), t('forgot_password.verify.code_sent_message'));
     } catch (error) {
       showErrorAlert(error, { fallback: ERROR_MESSAGES.RESEND_CODE_FAILED });
     }
@@ -99,7 +101,7 @@ export default function ForgotPasswordVerifyScreen() {
           <Pressable
             onPress={handleBack}
             accessibilityRole="button"
-            accessibilityLabel="Go back"
+            accessibilityLabel={t('common.go_back')}
             className="h-10 w-10 items-center justify-center rounded-full">
             <Ionicons name="chevron-back" size={24} color="black" />
           </Pressable>
@@ -118,18 +120,18 @@ export default function ForgotPasswordVerifyScreen() {
 
             <View className="items-center gap-2">
               <ThemedText type="title" className="text-center">
-                Verify Code
+                {t('forgot_password.verify.title')}
               </ThemedText>
               {data.email ? (
                 <ThemedText className="text-center text-sm text-muted-foreground">
-                  Enter the code sent to {data.email}
+                  {t('forgot_password.verify.description', { email: data.email })}
                 </ThemedText>
               ) : null}
             </View>
 
             {/* OTP Input */}
             <View className="w-full">
-              <ThemedText className="mb-2 text-sm font-medium">Verification Code</ThemedText>
+              <ThemedText className="mb-2 text-sm font-medium">{t('forgot_password.verify.code_label')}</ThemedText>
               <View className="w-full flex-row items-center justify-between">
                 {Array.from({ length: OTP_LENGTH }, (_, index) => (
                   <View
@@ -144,7 +146,7 @@ export default function ForgotPasswordVerifyScreen() {
                       onChangeText={(text) => handleOtpChange(text, index)}
                       onKeyPress={(event) => handleOtpKeyPress(event, index)}
                       value={otp[index]}
-                      accessibilityLabel={`OTP digit ${index + 1}`}
+                      accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
                       className="h-full w-full text-center text-[18px] text-foreground"
                       editable={!isLoading}
                     />
@@ -155,22 +157,22 @@ export default function ForgotPasswordVerifyScreen() {
               <View className="mt-2 items-center">
                 {secondsLeft > 0 ? (
                   <ThemedText className="text-[14px] text-muted-foreground">
-                    Resend code in {formatTime(secondsLeft)}
+                    {t('forgot_password.verify.resend_countdown', { time: formatTime(secondsLeft) })}
                   </ThemedText>
                 ) : (
                   <Pressable
                     onPress={handleResend}
                     accessibilityRole="button"
-                    accessibilityLabel="Resend code"
+                    accessibilityLabel={t('forgot_password.verify.resend_code')}
                     className="h-8 items-center justify-center rounded-[8px] px-2">
-                    <ThemedText className="text-[14px] text-primary">Resend code</ThemedText>
+                    <ThemedText className="text-[14px] text-primary">{t('forgot_password.verify.resend_code')}</ThemedText>
                   </Pressable>
                 )}
               </View>
             </View>
 
-            <Button disabled={!canSubmit} onPress={handleConfirm} accessibilityLabel="Verify code">
-              {isLoading ? 'Verifying...' : 'Verify'}
+            <Button disabled={!canSubmit} onPress={handleConfirm} accessibilityLabel={t('forgot_password.verify.verify_button')}>
+              {isLoading ? t('forgot_password.verify.verifying') : t('forgot_password.verify.verify_button')}
             </Button>
           </View>
         </View>

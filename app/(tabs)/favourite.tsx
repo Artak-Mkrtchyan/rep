@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -18,6 +19,7 @@ import {
 import { Image } from 'expo-image';
 
 export default function FavouriteScreen() {
+  const { t } = useTranslation();
   const { favourites, isLoading, error, refetch, toggle } = useFavourites();
   const [seeding, setSeeding] = useState(false);
 
@@ -47,7 +49,7 @@ export default function FavouriteScreen() {
         <SafeAreaView className="flex-1 items-center justify-center px-4" edges={['top']}>
           <ThemedText className="mb-4 text-center text-foreground">{error}</ThemedText>
           <Pressable onPress={refetch} className="rounded-lg bg-main-500 px-6 py-3">
-            <ThemedText className="font-semibold text-white">Retry</ThemedText>
+            <ThemedText className="font-semibold text-white">{t('common.retry')}</ThemedText>
           </Pressable>
         </SafeAreaView>
       </ThemedView>
@@ -60,7 +62,7 @@ export default function FavouriteScreen() {
         {favourites.length ? (
           <ScrollView className="mt-[47px] flex-1 px-[16px]" showsVerticalScrollIndicator={false}>
             <ThemedText type="title" className="text-[34px]">
-              Favourite
+              {t('favourite.title')}
             </ThemedText>
 
             <View className="mt-8 flex-row flex-wrap justify-between">
@@ -88,7 +90,7 @@ export default function FavouriteScreen() {
                 disabled={seeding}
                 className="mb-8 items-center rounded-lg border border-dashed border-muted-foreground py-3">
                 <ThemedText className="text-sm text-muted-foreground">
-                  {seeding ? 'Seeding...' : '[DEV] Seed Test Data'}
+                  {seeding ? t('favourite.seeding') : t('favourite.seed_test_data')}
                 </ThemedText>
               </Pressable>
             )}
@@ -96,7 +98,7 @@ export default function FavouriteScreen() {
         ) : (
           <View className="mt-[47px] flex-1 px-[16px]">
             <ThemedText type="title" className="text-[34px]">
-              Favourite
+              {t('favourite.title')}
             </ThemedText>
             <View className="flex-1 items-center justify-center">
               <View className="aspect-square w-full max-w-[280px] items-center justify-center">
@@ -106,7 +108,7 @@ export default function FavouriteScreen() {
                   contentFit="contain"
                 />
                 <ThemedText className="mt-4 text-center text-[24px] font-semibold text-foreground">
-                  No result
+                  {t('favourite.no_result')}
                 </ThemedText>
                 {__DEV__ && (
                   <Pressable
@@ -114,7 +116,7 @@ export default function FavouriteScreen() {
                     disabled={seeding}
                     className="mt-6 rounded-lg bg-main-500 px-6 py-3">
                     <ThemedText className="font-semibold text-white">
-                      {seeding ? 'Seeding...' : '[DEV] Seed Test Data'}
+                      {seeding ? t('favourite.seeding') : t('favourite.seed_test_data')}
                     </ThemedText>
                   </Pressable>
                 )}

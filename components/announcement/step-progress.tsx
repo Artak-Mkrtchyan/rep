@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -24,9 +25,11 @@ export type StepProgressProps = {
 export const StepProgress: React.FC<StepProgressProps> = ({
   totalSteps = 7,
   completedStep,
-  label = 'List',
+  label,
   containerClassName,
 }) => {
+  const { t } = useTranslation();
+  const resolvedLabel = label ?? t('announcement.steps.list');
   return (
     <View
       className={`rounded-[12px] px-[16px] py-[16px] ${containerClassName ?? ''}`}
@@ -72,7 +75,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
       </View>
       <View className="mt-1 flex-row">
         <ThemedText className="text-[12px] font-medium text-foreground" numberOfLines={1}>
-          {label}
+          {resolvedLabel}
         </ThemedText>
       </View>
     </View>

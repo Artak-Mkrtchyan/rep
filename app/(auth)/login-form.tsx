@@ -1,6 +1,7 @@
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Alert,
@@ -29,6 +30,7 @@ const ROLE_TO_SCOPE: Record<string, AuthScope> = {
 };
 
 export default function LoginFormScreen() {
+  const { t } = useTranslation();
   const { role } = useLocalSearchParams<{ role: AccountRole }>();
   const scope = ROLE_TO_SCOPE[role ?? ''] ?? AuthScope.USUAL;
   const [email, setEmail] = React.useState('');
@@ -57,15 +59,15 @@ export default function LoginFormScreen() {
     let isValid = true;
 
     if (!email.trim()) {
-      setEmailError('Email is required');
+      setEmailError(t('validation.email_required'));
       isValid = false;
     } else if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('validation.email_invalid'));
       isValid = false;
     }
 
     if (!password) {
-      setPasswordError('Password is required');
+      setPasswordError(t('validation.required'));
       isValid = false;
     }
 
@@ -83,9 +85,9 @@ export default function LoginFormScreen() {
       // when auth state changes
     } catch {
       Alert.alert(
-        'Login Failed',
-        loginError?.message || 'Invalid email or password. Please try again.',
-        [{ text: 'OK' }]
+        t('login.failed_title'),
+        loginError?.message || t('login.failed_message'),
+        [{ text: t('common.ok') }]
       );
     }
   };
@@ -96,12 +98,12 @@ export default function LoginFormScreen() {
 
   const handleGoogleSignIn = () => {
     // TODO: Implement Google sign in
-    Alert.alert('Google Sign In', 'Google sign in coming soon.');
+    Alert.alert(t('login.google_sign_in_title'), t('login.google_sign_in_message'));
   };
 
   const handleAppleSignIn = () => {
     // TODO: Implement Apple sign in
-    Alert.alert('Apple Sign In', 'Apple sign in coming soon.');
+    Alert.alert(t('login.apple_sign_in_title'), t('login.apple_sign_in_message'));
   };
 
   return (
@@ -117,11 +119,11 @@ export default function LoginFormScreen() {
           />
 
           <ThemedText type="title" className="text-center">
-            Log in
+            {t('login.title')}
           </ThemedText>
 
           <Input
-            label="Email"
+            label={t('auth.email')}
             value={email}
             onChangeText={handleEmailChange}
             placeholder=""
@@ -135,7 +137,7 @@ export default function LoginFormScreen() {
           />
 
           <Input
-            label="Password"
+            label={t('auth.password')}
             value={password}
             onChangeText={handlePasswordChange}
             placeholder=""
@@ -151,7 +153,7 @@ export default function LoginFormScreen() {
             className="h-16 justify-center self-end rounded-[6px] px-1"
             onPress={handleForgotPassword}
             disabled={isLoading}>
-            <ThemedText className="text-[16px] text-primary">Forgot password?</ThemedText>
+            <ThemedText className="text-[16px] text-primary">{t('login.forgot_password')}</ThemedText>
           </Pressable>
 
           <Pressable
@@ -164,7 +166,7 @@ export default function LoginFormScreen() {
             {isLoading ? (
               <ActivityIndicator color="#ffffff" />
             ) : (
-              <ThemedText className="text-[16px] font-medium text-white">Continue</ThemedText>
+              <ThemedText className="text-[16px] font-medium text-white">{t('common.continue')}</ThemedText>
             )}
           </Pressable>
 
@@ -173,8 +175,8 @@ export default function LoginFormScreen() {
             onApplePress={handleAppleSignIn}
             onSignInPress={() => router.push('/(auth)/signup')}
             showSignInLink
-            signInLabel="Don't have an account?"
-            signInActionLabel="Sign up"
+            signInLabel={t('auth.dont_have_account')}
+            signInActionLabel={t('auth.sign_up')}
           />
         </View>
       </ThemedView>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -46,13 +47,15 @@ export const PasswordRequirementsList: React.FC<PasswordRequirementsListProps> =
   hasNumber,
   hasSymbol,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <View className="w-full flex-row flex-wrap items-start justify-between gap-4">
-      <PasswordRequirementItem icon="A" label="uppercase" isValid={hasUpperCase} />
-      <PasswordRequirementItem icon="a" label="lowercase" isValid={hasLowerCase} />
-      <PasswordRequirementItem icon="123" label="number" isValid={hasNumber} />
-      <PasswordRequirementItem icon="#&?" label="symbol" isValid={hasSymbol} />
-      <PasswordRequirementItem icon="8+" label="8 characters" isValid={hasMinLength} />
+      <PasswordRequirementItem icon="A" label={t('auth.password_req.uppercase')} isValid={hasUpperCase} />
+      <PasswordRequirementItem icon="a" label={t('auth.password_req.lowercase')} isValid={hasLowerCase} />
+      <PasswordRequirementItem icon="123" label={t('auth.password_req.number')} isValid={hasNumber} />
+      <PasswordRequirementItem icon="#&?" label={t('auth.password_req.symbol')} isValid={hasSymbol} />
+      <PasswordRequirementItem icon="8+" label={t('auth.password_req.min_length')} isValid={hasMinLength} />
     </View>
   );
 };

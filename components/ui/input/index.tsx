@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useThemeValue } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
@@ -45,6 +46,7 @@ export const Input = React.forwardRef(function Input(
   const inputRef = React.useRef<TextInput>(null);
   React.useImperativeHandle(ref, () => inputRef.current as TextInput);
 
+  const { t } = useTranslation();
   const [isFocused, setIsFocused] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(!!secureTextEntry);
   const resolvedDisabled = Boolean(isDisabled ?? disabled);
@@ -143,7 +145,7 @@ export const Input = React.forwardRef(function Input(
         />
         {showPasswordToggle ? (
           <Pressable
-            accessibilityLabel="Toggle password visibility"
+            accessibilityLabel={t('ui.toggle_password_visibility')}
             onPress={() => setShowPassword(!showPassword)}>
             <Image
               source={require('@/assets/images/eye-icon.svg')}

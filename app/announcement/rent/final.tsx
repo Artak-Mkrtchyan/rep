@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
 
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
@@ -11,13 +12,14 @@ import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
 import {
   CHARACTERISTIC_ICONS,
-  OBJECT_CHARACTERISTICS,
-  PET_ITEMS_CONFIG,
+  getObjectCharacteristics,
+  getPetItemsConfig,
 } from '@/constants/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
 
 export default function FinalScreen() {
+  const { t } = useTranslation();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const publicId = useAnnouncementForRentFormStore((s) => s.publicId);
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
@@ -28,7 +30,7 @@ export default function FinalScreen() {
       await publishFormData();
       resetForm();
     } catch {
-      Alert.alert('Error', 'Failed to publish');
+      Alert.alert(t('common.error'), t('error.failed_to_publish'));
     } finally {
       router.replace('/(tabs)');
     }
@@ -42,18 +44,18 @@ export default function FinalScreen() {
     // Placeholder: open map with address
   };
 
-  const allowedPets = PET_ITEMS_CONFIG.filter((c) => c.getAllowed(formData));
+  const allowedPets = getPetItemsConfig(t).filter((c) => c.getAllowed(formData));
 
   const conditionRaw = formData.property?.attributes?.ownershipAndCondition?.condition;
   const conditionLabel =
     conditionRaw === 'EXCELLENT'
-      ? 'Excellent'
+      ? t('condition_options.excellent')
       : conditionRaw === 'RENOVATED'
-        ? 'Renovated'
+        ? t('condition_options.renovated')
         : conditionRaw === 'NEEDS_RENOVATION'
-          ? 'Needs renovation'
+          ? t('condition_options.needs_renovation')
           : conditionRaw === 'UNDER_CONSTRUCTION'
-            ? 'Under construction'
+            ? t('condition_options.under_construction')
             : '—';
 
   const buildingTypeRaw = formData.property?.attributes?.building?.buildingType;
@@ -64,17 +66,17 @@ export default function FinalScreen() {
   const ownershipRaw = formData.property?.attributes?.ownershipAndCondition?.ownershipType;
   const ownershipLabel =
     ownershipRaw === 'FULL'
-      ? 'Full'
+      ? t('ownership_type_options.full')
       : ownershipRaw === 'SHARED'
-        ? 'Shared'
+        ? t('ownership_type_options.shared')
         : ownershipRaw === 'JOINT'
-          ? 'Joint'
+          ? t('ownership_type_options.joint')
           : '—';
 
-  const formatYesNo = (v: boolean | undefined) => (v ? 'Yes' : 'No');
+  const formatYesNo = (v: boolean | undefined) => (v ? t('common.yes') : t('common.no'));
 
   const typeLabel =
-    formData.listingType === 'FOR_RENT' ? 'Apartment for rent' : 'Apartment for sale';
+    formData.listingType === 'FOR_RENT' ? t('announcement.rent.final.apartment_for_rent') : t('announcement.rent.final.apartment_for_sale');
 
   const imageSources: { uri: string }[] = [];
 
@@ -95,7 +97,7 @@ export default function FinalScreen() {
           <View className="mb-4">
             <ImageSlider
               images={imageSources}
-              accessibilityLabel="Property images"
+              accessibilityLabel={t('announcement.rent.final.property_images')}
               className="h-[345px]"
             />
             <View className="absolute right-[16px] top-[16px]  flex-row items-center gap-[8px]">
@@ -152,7 +154,7 @@ export default function FinalScreen() {
           {/* Description */}
           <View className="my-4">
             <ThemedText className="mb-3 text-[20px] font-semibold text-neutral-950">
-              Description
+              {t('announcement.rent.final.description')}
             </ThemedText>
             <ThemedText className="text-neutaral-800 text-[14px] leading-5">
               {formData.description || '-'}
@@ -160,9 +162,9 @@ export default function FinalScreen() {
           </View>
 
           {/* Object characteristics + Security deposit */}
-          <AnnouncementCard title="Object characteristics" className="mb-4 gap-[24px]">
+          <AnnouncementCard title={t('announcement.rent.final.object_characteristics')} className="mb-4 gap-[24px]">
             <View className="flex-row flex-wrap gap-y-4">
-              {OBJECT_CHARACTERISTICS.map((config) => (
+              {getObjectCharacteristics(t).map((config) => (
                 <View key={config.iconKey} className="w-1/2 pr-2">
                   <PlacedByItem
                     icon={
@@ -187,7 +189,7 @@ export default function FinalScreen() {
             {formData.rentDetails?.securityDeposit ? (
               <View className="mt-4 h-[56px] flex-row items-center justify-center gap-[12px] rounded-[12px] bg-muted">
                 <ThemedText className="text-[16px] font-semibold text-neutral-950">
-                  Security deposit
+                  {t('announcement.rent.final.security_deposit')}
                 </ThemedText>
                 <View className="flex-row items-center gap-2">
                   <Image
@@ -210,7 +212,7 @@ export default function FinalScreen() {
 
           {/* Pets allowed */}
           {allowedPets.length > 0 ? (
-            <AnnouncementCard title="Pets allowed" className="gap-[12px]">
+            <AnnouncementCard title={t('announcement.rent.final.pets_allowed')} className="gap-[12px]">
               <View className="flex-row gap-2">
                 {allowedPets.map((config) => (
                   <View
@@ -238,8 +240,8 @@ export default function FinalScreen() {
       </ScrollView>
 
       <AnnouncementFooter
-        firstButtonLabel="Publish"
-        secondButtonLabel="Save & exit"
+        firstButtonLabel={t('common.publish')}
+        secondButtonLabel={t('common.save_and_exit')}
         onNextPress={handlePublish}
         onSaveAndExitPress={handleSaveAndExit}
       />

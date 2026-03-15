@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -11,11 +12,8 @@ import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { RentForApartmentsFormStep2 } from '@/types/announcement';
 
-const TITLE_PLACEHOLDER = 'Type your message here';
-const HELPER_TEXT =
-  "Write a clear and attractive title for your property listing, e.g., 'Bright 2-Bedroom Apartment with Balcony in City Center'";
-
 export default function AnnouncementTitleScreen() {
+  const { t } = useTranslation();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
@@ -38,7 +36,7 @@ export default function AnnouncementTitleScreen() {
       try {
         await sendFormData();
       } catch {
-        Alert.alert('Error', 'Failed to send form data');
+        Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       } finally {
         router.push('/(tabs)');
       }
@@ -70,27 +68,27 @@ export default function AnnouncementTitleScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="px-4 pt-[24px]">
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-                  Announcement title
+                  {t('announcement.rent.title_heading')}
                 </ThemedText>
                 <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-                  {HELPER_TEXT}
+                  {t('announcement.rent.title_helper')}
                 </ThemedText>
 
                 <View className="gap-1">
-                  <InputLabel>Title</InputLabel>
+                  <InputLabel>{t('announcement.rent.title_label')}</InputLabel>
                   <TextInput
                     value={values.title}
                     onChangeText={handleChange('title')}
                     onBlur={handleBlur('title')}
-                    placeholder={TITLE_PLACEHOLDER}
+                    placeholder={t('announcement.rent.title_placeholder')}
                     placeholderTextColor={placeholderColor}
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
                     className="min-h-[120px] w-full rounded-[12px] border border-default bg-card px-3 py-3 text-[16px] text-foreground"
                     style={{ paddingTop: 12 }}
-                    accessibilityLabel="Announcement title"
-                    accessibilityHint="Enter the title for your property listing"
+                    accessibilityLabel={t('announcement.rent.title_heading')}
+                    accessibilityHint={t('announcement.rent.title_hint')}
                   />
                   {touched.title && errors.title ? (
                     <ThemedText className="mt-1 text-[12px] text-destructive">
@@ -102,8 +100,8 @@ export default function AnnouncementTitleScreen() {
             </ScrollView>
 
             <AnnouncementFooter
-              firstButtonLabel="Next"
-              secondButtonLabel="Save & exit"
+              firstButtonLabel={t('common.next')}
+              secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
             />

@@ -1,6 +1,7 @@
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import React from 'react';
 import { Modal, Platform, Pressable, Text, TextInputChangeEvent, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from '@/components/ui/input';
 import type { InputProps } from '@/components/ui/input/types';
@@ -163,6 +164,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   maximumDate,
   ...inputProps
 }) => {
+  const { t } = useTranslation();
   const [displayValue, setDisplayValue] = React.useState(formatDateForDisplay(value));
   const [showPicker, setShowPicker] = React.useState(false);
   const [tempDate, setTempDate] = React.useState<Date>(parseValueToDate(value));
@@ -238,7 +240,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             onPress={handleIconPress}
             disabled={inputProps.disabled}
             accessibilityRole="button"
-            accessibilityLabel="Open date picker"
+            accessibilityLabel={t('ui.open_date_picker')}
             className="h-full items-center justify-center px-2">
             <Image
               source={require('@/assets/images/calendar-days.svg')}
@@ -247,7 +249,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             />
           </Pressable>
         }
-        placeholder={inputProps.placeholder || 'DD.MM.YYYY'}
+        placeholder={inputProps.placeholder || t('ui.date_placeholder')}
       />
 
       {Platform.OS === 'ios' ? (
@@ -257,21 +259,21 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               className="flex-1"
               onPress={handleCancel}
               accessibilityRole="button"
-              accessibilityLabel="Close date picker"
+              accessibilityLabel={t('ui.close_date_picker')}
             />
             <View className="bg-white pb-8">
               <View className="flex-row items-center justify-between border-b border-gray-200 px-4 py-3">
                 <Pressable
                   onPress={handleCancel}
                   accessibilityRole="button"
-                  accessibilityLabel="Cancel">
-                  <Text className="text-base text-gray-600">Cancel</Text>
+                  accessibilityLabel={t('common.cancel')}>
+                  <Text className="text-base text-gray-600">{t('common.cancel')}</Text>
                 </Pressable>
                 <Pressable
                   onPress={handleConfirm}
                   accessibilityRole="button"
-                  accessibilityLabel="Done">
-                  <Text className="text-base font-semibold text-blue-600">Done</Text>
+                  accessibilityLabel={t('common.done')}>
+                  <Text className="text-base font-semibold text-blue-600">{t('common.done')}</Text>
                 </Pressable>
               </View>
               <DateTimePicker

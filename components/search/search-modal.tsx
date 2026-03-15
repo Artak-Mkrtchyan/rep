@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -19,6 +20,7 @@ type SearchModalProps = {
 };
 
 export const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose, onSearch }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
   const [listingType, setListingType] = useState<ListingType>('BUY');
@@ -47,11 +49,11 @@ export const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose, onSe
           <Pressable
             onPress={onClose}
             className="h-10 w-10 items-center justify-center"
-            accessibilityLabel="Close search"
+            accessibilityLabel={t('search.close')}
             accessibilityRole="button">
             <Ionicons name="close" size={24} color="#111111" />
           </Pressable>
-          <ThemedText className="text-[18px] font-semibold">Search</ThemedText>
+          <ThemedText className="text-[18px] font-semibold">{t('search.title')}</ThemedText>
           <View className="h-10 w-10" />
         </View>
 
@@ -61,7 +63,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose, onSe
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}>
           <Input
-            placeholder="Search"
+            placeholder={t('search.title')}
             value={query}
             onChangeText={setQuery}
             left={<Ionicons name="search-outline" size={20} color="#ababab" />}
@@ -86,7 +88,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ visible, onClose, onSe
         </ScrollView>
 
         <View className="px-4 pb-4">
-          <Button onPress={handleSearch}>Search</Button>
+          <Button onPress={handleSearch}>{t('search.title')}</Button>
         </View>
       </View>
     </Modal>

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import React from 'react';
 import { Alert, Pressable, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/components/themed-text';
 import { InputError } from '@/components/ui/input/error';
@@ -34,6 +35,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   disabled = false,
   containerClassName,
 }) => {
+  const { t } = useTranslation();
   const [isUploading, setIsUploading] = React.useState(false);
   const [uploadedFiles, setUploadedFiles] = React.useState<Record<string, string>>({});
   const foregroundColor = useThemeValue('foreground');
@@ -52,7 +54,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         const asset = result.assets[0];
 
         if (asset.size && asset.size > MAX_FILE_SIZE) {
-          Alert.alert('File Too Large', 'Please select a file smaller than 15MB.');
+          Alert.alert(t('ui.file_too_large_title'), t('ui.file_too_large_message'));
           return;
         }
 
@@ -76,7 +78,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleUploadError = (error: unknown) => {
-    showErrorAlert(error, { title: 'Upload Failed', fallback: ERROR_MESSAGES.UPLOAD_FAILED });
+    showErrorAlert(error, { title: t('ui.upload_failed'), fallback: ERROR_MESSAGES.UPLOAD_FAILED });
   };
 
   const handleRemoveFile = (indexToRemove: number) => {
@@ -113,7 +115,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             />
           </View>
           <ThemedText className="text-[14px] text-foreground">
-            {isUploading ? 'Uploading...' : 'Upload your photo'}
+            {isUploading ? t('ui.uploading') : t('ui.upload_your_photo')}
           </ThemedText>
           <Pressable
             onPress={handleFileUpload}
@@ -123,10 +125,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               pressed && !disabled && !isUploading ? { opacity: 0.9 } : undefined
             }
             accessibilityRole="button"
-            accessibilityLabel="Select file"
+            accessibilityLabel={t('ui.select_file')}
             accessibilityState={{ disabled: disabled || isUploading }}>
             <ThemedText className="text-[14px] font-medium text-white">
-              {isUploading ? 'Uploading...' : 'Select file'}
+              {isUploading ? t('ui.uploading') : t('ui.select_file')}
             </ThemedText>
             <Image
               source={require('@/assets/images/upload.svg')}
@@ -149,7 +151,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 disabled={disabled}
                 className="absolute right-[-6px] top-[-6px] z-10 h-[22px] w-[22px] items-center justify-center rounded-full bg-destructive"
                 accessibilityRole="button"
-                accessibilityLabel="Remove file">
+                accessibilityLabel={t('ui.remove_file')}>
                 <Ionicons name="close" size={14} color="#FFFFFF" />
               </Pressable>
 
@@ -167,7 +169,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                     <ThemedText
                       className="mt-2 text-center text-[11px] text-foreground"
                       numberOfLines={2}>
-                      File {index + 1}
+                      {`${t('ui.select_file')} ${index + 1}`}
                     </ThemedText>
                   </>
                 )}
@@ -184,7 +186,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               pressed && !disabled && !isUploading ? { opacity: 0.9 } : undefined
             }
             accessibilityRole="button"
-            accessibilityLabel="Add file"
+            accessibilityLabel={t('ui.add_file')}
             accessibilityState={{ disabled: disabled || isUploading }}>
             <View className="h-12 w-12 items-center justify-center rounded-full bg-card">
               <Image
@@ -194,7 +196,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               />
             </View>
             <ThemedText className="mt-2 text-[12px] text-foreground">
-              {isUploading ? 'Uploading...' : 'Add'}
+              {isUploading ? t('ui.uploading') : t('common.add')}
             </ThemedText>
           </Pressable>
         </View>

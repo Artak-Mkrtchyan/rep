@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ImageBackground, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -13,6 +14,7 @@ type HeroSectionProps = {
 };
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onMenuPress, onSearchPress }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   return (
@@ -21,35 +23,35 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onMenuPress, onSearchP
       resizeMode="cover"
       style={{ paddingTop: insets.top }}
       className="justify-center">
-      <View className="bg-black/30 px-4 pb-8">
+      <View className="px-4 pb-8">
         <View className="flex-row items-center justify-between py-3">
           <Pressable
             onPress={onMenuPress}
             className="h-10 w-10 items-center justify-center"
-            accessibilityLabel="Open menu"
+            accessibilityLabel={t('home.open_menu')}
             accessibilityRole="button">
             <Ionicons name="menu" size={24} color="#ffffff" />
           </Pressable>
           <Pressable
             className="h-10 w-10 items-center justify-center"
-            accessibilityLabel="Favorites"
+            accessibilityLabel={t('home.favorites')}
             accessibilityRole="button">
             <Ionicons name="heart-outline" size={24} color="#ffffff" />
           </Pressable>
         </View>
 
         <ThemedText className="mt-8 text-center text-[28px] font-bold leading-[36px] text-white">
-          {'Find your next home\nsweet home'}
+          {t('home.hero_title')}
         </ThemedText>
 
         <Pressable
           onPress={onSearchPress}
           className="mt-6 h-12 flex-row items-center rounded-[12px] bg-white/90 px-4"
-          accessibilityLabel="Search properties"
+          accessibilityLabel={t('home.search_properties')}
           accessibilityRole="button">
           <Ionicons name="search-outline" size={20} color="#ababab" />
           <ThemedText className="ml-3 text-[16px] text-[#ababab]">
-            What are you looking for
+            {t('home.search_placeholder')}
           </ThemedText>
         </Pressable>
       </View>

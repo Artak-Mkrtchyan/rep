@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -9,6 +10,7 @@ import { ThemedView } from '@/components/themed-view';
 import { MENU_SECTIONS } from '@/constants/search';
 
 export default function MenuScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
 
@@ -31,7 +33,7 @@ export default function MenuScreen() {
           <Pressable
             onPress={handleBack}
             className="h-10 w-10 items-center justify-center"
-            accessibilityLabel="Go back"
+            accessibilityLabel={t('common.go_back')}
             accessibilityRole="button">
             <Ionicons name="chevron-back" size={24} color="#111111" />
           </Pressable>

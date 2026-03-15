@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 
+import i18n from '@/lib/i18n/i18n';
 import type { PasswordRequirements } from '@/types/auth';
 
 export const PASSWORD_MIN_LENGTH = 8;
@@ -17,44 +18,44 @@ export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
 export const yupSchemas = {
   email: Yup.string()
-    .required('Email is required')
+    .required(() => i18n.t('validation.email_required'))
     .test('email-format', (val, ctx) => {
       if (!val) return true;
       const trimmed = val.trim();
 
       if (!trimmed.includes('@')) {
-        return ctx.createError({ message: 'Email must follow the format: local@domain' });
+        return ctx.createError({ message: i18n.t('validation.email_format') });
       }
 
       const [local] = trimmed.split('@');
 
       if (local.length > EMAIL_LOCAL_MAX_LENGTH) {
         return ctx.createError({
-          message: `The part before '@' must be no more than ${EMAIL_LOCAL_MAX_LENGTH} characters`,
+          message: i18n.t('validation.email_local_part_too_long'),
         });
       }
 
       if (local.startsWith('.')) {
-        return ctx.createError({ message: 'Email must not start with a dot' });
+        return ctx.createError({ message: i18n.t('validation.email_starts_with_dot') });
       }
 
       if (local.includes('..')) {
-        return ctx.createError({ message: 'Email must not contain consecutive dots' });
+        return ctx.createError({ message: i18n.t('validation.email_consecutive_dots') });
       }
 
       if (!EMAIL_REGEX.test(trimmed)) {
         return ctx.createError({
-          message: 'Please enter a valid email address (e.g. name@example.com)',
+          message: i18n.t('validation.email_invalid'),
         });
       }
 
       return true;
     }),
   fullName: Yup.string()
-    .required('Full name is required')
-    .min(FULL_NAME_MIN_LENGTH, `Must be at least ${FULL_NAME_MIN_LENGTH} characters`)
-    .max(FULL_NAME_MAX_LENGTH, `Must be no more than ${FULL_NAME_MAX_LENGTH} characters`)
-    .test('no-leading-trailing-spaces', 'Must not start or end with a space', (val) =>
+    .required(() => i18n.t('validation.full_name_required'))
+    .min(FULL_NAME_MIN_LENGTH, () => i18n.t('validation.full_name_min_length'))
+    .max(FULL_NAME_MAX_LENGTH, () => i18n.t('validation.full_name_max_length'))
+    .test('no-leading-trailing-spaces', () => i18n.t('validation.no_leading_trailing_spaces'), (val) =>
       val ? val === val.trim() : true
     )
     .test('valid-characters', (val, ctx) => {
@@ -65,33 +66,32 @@ export const yupSchemas = {
 
         if (hasNumbers || hasInvalidSymbols) {
           return ctx.createError({
-            message: 'Full name may contain only letters, hyphens, and apostrophes',
+            message: i18n.t('validation.full_name_invalid_chars'),
           });
         }
 
         return ctx.createError({
-          message:
-            'Only Latin (A–Z), Cyrillic Russian (А–Я), and Uzbek (Ўў, Ққ, Ғғ, Ҳҳ) letters are allowed',
+          message: i18n.t('validation.full_name_allowed_alphabets'),
         });
       }
       return true;
     })
-    .test('has-two-words', 'Please enter both first and last name', (val) =>
+    .test('has-two-words', () => i18n.t('validation.full_name_two_words'), (val) =>
       val ? val.trim().split(/\s+/).length >= 2 : true
     ),
-  phone: Yup.string().required('Required').matches(PHONE_REGEX, 'Invalid phone number'),
-  phoneOptional: Yup.string().matches(PHONE_REGEX, 'Invalid phone number').optional(),
+  phone: Yup.string().required(() => i18n.t('validation.required')).matches(PHONE_REGEX, () => i18n.t('validation.invalid_phone_number')),
+  phoneOptional: Yup.string().matches(PHONE_REGEX, () => i18n.t('validation.invalid_phone_number')).optional(),
   password: Yup.string()
-    .min(PASSWORD_MIN_LENGTH, 'Password too short')
-    .matches(/[A-Z]/, 'Must contain uppercase')
-    .matches(/[a-z]/, 'Must contain lowercase')
-    .matches(/\d/, 'Must contain number')
-    .matches(/[^A-Za-z0-9]/, 'Must contain symbol')
-    .required('Required'),
+    .min(PASSWORD_MIN_LENGTH, () => i18n.t('validation.password_too_short'))
+    .matches(/[A-Z]/, () => i18n.t('validation.must_contain_uppercase'))
+    .matches(/[a-z]/, () => i18n.t('validation.must_contain_lowercase'))
+    .matches(/\d/, () => i18n.t('validation.must_contain_number'))
+    .matches(/[^A-Za-z0-9]/, () => i18n.t('validation.must_contain_symbol'))
+    .required(() => i18n.t('validation.required')),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password')], 'Passwords do not match')
-    .required('Required'),
-  certifiedOn: Yup.string().required('Required').matches(DATE_REGEX, 'Date in incorrect format'),
+    .oneOf([Yup.ref('password')], () => i18n.t('validation.passwords_do_not_match'))
+    .required(() => i18n.t('validation.required')),
+  certifiedOn: Yup.string().required(() => i18n.t('validation.required')).matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format')),
 };
 
 export const validateEmail = (email: string): boolean => {

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -25,15 +26,18 @@ type Props = {
 export const AnnouncementHeader: React.FC<Props> = ({
   completedStep = 1,
   totalSteps = 7,
-  headerTitle = 'Add announcement',
-  label = 'List',
+  headerTitle,
+  label,
   stepProgressContainerClassName,
   isStepProgressVisible = true,
   rightComponent = null,
   onHandleBackPress,
   headerClassName,
 }) => {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const resolvedHeaderTitle = headerTitle ?? t('announcement.add');
+  const resolvedLabel = label ?? t('announcement.steps.list');
 
   const handleBackPress = () => {
     if (onHandleBackPress) {
@@ -46,7 +50,7 @@ export const AnnouncementHeader: React.FC<Props> = ({
   const stepProgressProps: StepProgressProps = {
     completedStep,
     totalSteps,
-    label,
+    label: resolvedLabel,
     containerClassName: stepProgressContainerClassName,
   };
 
@@ -60,13 +64,13 @@ export const AnnouncementHeader: React.FC<Props> = ({
             onPress={handleBackPress}
             className="absolute left-0 h-10 items-center justify-center"
             accessibilityRole="button"
-            accessibilityLabel="Go back">
+            accessibilityLabel={t('common.go_back')}>
             <Ionicons name="chevron-back" size={24} color="#111111" />
           </Pressable>
           <ThemedText
             className="text-[17px] font-semibold leading-[22px] text-foreground"
             numberOfLines={1}>
-            {headerTitle}
+            {resolvedHeaderTitle}
           </ThemedText>
           <View className="absolute right-0 h-10 items-center justify-center">
             {rightComponent}

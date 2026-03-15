@@ -1,4 +1,5 @@
 import { Redirect, router, Stack } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 import { AnnouncementHeader } from '@/components/announcement/announcement-header';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
@@ -8,6 +9,7 @@ import { Image } from 'expo-image';
 import { Pressable } from 'react-native';
 
 export default function AnnouncementRentLayout() {
+  const { t } = useTranslation();
   const { shouldRedirect, targetRoute } = useStepRedirect();
   const setCurrentStep = useAnnouncementForRentFormStore((s) => s.setCurrentStep);
 
@@ -33,7 +35,7 @@ export default function AnnouncementRentLayout() {
             headerShown: true,
             header: () => (
               <AnnouncementHeader
-                label={route.label}
+                label={t(route.labelKey)}
                 completedStep={route.completedStep}
                 onHandleBackPress={() => handleBackPress(route.completedStep)}
               />

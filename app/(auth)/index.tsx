@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -9,15 +10,18 @@ import { AuthLayout } from '@/components/auth/auth-layout';
 import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { ACCOUNT_TYPE_OPTIONS, AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
+import { getAccountTypeOptions, AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
+import i18n from '@/lib/i18n/i18n';
 
 import type { AccountRole } from '@/types/auth';
 
 const LoginRoleSchema = Yup.object().shape({
-  role: Yup.string().required('Required'),
+  role: Yup.string().required(() => i18n.t('validation.required')),
 });
 
 export default function LoginRoleScreen() {
+  const { t } = useTranslation();
+
   const handleContinue = (values: { role: AccountRole }) => {
     router.push({
       pathname: AUTH_ROUTES.LOGIN_FORM as any,
@@ -26,11 +30,11 @@ export default function LoginRoleScreen() {
   };
 
   const handleGoogleSignIn = () => {
-    Alert.alert('Google Sign In', 'Google sign in coming soon.');
+    Alert.alert(t('login.google_sign_in_title'), t('login.google_sign_in_message'));
   };
 
   const handleAppleSignIn = () => {
-    Alert.alert('Apple Sign In', 'Apple sign in coming soon.');
+    Alert.alert(t('login.apple_sign_in_title'), t('login.apple_sign_in_message'));
   };
 
   return (
@@ -42,28 +46,28 @@ export default function LoginRoleScreen() {
         {({ handleSubmit, values, setFieldValue }) => (
           <>
             <AuthHeader
-              title="Log in"
+              title={t('login.title')}
               imageSource={require('@/assets/images/login-illustration.svg')}
               imageWidth={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION.width}
               imageHeight={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION.height}
-              description="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took."
+              description={t('login.description')}
             />
 
             <View className="w-full">
               <Select
-                label="Log in as"
-                placeholder="Select"
+                label={t('login.log_in_as')}
+                placeholder={t('common.select')}
                 value={values.role}
                 onChange={(value) => setFieldValue('role', value)}
-                options={ACCOUNT_TYPE_OPTIONS}
+                options={getAccountTypeOptions(t)}
               />
             </View>
 
             <Button
               disabled={!values.role}
               onPress={() => handleSubmit()}
-              accessibilityLabel="Continue">
-              Continue
+              accessibilityLabel={t('common.continue')}>
+              {t('common.continue')}
             </Button>
 
             <SignInFooter
@@ -71,8 +75,8 @@ export default function LoginRoleScreen() {
               onApplePress={handleAppleSignIn}
               onSignInPress={() => router.push('/(auth)/signup')}
               showSignInLink
-              signInLabel="Don't have an account?"
-              signInActionLabel="Sign up"
+              signInLabel={t('auth.dont_have_account')}
+              signInActionLabel={t('auth.sign_up')}
             />
           </>
         )}

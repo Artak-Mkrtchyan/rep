@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -11,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
+import i18n from '@/lib/i18n/i18n';
 
 import { DatePicker } from '@/components/ui/date-picker';
 import { FileUpload } from '@/components/ui/file-upload';
@@ -21,11 +23,11 @@ import { yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const BrokerCompanySchema = Yup.object().shape({
-  attachmentIds: Yup.array().min(1, 'At least one file is required').required('Required'),
+  attachmentIds: Yup.array().min(1, () => i18n.t('validation.at_least_one_file')).required(() => i18n.t('validation.required')),
   companyInfo: Yup.object().shape({
     certifiedOn: yupSchemas.certifiedOn,
     email: yupSchemas.email,
-    name: Yup.string().required('Required'),
+    name: Yup.string().required(() => i18n.t('validation.required')),
     phoneNumber: yupSchemas.phone,
     yearsOfActivity: Yup.number().required('Required'),
   }),
@@ -37,6 +39,7 @@ const BrokerCompanySchema = Yup.object().shape({
 });
 
 export default function BrokerSignUpScreen() {
+  const { t } = useTranslation();
   const { data, resetData } = useSignUpContext();
 
   const handleContinue = async (
@@ -106,7 +109,7 @@ export default function BrokerSignUpScreen() {
         }) => (
           <View className="mb-10 mt-10 w-full">
             <AuthHeader
-              title="Sign up"
+              title={t('signup.title')}
               imageSource={require('@/assets/images/icon-broker-illustration.svg')}
               imageWidth={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.width}
               imageHeight={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.height}
@@ -114,10 +117,10 @@ export default function BrokerSignUpScreen() {
 
             <View className="mt-10 w-full gap-5">
               <Input
-                label="Manager e-mail"
+                label={t('signup.broker_company.manager_email')}
                 required
                 value={values.managerInfo.email}
-                helper="E-mail for verification and access"
+                helper={t('signup.broker_company.manager_email_helper')}
                 disabled
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
@@ -132,7 +135,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <Input
-                label="Manager name"
+                label={t('signup.broker_company.manager_name')}
                 required
                 value={values.managerInfo.fullName}
                 onChangeText={handleChange('managerInfo.fullName')}
@@ -146,7 +149,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <PhoneInput
-                label="Manager mobile number"
+                label={t('signup.broker_company.manager_mobile_number')}
                 value={values.managerInfo.phoneNumber}
                 onChangeText={(text) => setFieldValue('managerInfo.phoneNumber', text)}
                 onBlur={handleBlur('managerInfo.phoneNumber')}
@@ -158,7 +161,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <Input
-                label="Company e-mail"
+                label={t('signup.broker_company.company_email')}
                 value={values.companyInfo.email}
                 onChangeText={handleChange('companyInfo.email')}
                 onBlur={handleBlur('companyInfo.email')}
@@ -169,12 +172,12 @@ export default function BrokerSignUpScreen() {
                 }
                 keyboardType="email-address"
                 autoCapitalize="none"
-                helper="Company e-mail for contact purposes"
+                helper={t('signup.broker_company.company_email_helper')}
                 autoCorrect={false}
               />
 
               <Input
-                label="Company name"
+                label={t('signup.broker_company.company_name')}
                 required
                 value={values.companyInfo.name}
                 onChangeText={handleChange('companyInfo.name')}
@@ -188,7 +191,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <PhoneInput
-                label="Mobile number"
+                label={t('signup.broker_company.mobile_number')}
                 value={values.companyInfo.phoneNumber}
                 onChangeText={(text) => setFieldValue('companyInfo.phoneNumber', text)}
                 onBlur={handleBlur('companyInfo.phoneNumber')}
@@ -200,7 +203,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <DatePicker
-                label="Company certification date"
+                label={t('signup.broker_company.certification_date')}
                 required
                 value={values.companyInfo.certifiedOn}
                 onChange={(date) => setFieldValue('companyInfo.certifiedOn', date)}
@@ -212,7 +215,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <Input
-                label="Certified by"
+                label={t('signup.broker_company.certified_by')}
                 value={values.companyInfo.certifiedBy}
                 onChangeText={handleChange('companyInfo.certifiedBy')}
                 onBlur={handleBlur('companyInfo.certifiedBy')}
@@ -225,7 +228,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <NumberPicker
-                label="Company's years of activity"
+                label={t('signup.broker_company.years_of_activity')}
                 value={values.companyInfo.yearsOfActivity}
                 onChange={(value) => setFieldValue('companyInfo.yearsOfActivity', value)}
                 min={0}
@@ -240,7 +243,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <FileUpload
-                label="Files upload"
+                label={t('signup.broker_company.files_upload')}
                 value={values.attachmentIds}
                 onChange={(attachmentIds) => setFieldValue('attachmentIds', attachmentIds)}
                 required
@@ -254,8 +257,8 @@ export default function BrokerSignUpScreen() {
               <Button
                 disabled={Object.keys(errors).length !== 0 || isSubmitting}
                 onPress={() => handleSubmit()}
-                accessibilityLabel="Continue">
-                {isSubmitting ? 'Submitting...' : 'Continue'}
+                accessibilityLabel={t('common.continue')}>
+                {isSubmitting ? t('common.submitting') : t('common.continue')}
               </Button>
 
               <SignInFooter

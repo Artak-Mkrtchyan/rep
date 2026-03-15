@@ -1,5 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import React, { useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   NativeScrollEvent,
@@ -26,6 +27,7 @@ const CARD_WIDTH = 175;
 const CARD_GAP = 8;
 
 export const FeaturedProperties: React.FC = () => {
+  const { t } = useTranslation();
   const { announcements, isLoading, error, refetch } = useFeaturedAnnouncements(5);
 
   const toggle = useCallback(
@@ -73,9 +75,9 @@ export const FeaturedProperties: React.FC = () => {
   return (
     <View className="mt-6">
       <View className="flex-row items-center justify-between px-4">
-        <ThemedText className="text-[20px] font-bold text-foreground">Featured Property</ThemedText>
+        <ThemedText className="text-[20px] font-bold text-foreground">{t('home.featured_property')}</ThemedText>
         <Pressable>
-          <ThemedText className="text-[14px] text-foreground">See more</ThemedText>
+          <ThemedText className="text-[14px] text-foreground">{t('home.see_more')}</ThemedText>
         </Pressable>
       </View>
 

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 
 import { AuthLayout } from '@/components/auth/auth-layout';
@@ -28,6 +29,7 @@ const PasswordSchema = Yup.object().shape({
 });
 
 export default function CreatePasswordScreen() {
+  const { t } = useTranslation();
   const { tokens: theme } = useTheme();
   const { data, resetData } = useSignUpContext();
 
@@ -96,11 +98,11 @@ export default function CreatePasswordScreen() {
           return (
             <>
               <ThemedText type="title" className="mt-10 text-center">
-                Sign up
+                {t('signup.title')}
               </ThemedText>
 
               <Input
-                label="Email"
+                label={t('auth.email')}
                 value={values.email}
                 onChangeText={handleChange('email')}
                 onBlur={handleBlur('email')}
@@ -114,7 +116,7 @@ export default function CreatePasswordScreen() {
               />
 
               <Input
-                label="Full name"
+                label={t('auth.full_name')}
                 value={values.fullName}
                 onChangeText={handleChange('fullName')}
                 onBlur={handleBlur('fullName')}
@@ -123,7 +125,7 @@ export default function CreatePasswordScreen() {
               />
 
               <PhoneInput
-                label="Phone number"
+                label={t('auth.phone_number')}
                 value={values.phone}
                 onChangeText={(text) => handleChange('phone')(text)}
                 onBlur={handleBlur('phone')}
@@ -131,7 +133,7 @@ export default function CreatePasswordScreen() {
               />
 
               <Input
-                label="Password"
+                label={t('auth.password')}
                 value={values.password}
                 showPasswordToggle
                 onChangeText={handleChange('password')}
@@ -151,7 +153,7 @@ export default function CreatePasswordScreen() {
               />
 
               <Input
-                label="Confirm password"
+                label={t('auth.confirm_password')}
                 value={values.confirmPassword}
                 onChangeText={handleChange('confirmPassword')}
                 onBlur={handleBlur('confirmPassword')}
@@ -170,8 +172,8 @@ export default function CreatePasswordScreen() {
               <Button
                 disabled={Object.keys(errors).length !== 0 || isSubmitting}
                 onPress={() => handleSubmit()}
-                accessibilityLabel="Continue">
-                Continue
+                accessibilityLabel={t('common.continue')}>
+                {t('common.continue')}
               </Button>
 
               <SignInFooter

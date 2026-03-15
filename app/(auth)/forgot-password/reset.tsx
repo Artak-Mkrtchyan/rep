@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { PasswordRequirementsList } from '@/components/auth/password-requirements';
@@ -17,6 +18,7 @@ import { isPasswordValid, validatePassword } from '@/lib/auth-validation';
 import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 
 export default function ForgotPasswordResetScreen() {
+  const { t } = useTranslation();
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function ForgotPasswordResetScreen() {
     if (!canSubmit) return;
 
     if (!passwordsMatch) {
-      setPasswordError('Passwords do not match');
+      setPasswordError(t('validation.passwords_do_not_match'));
       return;
     }
 
@@ -57,15 +59,15 @@ export default function ForgotPasswordResetScreen() {
       });
 
       resetData();
-      Alert.alert('Success', 'Your password has been reset successfully.', [
+      Alert.alert(t('common.success'), t('forgot_password.reset.success_message'), [
         {
-          text: 'OK',
+          text: t('common.ok'),
           onPress: () => router.replace(AUTH_ROUTES.LOGIN),
         },
       ]);
     } catch (error) {
       showErrorAlert(error, {
-        title: 'Reset Failed',
+        title: t('forgot_password.reset.failed_title'),
         fallback: ERROR_MESSAGES.RESET_PASSWORD_FAILED,
       });
     } finally {
@@ -87,7 +89,7 @@ export default function ForgotPasswordResetScreen() {
             <Pressable
               onPress={handleBack}
               accessibilityRole="button"
-              accessibilityLabel="Go back"
+              accessibilityLabel={t('common.go_back')}
               className="h-10 w-10 items-center justify-center rounded-full">
               <Ionicons name="chevron-back" size={24} color="black" />
             </Pressable>
@@ -106,16 +108,16 @@ export default function ForgotPasswordResetScreen() {
 
               <View className="items-center gap-2">
                 <ThemedText type="title" className="text-center">
-                  Reset Password
+                  {t('forgot_password.reset.title')}
                 </ThemedText>
               </View>
 
               {/* New Password */}
               <Input
-                label="New Password"
+                label={t('forgot_password.reset.new_password')}
                 value={newPassword}
                 onChangeText={handlePasswordChange}
-                placeholder="Enter new password"
+                placeholder={t('forgot_password.reset.enter_new_password')}
                 secureTextEntry
                 showPasswordToggle
                 autoComplete="new-password"
@@ -133,17 +135,17 @@ export default function ForgotPasswordResetScreen() {
 
               {/* Confirm Password */}
               <Input
-                label="Confirm Password"
+                label={t('forgot_password.reset.confirm_password')}
                 value={confirmPassword}
                 onChangeText={handleConfirmPasswordChange}
-                placeholder="Confirm new password"
+                placeholder={t('forgot_password.reset.confirm_new_password')}
                 secureTextEntry
                 showPasswordToggle
                 autoComplete="new-password"
                 placeholderTextColor={theme.placeholder}
                 error={
                   passwordError ||
-                  (confirmPassword && !passwordsMatch ? 'Passwords do not match' : undefined)
+                  (confirmPassword && !passwordsMatch ? t('validation.passwords_do_not_match') : undefined)
                 }
                 editable={!isLoading}
               />
@@ -151,8 +153,8 @@ export default function ForgotPasswordResetScreen() {
               <Button
                 disabled={!canSubmit}
                 onPress={handleSubmit}
-                accessibilityLabel="Reset password">
-                {isLoading ? 'Resetting...' : 'Reset Password'}
+                accessibilityLabel={t('forgot_password.reset.title')}>
+                {isLoading ? t('forgot_password.reset.resetting') : t('forgot_password.reset.title')}
               </Button>
             </View>
           </View>

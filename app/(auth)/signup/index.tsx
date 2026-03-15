@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -9,7 +10,7 @@ import { RadioButton } from '@/components/auth/radio-button';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { ACCOUNT_TYPE_OPTIONS, IMAGE_DIMENSIONS } from '@/constants/auth';
+import { getAccountTypeOptions, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 
@@ -20,6 +21,7 @@ const SignUpSchema = Yup.object().shape({
 });
 
 export default function SignUpFirstScreen() {
+  const { t } = useTranslation();
   const { data, updateData } = useSignUpContext();
   const { goToNext } = useSignUpFlow();
 
@@ -38,7 +40,7 @@ export default function SignUpFirstScreen() {
         {({ handleSubmit, values, setFieldValue }) => (
           <>
             <AuthHeader
-              title="Sign up"
+              title={t('signup.title')}
               imageSource={require('@/assets/images/signup-illustration.svg')}
               imageWidth={IMAGE_DIMENSIONS.SIGNUP_ILLUSTRATION.width}
               imageHeight={IMAGE_DIMENSIONS.SIGNUP_ILLUSTRATION.height}
@@ -46,31 +48,29 @@ export default function SignUpFirstScreen() {
 
             <View className="w-full gap-4">
               <ThemedText className="text-[14px] text-muted-foreground">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem
-                Ipsum has been the industry&rsquo;s standard dummy text ever since the 1500s, when
-                an unknown printer took.
+                {t('signup.description')}
               </ThemedText>
 
               <View className="gap-3">
                 <Select
-                  label="Register as"
-                  placeholder="Select"
+                  label={t('signup.register_as')}
+                  placeholder={t('common.select')}
                   value={values.role}
                   onChange={(value) => setFieldValue('role', value)}
-                  options={ACCOUNT_TYPE_OPTIONS}
+                  options={getAccountTypeOptions(t)}
                 />
 
                 {(values.role === 'broker' || values.role === 'broker_company') && (
                   <View className="flex-row items-center justify-between">
                     <RadioButton
                       value="broker"
-                      label="Individual broker"
+                      label={t('signup.individual_broker')}
                       selectedValue={values.role}
                       onSelect={(value) => setFieldValue('role', value)}
                     />
                     <RadioButton
                       value="broker_company"
-                      label="Broker company"
+                      label={t('signup.broker_company')}
                       selectedValue={values.role}
                       onSelect={(value) => setFieldValue('role', value)}
                     />
@@ -82,8 +82,8 @@ export default function SignUpFirstScreen() {
             <Button
               disabled={!values.role}
               onPress={() => handleSubmit()}
-              accessibilityLabel="Continue">
-              Continue
+              accessibilityLabel={t('common.continue')}>
+              {t('common.continue')}
             </Button>
           </>
         )}

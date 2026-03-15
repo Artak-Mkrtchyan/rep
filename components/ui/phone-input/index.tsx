@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, Text, TextInput, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { useThemeValue } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
@@ -81,6 +82,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   onBlur,
   ...inputProps
 }) => {
+  const { t } = useTranslation();
   const inputRef = React.useRef<TextInput>(null);
   const [isFocused, setIsFocused] = React.useState(false);
   const resolvedDisabled = Boolean(isDisabled ?? disabled);
@@ -151,7 +153,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
           onBlur={handleBlur}
           keyboardType="phone-pad"
           maxLength={14} // (XX)XXX XX XX = 14 characters
-          placeholder="(90)121 13 23"
+          placeholder={t('ui.phone_placeholder')}
           {...inputProps}
         />
       </Pressable>

@@ -1,4 +1,5 @@
 import { getApiUrl } from '@/constants/env';
+import i18n from '@/lib/i18n/i18n';
 import { ApiError, ValidationError } from '../auth.types';
 import {
   clearAllTokens,
@@ -20,14 +21,8 @@ export interface RequestConfig extends RequestInit {
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
-/**
- * Gets the current locale for API requests
- * Returns 'en' as default - can be extended to use expo-localization if needed
- */
 export const getLocale = (): string => {
-  // In React Native, we can use expo-localization for proper locale detection
-  // For now, return default locale
-  return 'en';
+  return i18n.language;
 };
 
 const subscribeToTokenRefresh = (callback: (token: string) => void): void => {

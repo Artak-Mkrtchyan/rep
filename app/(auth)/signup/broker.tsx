@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -31,6 +32,7 @@ const BrokerSchema = Yup.object().shape({
 });
 
 export default function BrokerSignUpScreen() {
+  const { t } = useTranslation();
   const { data, resetData } = useSignUpContext();
 
   const handleContinue = async (values: BrokerSignUpForm, { setSubmitting }: any) => {
@@ -94,7 +96,7 @@ export default function BrokerSignUpScreen() {
         }) => (
           <View className="mb-10 mt-10 w-full">
             <AuthHeader
-              title="Sign up"
+              title={t('signup.title')}
               imageSource={require('@/assets/images/icon-broker-illustration.svg')}
               imageWidth={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.width}
               imageHeight={IMAGE_DIMENSIONS.BROKER_ILLUSTRATION.height}
@@ -102,7 +104,7 @@ export default function BrokerSignUpScreen() {
 
             <View className="w-full gap-5">
               <Input
-                label="Email"
+                label={t('auth.email')}
                 value={values.email}
                 disabled
                 onChangeText={handleChange('email')}
@@ -114,7 +116,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <Input
-                label="Full name"
+                label={t('auth.full_name')}
                 required
                 value={values.fullName}
                 onChangeText={handleChange('fullName')}
@@ -124,7 +126,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <DatePicker
-                label="Certified on"
+                label={t('signup.broker.certified_on')}
                 required
                 value={values.certifiedOn}
                 onChange={(date) => setFieldValue('certifiedOn', date)}
@@ -132,7 +134,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <Input
-                label="Certified by"
+                label={t('signup.broker.certified_by')}
                 value={values.certifiedBy}
                 onChangeText={handleChange('certifiedBy')}
                 onBlur={handleBlur('certifiedBy')}
@@ -141,7 +143,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <PhoneInput
-                label="Phone number"
+                label={t('auth.phone_number')}
                 required
                 value={values.phoneNumber}
                 onChangeText={(text) => setFieldValue('phoneNumber', text)}
@@ -150,7 +152,7 @@ export default function BrokerSignUpScreen() {
               />
 
               <NumberPicker
-                label="Years of activity"
+                label={t('signup.broker.years_of_activity')}
                 value={values.yearsOfActivity}
                 onChange={(value) => setFieldValue('yearsOfActivity', value)}
                 min={0}
@@ -165,8 +167,8 @@ export default function BrokerSignUpScreen() {
               />
 
               <FileUpload
-                label="Files upload"
-                description="Please attach your brokerage license or proof of authorization"
+                label={t('signup.broker.files_upload')}
+                description={t('signup.broker.files_description')}
                 value={values.attachmentIds}
                 onChange={(attachmentIds) => setFieldValue('attachmentIds', attachmentIds)}
                 required
@@ -180,8 +182,8 @@ export default function BrokerSignUpScreen() {
               <Button
                 disabled={Object.keys(errors).length !== 0 || isSubmitting}
                 onPress={() => handleSubmit()}
-                accessibilityLabel="Continue">
-                {isSubmitting ? 'Submitting...' : 'Continue'}
+                accessibilityLabel={t('common.continue')}>
+                {isSubmitting ? t('common.submitting') : t('common.continue')}
               </Button>
 
               <SignInFooter

@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, Text, TextInput, View } from 'react-native';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -15,6 +16,7 @@ import { OTP_EXPIRATION_TIMEOUT, OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/a
 import { router } from 'expo-router';
 
 export default function VerifyEmailScreen() {
+  const { t } = useTranslation();
   const { data, updateData } = useSignUpContext();
   const { goToPrevious } = useSignUpFlow();
   const inputsRef = useRef<(TextInput | null)[]>([]);
@@ -30,10 +32,8 @@ export default function VerifyEmailScreen() {
     restart: restartResendCountdown,
     formatTime,
   } = useCountdown(RESEND_CODE_TIMEOUT);
-  const {
-    secondsLeft: expirationSecondsLeft,
-    restart: restartExpirationCountdown,
-  } = useCountdown(OTP_EXPIRATION_TIMEOUT);
+  const { secondsLeft: expirationSecondsLeft, restart: restartExpirationCountdown } =
+    useCountdown(OTP_EXPIRATION_TIMEOUT);
 
   const handleVerify = useCallback(
     async (code: string) => {
@@ -43,7 +43,7 @@ export default function VerifyEmailScreen() {
       setError('');
 
       if (expirationSecondsLeft <= 0) {
-        setError('Invalid code expired. Please request a new code. Please try again');
+        setError(t('signup.verify.code_expired'));
         setIsSubmitting(false);
         submittedRef.current = false;
         setOtp(Array(OTP_LENGTH).fill(''));
@@ -73,12 +73,12 @@ export default function VerifyEmailScreen() {
         if (isApiError(err)) {
           const message = err.message?.toLowerCase() || '';
           if (message.includes('expired')) {
-            setError('Invalid code expired. Please request a new code. Please try again');
+            setError(t('signup.verify.code_expired'));
           } else {
-            setError('Invalid code. Please try again.');
+            setError(t('signup.verify.invalid_code'));
           }
         } else {
-          setError('Invalid code. Please try again.');
+          setError(t('signup.verify.invalid_code'));
         }
         setOtp(Array(OTP_LENGTH).fill(''));
         inputsRef.current[0]?.focus();
@@ -87,7 +87,7 @@ export default function VerifyEmailScreen() {
         submittedRef.current = false;
       }
     },
-    [isSubmitting, expirationSecondsLeft, data.role, updateData]
+    [isSubmitting, expirationSecondsLeft, data.role, updateData, t]
   );
 
   const handleTextChange = (text: string, index: number) => {
@@ -139,7 +139,7 @@ export default function VerifyEmailScreen() {
         <Pressable
           onPress={goToPrevious}
           accessibilityRole="button"
-          accessibilityLabel="Go back"
+          accessibilityLabel={t('common.go_back')}
           className="h-10 w-10 items-center justify-center rounded-full">
           <Ionicons name="chevron-back" size={24} color="black" />
         </Pressable>
@@ -147,11 +147,11 @@ export default function VerifyEmailScreen() {
 
       <View className="items-center gap-3 pt-6">
         <AuthHeader
-          title="Verify your email address"
+          title={t('signup.verify.title')}
           imageSource={require('@/assets/images/icon-email-verify.svg')}
           imageWidth={IMAGE_DIMENSIONS.EMAIL_VERIFY.width}
           imageHeight={IMAGE_DIMENSIONS.EMAIL_VERIFY.height}
-          description={`We will send you a One Time Password via this mail: ${data.email}`}
+          description={t('signup.verify.description', { email: data.email })}
         />
       </View>
 
@@ -173,7 +173,7 @@ export default function VerifyEmailScreen() {
               onKeyPress={(event) => handleKeyPress(event, index)}
               value={otp[index]}
               editable={!isSubmitting}
-              accessibilityLabel={`OTP digit ${index + 1}`}
+              accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
               className="h-full w-full text-center text-[18px] text-foreground"
             />
           </View>
@@ -196,11 +196,11 @@ export default function VerifyEmailScreen() {
         onPress={handleResend}
         disabled={resendSecondsLeft > 0}
         accessibilityRole="button"
-        accessibilityLabel="Re-send new code"
+        accessibilityLabel={t('signup.verify.resend_code')}
         className="mb-4 h-8 items-center justify-center rounded-[8px] px-2">
         <ThemedText
           className={`text-[14px] ${resendSecondsLeft > 0 ? 'text-muted-foreground' : 'text-primary'}`}>
-          Re-send new code
+          {t('signup.verify.resend_code')}
         </ThemedText>
       </Pressable>
     </AuthLayout>

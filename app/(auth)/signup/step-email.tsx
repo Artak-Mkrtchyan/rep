@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -35,6 +36,7 @@ const EmailSchema = Yup.object().shape({
 });
 
 export default function SignUpEmailStepScreen() {
+  const { t } = useTranslation();
   const { tokens: theme } = useTheme();
   const { data, updateData } = useSignUpContext();
   const { goToNext } = useSignUpFlow();
@@ -50,7 +52,7 @@ export default function SignUpEmailStepScreen() {
       const existsResponse = await usersService.checkUserExists(values.email, scope);
 
       if (existsResponse.exists) {
-        setFieldError('email', 'An account with this email already exists');
+        setFieldError('email', t('signup.email_already_exists'));
         return;
       }
 
@@ -100,14 +102,14 @@ export default function SignUpEmailStepScreen() {
         {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
           <>
             <AuthHeader
-              title="Sign up"
+              title={t('signup.title')}
               imageSource={require('@/assets/images/icon-signup-email.svg')}
               imageWidth={IMAGE_DIMENSIONS.SIGNUP_EMAIL.width}
               imageHeight={IMAGE_DIMENSIONS.SIGNUP_EMAIL.height}
             />
 
             <Input
-              label="Email"
+              label={t('auth.email')}
               value={values.email}
               onChangeText={handleChange('email')}
               onBlur={handleBlur('email')}
@@ -122,8 +124,8 @@ export default function SignUpEmailStepScreen() {
             <Button
               disabled={!values.email || !!errors.email || isSubmitting}
               onPress={() => handleSubmit()}
-              accessibilityLabel="Continue">
-              {isSubmitting ? 'Sending...' : 'Continue'}
+              accessibilityLabel={t('common.continue')}>
+              {isSubmitting ? t('common.sending') : t('common.continue')}
             </Button>
 
             <SignInFooter

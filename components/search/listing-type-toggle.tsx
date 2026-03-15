@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -9,12 +10,14 @@ type ListingTypeToggleProps = {
   onChange: (value: ListingType) => void;
 };
 
-const OPTIONS: { label: string; value: ListingType }[] = [
-  { label: 'Buy', value: 'BUY' },
-  { label: 'Rent', value: 'RENT' },
-];
+export const ListingTypeToggle: React.FC<ListingTypeToggleProps> = ({ value, onChange }) => {
+  const { t } = useTranslation();
+  const OPTIONS: { label: string; value: ListingType }[] = [
+    { label: t('search.buy'), value: 'BUY' },
+    { label: t('search.rent'), value: 'RENT' },
+  ];
 
-export const ListingTypeToggle: React.FC<ListingTypeToggleProps> = ({ value, onChange }) => (
+  return (
   <View className="flex-row rounded-[10px] bg-secondary p-1">
     {OPTIONS.map((option) => {
       const isActive = value === option.value;
@@ -33,4 +36,5 @@ export const ListingTypeToggle: React.FC<ListingTypeToggleProps> = ({ value, onC
       );
     })}
   </View>
-);
+  );
+};

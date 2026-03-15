@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Keyboard, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -16,6 +17,7 @@ import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { validateEmail } from '@/lib/auth-validation';
 
 export default function ForgotPasswordEmailScreen() {
+  const { t } = useTranslation();
   const [email, setEmail] = React.useState('');
   const [emailError, setEmailError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -36,11 +38,11 @@ export default function ForgotPasswordEmailScreen() {
 
   const validateForm = (): boolean => {
     if (!email.trim()) {
-      setEmailError('Email is required');
+      setEmailError(t('validation.email_required'));
       return false;
     }
     if (!validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('validation.email_invalid'));
       return false;
     }
     return true;
@@ -82,7 +84,7 @@ export default function ForgotPasswordEmailScreen() {
           <Pressable
             onPress={handleBack}
             accessibilityRole="button"
-            accessibilityLabel="Go back"
+            accessibilityLabel={t('common.go_back')}
             className="h-10 w-10 items-center justify-center rounded-full">
             <Ionicons name="chevron-back" size={24} color="black" />
           </Pressable>
@@ -101,15 +103,15 @@ export default function ForgotPasswordEmailScreen() {
 
             <View className="items-center gap-2">
               <ThemedText type="title" className="text-center">
-                Forgot password?
+                {t('forgot_password.title')}
               </ThemedText>
             </View>
 
             <Input
-              label="Email"
+              label={t('auth.email')}
               value={email}
               onChangeText={handleEmailChange}
-              placeholder="Enter your email"
+              placeholder={t('forgot_password.enter_email')}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
@@ -122,8 +124,8 @@ export default function ForgotPasswordEmailScreen() {
             <Button
               disabled={!email.trim() || isLoading}
               onPress={handleContinue}
-              accessibilityLabel="Continue">
-              {isLoading ? 'Submitting...' : 'Continue'}
+              accessibilityLabel={t('common.continue')}>
+              {isLoading ? t('common.submitting') : t('common.continue')}
             </Button>
           </View>
         </View>

@@ -25,7 +25,7 @@ export const getEnvironment = (): Environment => {
  * Gets the API URL based on the current environment
  * Note: Using dev API for both environments until production API is ready
  */
-export const getApiUrl = (): string => 'https://rep-test.utspdev.com/api';
+export const getApiUrl = (): string => 'https://rep-dev.utspdev.com/api';
 
 /**
  * Yandex Geosuggest API key for address autocomplete.

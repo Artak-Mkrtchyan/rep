@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
@@ -20,9 +21,12 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
   onApplePress,
   onSignInPress,
   showSignInLink = false,
-  signInLabel = 'Already have an account?',
-  signInActionLabel = 'Sign in',
+  signInLabel,
+  signInActionLabel,
 }) => {
+  const { t } = useTranslation();
+  const resolvedSignInLabel = signInLabel ?? t('auth.already_have_account');
+  const resolvedSignInActionLabel = signInActionLabel ?? t('auth.sign_in');
   return (
     <>
       <FormDivider />
@@ -33,11 +37,11 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
         <Button
           variant="ghost"
           onPress={onSignInPress}
-          accessibilityLabel={`${signInLabel} ${signInActionLabel}`}>
+          accessibilityLabel={`${resolvedSignInLabel} ${resolvedSignInActionLabel}`}>
           <ThemedText className="text-[18px] font-[400] leading-[24px] text-[#ABABAB]">
-            {signInLabel}{' '}
+            {resolvedSignInLabel}{' '}
             <ThemedText className="text-[18px] font-[500] leading-[24px] text-primary">
-              {signInActionLabel}
+              {resolvedSignInActionLabel}
             </ThemedText>
           </ThemedText>
         </Button>

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -11,13 +12,10 @@ import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { RentForApartmentsFormStep3 } from '@/types/announcement';
 
-const TITLE_PLACEHOLDER = 'Type your message here';
-const HELPER_TEXT =
-  'Write several sentences describing the upgrades and desirable features that will attract renters to your property.';
-
 type DescriptionFormValues = { description: RentForApartmentsFormStep3['description'] };
 
 export default function PropertyInfoSecondScreen() {
+  const { t } = useTranslation();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
@@ -40,7 +38,7 @@ export default function PropertyInfoSecondScreen() {
       try {
         await sendFormData();
       } catch {
-        Alert.alert('Error', 'Failed to send form data');
+        Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       } finally {
         router.push('/(tabs)');
       }
@@ -72,19 +70,19 @@ export default function PropertyInfoSecondScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="px-4 pt-[24px]">
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-                  Describe the property
+                  {t('announcement.rent.describe_property')}
                 </ThemedText>
                 <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-                  {HELPER_TEXT}
+                  {t('announcement.rent.describe_property_helper')}
                 </ThemedText>
 
                 <View className="gap-1">
-                  <InputLabel>Property description</InputLabel>
+                  <InputLabel>{t('announcement.rent.property_description')}</InputLabel>
                   <TextInput
                     value={values.description}
                     onChangeText={handleChange('description')}
                     onBlur={handleBlur('description')}
-                    placeholder={TITLE_PLACEHOLDER}
+                    placeholder={t('announcement.rent.description_placeholder')}
                     placeholderTextColor={placeholderColor}
                     multiline
                     numberOfLines={4}
@@ -104,8 +102,8 @@ export default function PropertyInfoSecondScreen() {
             </ScrollView>
 
             <AnnouncementFooter
-              firstButtonLabel="Next"
-              secondButtonLabel="Save & exit"
+              firstButtonLabel={t('common.next')}
+              secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
             />

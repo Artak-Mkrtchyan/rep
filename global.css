@@ -41,30 +41,30 @@
     --sidebar-ring: 0 0% 63%;
 
     /* Main Brand Colors (Green) */
-    --main-50: #b2ffce;
-    --main-100: #2dfe9b;
-    --main-200: #1ad982;
-    --main-300: #13b86d;
-    --main-400: #0e9457;
-    --main-500: #087443;
-    --main-600: #055c34;
-    --main-700: #034827;
-    --main-800: #013119;
-    --main-900: #011f0e;
-    --main-950: #001206;
+    --main-50: 142 100% 85%;
+    --main-100: 152 99% 59%;
+    --main-200: 153 79% 48%;
+    --main-300: 153 81% 40%;
+    --main-400: 153 83% 32%;
+    --main-500: 153 87% 24%;
+    --main-600: 152 90% 19%;
+    --main-700: 151 92% 15%;
+    --main-800: 150 96% 10%;
+    --main-900: 146 94% 6%;
+    --main-950: 140 100% 4%;
 
     /* Neutral Colors */
-    --neutral-50: #f1f1f1;
-    --neutral-100: #e2e2e2;
-    --neutral-200: #c6c6c6;
-    --neutral-300: #ababab;
-    --neutral-400: #919191;
-    --neutral-500: #777777;
-    --neutral-600: #5e5e5e;
-    --neutral-700: #474747;
-    --neutral-800: #303030;
-    --neutral-900: #1b1b1b;
-    --neutral-950: #111111;
+    --neutral-50: 0 0% 95%;
+    --neutral-100: 0 0% 89%;
+    --neutral-200: 0 0% 78%;
+    --neutral-300: 0 0% 67%;
+    --neutral-400: 0 0% 57%;
+    --neutral-500: 0 0% 47%;
+    --neutral-600: 0 0% 37%;
+    --neutral-700: 0 0% 28%;
+    --neutral-800: 0 0% 19%;
+    --neutral-900: 0 0% 11%;
+    --neutral-950: 0 0% 7%;
 
     /* Secondary Colors (Beige/Tan) */
     --secondary-50: #f8f3e8;

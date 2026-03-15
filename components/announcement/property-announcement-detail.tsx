@@ -87,24 +87,61 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
             className="flex-row items-center gap-2 rounded-[4px] bg-[#E3FEDE] px-3 py-2"
             accessibilityRole="button"
             accessibilityLabel={`Status: ${status}`}>
-            <View className="h-5 w-5 items-center justify-center rounded-full border border-primary">
-              <Ionicons name="checkmark" size={12} color="#087443" />
-            </View>
-            <ThemedText className="text-[14px] font-medium text-primary">{status}</ThemedText>
-            <Ionicons name="chevron-down" size={14} color="#087443" />
+            <Image
+              source={require('@/assets/images/success-icon.svg')}
+              style={{
+                width: 16,
+                height: 16,
+              }}
+              contentFit="contain"
+            />
+            <ThemedText className="text-[12px] text-primary">{status}</ThemedText>
+            <Image
+              source={require('@/assets/images/chevron-down-icon.svg')}
+              style={{
+                width: 12,
+                height: 12,
+              }}
+              contentFit="contain"
+            />
           </Pressable>
           <View className="flex-row items-center gap-2">
-            <IconButton
-              icon="heart-outline"
+            <Pressable
               onPress={onFavoritePress}
-              accessibilityLabel="Add to favourites"
-            />
-            <IconButton
-              icon="list-outline"
+              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+              <Image
+                source={require('@/assets/images/heart-icon.svg')}
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+                contentFit="contain"
+              />
+            </Pressable>
+            <Pressable
               onPress={onMenuPress}
-              accessibilityLabel="More options"
-            />
-            <IconButton icon="share-outline" onPress={onSharePress} accessibilityLabel="Share" />
+              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+              <Image
+                source={require('@/assets/images/menu-icon.svg')}
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+                contentFit="contain"
+              />
+            </Pressable>
+            <Pressable
+              onPress={onSharePress}
+              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+              <Image
+                source={require('@/assets/images/share-icon.svg')}
+                style={{
+                  width: 24,
+                  height: 24,
+                }}
+                contentFit="contain"
+              />
+            </Pressable>
           </View>
         </View>
         <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1">
@@ -119,7 +156,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
           ) : null}
         </View>
         <ThemedText className="mb-2 text-[20px] font-bold text-foreground">{title}</ThemedText>
-        <ThemedText className="text-[20px] font-bold text-primary">{price}</ThemedText>
+        <ThemedText className="text-[20px] font-bold text-main-500">{price}</ThemedText>
       </View>
 
       {/* Announcement information */}
@@ -131,7 +168,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
             <PlacedByItem
               name={placedBy.name}
               label="Placed by"
-              nameClassName="text-primary"
+              nameClassName="text-main-500"
               icon={
                 placedBy.avatarUri ? (
                   <Image
@@ -201,11 +238,18 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               {distances?.metro ? (
                 <PlacedByItem
                   icon={
-                    <View className="h-8 w-8 items-center justify-center rounded-full bg-muted">
-                      <Ionicons name="train-outline" size={16} color="#6B7280" />
+                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
+                      <Image
+                        source={require('@/assets/images/announcement-icons/metro-icon.svg')}
+                        style={{
+                          width: 20,
+                          height: 20,
+                        }}
+                        contentFit="contain"
+                      />
                     </View>
                   }
-                  name="1.2km"
+                  name={distances.metro}
                   label="Metro"
                   nameClassName="text-foreground"
                 />
@@ -213,11 +257,18 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               {distances?.hospital ? (
                 <PlacedByItem
                   icon={
-                    <View className="h-8 w-8 items-center justify-center rounded-full bg-muted">
-                      <Ionicons name="medkit-outline" size={16} color="#6B7280" />
+                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
+                      <Image
+                        source={require('@/assets/images/announcement-icons/hospital-icon.svg')}
+                        style={{
+                          width: 20,
+                          height: 20,
+                        }}
+                        contentFit="contain"
+                      />
                     </View>
                   }
-                  name="10km"
+                  name={distances.hospital}
                   label="Hospital"
                   nameClassName="text-foreground"
                 />
@@ -225,11 +276,18 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               {distances?.school ? (
                 <PlacedByItem
                   icon={
-                    <View className="h-8 w-8 items-center justify-center rounded-full bg-muted">
-                      <Ionicons name="school-outline" size={16} color="#6B7280" />
+                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
+                      <Image
+                        source={require('@/assets/images/announcement-icons/school-icon.svg')}
+                        style={{
+                          width: 20,
+                          height: 20,
+                        }}
+                        contentFit="contain"
+                      />
                     </View>
                   }
-                  name="2km"
+                  name={distances.school}
                   label="School"
                   nameClassName="text-foreground"
                 />
@@ -237,11 +295,18 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               {distances?.grocery ? (
                 <PlacedByItem
                   icon={
-                    <View className="h-8 w-8 items-center justify-center rounded-full bg-muted">
-                      <Ionicons name="cart-outline" size={16} color="#6B7280" />
+                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
+                      <Image
+                        source={require('@/assets/images/announcement-icons/grocery-icon.svg')}
+                        style={{
+                          width: 20,
+                          height: 20,
+                        }}
+                        contentFit="contain"
+                      />
                     </View>
                   }
-                  name="3km"
+                  name={distances.grocery}
                   label="Grocery shop"
                   nameClassName="text-foreground"
                 />
@@ -271,23 +336,3 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
     </View>
   );
 };
-
-function IconButton({
-  icon,
-  onPress,
-  accessibilityLabel,
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  onPress?: () => void;
-  accessibilityLabel: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      className="h-10 w-10 items-center justify-center rounded-full border border-[#E5E5E5] bg-[#F5F5F5]"
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}>
-      <Ionicons name={icon} size={22} color="#111111" />
-    </Pressable>
-  );
-}

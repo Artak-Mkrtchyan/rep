@@ -276,6 +276,22 @@ class HttpClient {
     }
   }
 
+  async getFile(endpoint: string, config: RequestConfig = {}): Promise<Blob> {
+    const url = `${this.baseURL}${endpoint}`;
+    const headers = this.getHeaders(config);
+
+    const response = await fetch(url, {
+      ...config,
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to download file: ${response.statusText}`);
+    }
+
+    return await response.blob();
+  }
+
   async get<T>(endpoint: string, config?: RequestConfig): Promise<T> {
     return this.request<T>(endpoint, { ...config, method: 'GET' });
   }

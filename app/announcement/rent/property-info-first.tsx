@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 
@@ -68,8 +68,13 @@ export default function PropertyInfoFirstScreen() {
     if (isNext) {
       router.replace(ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path);
     } else {
-      await sendFormData();
-      router.push('/(tabs)');
+      try {
+        await sendFormData();
+      } catch {
+        Alert.alert('Error', 'Failed to send form data');
+      } finally {
+        router.push('/(tabs)');
+      }
     }
   };
 

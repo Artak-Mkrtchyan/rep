@@ -1,3 +1,5 @@
+import { CHARACTERISTIC_ICONS } from '@/constants/announcement';
+
 export type RentForApartmentsForm = { stepNumber: number } & RentForApartmentsFormStep1 &
   RentForApartmentsFormStep2 &
   RentForApartmentsFormStep3 &
@@ -86,4 +88,18 @@ export type Attributes = {
     largeDogs?: boolean;
     smallDogs?: boolean;
   };
+};
+
+export type CharacteristicConfig = {
+  iconKey: keyof typeof CHARACTERISTIC_ICONS;
+  label: string;
+  getValue: (
+    formData: RentForApartmentsForm,
+    helpers: {
+      conditionLabel: string;
+      buildingTypeLabel: string;
+      ownershipLabel: string;
+      formatYesNo: (v: boolean | undefined) => string;
+    }
+  ) => string;
 };

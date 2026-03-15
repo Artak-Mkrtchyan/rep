@@ -10,7 +10,7 @@ export const getTargetRoute = (step: number): AnnouncementRoutePath => {
   return (route?.path ?? ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path) as AnnouncementRoutePath;
 };
 
-export const getTargetStep = (path: string): number => {
+export const getTargetStep = (path: string): number | undefined => {
   const route = ROUTES.find((r) => r.path === path);
-  return route?.completedStep ?? 1;
+  return route?.completedStep;
 };

@@ -6,33 +6,40 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 
-import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
+import { cn } from '@/lib/utils';
 import type { StepProgressProps } from './step-progress';
 import { StepProgress } from './step-progress';
-
-const HEADER_TITLE = 'Add announcement';
 
 type Props = {
   completedStep?: number;
   totalSteps?: number;
+  headerTitle?: string;
   label?: string;
   stepProgressContainerClassName?: string;
+  isStepProgressVisible?: boolean;
+  rightComponent?: React.ReactNode;
+  onHandleBackPress?: () => void;
+  headerClassName?: string;
 };
 
 export const AnnouncementHeader: React.FC<Props> = ({
   completedStep = 1,
   totalSteps = 7,
+  headerTitle = 'Add announcement',
   label = 'List',
   stepProgressContainerClassName,
+  isStepProgressVisible = true,
+  rightComponent = null,
+  onHandleBackPress,
+  headerClassName,
 }) => {
   const insets = useSafeAreaInsets();
-  const setCurrentStep = useAnnouncementForRentFormStore((s) => s.setCurrentStep);
 
   const handleBackPress = () => {
-    if (completedStep === 1) {
-      router.push('/(tabs)');
+    if (onHandleBackPress) {
+      onHandleBackPress();
     } else {
-      setCurrentStep(--completedStep);
+      router.back();
     }
   };
 
@@ -44,7 +51,9 @@ export const AnnouncementHeader: React.FC<Props> = ({
   };
 
   return (
-    <View className="bg-white px-4" style={{ paddingTop: insets.top, paddingBottom: 12 }}>
+    <View
+      className={cn('bg-white px-4', headerClassName)}
+      style={{ paddingTop: insets.top, paddingBottom: 12 }}>
       <View className="flex-row items-center">
         <View className="flex-1 items-center justify-center">
           <Pressable
@@ -57,14 +66,19 @@ export const AnnouncementHeader: React.FC<Props> = ({
           <ThemedText
             className="text-[17px] font-semibold leading-[22px] text-foreground"
             numberOfLines={1}>
-            {HEADER_TITLE}
+            {headerTitle}
           </ThemedText>
+          <View className="absolute right-0 h-10 items-center justify-center">
+            {rightComponent}
+          </View>
         </View>
       </View>
 
-      <View className="mt-[24px]">
-        <StepProgress {...stepProgressProps} />
-      </View>
+      {isStepProgressVisible ? (
+        <View className="mt-[24px]">
+          <StepProgress {...stepProgressProps} />
+        </View>
+      ) : null}
     </View>
   );
 };

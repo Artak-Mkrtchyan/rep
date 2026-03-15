@@ -1,22 +1,24 @@
 import { applicationsService } from '@/lib/api/applications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native';
 import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import { RentForApartmentsForm } from '../types/announcement';
 
-const PERSIST_KEY = 'announcement-rent-form-five';
+const PERSIST_KEY = 'announcement-rent-form-seven';
 
 type PersistedState = {
   formData: RentForApartmentsForm;
   announcementId?: string;
+  publicId?: string;
 };
 
 interface AnnouncementForRentFormStore {
   announcementId?: string;
+  publicId?: string;
   formData: RentForApartmentsForm;
   nextStep: () => void;
   sendFormData: () => Promise<void>;
+  publishFormData: () => Promise<void>;
   setCurrentStep: (step: number) => void;
   updateFormData: (data: Partial<RentForApartmentsForm>) => void;
   resetForm: () => void;
@@ -40,6 +42,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
   persist(
     subscribeWithSelector((set, get) => ({
       announcementId: undefined,
+      publicId: undefined,
       formData: initialFormData,
 
       setCurrentStep: (step) =>
@@ -62,15 +65,26 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
             await applicationsService.updateAnnouncementPublication(announcementId, formData);
           } else {
             const response = await applicationsService.announcementPublication(formData);
-            set((state) => {
-              return {
-                announcementId: response.id,
-                formData: { ...state.formData, response },
-              };
-            });
+            set(() => ({
+              announcementId: response.id,
+              publicId: response.publicId,
+            }));
           }
-        } catch {
-          Alert.alert('Error', 'Failed to send form data');
+        } catch (error) {
+          throw error;
+        }
+      },
+
+      publishFormData: async () => {
+        try {
+          const { announcementId } = get();
+          if (!announcementId) {
+            const error = new Error('Save the form first before publishing');
+            throw error;
+          }
+          await applicationsService.publishApplication(announcementId);
+        } catch (error) {
+          throw error;
         }
       },
 
@@ -81,6 +95,8 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
 
       resetForm: () =>
         set({
+          announcementId: undefined,
+          publicId: undefined,
           formData: initialFormData,
         }),
     })),
@@ -91,6 +107,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         ({
           formData: state.formData,
           announcementId: state.announcementId,
+          publicId: state.publicId,
         }) as PersistedState,
       merge: (persistedState, currentState) => {
         const persisted = persistedState as PersistedState | undefined;

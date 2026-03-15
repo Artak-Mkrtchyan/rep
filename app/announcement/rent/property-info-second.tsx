@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
-import { ScrollView, TextInput, View } from 'react-native';
+import { Alert, ScrollView, TextInput, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ThemedText } from '@/components/themed-text';
@@ -37,9 +37,13 @@ export default function PropertyInfoSecondScreen() {
     if (isNext) {
       nextStep();
     } else {
-      await sendFormData();
-
-      router.push('/(tabs)');
+      try {
+        await sendFormData();
+      } catch {
+        Alert.alert('Error', 'Failed to send form data');
+      } finally {
+        router.push('/(tabs)');
+      }
     }
   };
 

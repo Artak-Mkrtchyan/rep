@@ -1,4 +1,5 @@
 import type { SelectOption } from '@/components/ui/select';
+import { CharacteristicConfig, RentForApartmentsForm } from '@/types/announcement';
 
 export const LISTING_TYPE_OPTIONS: SelectOption<string>[] = [
   { label: 'For rent', value: 'FOR_RENT' },
@@ -67,12 +68,148 @@ export const YEAR_BUILT_OPTIONS: SelectOption<string>[] = Array.from(
   }
 );
 
+export const CHARACTERISTIC_ICONS: Record<string, string> = {
+  floors: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  area: require('@/assets/images/announcement-icons/size-icon.svg'),
+  bedroom: require('@/assets/images/announcement-icons/bed-icon.svg'),
+  bathroom: require('@/assets/images/announcement-icons/bath-icon.svg'),
+  condition: require('@/assets/images/announcement-icons/condition-icon.svg'),
+  buildingType: require('@/assets/images/announcement-icons/buildingType-icon.svg'),
+  yearBuilt: require('@/assets/images/announcement-icons/yearBuilt-icon.svg'),
+  ownershipType: require('@/assets/images/announcement-icons/ownershipType-icon.svg'),
+  offStreetParking: require('@/assets/images/announcement-icons/parking-icon.svg'),
+  attachedGarage: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  detachedGarage: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  washerAndLaundry: require('@/assets/images/announcement-icons/washer-icon.svg'),
+  disabledAccess: require('@/assets/images/announcement-icons/disabledAccess-icon.svg'),
+  bicycleStorage: require('@/assets/images/announcement-icons/bike-icon.svg'),
+};
+
+export const PET_ITEMS_CONFIG: {
+  key: string;
+  icon: string;
+  label: string;
+  getAllowed: (formData: RentForApartmentsForm) => boolean;
+}[] = [
+  {
+    key: 'cat',
+    icon: require('@/assets/images/announcement-icons/cat-icon.svg'),
+    label: 'Cat',
+    getAllowed: (f) => !!f.property?.attributes?.pets?.cat,
+  },
+  {
+    key: 'smallDogs',
+    icon: require('@/assets/images/announcement-icons/small-dog-icon.svg'),
+    label: 'Small dogs\n(under 40 kg)',
+    getAllowed: (f) => !!f.property?.attributes?.pets?.smallDogs,
+  },
+  {
+    key: 'largeDogs',
+    icon: require('@/assets/images/announcement-icons/large-dog-icon.svg'),
+    label: 'Large dogs\n(over 40 kg)',
+    getAllowed: (f) => !!f.property?.attributes?.pets?.largeDogs,
+  },
+];
+
+export const OBJECT_CHARACTERISTICS: CharacteristicConfig[] = [
+  {
+    iconKey: 'floors',
+    label: 'Floors',
+    getValue: (fd) => {
+      const b = fd.property?.attributes?.building;
+      return b?.floorNo != null && b?.numberOfFloors != null
+        ? `${b.floorNo} of ${b.numberOfFloors}`
+        : '—';
+    },
+  },
+  {
+    iconKey: 'area',
+    label: 'Area (m²)',
+    getValue: (fd) => (fd.property?.areaM2 != null ? String(fd.property.areaM2) : '—'),
+  },
+  {
+    iconKey: 'bedroom',
+    label: 'Bedroom',
+    getValue: (fd) =>
+      fd.property?.attributes?.bedroomCount != null
+        ? String(fd.property.attributes.bedroomCount)
+        : '—',
+  },
+  {
+    iconKey: 'bathroom',
+    label: 'Bathroom',
+    getValue: (fd) =>
+      fd.property?.attributes?.bathroomCount != null
+        ? String(fd.property.attributes.bathroomCount)
+        : '—',
+  },
+  {
+    iconKey: 'condition',
+    label: 'Condition',
+    getValue: (_, h) => h.conditionLabel,
+  },
+  {
+    iconKey: 'buildingType',
+    label: 'Building type',
+    getValue: (_, h) => h.buildingTypeLabel,
+  },
+  {
+    iconKey: 'yearBuilt',
+    label: 'Year built',
+    getValue: (fd) =>
+      fd.property?.attributes?.building?.yearBuilt != null
+        ? String(fd.property.attributes.building.yearBuilt)
+        : '—',
+  },
+  {
+    iconKey: 'ownershipType',
+    label: 'Ownership type',
+    getValue: (_, h) => h.ownershipLabel,
+  },
+  {
+    iconKey: 'offStreetParking',
+    label: 'Off-street parking',
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.offStreetParking),
+  },
+  {
+    iconKey: 'attachedGarage',
+    label: 'Attached garage',
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.attachedGarage),
+  },
+  {
+    iconKey: 'detachedGarage',
+    label: 'Detached garage',
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.detachedGarage),
+  },
+  {
+    iconKey: 'washerAndLaundry',
+    label: 'Washer and laundry',
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.washerLaundry),
+  },
+  {
+    iconKey: 'disabledAccess',
+    label: 'Disabled access',
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.disabledAccess),
+  },
+  {
+    iconKey: 'bicycleStorage',
+    label: 'Bicycle storage',
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
+  },
+];
+
 export const ANNOUNCEMENT_ROUTES = {
   RENT_BASIC_INFO: {
     name: 'basic-info',
     label: 'List',
     completedStep: 1,
     path: '/announcement/rent/basic-info',
+  },
+  RENT_BROKER_LIST: {
+    name: 'broker-list',
+    label: 'List',
+    completedStep: 1,
+    path: '/announcement/rent/broker-list',
   },
   RENT_ANNOUNCEMENT_TITLE: {
     name: 'announcement-title',

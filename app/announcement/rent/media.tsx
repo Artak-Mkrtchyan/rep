@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ThemedText } from '@/components/themed-text';
@@ -28,8 +28,13 @@ export default function MediaScreen() {
   };
 
   const handleSaveAndExit = async () => {
-    await sendFormData();
-    router.push('/(tabs)');
+    try {
+      await sendFormData();
+    } catch {
+      Alert.alert('Error', 'Failed to send form data');
+    } finally {
+      router.push('/(tabs)');
+    }
   };
 
   return (

@@ -1,6 +1,8 @@
 import { Href, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
+import { ScrollView } from 'react-native';
 
+import { FeaturedProperties } from '@/components/home/featured-properties';
 import { HeroSection } from '@/components/home/hero-section';
 import { SearchModal } from '@/components/search/search-modal';
 import { ThemedView } from '@/components/themed-view';
@@ -29,7 +31,10 @@ export default function HomeScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <HeroSection onMenuPress={handleMenuPress} onSearchPress={handleSearchPress} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <HeroSection onMenuPress={handleMenuPress} onSearchPress={handleSearchPress} />
+        <FeaturedProperties />
+      </ScrollView>
 
       <SearchModal
         visible={isSearchVisible}

@@ -13,8 +13,8 @@ import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
-import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { isPasswordValid, validatePassword } from '@/lib/auth-validation';
+import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 
 export default function ForgotPasswordResetScreen() {
   const [newPassword, setNewPassword] = React.useState('');
@@ -64,7 +64,10 @@ export default function ForgotPasswordResetScreen() {
         },
       ]);
     } catch (error) {
-      showErrorAlert(error, { title: 'Reset Failed', fallback: ERROR_MESSAGES.RESET_PASSWORD_FAILED });
+      showErrorAlert(error, {
+        title: 'Reset Failed',
+        fallback: ERROR_MESSAGES.RESET_PASSWORD_FAILED,
+      });
     } finally {
       setIsLoading(false);
     }

@@ -57,9 +57,7 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
             style={detailStyles.statusIcon}
             contentFit="contain"
           />
-          <ThemedText className="text-[12px] text-[#5EBC39]">
-            {displayStatus}
-          </ThemedText>
+          <ThemedText className="text-[12px] text-[#5EBC39]">{displayStatus}</ThemedText>
           <Image
             source={require('@/assets/images/chevron-down-icon.svg')}
             style={detailStyles.chevronIcon}

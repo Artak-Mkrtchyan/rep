@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DescriptionSection } from '@/components/announcement/description-section';
@@ -135,13 +135,17 @@ export default function AnnouncementDetailScreen() {
             <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
           </Pressable>
           <View style={detailStyles.actionButtonsGroup}>
-            <Pressable accessibilityLabel="Favourite">
-              <Ionicons name="heart-outline" size={24} color="#FFFFFF" />
+            <Pressable onPress={toggleFavourite} accessibilityLabel="Favourite">
+              <Ionicons
+                name={announcement.favourite ? 'heart' : 'heart-outline'}
+                size={24}
+                color={announcement.favourite ? '#FF3636' : '#FFFFFF'}
+              />
             </Pressable>
             <Pressable accessibilityLabel="Compare">
               <Ionicons name="list-outline" size={24} color="#FFFFFF" />
             </Pressable>
-            <Pressable accessibilityLabel="Share">
+            <Pressable onPress={handleShare} accessibilityLabel="Share">
               <Ionicons name="share-social-outline" size={24} color="#FFFFFF" />
             </Pressable>
           </View>

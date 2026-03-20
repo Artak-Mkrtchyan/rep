@@ -8,6 +8,7 @@ export interface UseAnnouncementDetailsResult {
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
+  toggleFavourite: () => Promise<void>;
 }
 
 export function useAnnouncementDetails(id: string): UseAnnouncementDetailsResult {
@@ -45,5 +46,22 @@ export function useAnnouncementDetails(id: string): UseAnnouncementDetailsResult
     };
   }, [fetch]);
 
-  return { announcement, isLoading, error, refetch: fetch };
+  const toggleFavourite = useCallback(async () => {
+    if (!announcement) return;
+    const wasFavourite = announcement.favourite;
+
+    setAnnouncement((prev) => (prev ? { ...prev, favourite: !wasFavourite } : prev));
+
+    try {
+      if (wasFavourite) {
+        await announcementsService.removeFromFavourites(announcement.id);
+      } else {
+        await announcementsService.addToFavourites(announcement.id);
+      }
+    } catch {
+      setAnnouncement((prev) => (prev ? { ...prev, favourite: wasFavourite } : prev));
+    }
+  }, [announcement]);
+
+  return { announcement, isLoading, error, refetch: fetch, toggleFavourite };
 }

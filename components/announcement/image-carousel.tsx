@@ -5,6 +5,7 @@ import {
   type ListRenderItemInfo,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
+  Pressable,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -17,9 +18,10 @@ const MAX_DOTS = 9;
 
 type ImageCarouselProps = {
   images: string[];
+  onImagePress?: (index: number) => void;
 };
 
-export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
+export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, onImagePress }) => {
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef<FlatList<string>>(null);
@@ -33,12 +35,14 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
   );
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<string>) => (
-      <View style={[styles.container, { width }]}>
+    ({ item, index }: ListRenderItemInfo<string>) => (
+      <Pressable
+        style={[styles.container, { width }]}
+        onPress={() => onImagePress?.(index)}>
         <Image source={{ uri: item }} style={styles.image} contentFit="cover" />
-      </View>
+      </Pressable>
     ),
-    [width]
+    [width, onImagePress]
   );
 
   const keyExtractor = useCallback((_: string, index: number) => `img-${index}`, []);

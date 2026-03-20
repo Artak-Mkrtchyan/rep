@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,6 +12,7 @@ import { LocationSection } from '@/components/announcement/detail/location-secti
 import { NotableDistancesSection } from '@/components/announcement/detail/notable-distances-section';
 import { ImageCarousel } from '@/components/announcement/image-carousel';
 import { ObjectCharacteristics } from '@/components/announcement/object-characteristics';
+import { PhotoGallery } from '@/components/announcement/photo-gallery';
 import { PetsAllowed } from '@/components/announcement/pets-allowed';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -45,6 +46,14 @@ export default function AnnouncementDetailScreen() {
       // user cancelled or share failed
     }
   }, [announcement]);
+
+  const [galleryVisible, setGalleryVisible] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
+
+  const handleImagePress = useCallback((index: number) => {
+    setGalleryInitialIndex(index);
+    setGalleryVisible(true);
+  }, []);
 
   const images = useMemo(() => (announcement ? mapImages(announcement) : []), [announcement]);
   const location = useMemo(
@@ -87,7 +96,7 @@ export default function AnnouncementDetailScreen() {
   return (
     <ThemedView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
-        <ImageCarousel images={images} />
+        <ImageCarousel images={images} onImagePress={handleImagePress} />
 
         <View style={detailStyles.content}>
           <View style={detailStyles.pillContainer}>
@@ -169,6 +178,15 @@ export default function AnnouncementDetailScreen() {
           </Pressable>
         </View>
       </SafeAreaView>
+
+      <PhotoGallery
+        visible={galleryVisible}
+        images={images}
+        initialIndex={galleryInitialIndex}
+        isFavourite={announcement.favourite}
+        onClose={() => setGalleryVisible(false)}
+        onToggleFavourite={toggleFavourite}
+      />
     </ThemedView>
   );
 }

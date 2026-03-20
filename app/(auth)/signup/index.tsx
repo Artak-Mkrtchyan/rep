@@ -1,16 +1,18 @@
+import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Alert, View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { RadioButton } from '@/components/auth/radio-button';
+import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { getAccountTypeOptions, IMAGE_DIMENSIONS } from '@/constants/auth';
+import { getAccountTypeOptions, AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 
@@ -28,6 +30,18 @@ export default function SignUpFirstScreen() {
   const handleContinue = (values: { role: AccountRole }) => {
     updateData({ role: values.role });
     goToNext();
+  };
+
+  const handleGoogleAuth = () => {
+    Alert.alert(t('login.google_sign_in_title'), t('login.google_sign_in_coming_soon'));
+  };
+
+  const handleAppleAuth = () => {
+    Alert.alert(t('login.apple_sign_in_title'), t('login.apple_sign_in_coming_soon'));
+  };
+
+  const handleGoToLogin = () => {
+    router.replace(AUTH_ROUTES.LOGIN);
   };
 
   return (
@@ -85,6 +99,13 @@ export default function SignUpFirstScreen() {
               accessibilityLabel={t('common.continue')}>
               {t('common.continue')}
             </Button>
+
+            <SignInFooter
+              onGooglePress={handleGoogleAuth}
+              onApplePress={handleAppleAuth}
+              onSignInPress={handleGoToLogin}
+              showSignInLink
+            />
           </>
         )}
       </Formik>

@@ -150,6 +150,7 @@ export default function CreatePasswordScreen() {
                 hasLowerCase={passwordRequirements.hasLowerCase}
                 hasNumber={passwordRequirements.hasNumber}
                 hasSymbol={passwordRequirements.hasSymbol}
+                hasOnlyAllowedChars={passwordRequirements.hasOnlyAllowedChars}
               />
 
               <Input

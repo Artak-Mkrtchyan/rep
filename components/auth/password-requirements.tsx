@@ -38,6 +38,7 @@ export interface PasswordRequirementsListProps {
   hasLowerCase: boolean;
   hasNumber: boolean;
   hasSymbol: boolean;
+  hasOnlyAllowedChars: boolean;
 }
 
 export const PasswordRequirementsList: React.FC<PasswordRequirementsListProps> = ({
@@ -46,16 +47,37 @@ export const PasswordRequirementsList: React.FC<PasswordRequirementsListProps> =
   hasLowerCase,
   hasNumber,
   hasSymbol,
+  hasOnlyAllowedChars,
 }) => {
   const { t } = useTranslation();
 
   return (
     <View className="w-full flex-row flex-wrap items-start justify-between gap-4">
-      <PasswordRequirementItem icon="A" label={t('auth.password_req.uppercase')} isValid={hasUpperCase} />
-      <PasswordRequirementItem icon="a" label={t('auth.password_req.lowercase')} isValid={hasLowerCase} />
-      <PasswordRequirementItem icon="123" label={t('auth.password_req.number')} isValid={hasNumber} />
-      <PasswordRequirementItem icon="#&?" label={t('auth.password_req.symbol')} isValid={hasSymbol} />
-      <PasswordRequirementItem icon="8+" label={t('auth.password_req.min_length')} isValid={hasMinLength} />
+      <PasswordRequirementItem
+        icon="A"
+        label={t('auth.password_req.uppercase')}
+        isValid={hasUpperCase}
+      />
+      <PasswordRequirementItem
+        icon="a"
+        label={t('auth.password_req.lowercase')}
+        isValid={hasLowerCase}
+      />
+      <PasswordRequirementItem
+        icon="123"
+        label={t('auth.password_req.number')}
+        isValid={hasNumber}
+      />
+      <PasswordRequirementItem
+        icon="#&!"
+        label={t('auth.password_req.symbol')}
+        isValid={hasSymbol && hasOnlyAllowedChars}
+      />
+      <PasswordRequirementItem
+        icon="8+"
+        label={t('auth.password_req.min_length')}
+        isValid={hasMinLength}
+      />
     </View>
   );
 };

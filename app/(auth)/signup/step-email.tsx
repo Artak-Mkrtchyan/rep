@@ -122,7 +122,7 @@ export default function SignUpEmailStepScreen() {
             />
 
             <Button
-              disabled={!values.email || !!errors.email || isSubmitting}
+              disabled={!values.email || isSubmitting}
               onPress={() => handleSubmit()}
               accessibilityLabel={t('common.continue')}>
               {isSubmitting ? t('common.sending') : t('common.continue')}

@@ -34,6 +34,24 @@ export const getApiUrl = (): string => 'https://rep-dev.utspdev.com/api';
 export const YANDEX_SUGGEST_API_KEY =
   typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_YANDEX_SUGGEST_API_KEY : undefined;
 
+/**
+ * Universal link base for the mobile app.
+ * On mobile: OS intercepts the URL and opens the app if installed,
+ * otherwise the web fallback page redirects to the app store.
+ * On desktop: the fallback page redirects to the corresponding web page.
+ */
+export const getMobileAppLink = (): string => {
+  const env = getEnvironment();
+  switch (env) {
+    case 'production':
+      return 'https://rep.utspdev.com/app/open';
+    default:
+      return 'https://rep-test.utspdev.com/app/open';
+  }
+};
+
+export const MOBILE_APP_LINK = getMobileAppLink();
+
 // TODO: Restore when production API is ready:
 // export const getApiUrl = (): string =>
 //   isProduction() ? 'https://rep.utspdev.com/api' : 'https://rep-dev.utspdev.com/api';

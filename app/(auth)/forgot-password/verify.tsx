@@ -3,7 +3,15 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Keyboard, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -22,6 +30,7 @@ export default function ForgotPasswordVerifyScreen() {
   const { secondsLeft, restart: restartCountdown, formatTime } = useCountdown(RESEND_CODE_TIMEOUT);
 
   const inputsRef = React.useRef<(TextInput | null)[]>([]);
+  const isResendingRef = React.useRef(false);
   const { data } = useForgotPasswordContext();
 
   const isOtpComplete = otp.every((val) => val.length === 1);
@@ -54,14 +63,20 @@ export default function ForgotPasswordVerifyScreen() {
   };
 
   const handleResend = async () => {
-    if (secondsLeft > 0 || !data.email) return;
+    if (secondsLeft > 0 || !data.email || isResendingRef.current) return;
+    isResendingRef.current = true;
 
     try {
       await authService.sendPasswordOtp(data.email);
       restartCountdown();
-      Alert.alert(t('forgot_password.verify.code_sent_title'), t('forgot_password.verify.code_sent_message'));
+      Alert.alert(
+        t('forgot_password.verify.code_sent_title'),
+        t('forgot_password.verify.code_sent_message')
+      );
     } catch (error) {
       showErrorAlert(error, { fallback: ERROR_MESSAGES.RESEND_CODE_FAILED });
+    } finally {
+      isResendingRef.current = false;
     }
   };
 
@@ -97,85 +112,93 @@ export default function ForgotPasswordVerifyScreen() {
       style={{ flex: 1 }}>
       <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
         <ThemedView className="flex-1 px-4">
-        <View className="mt-6">
-          <Pressable
-            onPress={handleBack}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.go_back')}
-            className="h-10 w-10 items-center justify-center rounded-full">
-            <Ionicons name="chevron-back" size={24} color="black" />
-          </Pressable>
-        </View>
-
-        <View className="flex-1 items-center justify-center">
-          <View className="w-[358px] max-w-full items-center gap-6">
-            <Image
-              style={{
-                width: IMAGE_DIMENSIONS.FORGOT_PASSWORD.width,
-                height: IMAGE_DIMENSIONS.FORGOT_PASSWORD.height,
-              }}
-              source={require('@/assets/images/forgot-password-illustration.svg')}
-              contentFit="contain"
-            />
-
-            <View className="items-center gap-2">
-              <ThemedText type="title" className="text-center">
-                {t('forgot_password.verify.title')}
-              </ThemedText>
-              {data.email ? (
-                <ThemedText className="text-center text-sm text-muted-foreground">
-                  {t('forgot_password.verify.description', { email: data.email })}
-                </ThemedText>
-              ) : null}
-            </View>
-
-            {/* OTP Input */}
-            <View className="w-full">
-              <ThemedText className="mb-2 text-sm font-medium">{t('forgot_password.verify.code_label')}</ThemedText>
-              <View className="w-full flex-row items-center justify-between">
-                {Array.from({ length: OTP_LENGTH }, (_, index) => (
-                  <View
-                    key={index}
-                    className="h-14 w-14 items-center justify-center rounded-[12px] border border-default bg-card">
-                    <TextInput
-                      ref={(element) => {
-                        inputsRef.current[index] = element;
-                      }}
-                      keyboardType="number-pad"
-                      maxLength={1}
-                      onChangeText={(text) => handleOtpChange(text, index)}
-                      onKeyPress={(event) => handleOtpKeyPress(event, index)}
-                      value={otp[index]}
-                      accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
-                      className="h-full w-full text-center text-[18px] text-foreground"
-                      editable={!isLoading}
-                    />
-                  </View>
-                ))}
-              </View>
-
-              <View className="mt-2 items-center">
-                {secondsLeft > 0 ? (
-                  <ThemedText className="text-[14px] text-muted-foreground">
-                    {t('forgot_password.verify.resend_countdown', { time: formatTime(secondsLeft) })}
-                  </ThemedText>
-                ) : (
-                  <Pressable
-                    onPress={handleResend}
-                    accessibilityRole="button"
-                    accessibilityLabel={t('forgot_password.verify.resend_code')}
-                    className="h-8 items-center justify-center rounded-[8px] px-2">
-                    <ThemedText className="text-[14px] text-primary">{t('forgot_password.verify.resend_code')}</ThemedText>
-                  </Pressable>
-                )}
-              </View>
-            </View>
-
-            <Button disabled={!canSubmit} onPress={handleConfirm} accessibilityLabel={t('forgot_password.verify.verify_button')}>
-              {isLoading ? t('forgot_password.verify.verifying') : t('forgot_password.verify.verify_button')}
-            </Button>
+          <View className="mt-6">
+            <Pressable
+              onPress={handleBack}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.go_back')}
+              className="h-10 w-10 items-center justify-center rounded-full">
+              <Ionicons name="chevron-back" size={24} color="black" />
+            </Pressable>
           </View>
-        </View>
+
+          <View className="flex-1 items-center justify-center">
+            <View className="w-[358px] max-w-full items-center gap-6">
+              <Image
+                style={{
+                  width: IMAGE_DIMENSIONS.FORGOT_PASSWORD.width,
+                  height: IMAGE_DIMENSIONS.FORGOT_PASSWORD.height,
+                }}
+                source={require('@/assets/images/forgot-password-illustration.svg')}
+                contentFit="contain"
+              />
+
+              <View className="items-center gap-2">
+                <ThemedText type="title" className="text-center">
+                  {t('forgot_password.verify.title')}
+                </ThemedText>
+                {data.email ? (
+                  <ThemedText className="text-center text-sm text-muted-foreground">
+                    {t('forgot_password.verify.description', { email: data.email })}
+                  </ThemedText>
+                ) : null}
+              </View>
+
+              {/* OTP Input */}
+              <View className="w-full items-end gap-[8px]">
+                <View className="flex-row items-center gap-[4px]">
+                  {Array.from({ length: OTP_LENGTH }, (_, index) => (
+                    <View
+                      key={index}
+                      className="h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E2E2E2] bg-card">
+                      <TextInput
+                        ref={(element) => {
+                          inputsRef.current[index] = element;
+                        }}
+                        keyboardType="number-pad"
+                        maxLength={1}
+                        onChangeText={(text) => handleOtpChange(text, index)}
+                        onKeyPress={(event) => handleOtpKeyPress(event, index)}
+                        value={otp[index]}
+                        accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
+                        className="h-full w-full text-center text-[20px] font-semibold text-foreground"
+                        editable={!isLoading}
+                      />
+                    </View>
+                  ))}
+                </View>
+
+                <View className="w-full items-center">
+                  {secondsLeft > 0 ? (
+                    <ThemedText className="text-[16px] font-medium text-primary">
+                      {t('forgot_password.verify.resend_countdown', {
+                        time: formatTime(secondsLeft),
+                      })}
+                    </ThemedText>
+                  ) : (
+                    <Pressable
+                      onPress={handleResend}
+                      accessibilityRole="button"
+                      accessibilityLabel={t('forgot_password.verify.resend_code')}
+                      className="h-[48px] items-center justify-center rounded-[6px] px-[16px] py-[8px]">
+                      <ThemedText className="text-[18px] font-medium text-primary">
+                        {t('forgot_password.verify.resend_code')}
+                      </ThemedText>
+                    </Pressable>
+                  )}
+                </View>
+              </View>
+
+              <Button
+                disabled={!canSubmit}
+                onPress={handleConfirm}
+                accessibilityLabel={t('forgot_password.verify.verify_button')}>
+                {isLoading
+                  ? t('forgot_password.verify.verifying')
+                  : t('forgot_password.verify.verify_button')}
+              </Button>
+            </View>
+          </View>
         </ThemedView>
       </Pressable>
     </KeyboardAvoidingView>

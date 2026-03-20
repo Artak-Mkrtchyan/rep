@@ -57,7 +57,7 @@
     "auth.password_req.uppercase": "katta harf",
     "auth.password_req.lowercase": "kichik harf",
     "auth.password_req.number": "raqam",
-    "auth.password_req.symbol": "belgi",
+    "auth.password_req.symbol": "-_!@#$%^&*()",
     "auth.password_req.min_length": "8 ta belgi",
 
     "auth.account_type.individual": "Jismoniy shaxs",
@@ -84,7 +84,8 @@
     "validation.must_contain_uppercase": "Katta harf bo'lishi kerak",
     "validation.must_contain_lowercase": "Kichik harf bo'lishi kerak",
     "validation.must_contain_number": "Raqam bo'lishi kerak",
-    "validation.must_contain_symbol": "Belgi bo'lishi kerak",
+    "validation.must_contain_symbol": "Maxsus belgi bo'lishi kerak: - _ ! @ # $ % ^ & * ( )",
+    "validation.password_invalid_chars": "Parolda noto'g'ri belgilar mavjud. Ruxsat etilgan maxsus belgilar: - _ ! @ # $ % ^ & * ( )",
     "validation.passwords_do_not_match": "Parollar mos kelmaydi",
     "validation.date_incorrect_format": "Sana noto'g'ri formatda",
     "validation.at_least_one_file": "Kamida bitta fayl kerak",

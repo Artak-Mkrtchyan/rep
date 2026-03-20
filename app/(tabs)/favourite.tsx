@@ -65,11 +65,11 @@ export default function FavouriteScreen() {
               {t('favourite.title')}
             </ThemedText>
 
-            <View className="mt-8 flex-row flex-wrap justify-between">
+            <View className="mt-8 flex-row flex-wrap gap-x-[8px] gap-y-[12px]">
               {favourites.map((item) => (
                 <AnnouncementSmallCard
                   key={item.id}
-                  className="mb-[16px] w-[48%]"
+                  className="w-[175px]"
                   imageSource={getImageSource(item)}
                   title={item.title}
                   address={getAddress(item)}

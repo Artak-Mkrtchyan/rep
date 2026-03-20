@@ -12,7 +12,7 @@ import { useCountdown } from '@/hooks/use-countdown';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { authService } from '@/lib/api/auth';
 import { ERROR_MESSAGES, getApiErrorMessage, isApiError } from '@/lib/error-handler';
-import { OTP_EXPIRATION_TIMEOUT, OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
+import { OTP_EXPIRATION_TIMEOUT, OTP_LENGTH } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 export default function VerifyEmailScreen() {
@@ -26,14 +26,13 @@ export default function VerifyEmailScreen() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittedRef = useRef(false);
+  const isResendingRef = useRef(false);
 
   const {
-    secondsLeft: resendSecondsLeft,
-    restart: restartResendCountdown,
+    secondsLeft: expirationSecondsLeft,
+    restart: restartExpirationCountdown,
     formatTime,
-  } = useCountdown(RESEND_CODE_TIMEOUT);
-  const { secondsLeft: expirationSecondsLeft, restart: restartExpirationCountdown } =
-    useCountdown(OTP_EXPIRATION_TIMEOUT);
+  } = useCountdown(OTP_EXPIRATION_TIMEOUT);
 
   const handleVerify = useCallback(
     async (code: string) => {
@@ -116,17 +115,19 @@ export default function VerifyEmailScreen() {
   };
 
   const handleResend = async () => {
-    if (resendSecondsLeft > 0 || !data.email) return;
+    if (expirationSecondsLeft > 0 || !data.email || isResendingRef.current) return;
+    isResendingRef.current = true;
 
     try {
       await authService.requestEmailConfirmation(data.email);
-      restartResendCountdown();
       restartExpirationCountdown();
       setError('');
       setOtp(Array(OTP_LENGTH).fill(''));
       inputsRef.current[0]?.focus();
     } catch (err) {
       setError(getApiErrorMessage(err, ERROR_MESSAGES.RESEND_CODE_FAILED));
+    } finally {
+      isResendingRef.current = false;
     }
   };
 
@@ -156,37 +157,41 @@ export default function VerifyEmailScreen() {
       </View>
 
       {/* OTP Input */}
-      <View className="w-full flex-row items-center justify-between">
-        {Array.from({ length: OTP_LENGTH }, (_, index) => (
-          <View
-            key={index}
-            className={`h-14 w-14 items-center justify-center rounded-[12px] border bg-card ${
-              hasError ? 'border-red-500' : 'border-default'
-            }`}>
-            <TextInput
-              ref={(element) => {
-                inputsRef.current[index] = element;
-              }}
-              keyboardType="number-pad"
-              maxLength={1}
-              onChangeText={(text) => handleTextChange(text, index)}
-              onKeyPress={(event) => handleKeyPress(event, index)}
-              value={otp[index]}
-              editable={!isSubmitting}
-              accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
-              className="h-full w-full text-center text-[18px] text-foreground"
-            />
-          </View>
-        ))}
+      <View className="w-full items-end gap-[8px]">
+        <View className="flex-row items-center gap-[4px]">
+          {Array.from({ length: OTP_LENGTH }, (_, index) => (
+            <View
+              key={index}
+              className={`h-[56px] w-[56px] items-center justify-center rounded-[6px] border bg-card ${
+                hasError ? 'border-red-500' : 'border-[#E2E2E2]'
+              }`}>
+              <TextInput
+                ref={(element) => {
+                  inputsRef.current[index] = element;
+                }}
+                keyboardType="number-pad"
+                maxLength={1}
+                onChangeText={(text) => handleTextChange(text, index)}
+                onKeyPress={(event) => handleKeyPress(event, index)}
+                value={otp[index]}
+                editable={!isSubmitting}
+                accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
+                className="h-full w-full text-center text-[20px] font-semibold text-foreground"
+              />
+            </View>
+          ))}
+        </View>
+
+        {/* Inline error message */}
+        {hasError && <Text className="w-full text-[14px] text-red-500">{error}</Text>}
+
+        {/* Countdown timer */}
+        {expirationSecondsLeft > 0 && (
+          <Text className="w-full text-center text-[16px] font-medium text-primary">
+            {formatTime(expirationSecondsLeft)}
+          </Text>
+        )}
       </View>
-
-      {/* Inline error message */}
-      {hasError && <Text className="w-full text-[14px] text-red-500">{error}</Text>}
-
-      {/* Countdown timer */}
-      {resendSecondsLeft > 0 && (
-        <Text className="text-[14px] text-primary">{formatTime(resendSecondsLeft)}</Text>
-      )}
 
       {/* Spacer to push resend to bottom */}
       <View className="flex-1" />
@@ -194,12 +199,12 @@ export default function VerifyEmailScreen() {
       {/* Resend button pinned to bottom */}
       <Pressable
         onPress={handleResend}
-        disabled={resendSecondsLeft > 0}
+        disabled={expirationSecondsLeft > 0}
         accessibilityRole="button"
         accessibilityLabel={t('signup.verify.resend_code')}
-        className="mb-4 h-8 items-center justify-center rounded-[8px] px-2">
+        className="mb-4 h-[48px] items-center justify-center rounded-[6px] px-[16px] py-[8px]">
         <ThemedText
-          className={`text-[14px] ${resendSecondsLeft > 0 ? 'text-muted-foreground' : 'text-primary'}`}>
+          className={`text-[18px] font-medium ${expirationSecondsLeft > 0 ? 'text-muted-foreground' : 'text-primary'}`}>
           {t('signup.verify.resend_code')}
         </ThemedText>
       </Pressable>

@@ -4,6 +4,9 @@ import i18n from '@/lib/i18n/i18n';
 import type { PasswordRequirements } from '@/types/auth';
 
 export const PASSWORD_MIN_LENGTH = 8;
+export const ALLOWED_SPECIAL_CHARS = '-_!@#$%^&*()';
+export const ALLOWED_SPECIAL_CHARS_REGEX = /[-_!@#$%^&*()]/;
+export const PASSWORD_ALLOWED_CHARS_REGEX = /^[A-Za-z0-9\-_!@#$%^&*()]+$/;
 export const OTP_LENGTH = 6;
 export const RESEND_CODE_TIMEOUT = 60;
 export const OTP_EXPIRATION_TIMEOUT = 300; // 5 minutes
@@ -94,7 +97,8 @@ export const yupSchemas = {
     .matches(/[A-Z]/, () => i18n.t('validation.must_contain_uppercase'))
     .matches(/[a-z]/, () => i18n.t('validation.must_contain_lowercase'))
     .matches(/\d/, () => i18n.t('validation.must_contain_number'))
-    .matches(/[^A-Za-z0-9]/, () => i18n.t('validation.must_contain_symbol'))
+    .matches(ALLOWED_SPECIAL_CHARS_REGEX, () => i18n.t('validation.must_contain_symbol'))
+    .matches(PASSWORD_ALLOWED_CHARS_REGEX, () => i18n.t('validation.password_invalid_chars'))
     .required(() => i18n.t('validation.required')),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], () => i18n.t('validation.passwords_do_not_match'))
@@ -114,7 +118,8 @@ export const validatePassword = (password: string): PasswordRequirements => {
     hasUpperCase: /[A-Z]/.test(password),
     hasLowerCase: /[a-z]/.test(password),
     hasNumber: /\d/.test(password),
-    hasSymbol: /[^A-Za-z0-9]/.test(password),
+    hasSymbol: ALLOWED_SPECIAL_CHARS_REGEX.test(password),
+    hasOnlyAllowedChars: password.length === 0 || PASSWORD_ALLOWED_CHARS_REGEX.test(password),
   };
 };
 
@@ -124,7 +129,8 @@ export const isPasswordValid = (requirements: PasswordRequirements): boolean => 
     requirements.hasUpperCase &&
     requirements.hasLowerCase &&
     requirements.hasNumber &&
-    requirements.hasSymbol
+    requirements.hasSymbol &&
+    requirements.hasOnlyAllowedChars
   );
 };
 

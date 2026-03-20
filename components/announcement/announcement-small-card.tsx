@@ -44,7 +44,7 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
       <View className="mb-2 h-[97px] w-full overflow-hidden rounded-[8px] bg-muted">
         <Image source={imageSource} style={styles.heroImage} contentFit="cover" />
         <View className="absolute right-[8px] top-[8px]  flex-row items-center gap-[8px]">
-          <Pressable className="h-[20px] w-[20px] items-center justify-center rounded-[36px] bg-[#1111114d]">
+          <Pressable className="h-[24px] w-[24px] items-center justify-center rounded-[36px] bg-[#1111114d]">
             <Image
               source={require('@/assets/images/menu-icon.svg')}
               style={styles.menuIcon}
@@ -54,12 +54,12 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
           <Pressable
             onPress={onFavouritePress}
             className={cn(
-              'h-[20px] w-[20px] items-center justify-center rounded-[36px]',
+              'h-[24px] w-[24px] items-center justify-center rounded-[36px]',
               bgHeartIcon
             )}>
             <HeartIcon
-              width={14}
-              height={14}
+              width={16}
+              height={16}
               stroke={isFavourite ? '#13B86D' : 'white'}
               fill={isFavourite ? '#13B86D' : 'none'}
             />
@@ -102,7 +102,7 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
           </View>
         </View>
 
-        <View className="mt-1 flex-row items-center justify-between">
+        <View className="flex-row items-center justify-between">
           <ThemedText className="text-[14px] font-bold leading-[17px] text-foreground">
             {priceLabel}
           </ThemedText>

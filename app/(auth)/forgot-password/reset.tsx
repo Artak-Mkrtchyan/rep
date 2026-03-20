@@ -131,6 +131,7 @@ export default function ForgotPasswordResetScreen() {
                 hasLowerCase={passwordRequirements.hasLowerCase}
                 hasNumber={passwordRequirements.hasNumber}
                 hasSymbol={passwordRequirements.hasSymbol}
+                hasOnlyAllowedChars={passwordRequirements.hasOnlyAllowedChars}
               />
 
               {/* Confirm Password */}

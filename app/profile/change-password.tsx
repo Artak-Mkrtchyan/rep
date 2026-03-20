@@ -122,6 +122,7 @@ export default function ChangePasswordScreen() {
                   hasLowerCase={passwordRequirements.hasLowerCase}
                   hasNumber={passwordRequirements.hasNumber}
                   hasSymbol={passwordRequirements.hasSymbol}
+                  hasOnlyAllowedChars={passwordRequirements.hasOnlyAllowedChars}
                 />
 
                 <Input

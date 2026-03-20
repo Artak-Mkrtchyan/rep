@@ -10,7 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.rep"
+      "bundleIdentifier": "com.anonymous.rep",
+      "associatedDomains": [
+        "applinks:rep-dev.utspdev.com",
+        "applinks:rep-test.utspdev.com",
+        "applinks:rep.utspdev.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +25,19 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            { "scheme": "https", "host": "rep-dev.utspdev.com", "pathPrefix": "/app/open" },
+            { "scheme": "https", "host": "rep-test.utspdev.com", "pathPrefix": "/app/open" },
+            { "scheme": "https", "host": "rep.utspdev.com", "pathPrefix": "/app/open" }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "output": "static",

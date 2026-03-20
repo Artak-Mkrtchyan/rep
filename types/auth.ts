@@ -5,6 +5,7 @@ export interface PasswordRequirements {
   hasLowerCase: boolean;
   hasNumber: boolean;
   hasSymbol: boolean;
+  hasOnlyAllowedChars: boolean;
 }
 
 export interface BrokerSignUpForm {

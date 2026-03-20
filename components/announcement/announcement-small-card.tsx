@@ -58,8 +58,8 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
               bgHeartIcon
             )}>
             <HeartIcon
-              width={16}
-              height={16}
+              width={14}
+              height={14}
               stroke={isFavourite ? '#13B86D' : 'white'}
               fill={isFavourite ? '#13B86D' : 'none'}
             />

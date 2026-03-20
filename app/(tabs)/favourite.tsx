@@ -101,7 +101,7 @@ export default function FavouriteScreen() {
               {t('favourite.title')}
             </ThemedText>
             <View className="flex-1 items-center justify-center">
-              <View className="aspect-square w-full max-w-[280px] items-center justify-center">
+              <View className="mb-20 aspect-square w-full max-w-[280px] items-center justify-center">
                 <Image
                   source={require('@/assets/images/no-result-illustration.svg')}
                   style={{ width: 250, height: 154 }}

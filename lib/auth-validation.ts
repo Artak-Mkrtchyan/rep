@@ -9,7 +9,7 @@ export const RESEND_CODE_TIMEOUT = 60;
 export const OTP_EXPIRATION_TIMEOUT = 300; // 5 minutes
 export const FULL_NAME_MIN_LENGTH = 2;
 export const FULL_NAME_MAX_LENGTH = 100;
-export const FULL_NAME_REGEX = /^[a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'-\s]+$/;
+export const FULL_NAME_REGEX = /^[a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'\u2018\u2019\-\s]+$/;
 export const EMAIL_REGEX =
   /^(?=^.{1,64}@)(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
 export const EMAIL_LOCAL_MAX_LENGTH = 64;
@@ -55,14 +55,16 @@ export const yupSchemas = {
     .required(() => i18n.t('validation.full_name_required'))
     .min(FULL_NAME_MIN_LENGTH, () => i18n.t('validation.full_name_min_length'))
     .max(FULL_NAME_MAX_LENGTH, () => i18n.t('validation.full_name_max_length'))
-    .test('no-leading-trailing-spaces', () => i18n.t('validation.no_leading_trailing_spaces'), (val) =>
-      val ? val === val.trim() : true
+    .test(
+      'no-leading-trailing-spaces',
+      () => i18n.t('validation.no_leading_trailing_spaces'),
+      (val) => (val ? val === val.trim() : true)
     )
     .test('valid-characters', (val, ctx) => {
       if (!val) return true;
       if (!FULL_NAME_REGEX.test(val)) {
         const hasNumbers = /\d/.test(val);
-        const hasInvalidSymbols = /[^a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'\-\s]/.test(val);
+        const hasInvalidSymbols = /[^a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'\u2018\u2019\-\s]/.test(val);
 
         if (hasNumbers || hasInvalidSymbols) {
           return ctx.createError({
@@ -76,11 +78,17 @@ export const yupSchemas = {
       }
       return true;
     })
-    .test('has-two-words', () => i18n.t('validation.full_name_two_words'), (val) =>
-      val ? val.trim().split(/\s+/).length >= 2 : true
+    .test(
+      'has-two-words',
+      () => i18n.t('validation.full_name_two_words'),
+      (val) => (val ? val.trim().split(/\s+/).length >= 2 : true)
     ),
-  phone: Yup.string().required(() => i18n.t('validation.required')).matches(PHONE_REGEX, () => i18n.t('validation.invalid_phone_number')),
-  phoneOptional: Yup.string().matches(PHONE_REGEX, () => i18n.t('validation.invalid_phone_number')).optional(),
+  phone: Yup.string()
+    .required(() => i18n.t('validation.required'))
+    .matches(PHONE_REGEX, () => i18n.t('validation.invalid_phone_number')),
+  phoneOptional: Yup.string()
+    .matches(PHONE_REGEX, () => i18n.t('validation.invalid_phone_number'))
+    .optional(),
   password: Yup.string()
     .min(PASSWORD_MIN_LENGTH, () => i18n.t('validation.password_too_short'))
     .matches(/[A-Z]/, () => i18n.t('validation.must_contain_uppercase'))
@@ -91,7 +99,9 @@ export const yupSchemas = {
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], () => i18n.t('validation.passwords_do_not_match'))
     .required(() => i18n.t('validation.required')),
-  certifiedOn: Yup.string().required(() => i18n.t('validation.required')).matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format')),
+  certifiedOn: Yup.string()
+    .required(() => i18n.t('validation.required'))
+    .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format')),
 };
 
 export const validateEmail = (email: string): boolean => {

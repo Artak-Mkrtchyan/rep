@@ -109,14 +109,29 @@ export default function AnnouncementDetailScreen() {
         </View>
       </ScrollView>
 
-      <SafeAreaView className="absolute left-[16px] top-0 z-10" edges={['top']}>
-        <Pressable
-          onPress={handleBack}
-          accessibilityRole="button"
-          accessibilityLabel={t('common.go_back')}
-          style={detailStyles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#111111" />
-        </Pressable>
+      <SafeAreaView
+        className="absolute left-0 right-0 top-0 z-10 px-[16px]"
+        edges={['top']}>
+        <View className="flex-row items-center justify-between" style={{ marginTop: 16 }}>
+          <Pressable
+            onPress={handleBack}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.go_back')}
+            style={detailStyles.backButton}>
+            <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
+          </Pressable>
+          <View style={detailStyles.actionButtonsGroup}>
+            <Pressable accessibilityLabel="Favourite">
+              <Ionicons name="heart-outline" size={24} color="#FFFFFF" />
+            </Pressable>
+            <Pressable accessibilityLabel="Compare">
+              <Ionicons name="list-outline" size={24} color="#FFFFFF" />
+            </Pressable>
+            <Pressable accessibilityLabel="Share">
+              <Ionicons name="share-social-outline" size={24} color="#FFFFFF" />
+            </Pressable>
+          </View>
+        </View>
       </SafeAreaView>
     </ThemedView>
   );

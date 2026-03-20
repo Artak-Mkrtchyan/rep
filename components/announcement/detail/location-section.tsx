@@ -35,6 +35,14 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ location }) =>
               nameClassName="text-[12px] font-bold text-foreground"
             />
           ) : null}
+          {location.province ? (
+            <PlacedByItem
+              name={location.province}
+              label={t('announcement.detail.province')}
+              labelClassName="text-[10px]"
+              nameClassName="text-[12px] font-bold text-foreground"
+            />
+          ) : null}
           {location.district ? (
             <PlacedByItem
               name={location.district}
@@ -43,10 +51,18 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ location }) =>
               nameClassName="text-[12px] font-bold text-foreground"
             />
           ) : null}
-          {location.address ? (
+          {location.street ? (
             <PlacedByItem
-              name={location.address}
-              label={t('announcement.detail.address')}
+              name={location.street}
+              label={t('announcement.detail.street')}
+              labelClassName="text-[10px]"
+              nameClassName="text-[12px] font-bold text-foreground"
+            />
+          ) : null}
+          {location.house ? (
+            <PlacedByItem
+              name={location.house}
+              label={t('announcement.detail.house')}
               labelClassName="text-[10px]"
               nameClassName="text-[12px] font-bold text-foreground"
             />

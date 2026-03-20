@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const detailStyles = StyleSheet.create({
   content: {
     gap: 24,
-    paddingBottom: 40,
+    paddingBottom: 140,
     marginTop: -24,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -52,5 +52,40 @@ export const detailStyles = StyleSheet.create({
   actionIcon: {
     width: 24,
     height: 24,
+  },
+  bottomBarShadow: {
+    borderTopWidth: 1,
+    borderTopColor: '#F1F1F1',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    shadowColor: '#6E6E6E',
+    shadowOffset: { width: 2, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 33,
+    elevation: 10,
+  },
+  bottomBar: {
+    paddingHorizontal: 16,
+    paddingTop: 24,
+    paddingBottom: 12,
+    gap: 12,
+  },
+  primaryButton: {
+    height: 49,
+    borderRadius: 12,
+    backgroundColor: '#0E9457',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+  },
+  secondaryButton: {
+    height: 49,
+    borderRadius: 12,
+    backgroundColor: '#F1F1F1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
   },
 });

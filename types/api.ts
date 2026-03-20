@@ -84,11 +84,14 @@ export type PropertyDetailsDto = {
 
 export interface Announcement {
   id: string;
+  createdAt?: string;
+  createdBy?: string;
   archived: boolean;
   listingType: ListingType;
   propertyType: PropertyType;
   processType: ProcessType;
   geo: GeoDetailsDto;
+  status?: { code: string; name: string };
   needPhotographer: boolean;
   needAssessmentExpert: boolean;
   title: string;
@@ -100,4 +103,10 @@ export interface Announcement {
   favourite: boolean;
   forComparison: boolean;
   publicId: string;
+  infrastructureObjects?: InfrastructureObject[];
+}
+
+export interface InfrastructureObject {
+  type: string;
+  distanceInMeters: number;
 }

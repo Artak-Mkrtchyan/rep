@@ -365,6 +365,9 @@
     "announcement.detail.city": "Shahar",
     "announcement.detail.district": "Tuman",
     "announcement.detail.address": "Manzil",
+    "announcement.detail.province": "Viloyat",
+    "announcement.detail.street": "Ko'cha",
+    "announcement.detail.house": "Uy",
     "announcement.detail.notable_distances": "Muhim masofalar",
     "announcement.detail.metro": "Metro",
     "announcement.detail.hospital": "Kasalxona",
@@ -375,6 +378,8 @@
     "announcement.detail.show_less": "Kamroq ko'rsatish",
     "announcement.detail.not_found": "E'lon topilmadi",
     "announcement.detail.view_on_map": "Xaritada ko'rish",
+    "announcement.detail.request_tour": "Ekskursiya so'rash",
+    "announcement.detail.contact_info": "Aloqa ma'lumotlari",
 
     "property_details.see_all_photos": "Barcha rasmlarni ko'rish",
     "property_details.announcement_information": "E'lon ma'lumotlari",

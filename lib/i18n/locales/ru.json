@@ -365,6 +365,9 @@
   "announcement.detail.city": "Город",
   "announcement.detail.district": "Район",
   "announcement.detail.address": "Адрес",
+  "announcement.detail.province": "Область",
+  "announcement.detail.street": "Улица",
+  "announcement.detail.house": "Дом",
   "announcement.detail.notable_distances": "Важные расстояния",
   "announcement.detail.metro": "Метро",
   "announcement.detail.hospital": "Больница",
@@ -375,6 +378,8 @@
   "announcement.detail.show_less": "Показать меньше",
   "announcement.detail.not_found": "Объявление не найдено",
   "announcement.detail.view_on_map": "Посмотреть на карте",
+  "announcement.detail.request_tour": "Запросить экскурсию",
+  "announcement.detail.contact_info": "Контактная информация",
 
   "property_details.see_all_photos": "Посмотреть все фото",
   "property_details.announcement_information": "Информация об объявлении",

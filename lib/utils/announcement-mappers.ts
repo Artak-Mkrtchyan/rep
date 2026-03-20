@@ -1,26 +1,48 @@
-import type { Announcement } from '@/types/api';
+import type { Announcement, InfrastructureObject } from '@/types/api';
 import { ListingType } from '@/types/api';
 
 export type LocationInfo = {
   country?: string;
   city?: string;
+  province?: string;
   district?: string;
-  address?: string;
+  street?: string;
+  house?: string;
+};
+
+export type DistanceInfo = {
+  type: string;
+  distanceKm: string;
 };
 
 export function mapImages(announcement: Announcement): string[] {
   return announcement.mediaFiles.map((f) => f.url).filter(Boolean);
 }
 
+function getLangValue(field: Record<string, string> | undefined): string | undefined {
+  if (!field) return undefined;
+  return field.en || Object.values(field)[0] || undefined;
+}
+
 export function mapLocation(announcement: Announcement): LocationInfo {
   const geo = announcement.geo;
-  const locale = 'en';
   return {
-    country: geo?.country?.[locale] || Object.values(geo?.country || {})[0],
-    city: geo?.locality?.[locale] || Object.values(geo?.locality || {})[0],
-    district: geo?.district?.[locale] || Object.values(geo?.district || {})[0],
-    address: geo?.street?.[locale] || Object.values(geo?.street || {})[0],
+    country: getLangValue(geo?.country),
+    city: getLangValue(geo?.locality),
+    province: getLangValue(geo?.province),
+    district: getLangValue(geo?.district),
+    street: getLangValue(geo?.street),
+    house: getLangValue(geo?.house),
   };
+}
+
+export function mapDistances(announcement: Announcement): DistanceInfo[] {
+  const objects = announcement.infrastructureObjects;
+  if (!objects || objects.length === 0) return [];
+  return objects.map((obj: InfrastructureObject) => ({
+    type: obj.type,
+    distanceKm: (obj.distanceInMeters / 1000).toFixed(1),
+  }));
 }
 
 export function mapTypeLabel(announcement: Announcement, t: (key: string) => string): string {
@@ -44,5 +66,5 @@ export function mapPets(announcement: Announcement) {
 }
 
 export function hasLocationData(location?: LocationInfo): boolean {
-  return !!(location && (location.country || location.city || location.district || location.address));
+  return !!(location && (location.country || location.city || location.province || location.district || location.street || location.house));
 }

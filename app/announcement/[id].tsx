@@ -19,6 +19,7 @@ import { useAnnouncementDetails } from '@/hooks/api/use-announcement-details';
 import { getPriceLabel } from '@/lib/utils/announcement-helpers';
 import {
   hasLocationData,
+  mapDistances,
   mapImages,
   mapLocation,
   mapPets,
@@ -29,9 +30,21 @@ export default function AnnouncementDetailScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { announcement, isLoading, error, refetch } = useAnnouncementDetails(id!);
+  const { announcement, isLoading, error, refetch, toggleFavourite } = useAnnouncementDetails(id!);
 
   const handleBack = useCallback(() => router.back(), [router]);
+
+  const handleShare = useCallback(async () => {
+    if (!announcement) return;
+    try {
+      await Share.share({
+        title: announcement.title,
+        message: `${announcement.title}\n${getPriceLabel(announcement)}`,
+      });
+    } catch {
+      // user cancelled or share failed
+    }
+  }, [announcement]);
 
   const images = useMemo(() => (announcement ? mapImages(announcement) : []), [announcement]);
   const location = useMemo(
@@ -42,6 +55,7 @@ export default function AnnouncementDetailScreen() {
     () => (announcement ? mapTypeLabel(announcement, t) : ''),
     [announcement, t]
   );
+  const distances = useMemo(() => (announcement ? mapDistances(announcement) : []), [announcement]);
   const pets = useMemo(() => (announcement ? mapPets(announcement) : null), [announcement]);
 
   if (isLoading) {
@@ -85,11 +99,13 @@ export default function AnnouncementDetailScreen() {
             publicId={announcement.publicId}
             typeLabel={typeLabel}
             price={getPriceLabel(announcement)}
+            statusLabel={announcement.status?.name}
+            postedDate={announcement.createdAt}
           />
 
           {hasLocationData(location) && <LocationSection location={location!} />}
 
-          <NotableDistancesSection />
+          <NotableDistancesSection distances={distances} />
 
           <DescriptionSection description={announcement.description} />
 
@@ -109,9 +125,7 @@ export default function AnnouncementDetailScreen() {
         </View>
       </ScrollView>
 
-      <SafeAreaView
-        className="absolute left-0 right-0 top-0 z-10 px-[16px]"
-        edges={['top']}>
+      <SafeAreaView className="absolute left-0 right-0 top-0 z-10 px-[16px]" edges={['top']}>
         <View className="flex-row items-center justify-between" style={{ marginTop: 16 }}>
           <Pressable
             onPress={handleBack}
@@ -131,6 +145,24 @@ export default function AnnouncementDetailScreen() {
               <Ionicons name="share-social-outline" size={24} color="#FFFFFF" />
             </Pressable>
           </View>
+        </View>
+      </SafeAreaView>
+
+      <SafeAreaView
+        className="bottom-0 left-0 right-0 bg-white"
+        style={detailStyles.bottomBarShadow}
+        edges={['bottom']}>
+        <View style={detailStyles.bottomBar}>
+          <Pressable style={detailStyles.primaryButton}>
+            <ThemedText className="text-[16px] font-medium leading-[21px] text-white">
+              {t('announcement.detail.request_tour')}
+            </ThemedText>
+          </Pressable>
+          <Pressable style={detailStyles.secondaryButton}>
+            <ThemedText className="text-[16px] font-medium leading-[21px] text-[#0E9457]">
+              {t('announcement.detail.contact_info')}
+            </ThemedText>
+          </Pressable>
         </View>
       </SafeAreaView>
     </ThemedView>

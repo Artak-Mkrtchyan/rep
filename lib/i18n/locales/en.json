@@ -365,6 +365,9 @@
   "announcement.detail.city": "City",
   "announcement.detail.district": "District",
   "announcement.detail.address": "Address",
+  "announcement.detail.province": "Province",
+  "announcement.detail.street": "Street",
+  "announcement.detail.house": "House",
   "announcement.detail.notable_distances": "Notable distances",
   "announcement.detail.metro": "Metro",
   "announcement.detail.hospital": "Hospital",
@@ -375,6 +378,8 @@
   "announcement.detail.show_less": "Show less",
   "announcement.detail.not_found": "Announcement not found",
   "announcement.detail.view_on_map": "View on map",
+  "announcement.detail.request_tour": "Request a tour",
+  "announcement.detail.contact_info": "Contact information",
 
   "property_details.see_all_photos": "See all photos",
   "property_details.announcement_information": "Announcement information",

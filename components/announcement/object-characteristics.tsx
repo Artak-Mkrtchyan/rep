@@ -15,6 +15,21 @@ type CharacteristicConfig = {
   icon: ImageSource;
 };
 
+function flattenAttributes(attrs: Record<string, unknown> | undefined): Record<string, unknown> {
+  if (!attrs) return {};
+  const flat: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(attrs)) {
+    if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+      for (const [nestedKey, nestedValue] of Object.entries(value as Record<string, unknown>)) {
+        flat[nestedKey] = nestedValue;
+      }
+    } else {
+      flat[key] = value;
+    }
+  }
+  return flat;
+}
+
 const COMMON_CHARACTERISTICS: CharacteristicConfig[] = [
   {
     key: 'areaM2',
@@ -30,7 +45,7 @@ const APARTMENT_CHARACTERISTICS: CharacteristicConfig[] = [
     icon: require('@/assets/images/announcement-icons/yearBuilt-icon.svg'),
   },
   {
-    key: 'floorNumber',
+    key: 'floorNo',
     labelKey: 'property_details.floors',
     icon: require('@/assets/images/announcement-icons/floors-icon.svg'),
   },
@@ -90,7 +105,7 @@ const APARTMENT_CHARACTERISTICS: CharacteristicConfig[] = [
     icon: require('@/assets/images/announcement-icons/bike-icon.svg'),
   },
   {
-    key: 'washerAndLaundry',
+    key: 'washerLaundry',
     labelKey: 'property_details.laundry',
     icon: require('@/assets/images/announcement-icons/washer-icon.svg'),
   },
@@ -103,6 +118,11 @@ const APARTMENT_CHARACTERISTICS: CharacteristicConfig[] = [
     key: 'hvac',
     labelKey: 'property_details.hvac',
     icon: require('@/assets/images/announcement-icons/condition-icon.svg'),
+  },
+  {
+    key: 'evChargingStation',
+    labelKey: 'property_details.ev_charging',
+    icon: require('@/assets/images/announcement-icons/parking-icon.svg'),
   },
 ];
 
@@ -248,6 +268,7 @@ export const ObjectCharacteristics: React.FC<ObjectCharacteristicsProps> = ({
 }) => {
   const { t } = useTranslation();
   const attrs = propertyDetails.attributes as Record<string, unknown> | undefined;
+  const flatAttrs = useMemo(() => flattenAttributes(attrs), [attrs]);
 
   const items = useMemo(() => {
     const typeConfig = CHARACTERISTICS_BY_TYPE[propertyType] ?? [];
@@ -255,15 +276,20 @@ export const ObjectCharacteristics: React.FC<ObjectCharacteristicsProps> = ({
 
     return allConfigs
       .map((config) => {
-        const rawValue = config.key === 'areaM2' ? propertyDetails.areaM2 : attrs?.[config.key];
-        if (rawValue == null || rawValue === '' || rawValue === false) return null;
+        const rawValue = config.key === 'areaM2' ? propertyDetails.areaM2 : flatAttrs[config.key];
+        if (rawValue == null || rawValue === '') return null;
 
-        const displayValue = typeof rawValue === 'boolean' ? t('common.yes') : String(rawValue);
+        const displayValue =
+          typeof rawValue === 'boolean'
+            ? rawValue
+              ? t('common.yes')
+              : t('common.no')
+            : String(rawValue);
 
         return { ...config, displayValue };
       })
       .filter(Boolean) as (CharacteristicConfig & { displayValue: string })[];
-  }, [propertyType, propertyDetails, attrs, t]);
+  }, [propertyType, propertyDetails, flatAttrs, t]);
 
   if (items.length === 0 && securityDeposit == null) return null;
 

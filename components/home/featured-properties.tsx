@@ -13,6 +13,7 @@ import {
 
 import { AnnouncementSmallCard } from '@/components/announcement/announcement-small-card';
 import { ThemedText } from '@/components/themed-text';
+import { PaginationIndicator } from '@/components/ui/pagination-indicator';
 import { useFeaturedAnnouncements } from '@/hooks/api/use-announcements';
 import { announcementsService } from '@/lib/api/announcements';
 import {
@@ -109,18 +110,11 @@ export const FeaturedProperties: React.FC = () => {
         ))}
       </ScrollView>
 
-      {announcements.length > 1 && (
-        <View className="mt-4 flex-row items-center justify-center gap-2">
-          {announcements.map((_, index) => (
-            <View
-              key={`dot-${index}`}
-              className={`rounded-full ${
-                activeIndex === index ? 'h-2 w-14 bg-foreground' : 'h-2 w-2 bg-muted'
-              }`}
-            />
-          ))}
-        </View>
-      )}
+      <PaginationIndicator
+        count={announcements.length}
+        activeIndex={activeIndex}
+        variant="inline"
+      />
     </View>
   );
 };

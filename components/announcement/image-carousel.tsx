@@ -5,14 +5,15 @@ import {
   type ListRenderItemInfo,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
-  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
 
+import { PaginationIndicator } from '@/components/ui/pagination-indicator';
+
 import { styles } from './image-carousel.styles';
 
-const MAX_DOTS = 5;
+const MAX_DOTS = 9;
 
 type ImageCarouselProps = {
   images: string[];
@@ -54,8 +55,6 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
     );
   }
 
-  const showDots = images.length <= MAX_DOTS;
-
   return (
     <View style={styles.container}>
       <FlatList
@@ -69,29 +68,26 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
         onScroll={handleScroll}
         scrollEventThrottle={16}
       />
-      {images.length > 1 &&
-        (showDots ? (
-          <PaginationDots count={images.length} activeIndex={activeIndex} />
-        ) : (
-          <View style={styles.counter}>
-            <Text style={styles.counterText}>
-              {activeIndex + 1} / {images.length}
-            </Text>
-          </View>
-        ))}
+      {images.length > 1 && (
+        <>
+          {images.length <= MAX_DOTS && (
+            <PaginationIndicator
+              count={images.length}
+              activeIndex={activeIndex}
+              variant="overlay"
+              maxDots={MAX_DOTS}
+              bottom={40}
+            />
+          )}
+          <PaginationIndicator
+            count={images.length}
+            activeIndex={activeIndex}
+            variant="overlay"
+            maxDots={0}
+            bottom={40}
+          />
+        </>
+      )}
     </View>
   );
 };
-
-type PaginationDotsProps = {
-  count: number;
-  activeIndex: number;
-};
-
-const PaginationDots: React.FC<PaginationDotsProps> = ({ count, activeIndex }) => (
-  <View style={styles.dotsContainer}>
-    {Array.from({ length: count }, (_, i) => (
-      <View key={i} style={i === activeIndex ? styles.dotActive : styles.dot} />
-    ))}
-  </View>
-);

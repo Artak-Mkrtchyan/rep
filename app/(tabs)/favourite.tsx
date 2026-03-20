@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,8 +21,14 @@ import { Image } from 'expo-image';
 
 export default function FavouriteScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { favourites, isLoading, error, refetch, toggle } = useFavourites();
   const [seeding, setSeeding] = useState(false);
+
+  const handleCardPress = useCallback(
+    (id: string) => router.push(`/announcement/${id}` as any),
+    [router]
+  );
 
   const handleSeed = async () => {
     setSeeding(true);
@@ -79,6 +86,7 @@ export default function FavouriteScreen() {
                   priceLabel={getPriceLabel(item)}
                   isArrowUpRight={false}
                   isFavourite
+                  onPress={() => handleCardPress(item.id)}
                   onFavouritePress={() => toggle(item.id, true)}
                 />
               ))}

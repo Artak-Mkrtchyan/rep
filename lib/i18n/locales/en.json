@@ -370,6 +370,10 @@
   "announcement.detail.hospital": "Hospital",
   "announcement.detail.school": "School",
   "announcement.detail.grocery_shop": "Grocery shop",
+  "announcement.detail.description": "Description",
+  "announcement.detail.show_more": "Show more",
+  "announcement.detail.show_less": "Show less",
+  "announcement.detail.not_found": "Announcement not found",
   "announcement.detail.view_on_map": "View on map",
 
   "property_details.see_all_photos": "See all photos",

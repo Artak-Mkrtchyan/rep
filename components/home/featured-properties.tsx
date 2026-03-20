@@ -1,4 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -28,6 +29,7 @@ const CARD_GAP = 8;
 
 export const FeaturedProperties: React.FC = () => {
   const { t } = useTranslation();
+  const router = useRouter();
   const { announcements, isLoading, error, refetch } = useFeaturedAnnouncements(5);
 
   const toggle = useCallback(
@@ -101,6 +103,7 @@ export const FeaturedProperties: React.FC = () => {
             sizeLabel={getSizeLabel(item)}
             priceLabel={getPriceLabel(item)}
             isFavourite={item.favourite}
+            onPress={() => router.push(`/announcement/${item.id}` as any)}
             onFavouritePress={() => toggle(item.id, item.favourite)}
           />
         ))}

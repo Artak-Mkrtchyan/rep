@@ -370,6 +370,10 @@
     "announcement.detail.hospital": "Kasalxona",
     "announcement.detail.school": "Maktab",
     "announcement.detail.grocery_shop": "Oziq-ovqat do'koni",
+    "announcement.detail.description": "Tavsif",
+    "announcement.detail.show_more": "Ko'proq ko'rsatish",
+    "announcement.detail.show_less": "Kamroq ko'rsatish",
+    "announcement.detail.not_found": "E'lon topilmadi",
     "announcement.detail.view_on_map": "Xaritada ko'rish",
 
     "property_details.see_all_photos": "Barcha rasmlarni ko'rish",

@@ -3,6 +3,14 @@ import { httpClient } from './http/client';
 import { Announcement, ItemsListApiResponse, SearchRequest } from '@/types/api';
 
 export const announcementsService = {
+  getAnnouncementById: async (id: string): Promise<Announcement> => {
+    const response = await httpClient.get<ApiResponse<Announcement>>(
+      `/v1/announcements/${id}`,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as Announcement);
+  },
+
   searchAnnouncements: async (
     request: SearchRequest
   ): Promise<ItemsListApiResponse<Announcement>> => {

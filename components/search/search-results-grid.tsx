@@ -24,6 +24,7 @@ type SearchResultsGridProps = {
   hasMore: boolean;
   onRetry: () => void;
   onLoadMore: () => void;
+  onCardPress?: (id: string) => void;
 };
 
 export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
@@ -35,6 +36,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   hasMore,
   onRetry,
   onLoadMore,
+  onCardPress,
 }) => {
   const { t } = useTranslation();
 
@@ -107,6 +109,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               sizeLabel={getSizeLabel(item)}
               priceLabel={getPriceLabel(item)}
               isFavourite={item.favourite}
+              onPress={onCardPress ? () => onCardPress(item.id) : undefined}
             />
           ))}
         </View>

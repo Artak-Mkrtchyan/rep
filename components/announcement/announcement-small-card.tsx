@@ -19,6 +19,7 @@ export type AnnouncementSmallCardProps = {
   className?: string;
   isArrowUpRight?: boolean;
   isFavourite?: boolean;
+  onPress?: () => void;
   onFavouritePress?: () => void;
 };
 
@@ -33,12 +34,15 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
   className,
   isArrowUpRight = true,
   isFavourite = false,
+  onPress,
   onFavouritePress,
 }) => {
   const bgHeartIcon = isFavourite ? 'bg-[#11111199]' : 'bg-[#1111114d]';
+  const Container = onPress ? Pressable : View;
 
   return (
-    <View
+    <Container
+      {...(onPress ? { onPress } : {})}
       className={cn('w-full rounded-[16px] bg-card px-[12px] py-[8px]', className)}
       style={styles.container}>
       <View className="mb-2 h-[97px] w-full overflow-hidden rounded-[8px] bg-muted">
@@ -117,6 +121,6 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
           )}
         </View>
       </View>
-    </View>
+    </Container>
   );
 };

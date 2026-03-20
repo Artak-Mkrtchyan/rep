@@ -62,6 +62,11 @@ export default function SearchResultsScreen() {
     [currentFilters, handleSearch]
   );
 
+  const handleCardPress = useCallback(
+    (id: string) => router.push(`/announcement/${id}` as any),
+    [router]
+  );
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemedView className="flex-1">
@@ -85,6 +90,7 @@ export default function SearchResultsScreen() {
             hasMore={hasMore}
             onRetry={() => search(currentFilters)}
             onLoadMore={loadMore}
+            onCardPress={handleCardPress}
           />
         </SearchResultsSheet>
 

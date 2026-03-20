@@ -370,6 +370,10 @@
   "announcement.detail.hospital": "Больница",
   "announcement.detail.school": "Школа",
   "announcement.detail.grocery_shop": "Продуктовый магазин",
+  "announcement.detail.description": "Описание",
+  "announcement.detail.show_more": "Показать больше",
+  "announcement.detail.show_less": "Показать меньше",
+  "announcement.detail.not_found": "Объявление не найдено",
   "announcement.detail.view_on_map": "Посмотреть на карте",
 
   "property_details.see_all_photos": "Посмотреть все фото",

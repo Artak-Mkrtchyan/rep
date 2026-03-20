@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -152,7 +153,12 @@ export default function AnnouncementDetailScreen() {
               />
             </Pressable>
             <Pressable accessibilityLabel="Compare">
-              <Ionicons name="list-outline" size={24} color="#FFFFFF" />
+              <Image
+                source={require('@/assets/images/menu-icon.svg')}
+                style={{ width: 24, height: 24 }}
+                contentFit="contain"
+                tintColor="#FFFFFF"
+              />
             </Pressable>
             <Pressable onPress={handleShare} accessibilityLabel="Share">
               <Ionicons name="share-social-outline" size={24} color="#FFFFFF" />

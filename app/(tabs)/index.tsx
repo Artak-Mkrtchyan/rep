@@ -24,10 +24,16 @@ export default function HomeScreen() {
     setIsSearchVisible(false);
   }, []);
 
-  const handleSearch = useCallback((filters: SearchFilters) => {
-    setIsSearchVisible(false);
-    // TODO: Navigate to search results with filters
-  }, []);
+  const handleSearch = useCallback(
+    (filters: SearchFilters) => {
+      setIsSearchVisible(false);
+      router.push({
+        pathname: '/search/results' as any,
+        params: { filters: JSON.stringify(filters) },
+      });
+    },
+    [router]
+  );
 
   return (
     <ThemedView className="flex-1">

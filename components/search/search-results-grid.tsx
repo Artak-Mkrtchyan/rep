@@ -61,9 +61,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
     return (
       <View className="flex-1 items-center justify-center">
         <ActivityIndicator size="large" />
-        <ThemedText className="mt-4 text-muted-foreground">
-          {t('search.searching')}
-        </ThemedText>
+        <ThemedText className="mt-4 text-muted-foreground">{t('search.searching')}</ThemedText>
       </View>
     );
   }
@@ -114,9 +112,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               isForComparison={item.forComparison}
               onPress={onCardPress ? () => onCardPress(item.id) : undefined}
               onComparisonPress={
-                onComparisonPress
-                  ? () => onComparisonPress(item.id, item.forComparison)
-                  : undefined
+                onComparisonPress ? () => onComparisonPress(item.id, item.forComparison) : undefined
               }
             />
           ))}

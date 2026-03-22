@@ -218,6 +218,13 @@
   "profile.my_application": "Моя заявка",
   "profile.brokers_management": "Управление брокерами",
   "profile.comparisons": "Сравнения",
+
+  "comparisons.title": "Сравнения",
+  "comparisons.compare": "Сравнить",
+  "comparisons.no_result": "Нет результатов",
+  "comparisons.too_many_title": "Слишком много элементов..",
+  "comparisons.too_many_message": "Пожалуйста, выберите 2 или 3 элемента для сравнения.",
+  "comparisons.close": "Закрыть",
   "profile.help": "Помощь",
   "profile.languages": "Языки",
   "profile.logout": "Выйти",

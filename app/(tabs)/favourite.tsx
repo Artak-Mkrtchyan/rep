@@ -8,6 +8,7 @@ import { AnnouncementSmallCard } from '@/components/announcement/announcement-sm
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFavourites } from '@/hooks/api/use-favourites';
+import { announcementsService } from '@/lib/api/announcements';
 import { seedAll } from '@/lib/dev/create-announcements';
 import {
   getAddress,
@@ -28,6 +29,22 @@ export default function FavouriteScreen() {
   const handleCardPress = useCallback(
     (id: string) => router.push(`/announcement/${id}` as any),
     [router]
+  );
+
+  const toggleComparison = useCallback(
+    async (id: string, isForComparison: boolean) => {
+      try {
+        if (isForComparison) {
+          await announcementsService.removeFromComparison(id);
+        } else {
+          await announcementsService.addToComparison(id);
+        }
+        await refetch();
+      } catch (err) {
+        console.error('Failed to toggle comparison:', err);
+      }
+    },
+    [refetch]
   );
 
   const handleSeed = async () => {
@@ -86,8 +103,10 @@ export default function FavouriteScreen() {
                   priceLabel={getPriceLabel(item)}
                   isArrowUpRight={false}
                   isFavourite
+                  isForComparison={item.forComparison}
                   onPress={() => handleCardPress(item.id)}
                   onFavouritePress={() => toggle(item.id, true)}
+                  onComparisonPress={() => toggleComparison(item.id, item.forComparison)}
                 />
               ))}
             </View>

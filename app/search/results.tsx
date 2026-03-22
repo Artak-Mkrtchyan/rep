@@ -9,6 +9,7 @@ import { SearchResultsHeader } from '@/components/search/search-results-header';
 import { SearchResultsSheet } from '@/components/search/search-results-sheet';
 import { ThemedView } from '@/components/themed-view';
 import { useSearchAnnouncements } from '@/hooks/api/use-search-announcements';
+import { announcementsService } from '@/lib/api/announcements';
 import type { SearchFilters } from '@/types/search';
 
 export default function SearchResultsScreen() {
@@ -67,6 +68,22 @@ export default function SearchResultsScreen() {
     [router]
   );
 
+  const handleComparisonPress = useCallback(
+    async (id: string, isForComparison: boolean) => {
+      try {
+        if (isForComparison) {
+          await announcementsService.removeFromComparison(id);
+        } else {
+          await announcementsService.addToComparison(id);
+        }
+        search(currentFilters);
+      } catch (err) {
+        console.error('Failed to toggle comparison:', err);
+      }
+    },
+    [search, currentFilters]
+  );
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemedView className="flex-1">
@@ -91,6 +108,7 @@ export default function SearchResultsScreen() {
             onRetry={() => search(currentFilters)}
             onLoadMore={loadMore}
             onCardPress={handleCardPress}
+            onComparisonPress={handleComparisonPress}
           />
         </SearchResultsSheet>
 

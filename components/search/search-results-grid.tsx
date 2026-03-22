@@ -25,6 +25,7 @@ type SearchResultsGridProps = {
   onRetry: () => void;
   onLoadMore: () => void;
   onCardPress?: (id: string) => void;
+  onComparisonPress?: (id: string, isForComparison: boolean) => void;
 };
 
 export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
@@ -37,6 +38,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   onRetry,
   onLoadMore,
   onCardPress,
+  onComparisonPress,
 }) => {
   const { t } = useTranslation();
 
@@ -109,7 +111,13 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               sizeLabel={getSizeLabel(item)}
               priceLabel={getPriceLabel(item)}
               isFavourite={item.favourite}
+              isForComparison={item.forComparison}
               onPress={onCardPress ? () => onCardPress(item.id) : undefined}
+              onComparisonPress={
+                onComparisonPress
+                  ? () => onComparisonPress(item.id, item.forComparison)
+                  : undefined
+              }
             />
           ))}
         </View>

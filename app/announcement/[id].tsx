@@ -32,7 +32,8 @@ export default function AnnouncementDetailScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { announcement, isLoading, error, refetch, toggleFavourite } = useAnnouncementDetails(id!);
+  const { announcement, isLoading, error, refetch, toggleFavourite, toggleComparison } =
+    useAnnouncementDetails(id!);
 
   const handleBack = useCallback(() => router.back(), [router]);
 
@@ -152,12 +153,12 @@ export default function AnnouncementDetailScreen() {
                 color={announcement.favourite ? '#FF3636' : '#FFFFFF'}
               />
             </Pressable>
-            <Pressable accessibilityLabel="Compare">
+            <Pressable onPress={toggleComparison} accessibilityLabel="Compare">
               <Image
                 source={require('@/assets/images/menu-icon.svg')}
                 style={{ width: 24, height: 24 }}
                 contentFit="contain"
-                tintColor="#FFFFFF"
+                tintColor={announcement.forComparison ? '#13B86D' : '#FFFFFF'}
               />
             </Pressable>
             <Pressable onPress={handleShare} accessibilityLabel="Share">

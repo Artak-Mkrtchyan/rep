@@ -33,7 +33,7 @@ export const FeaturedProperties: React.FC = () => {
   const router = useRouter();
   const { announcements, isLoading, error, refetch } = useFeaturedAnnouncements(5);
 
-  const toggle = useCallback(
+  const toggleFavourite = useCallback(
     async (id: string, isFavourite: boolean) => {
       try {
         if (isFavourite) {
@@ -44,6 +44,22 @@ export const FeaturedProperties: React.FC = () => {
         await refetch();
       } catch (err) {
         console.error('Failed to toggle favourite:', err);
+      }
+    },
+    [refetch]
+  );
+
+  const toggleComparison = useCallback(
+    async (id: string, isForComparison: boolean) => {
+      try {
+        if (isForComparison) {
+          await announcementsService.removeFromComparison(id);
+        } else {
+          await announcementsService.addToComparison(id);
+        }
+        await refetch();
+      } catch (err) {
+        console.error('Failed to toggle comparison:', err);
       }
     },
     [refetch]
@@ -104,8 +120,10 @@ export const FeaturedProperties: React.FC = () => {
             sizeLabel={getSizeLabel(item)}
             priceLabel={getPriceLabel(item)}
             isFavourite={item.favourite}
+            isForComparison={item.forComparison}
             onPress={() => router.push(`/announcement/${item.id}` as any)}
-            onFavouritePress={() => toggle(item.id, item.favourite)}
+            onFavouritePress={() => toggleFavourite(item.id, item.favourite)}
+            onComparisonPress={() => toggleComparison(item.id, item.forComparison)}
           />
         ))}
       </ScrollView>

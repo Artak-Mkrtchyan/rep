@@ -9,6 +9,7 @@ export interface UseAnnouncementDetailsResult {
   error: string | null;
   refetch: () => Promise<void>;
   toggleFavourite: () => Promise<void>;
+  toggleComparison: () => Promise<void>;
 }
 
 export function useAnnouncementDetails(id: string): UseAnnouncementDetailsResult {
@@ -63,5 +64,22 @@ export function useAnnouncementDetails(id: string): UseAnnouncementDetailsResult
     }
   }, [announcement]);
 
-  return { announcement, isLoading, error, refetch: fetch, toggleFavourite };
+  const toggleComparison = useCallback(async () => {
+    if (!announcement) return;
+    const wasForComparison = announcement.forComparison;
+
+    setAnnouncement((prev) => (prev ? { ...prev, forComparison: !wasForComparison } : prev));
+
+    try {
+      if (wasForComparison) {
+        await announcementsService.removeFromComparison(announcement.id);
+      } else {
+        await announcementsService.addToComparison(announcement.id);
+      }
+    } catch {
+      setAnnouncement((prev) => (prev ? { ...prev, forComparison: wasForComparison } : prev));
+    }
+  }, [announcement]);
+
+  return { announcement, isLoading, error, refetch: fetch, toggleFavourite, toggleComparison };
 }

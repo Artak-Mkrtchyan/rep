@@ -218,6 +218,13 @@
     "profile.my_application": "Mening arizam",
     "profile.brokers_management": "Brokerlarni boshqarish",
     "profile.comparisons": "Taqqoslashlar",
+
+    "comparisons.title": "Taqqoslashlar",
+    "comparisons.compare": "Taqqoslash",
+    "comparisons.no_result": "Natija yo'q",
+    "comparisons.too_many_title": "Juda ko'p elementlar..",
+    "comparisons.too_many_message": "Taqqoslash uchun 2 yoki 3 ta elementni tanlang.",
+    "comparisons.close": "Yopish",
     "profile.help": "Yordam",
     "profile.languages": "Tillar",
     "profile.logout": "Chiqish",

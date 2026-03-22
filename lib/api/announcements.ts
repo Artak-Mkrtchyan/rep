@@ -50,4 +50,33 @@ export const announcementsService = {
     );
     return response.data || response;
   },
+
+  getComparisons: async (
+    page: number,
+    pageSize: number
+  ): Promise<ItemsListApiResponse<Announcement>> => {
+    return announcementsService.searchAnnouncements({
+      filter: { forComparison: true },
+      pagination: { pageNumber: page, pageSize },
+      sorts: [{ sort: 'CREATED_AT', direction: 'DESC' }],
+    });
+  },
+
+  addToComparison: async (id: string): Promise<unknown> => {
+    const response = await httpClient.post<ApiResponse<unknown>>(
+      `/v1/announcements/${id}/for-comparison`,
+      {},
+      { requiresAuth: true }
+    );
+    return response.data || response;
+  },
+
+  removeFromComparison: async (id: string): Promise<unknown> => {
+    const response = await httpClient.delete<ApiResponse<unknown>>(
+      `/v1/announcements/${id}/for-comparison`,
+      undefined,
+      { requiresAuth: true }
+    );
+    return response.data || response;
+  },
 };

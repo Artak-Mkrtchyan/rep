@@ -65,7 +65,7 @@ function useProfileMenuItems(
       id: 'comparisons',
       label: t('profile.comparisons'),
       icon: <Ionicons name="git-compare-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/(tabs)/profile'),
+      onPress: () => router.push('/profile/comparisons' as any),
     },
   ];
 

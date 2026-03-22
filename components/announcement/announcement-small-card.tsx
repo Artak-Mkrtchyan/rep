@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import React from 'react';
 import { Pressable, View } from 'react-native';
 
+import { ComparisonIcon } from '@/components/icons/comparison-icon';
 import { HeartIcon } from '@/components/icons/heart-icon';
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
@@ -19,8 +20,10 @@ export type AnnouncementSmallCardProps = {
   className?: string;
   isArrowUpRight?: boolean;
   isFavourite?: boolean;
+  isForComparison?: boolean;
   onPress?: () => void;
   onFavouritePress?: () => void;
+  onComparisonPress?: () => void;
 };
 
 export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
@@ -33,9 +36,11 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
   priceLabel,
   className,
   isArrowUpRight = true,
+  isForComparison = false,
   isFavourite = false,
   onPress,
   onFavouritePress,
+  onComparisonPress,
 }) => {
   const bgHeartIcon = isFavourite ? 'bg-[#11111199]' : 'bg-[#1111114d]';
   const Container = onPress ? Pressable : View;
@@ -48,11 +53,17 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
       <View className="mb-2 h-[97px] w-full overflow-hidden rounded-[8px] bg-muted">
         <Image source={imageSource} style={styles.heroImage} contentFit="cover" />
         <View className="absolute right-[8px] top-[8px]  flex-row items-center gap-[8px]">
-          <Pressable className="h-[24px] w-[24px] items-center justify-center rounded-[36px] bg-[#1111114d]">
-            <Image
-              source={require('@/assets/images/menu-icon.svg')}
-              style={styles.menuIcon}
-              contentFit="contain"
+          <Pressable
+            onPress={onComparisonPress}
+            className={cn(
+              'h-[24px] w-[24px] items-center justify-center rounded-[36px]',
+              isForComparison ? 'bg-[#11111199]' : 'bg-[#1111114d]'
+            )}>
+            <ComparisonIcon
+              width={20}
+              height={20}
+              stroke={isForComparison ? '#13B86D' : 'white'}
+              fill={isForComparison ? '#13B86D' : 'white'}
             />
           </Pressable>
           <Pressable

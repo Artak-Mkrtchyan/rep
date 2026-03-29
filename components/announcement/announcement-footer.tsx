@@ -16,6 +16,7 @@ const FOOTER_SHADOW = {
 export type AnnouncementFooterProps = {
   firstButtonLabel?: string;
   secondButtonLabel?: string;
+  firstButtonDisabled?: boolean;
   onNextPress: () => void;
   onSaveAndExitPress: () => void;
 };
@@ -25,6 +26,7 @@ export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
   onSaveAndExitPress,
   firstButtonLabel = '',
   secondButtonLabel = '',
+  firstButtonDisabled = false,
 }) => {
   const insets = useSafeAreaInsets();
   const paddingBottom = insets.bottom > 0 ? insets.bottom + 21 : 24;
@@ -38,7 +40,7 @@ export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
         borderTopColor: '#F1F1F1',
         ...FOOTER_SHADOW,
       }}>
-      <Button onPress={onNextPress} accessibilityLabel="Next">
+      <Button onPress={onNextPress} accessibilityLabel="Next" disabled={firstButtonDisabled}>
         {firstButtonLabel}
       </Button>
       <Button

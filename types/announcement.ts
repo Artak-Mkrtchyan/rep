@@ -1,4 +1,5 @@
 import { CHARACTERISTIC_ICONS } from '@/constants/announcement';
+import { Language } from '@/lib/i18n/i18n';
 
 export type RentForApartmentsForm = { stepNumber: number } & RentForApartmentsFormStep1 &
   RentForApartmentsFormStep2 &
@@ -14,18 +15,26 @@ export type Property =
   | 'LAND'
   | 'PARKING_SPACE';
 
+export type LangFormDTO = {
+  [key in Language]?: string;
+};
+
+export type GeoDetailsDto = {
+  formattedAddress: LangFormDTO;
+  latitude?: number;
+  longitude?: number;
+
+  country: LangFormDTO;
+  locality: LangFormDTO;
+  province: LangFormDTO;
+  district?: LangFormDTO;
+  street: LangFormDTO;
+  house?: LangFormDTO;
+};
+
 export type RentForApartmentsFormStep1 = {
   listingType: 'FOR_RENT' | 'FOR_SALE' | '';
-  geo: {
-    country: string;
-    formattedAddress: string;
-    house?: string;
-    latitude?: number;
-    locality: string;
-    longitude?: number;
-    province: string;
-    street: string;
-  };
+  geo: GeoDetailsDto;
   propertyType: Property | '';
   processType: 'AS_INDIVIDUAL' | 'AS_BROKER' | '';
   needPhotographer?: boolean;

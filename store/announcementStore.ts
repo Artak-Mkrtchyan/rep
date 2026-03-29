@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
 import { RentForApartmentsForm } from '../types/announcement';
 
-const PERSIST_KEY = 'announcement-rent-form-seven';
+const PERSIST_KEY = 'announcement-rent-form-v1';
 
 type PersistedState = {
   formData: RentForApartmentsForm;
@@ -24,15 +24,21 @@ interface AnnouncementForRentFormStore {
   resetForm: () => void;
 }
 
+export const EMPTY_FLAT_GEO = {
+  formattedAddress: { ru: '', en: '', uz: '' },
+  latitude: undefined,
+  longitude: undefined,
+  country: { ru: '', en: '', uz: '' },
+  house: undefined,
+  locality: { ru: '', en: '', uz: '' },
+  province: { ru: '', en: '', uz: '' },
+  district: { ru: '', en: '', uz: '' },
+  street: { ru: '', en: '', uz: '' },
+};
+
 const initialFormData: RentForApartmentsForm = {
   listingType: '',
-  geo: {
-    country: '',
-    formattedAddress: '',
-    locality: '',
-    province: '',
-    street: '',
-  },
+  geo: EMPTY_FLAT_GEO,
   propertyType: '',
   processType: '',
   stepNumber: 1,

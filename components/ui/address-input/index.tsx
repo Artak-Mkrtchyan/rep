@@ -1,15 +1,19 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Keyboard, Pressable, ScrollView, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { InputError } from '@/components/ui/input/error';
 import { useThemeValue } from '@/hooks/use-theme';
+import { useGeocodeByUri, useSearchAddress } from '@/hooks/use-yandex';
+import type { YandexSuggestRequestResults } from '@/lib/api/yandex';
 import { cn } from '@/lib/utils';
-import { fetchYandexSuggestions } from '@/lib/yandex-suggest';
+import { flatGeoFromMultilangGeocode } from '@/lib/yandex-geocode-to-flat-geo';
 
-import type { AddressInputProps, AddressSuggestion } from './types';
+import { EMPTY_FLAT_GEO } from '@/store/announcementStore';
+import type { AddressInputProps } from './types';
 
 const DEBOUNCE_MS = 300;
+const MIN_INPUT_LENGTH = 3;
 
 export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(function AddressInput(
   {
@@ -17,10 +21,11 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
     value,
     onChangeText,
     onFocus,
+    onBlur,
     error,
     containerClassName,
     onSelectAddress,
-    lang = 'en_US',
+    lang = 'en',
     placeholder = 'Enter address',
     ...textInputProps
   },
@@ -33,77 +38,152 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
     else if (ref) (ref as React.MutableRefObject<TextInput | null>).current = node;
   };
 
-  const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
+  const searchAddress = useSearchAddress();
+  const geocodeByUri = useGeocodeByUri();
+
+  const [results, setResults] = useState<YandexSuggestRequestResults[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showEmptyState, setShowEmptyState] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const abortRef = useRef<AbortController | null>(null);
   const placeholderColor = useThemeValue('placeholder');
 
-  const loadSuggestions = useCallback(
-    async (query: string) => {
-      abortRef.current?.abort();
-      abortRef.current = new AbortController();
+  const runSearch = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed || trimmed.length <= MIN_INPUT_LENGTH) {
+        setResults([]);
+        setShowEmptyState(false);
+        return;
+      }
       setIsLoading(true);
+      setShowEmptyState(false);
       try {
-        const list = await fetchYandexSuggestions(query, lang);
-        setSuggestions(list);
+        const response = await searchAddress.mutate({
+          text: trimmed,
+          lang,
+          results: 10,
+        });
+        const list = response?.results ?? [];
+        setResults(list);
+        setShowEmptyState(list.length === 0);
       } catch {
-        setSuggestions([]);
+        setResults([]);
+        setShowEmptyState(true);
       } finally {
         setIsLoading(false);
-        abortRef.current = null;
       }
     },
-    [lang]
+    [lang, searchAddress]
+  );
+
+  const debouncedSearch = useCallback(
+    (text: string) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      debounceRef.current = setTimeout(() => {
+        void runSearch(text);
+      }, DEBOUNCE_MS);
+    },
+    [runSearch]
+  );
+
+  const emitEmptyGeo = useCallback(
+    (text = '') => {
+      onSelectAddress?.({
+        ...EMPTY_FLAT_GEO,
+        formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: text },
+      });
+    },
+    [onSelectAddress, lang]
   );
 
   const handleChangeText = useCallback(
     (text: string) => {
       onChangeText(text);
-      onSelectAddress?.({
-        country: '',
-        formattedAddress: text,
-        locality: '',
-        province: '',
-        street: '',
-        house: '',
-      });
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => loadSuggestions(text), DEBOUNCE_MS);
+
+      if (!text.trim()) {
+        setResults([]);
+        setShowEmptyState(false);
+        emitEmptyGeo(text);
+        return;
+      }
+
+      if (text.length <= MIN_INPUT_LENGTH) {
+        setResults([]);
+        setShowEmptyState(false);
+        emitEmptyGeo(text);
+        return;
+      }
+
+      debouncedSearch(text);
     },
-    [onChangeText, loadSuggestions, onSelectAddress]
+    [onChangeText, debouncedSearch, emitEmptyGeo]
   );
 
   const handleFocus = useCallback(
     (e: any) => {
       setIsFocused(true);
-      if (value.trim()) loadSuggestions(value);
+      if (value.trim().length > MIN_INPUT_LENGTH) {
+        void runSearch(value);
+      }
       onFocus?.(e);
     },
-    [value, loadSuggestions, onFocus]
+    [value, runSearch, onFocus]
+  );
+
+  const handleBlur = useCallback(
+    (e: any) => {
+      setIsFocused(false);
+      onBlur?.(e);
+    },
+    [onBlur]
   );
 
   const handleSelectSuggestion = useCallback(
-    (suggestion: AddressSuggestion) => {
-      const address = suggestion.formattedAddress || suggestion.title;
-      onChangeText(address);
-      onSelectAddress?.({
-        country: suggestion.country,
-        formattedAddress: suggestion.formattedAddress,
-        locality: suggestion.locality,
-        province: suggestion.province,
-        street: suggestion.street,
-        house: suggestion.house,
-      });
-      setSuggestions([]);
+    async (item: YandexSuggestRequestResults) => {
+      const title = item.title.text;
+      onChangeText(title);
+
+      if (item.uri) {
+        try {
+          const geocodeData = await geocodeByUri.mutate({ uri: item.uri });
+
+          const flat = flatGeoFromMultilangGeocode(geocodeData);
+          onSelectAddress?.({
+            ...flat,
+          });
+        } catch {
+          onSelectAddress?.({
+            ...EMPTY_FLAT_GEO,
+            formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: title },
+          });
+        }
+      } else {
+        onSelectAddress?.({
+          ...EMPTY_FLAT_GEO,
+          formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: title },
+        });
+      }
+
+      setResults([]);
       Keyboard.dismiss();
       inputRef.current?.blur();
     },
-    [onChangeText, onSelectAddress]
+    [onChangeText, onSelectAddress, geocodeByUri, lang]
   );
 
-  const showDropdown = isFocused && (suggestions.length > 0 || isLoading);
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
+  const canSuggest = value.trim().length > MIN_INPUT_LENGTH;
+
+  const showDropdown =
+    isFocused && canSuggest && (isLoading || results.length > 0 || showEmptyState);
+
+  const showNoResults = !isLoading && results.length === 0 && showEmptyState;
 
   return (
     <View className={cn('w-full gap-1', containerClassName)}>
@@ -127,6 +207,7 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
           value={value}
           onChangeText={handleChangeText}
           onFocus={handleFocus}
+          onBlur={handleBlur}
           placeholder={placeholder}
           placeholderTextColor={placeholderColor}
           className="flex-1 text-[16px] text-foreground placeholder:text-muted-foreground"
@@ -149,25 +230,31 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
             nestedScrollEnabled
             showsVerticalScrollIndicator
             className="max-h-[240px]">
-            {suggestions.map((suggestion) => (
-              <Pressable
-                key={suggestion.id}
-                onPress={() => handleSelectSuggestion(suggestion)}
-                className="border-b border-default px-3 py-3 last:border-b-0"
-                accessibilityRole="button"
-                accessibilityLabel={`${suggestion.title}${suggestion.subtitle ? `, ${suggestion.subtitle}` : ''}`}>
-                <ThemedText className="text-[14px] font-medium text-foreground" numberOfLines={1}>
-                  {suggestion.title}
-                </ThemedText>
-                {suggestion.subtitle ? (
-                  <ThemedText
-                    className="mt-0.5 text-[12px] text-muted-foreground"
-                    numberOfLines={1}>
-                    {suggestion.subtitle}
+            {showNoResults ? (
+              <View className="px-3 py-3">
+                <ThemedText className="text-[14px] text-muted-foreground">No results</ThemedText>
+              </View>
+            ) : (
+              results.map((result, index) => (
+                <Pressable
+                  key={`${result.title.text}-${index}`}
+                  onPress={() => handleSelectSuggestion(result)}
+                  className="border-b border-default px-3 py-3 last:border-b-0"
+                  accessibilityRole="button"
+                  accessibilityLabel={`${result.title.text}${result.subtitle?.text ? `, ${result.subtitle.text}` : ''}`}>
+                  <ThemedText className="text-[14px] font-medium text-foreground" numberOfLines={1}>
+                    {result.title.text}
                   </ThemedText>
-                ) : null}
-              </Pressable>
-            ))}
+                  {result.subtitle?.text ? (
+                    <ThemedText
+                      className="mt-0.5 text-[12px] text-muted-foreground"
+                      numberOfLines={1}>
+                      {result.subtitle.text}
+                    </ThemedText>
+                  ) : null}
+                </Pressable>
+              ))
+            )}
           </ScrollView>
         </View>
       ) : null}
@@ -177,4 +264,4 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
   );
 });
 
-export type { AddressInputProps, AddressSuggestion, YandexSuggestResult } from './types';
+export type { AddressInputProps } from './types';

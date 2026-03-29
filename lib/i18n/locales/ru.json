@@ -211,6 +211,7 @@
   "change_password.failed_title": "Ошибка изменения пароля",
   "change_password.changing": "Изменение...",
   "change_password.session_expired": "Данные сессии неполны. Пожалуйста, выйдите и войдите снова, чтобы сменить пароль.",
+  "change_password.incorrect_current_password": "Неверный текущий пароль",
 
   "profile.title": "Профиль",
   "profile.edit_profile": "Редактировать профиль",

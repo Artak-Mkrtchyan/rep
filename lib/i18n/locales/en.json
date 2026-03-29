@@ -211,6 +211,7 @@
   "change_password.failed_title": "Change Password Failed",
   "change_password.changing": "Changing...",
   "change_password.session_expired": "Your session info is incomplete. Please log out and log back in to change your password.",
+  "change_password.incorrect_current_password": "Incorrect current password",
 
   "profile.title": "Profile",
   "profile.edit_profile": "Edit profile",

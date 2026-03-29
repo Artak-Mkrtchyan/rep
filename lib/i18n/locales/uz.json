@@ -211,6 +211,7 @@
     "change_password.failed_title": "Parolni o'zgartirish muvaffaqiyatsiz",
     "change_password.changing": "O'zgartirilmoqda...",
     "change_password.session_expired": "Sessiya ma'lumotlari to'liq emas. Parolni o'zgartirish uchun tizimdan chiqib, qayta kiring.",
+    "change_password.incorrect_current_password": "Joriy parol noto'g'ri",
 
     "profile.title": "Profil",
     "profile.edit_profile": "Profilni tahrirlash",

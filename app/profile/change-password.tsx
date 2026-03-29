@@ -14,7 +14,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
-import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
+import { ERROR_MESSAGES, getApiErrorMessage, isApiError, showErrorAlert } from '@/lib/error-handler';
 import { doPasswordsMatch, isPasswordValid, validatePassword } from '@/lib/auth-validation';
 
 export default function ChangePasswordScreen() {
@@ -23,6 +23,7 @@ export default function ChangePasswordScreen() {
   const [newPassword, setNewPassword] = React.useState('');
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const [currentPasswordError, setCurrentPasswordError] = React.useState<string | undefined>();
 
   const { userInfo } = useAuth();
   const { tokens: theme } = useTheme();
@@ -38,6 +39,7 @@ export default function ChangePasswordScreen() {
 
   const handleCurrentPasswordChange = (text: string) => {
     setCurrentPassword(text);
+    if (currentPasswordError) setCurrentPasswordError(undefined);
   };
 
   const handleNewPasswordChange = (text: string) => {
@@ -72,10 +74,16 @@ export default function ChangePasswordScreen() {
         { text: t('common.ok'), onPress: () => router.back() },
       ]);
     } catch (error) {
-      showErrorAlert(error, {
-        title: t('change_password.failed_title'),
-        fallback: ERROR_MESSAGES.CHANGE_PASSWORD_FAILED,
-      });
+      if (isApiError(error) && (error.statusCode === 400 || error.statusCode === 401)) {
+        setCurrentPasswordError(
+          getApiErrorMessage(error, t('change_password.incorrect_current_password'))
+        );
+      } else {
+        showErrorAlert(error, {
+          title: t('change_password.failed_title'),
+          fallback: ERROR_MESSAGES.CHANGE_PASSWORD_FAILED,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +130,7 @@ export default function ChangePasswordScreen() {
                 autoComplete="current-password"
                 placeholderTextColor={theme.placeholder}
                 editable={!isLoading}
+                error={currentPasswordError}
               />
 
               <Input

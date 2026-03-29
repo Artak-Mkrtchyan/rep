@@ -1,38 +1,45 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
-import { ThemedText } from '@/components/themed-text';
+import { OtpInput, type OtpInputHandle } from '@/components/auth/otp-input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
-import { useCountdown } from '@/hooks/use-countdown';
+import { useOtpResend } from '@/hooks/use-otp-resend';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { authService } from '@/lib/api/auth';
 import { ERROR_MESSAGES, getApiErrorMessage, isApiError } from '@/lib/error-handler';
-import { OTP_EXPIRATION_TIMEOUT, OTP_LENGTH } from '@/lib/auth-validation';
+import { OTP_EXPIRATION_TIMEOUT } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 export default function VerifyEmailScreen() {
   const { t } = useTranslation();
   const { data, updateData } = useSignUpContext();
   const { goToPrevious } = useSignUpFlow();
-  const inputsRef = useRef<(TextInput | null)[]>([]);
-  const [otp, setOtp] = useState<string[]>(
-    data.otp ? data.otp.split('') : Array(OTP_LENGTH).fill('')
-  );
+  const otpInputRef = useRef<OtpInputHandle>(null);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittedRef = useRef(false);
-  const isResendingRef = useRef(false);
 
-  const {
-    secondsLeft: expirationSecondsLeft,
-    restart: restartExpirationCountdown,
-    formatTime,
-  } = useCountdown(OTP_EXPIRATION_TIMEOUT);
+  const resendFn = useCallback(async () => {
+    if (!data.email) return;
+    try {
+      await authService.requestEmailConfirmation(data.email);
+      setError('');
+      otpInputRef.current?.reset();
+    } catch (err) {
+      setError(getApiErrorMessage(err, ERROR_MESSAGES.RESEND_CODE_FAILED));
+      throw err;
+    }
+  }, [data.email]);
+
+  const { secondsLeft, canResend, resend, formatTime } = useOtpResend({
+    countdownSeconds: OTP_EXPIRATION_TIMEOUT,
+    resendFn,
+  });
 
   const handleVerify = useCallback(
     async (code: string) => {
@@ -41,12 +48,11 @@ export default function VerifyEmailScreen() {
       setIsSubmitting(true);
       setError('');
 
-      if (expirationSecondsLeft <= 0) {
+      if (secondsLeft <= 0) {
         setError(t('signup.verify.code_expired'));
         setIsSubmitting(false);
         submittedRef.current = false;
-        setOtp(Array(OTP_LENGTH).fill(''));
-        inputsRef.current[0]?.focus();
+        otpInputRef.current?.reset();
         return;
       }
 
@@ -79,59 +85,14 @@ export default function VerifyEmailScreen() {
         } else {
           setError(t('signup.verify.invalid_code'));
         }
-        setOtp(Array(OTP_LENGTH).fill(''));
-        inputsRef.current[0]?.focus();
+        otpInputRef.current?.reset();
       } finally {
         setIsSubmitting(false);
         submittedRef.current = false;
       }
     },
-    [isSubmitting, expirationSecondsLeft, data.role, updateData, t]
+    [isSubmitting, secondsLeft, data.role, updateData, t]
   );
-
-  const handleTextChange = (text: string, index: number) => {
-    const char = text.slice(-1);
-    if (!/^\d*$/.test(char)) return;
-
-    setError('');
-    const newOtp = [...otp];
-    newOtp[index] = char;
-    setOtp(newOtp);
-
-    if (char && index < OTP_LENGTH - 1) {
-      inputsRef.current[index + 1]?.focus();
-    }
-
-    // Auto-submit when all 6 digits are filled
-    if (char && newOtp.every((val) => val.length === 1)) {
-      handleVerify(newOtp.join(''));
-    }
-  };
-
-  const handleKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-      inputsRef.current[index - 1]?.focus();
-    }
-  };
-
-  const handleResend = async () => {
-    if (expirationSecondsLeft > 0 || !data.email || isResendingRef.current) return;
-    isResendingRef.current = true;
-
-    try {
-      await authService.requestEmailConfirmation(data.email);
-      restartExpirationCountdown();
-      setError('');
-      setOtp(Array(OTP_LENGTH).fill(''));
-      inputsRef.current[0]?.focus();
-    } catch (err) {
-      setError(getApiErrorMessage(err, ERROR_MESSAGES.RESEND_CODE_FAILED));
-    } finally {
-      isResendingRef.current = false;
-    }
-  };
-
-  const hasError = error.length > 0;
 
   return (
     <AuthLayout>
@@ -156,58 +117,22 @@ export default function VerifyEmailScreen() {
         />
       </View>
 
-      {/* OTP Input */}
-      <View className="w-full items-end gap-[8px]">
-        <View className="flex-row items-center gap-[4px]">
-          {Array.from({ length: OTP_LENGTH }, (_, index) => (
-            <View
-              key={index}
-              className={`h-[56px] w-[56px] items-center justify-center rounded-[6px] border bg-card ${
-                hasError ? 'border-red-500' : 'border-[#E2E2E2]'
-              }`}>
-              <TextInput
-                ref={(element) => {
-                  inputsRef.current[index] = element;
-                }}
-                keyboardType="number-pad"
-                maxLength={1}
-                onChangeText={(text) => handleTextChange(text, index)}
-                onKeyPress={(event) => handleKeyPress(event, index)}
-                value={otp[index]}
-                editable={!isSubmitting}
-                accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
-                className="h-full w-full text-center text-[20px] font-semibold text-foreground"
-              />
-            </View>
-          ))}
-        </View>
-
-        {/* Inline error message */}
-        {hasError && <Text className="w-full text-[14px] text-red-500">{error}</Text>}
-
-        {/* Countdown timer */}
-        {expirationSecondsLeft > 0 && (
-          <Text className="w-full text-center text-[16px] font-medium text-primary">
-            {formatTime(expirationSecondsLeft)}
-          </Text>
-        )}
-      </View>
+      <OtpInput
+        ref={otpInputRef}
+        error={error}
+        disabled={isSubmitting}
+        initialValue={data.otp}
+        onComplete={handleVerify}
+        onChange={() => setError('')}
+        countdownSecondsLeft={secondsLeft}
+        countdownDisplay={formatTime(secondsLeft)}
+        canResend={canResend}
+        onResend={resend}
+        resendLabel={t('signup.verify.resend_code')}
+      />
 
       {/* Spacer to push resend to bottom */}
       <View className="flex-1" />
-
-      {/* Resend button pinned to bottom */}
-      <Pressable
-        onPress={handleResend}
-        disabled={expirationSecondsLeft > 0}
-        accessibilityRole="button"
-        accessibilityLabel={t('signup.verify.resend_code')}
-        className="mb-4 h-[48px] items-center justify-center rounded-[6px] px-[16px] py-[8px]">
-        <ThemedText
-          className={`text-[18px] font-medium ${expirationSecondsLeft > 0 ? 'text-muted-foreground' : 'text-primary'}`}>
-          {t('signup.verify.resend_code')}
-        </ThemedText>
-      </Pressable>
     </AuthLayout>
   );
 }

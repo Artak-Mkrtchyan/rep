@@ -13,7 +13,9 @@ export function useCountdown(durationSeconds: number) {
   useEffect(() => {
     if (secondsLeft <= 0) return;
 
-    const intervalId = setInterval(recalc, 1000);
+    // Use a shorter interval when close to 0 so the button enables promptly
+    const interval = secondsLeft <= 2 ? 200 : 1000;
+    const intervalId = setInterval(recalc, interval);
     return () => clearInterval(intervalId);
   }, [secondsLeft, recalc]);
 

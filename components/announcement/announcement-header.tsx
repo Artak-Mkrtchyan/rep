@@ -6,6 +6,7 @@ import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 
 import { cn } from '@/lib/utils';
 import type { StepProgressProps } from './step-progress';
@@ -36,6 +37,7 @@ export const AnnouncementHeader: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { horizontalStyle } = useScreenEdgePadding();
   const resolvedHeaderTitle = headerTitle ?? t('announcement.add');
   const resolvedLabel = label ?? t('announcement.steps.list');
 
@@ -56,8 +58,8 @@ export const AnnouncementHeader: React.FC<Props> = ({
 
   return (
     <View
-      className={cn('bg-white px-4', headerClassName)}
-      style={{ paddingTop: insets.top, paddingBottom: 12 }}>
+      className={cn('bg-white', headerClassName)}
+      style={[{ paddingTop: insets.top, paddingBottom: 12 }, horizontalStyle]}>
       <View className="flex-row items-center">
         <View className="flex-1 items-center justify-center">
           <Pressable

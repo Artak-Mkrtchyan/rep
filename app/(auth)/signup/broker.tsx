@@ -18,7 +18,8 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { NumberPicker } from '@/components/ui/number-picker';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { applicationsService } from '@/lib/api/applications';
-import { yupSchemas } from '@/lib/auth-validation';
+import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
+import i18n from '@/lib/i18n/i18n';
 import type { BrokerSignUpForm } from '@/types/auth';
 import { router } from 'expo-router';
 
@@ -26,6 +27,7 @@ const BrokerSchema = Yup.object().shape({
   email: yupSchemas.email,
   fullName: yupSchemas.fullName,
   attachmentIds: Yup.array().min(1).required('Required'),
+  certifiedBy: Yup.string().optional().max(255, () => i18n.t('validation.max_length_255')),
   certifiedOn: yupSchemas.certifiedOn,
   phoneNumber: yupSchemas.phone,
   yearsOfActivity: Yup.number().required(),
@@ -123,6 +125,7 @@ export default function BrokerSignUpScreen() {
                 onBlur={handleBlur('fullName')}
                 error={touched.fullName && errors.fullName ? errors.fullName : undefined}
                 placeholder=""
+                maxLength={FULL_NAME_MAX_LENGTH}
               />
 
               <DatePicker
@@ -130,6 +133,7 @@ export default function BrokerSignUpScreen() {
                 required
                 value={values.certifiedOn}
                 onChange={(date) => setFieldValue('certifiedOn', date)}
+                maximumDate={new Date()}
                 error={touched.certifiedOn && errors.certifiedOn ? errors.certifiedOn : undefined}
               />
 
@@ -140,6 +144,7 @@ export default function BrokerSignUpScreen() {
                 onBlur={handleBlur('certifiedBy')}
                 error={touched.certifiedBy && errors.certifiedBy ? errors.certifiedBy : undefined}
                 placeholder=""
+                maxLength={255}
               />
 
               <PhoneInput

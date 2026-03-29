@@ -136,7 +136,7 @@ export const Input = React.forwardRef(function Input(
           )}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          secureTextEntry={showPassword}
+          secureTextEntry={secureTextEntry ? showPassword : false}
           {...props}
           onChangeText={handleChangeText}
           keyboardType={
@@ -148,7 +148,11 @@ export const Input = React.forwardRef(function Input(
             accessibilityLabel={t('ui.toggle_password_visibility')}
             onPress={() => setShowPassword(!showPassword)}>
             <Image
-              source={require('@/assets/images/eye-icon.svg')}
+              source={
+                showPassword
+                  ? require('@/assets/images/eye-icon.svg')
+                  : require('@/assets/images/eye-open-icon.svg')
+              }
               style={{ width: 20, height: 20 }}
               contentFit="contain"
             />

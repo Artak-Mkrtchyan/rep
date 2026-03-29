@@ -8,6 +8,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep4 } from '@/types/announcement';
 
@@ -31,6 +32,7 @@ const RentDetailsSchema = Yup.object().shape({
 });
 
 export default function RentDetailsScreen() {
+  const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
@@ -86,7 +88,7 @@ export default function RentDetailsScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="px-4 pt-6">
+              <View className="pt-6" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {SCREEN_TITLE}
                 </ThemedText>

@@ -10,6 +10,7 @@ import {
   Pressable,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { ThemedText } from '@/components/themed-text';
@@ -17,6 +18,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useLogin } from '@/hooks/api/use-auth';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { AuthScope } from '@/lib/api/auth';
 import { validateEmail } from '@/lib/auth-validation';
@@ -40,6 +42,8 @@ export default function LoginFormScreen() {
 
   const { login, isLoading, error: loginError, reset: resetLoginError } = useLogin();
   const { tokens: theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { horizontalStyle } = useScreenEdgePadding();
 
   const canContinue = email.length > 0 && password.length > 0 && !isLoading;
 
@@ -110,8 +114,10 @@ export default function LoginFormScreen() {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
-      <ThemedView className="flex-1 items-center justify-center px-4">
-        <View className="w-[358px] max-w-full items-center gap-6">
+      <ThemedView
+        className="flex-1 items-center justify-center"
+        style={[{ paddingTop: insets.top, paddingBottom: insets.bottom }, horizontalStyle]}>
+        <View className="w-full max-w-full items-center gap-6">
           <Image
             style={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION}
             source={require('@/assets/images/login-illustration.svg')}

@@ -24,10 +24,14 @@ const SignUpSchema = Yup.object().shape({
 
 export default function SignUpFirstScreen() {
   const { t } = useTranslation();
-  const { data, updateData } = useSignUpContext();
+  const { data, updateData, resetData } = useSignUpContext();
   const { goToNext } = useSignUpFlow();
 
   const handleContinue = (values: { role: AccountRole }) => {
+    if (values.role !== data.role) {
+      // Role changed — clear previously entered data
+      resetData();
+    }
     updateData({ role: values.role });
     goToNext();
   };

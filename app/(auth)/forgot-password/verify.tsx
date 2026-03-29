@@ -1,106 +1,108 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useCallback, useRef, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
-  TextInput,
+  ScrollView,
+  Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { OtpInput } from '@/components/auth/otp-input';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Button } from '@/components/ui/button';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
-import { useCountdown } from '@/hooks/use-countdown';
+import { useOtpResend } from '@/hooks/use-otp-resend';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { authService } from '@/lib/api/auth';
-import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
-import { OTP_LENGTH, RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
+import { ERROR_MESSAGES, isApiError, showErrorAlert } from '@/lib/error-handler';
+import { OTP_EXPIRATION_TIMEOUT } from '@/lib/auth-validation';
 
 export default function ForgotPasswordVerifyScreen() {
   const { t } = useTranslation();
-  const [otp, setOtp] = React.useState<string[]>(Array(OTP_LENGTH).fill(''));
-  const [isLoading, setIsLoading] = React.useState(false);
-  const { secondsLeft, restart: restartCountdown, formatTime } = useCountdown(RESEND_CODE_TIMEOUT);
-
-  const inputsRef = React.useRef<(TextInput | null)[]>([]);
-  const isResendingRef = React.useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { data } = useForgotPasswordContext();
+  const otpRef = useRef('');
+  const failedOtpAttemptsRef = useRef(0);
 
-  const isOtpComplete = otp.every((val) => val.length === 1);
-  const canSubmit = isOtpComplete && !isLoading;
+  const insets = useSafeAreaInsets();
+  const { horizontalStyle } = useScreenEdgePadding();
 
-  const handleInputFocus = (index: number) => {
-    const ref = inputsRef.current[index];
-    if (ref) {
-      ref.focus();
-    }
-  };
+  const resendFn = useCallback(async () => {
+    if (!data.email) return;
+    await authService.sendPasswordOtp(data.email);
+    failedOtpAttemptsRef.current = 0;
+    Alert.alert(
+      t('forgot_password.verify.code_sent_title'),
+      t('forgot_password.verify.code_sent_message')
+    );
+  }, [data.email, t]);
 
-  const handleOtpChange = (text: string, index: number) => {
-    const char = text.slice(-1);
-    if (!/^\d*$/.test(char)) return;
+  const { secondsLeft, canResend, resend, formatTime } = useOtpResend({
+    countdownSeconds: OTP_EXPIRATION_TIMEOUT,
+    resendFn,
+  });
 
-    const newOtp = [...otp];
-    newOtp[index] = char;
-    setOtp(newOtp);
-
-    if (char && index < OTP_LENGTH - 1) {
-      handleInputFocus(index + 1);
-    }
-  };
-
-  const handleOtpKeyPress = (e: any, index: number) => {
-    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-      handleInputFocus(index - 1);
-    }
-  };
-
-  const handleResend = async () => {
-    if (secondsLeft > 0 || !data.email || isResendingRef.current) return;
-    isResendingRef.current = true;
-
+  const handleResend = useCallback(async () => {
     try {
-      await authService.sendPasswordOtp(data.email);
-      restartCountdown();
-      Alert.alert(
-        t('forgot_password.verify.code_sent_title'),
-        t('forgot_password.verify.code_sent_message')
-      );
+      await resend();
     } catch (error) {
       showErrorAlert(error, { fallback: ERROR_MESSAGES.RESEND_CODE_FAILED });
-    } finally {
-      isResendingRef.current = false;
     }
-  };
+  }, [resend]);
 
-  const handleConfirm = async () => {
-    if (!canSubmit) return;
+  const runVerify = useCallback(
+    async (code: string) => {
+      if (!code || code.length !== 6 || isLoading) return;
 
-    setIsLoading(true);
-    try {
-      const code = otp.join('');
-      await authService.confirmPasswordOtp(code);
-      router.push(AUTH_ROUTES.FORGOT_PASSWORD_RESET);
-    } catch (error) {
-      showErrorAlert(error, {
-        fallback: ERROR_MESSAGES.INVALID_CODE,
-        statusMessages: {
-          0: ERROR_MESSAGES.NETWORK,
-          400: ERROR_MESSAGES.INVALID_CODE,
-          500: ERROR_MESSAGES.SERVER,
-        },
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      setIsLoading(true);
+      try {
+        await authService.confirmPasswordOtp(code);
+        router.push(AUTH_ROUTES.FORGOT_PASSWORD_RESET);
+      } catch (error) {
+        if (isApiError(error) && (error.statusCode === 400 || error.statusCode === 422)) {
+          failedOtpAttemptsRef.current += 1;
+        }
+        const msg = isApiError(error) ? (error.message?.toLowerCase() ?? '') : '';
+        const useExpiredMessage =
+          msg.includes('expired') ||
+          msg.includes('maximum') ||
+          msg.includes('too many') ||
+          msg.includes('exceeded') ||
+          msg.includes('locked') ||
+          failedOtpAttemptsRef.current >= 4;
+        const expiredMsg = t('signup.verify.code_expired');
+        const invalidMsg = ERROR_MESSAGES.INVALID_CODE;
+        showErrorAlert(error, {
+          fallback: useExpiredMessage ? expiredMsg : invalidMsg,
+          statusMessages: {
+            0: ERROR_MESSAGES.NETWORK,
+            400: useExpiredMessage ? expiredMsg : invalidMsg,
+            500: ERROR_MESSAGES.SERVER,
+          },
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [isLoading, t]
+  );
+
+  const handleOtpComplete = useCallback(
+    (code: string) => {
+      otpRef.current = code;
+      void runVerify(code);
+    },
+    [runVerify]
+  );
 
   const handleBack = () => {
     router.back();
@@ -111,92 +113,88 @@ export default function ForgotPasswordVerifyScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
       <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
-        <ThemedView className="flex-1 px-4">
-          <View className="mt-6">
-            <Pressable
-              onPress={handleBack}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.go_back')}
-              className="h-10 w-10 items-center justify-center rounded-full">
-              <Ionicons name="chevron-back" size={24} color="black" />
-            </Pressable>
-          </View>
+        <ThemedView className="flex-1 bg-background" style={[{ paddingTop: insets.top }, horizontalStyle]}>
+          <View className="w-full flex-1">
+            <View className="pt-2">
+              <Pressable
+                onPress={handleBack}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.go_back')}
+                className="h-10 w-10 items-center justify-center rounded-full">
+                <Ionicons name="chevron-back" size={24} color="#111111" />
+              </Pressable>
+            </View>
 
-          <View className="flex-1 items-center justify-center">
-            <View className="w-[358px] max-w-full items-center gap-6">
-              <Image
-                style={{
-                  width: IMAGE_DIMENSIONS.FORGOT_PASSWORD.width,
-                  height: IMAGE_DIMENSIONS.FORGOT_PASSWORD.height,
-                }}
-                source={require('@/assets/images/forgot-password-illustration.svg')}
-                contentFit="contain"
-              />
-
-              <View className="items-center gap-2">
-                <ThemedText type="title" className="text-center">
-                  {t('forgot_password.verify.title')}
-                </ThemedText>
-                {data.email ? (
-                  <ThemedText className="text-center text-sm text-muted-foreground">
-                    {t('forgot_password.verify.description', { email: data.email })}
-                  </ThemedText>
-                ) : null}
-              </View>
-
-              {/* OTP Input */}
-              <View className="w-full items-end gap-[8px]">
-                <View className="flex-row items-center gap-[4px]">
-                  {Array.from({ length: OTP_LENGTH }, (_, index) => (
-                    <View
-                      key={index}
-                      className="h-[56px] w-[56px] items-center justify-center rounded-[6px] border border-[#E2E2E2] bg-card">
-                      <TextInput
-                        ref={(element) => {
-                          inputsRef.current[index] = element;
-                        }}
-                        keyboardType="number-pad"
-                        maxLength={1}
-                        onChangeText={(text) => handleOtpChange(text, index)}
-                        onKeyPress={(event) => handleOtpKeyPress(event, index)}
-                        value={otp[index]}
-                        accessibilityLabel={t('signup.verify.otp_digit', { number: index + 1 })}
-                        className="h-full w-full text-center text-[20px] font-semibold text-foreground"
-                        editable={!isLoading}
-                      />
-                    </View>
-                  ))}
-                </View>
-
-                <View className="w-full items-center">
-                  {secondsLeft > 0 ? (
-                    <ThemedText className="text-[16px] font-medium text-primary">
-                      {t('forgot_password.verify.resend_countdown', {
-                        time: formatTime(secondsLeft),
-                      })}
+            <View className="flex-1">
+              <ScrollView
+                className="flex-1"
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{
+                  flexGrow: 1,
+                  paddingTop: 16,
+                  paddingBottom: 16,
+                }}>
+                <View className="w-full max-w-[358px] flex-col gap-4 self-center">
+                  <View className="w-full max-w-[324px] items-center gap-4 self-center">
+                    <Image
+                      style={{
+                        width: IMAGE_DIMENSIONS.EMAIL_VERIFY.width,
+                        height: IMAGE_DIMENSIONS.EMAIL_VERIFY.height,
+                      }}
+                      source={require('@/assets/images/icon-email-verify.svg')}
+                      contentFit="contain"
+                    />
+                    <ThemedText type="title" className="text-center text-foreground">
+                      {t('forgot_password.verify.title')}
                     </ThemedText>
-                  ) : (
-                    <Pressable
-                      onPress={handleResend}
-                      accessibilityRole="button"
-                      accessibilityLabel={t('forgot_password.verify.resend_code')}
-                      className="h-[48px] items-center justify-center rounded-[6px] px-[16px] py-[8px]">
-                      <ThemedText className="text-[18px] font-medium text-primary">
-                        {t('forgot_password.verify.resend_code')}
-                      </ThemedText>
-                    </Pressable>
-                  )}
-                </View>
-              </View>
+                  </View>
 
-              <Button
-                disabled={!canSubmit}
-                onPress={handleConfirm}
-                accessibilityLabel={t('forgot_password.verify.verify_button')}>
-                {isLoading
-                  ? t('forgot_password.verify.verifying')
-                  : t('forgot_password.verify.verify_button')}
-              </Button>
+                  {data.email ? (
+                    <ThemedText className="text-center text-[16px] leading-6 text-muted-foreground">
+                      <Trans
+                        i18nKey="forgot_password.verify.description"
+                        values={{ email: data.email }}
+                        components={{
+                          emailStyle: (
+                            <Text className="text-[16px] leading-6 text-muted-foreground" />
+                          ),
+                        }}
+                      />
+                    </ThemedText>
+                  ) : null}
+
+                  <OtpInput
+                    disabled={isLoading}
+                    hideResend
+                    onChange={(code) => {
+                      otpRef.current = code;
+                    }}
+                    onComplete={handleOtpComplete}
+                    countdownSecondsLeft={secondsLeft}
+                    countdownLabel={secondsLeft > 0 ? formatTime(secondsLeft) : undefined}
+                    canResend={canResend}
+                    onResend={handleResend}
+                    resendLabel={t('forgot_password.verify.resend_new_code')}
+                  />
+                </View>
+              </ScrollView>
+
+              <View style={{ paddingBottom: Math.max(insets.bottom, 8) }}>
+                <Pressable
+                  onPress={handleResend}
+                  disabled={secondsLeft > 0 || !canResend || isLoading}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('forgot_password.verify.resend_new_code')}
+                  className="h-12 w-full items-center justify-center">
+                  <ThemedText
+                    className={`text-[18px] font-medium leading-6 ${
+                      secondsLeft > 0 || !canResend || isLoading ? 'text-muted-foreground' : 'text-primary'
+                    }`}>
+                    {t('forgot_password.verify.resend_new_code')}
+                  </ThemedText>
+                </Pressable>
+              </View>
             </View>
           </View>
         </ThemedView>

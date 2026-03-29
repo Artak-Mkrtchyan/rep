@@ -7,10 +7,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 
 export default function AnnouncementScreen() {
   const { t } = useTranslation();
+  const { horizontalStyle } = useScreenEdgePadding();
   const handleAddPress = () => {
     router.push(ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path);
   };
@@ -18,7 +20,7 @@ export default function AnnouncementScreen() {
   return (
     <ThemedView className="flex-1">
       <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-center px-4">
+        <View className="flex-1 items-center justify-center" style={horizontalStyle}>
           <Pressable
             onPress={handleAddPress}
             style={({ pressed }) => (pressed ? { opacity: 0.8 } : undefined)}

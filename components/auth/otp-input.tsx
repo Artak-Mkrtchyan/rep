@@ -75,6 +75,8 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
       if (digits.length >= OTP_LENGTH) {
         const pastedDigits = digits.slice(0, OTP_LENGTH);
         const newOtp = pastedDigits.split('');
+        // Clear the native input that received the paste to avoid flash of all digits
+        inputsRef.current[index]?.setNativeProps({ text: newOtp[index] });
         setOtp(newOtp);
         inputsRef.current[OTP_LENGTH - 1]?.focus();
         const code = newOtp.join('');

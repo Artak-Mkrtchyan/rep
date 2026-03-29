@@ -70,35 +70,52 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
 
   const handleTextChange = useCallback(
     (text: string, index: number) => {
+      // Handle paste: if text has multiple digits and matches OTP length, fill all fields
+      const digits = text.replace(/\D/g, '');
+      if (digits.length >= OTP_LENGTH) {
+        const pastedDigits = digits.slice(0, OTP_LENGTH);
+        const newOtp = pastedDigits.split('');
+        setOtp(newOtp);
+        inputsRef.current[OTP_LENGTH - 1]?.focus();
+        const code = newOtp.join('');
+        onChange?.(code);
+        // Defer so React commits the filled state before the verify request
+        setTimeout(() => onComplete?.(code), 0);
+        return;
+      }
+
       const char = text.slice(-1);
       if (!/^\d*$/.test(char)) return;
 
-      const newOtp = [...otp];
-      newOtp[index] = char;
-      setOtp(newOtp);
+      setOtp((prev) => {
+        const newOtp = [...prev];
+        newOtp[index] = char;
 
-      if (char && index < OTP_LENGTH - 1) {
-        inputsRef.current[index + 1]?.focus();
-      }
+        if (char && index < OTP_LENGTH - 1) {
+          inputsRef.current[index + 1]?.focus();
+        }
 
-      const code = newOtp.join('');
-      onChange?.(code);
+        const code = newOtp.join('');
+        onChange?.(code);
 
-      if (char && newOtp.every((val) => val.length === 1)) {
-        onComplete?.(code);
-      }
+        if (char && newOtp.every((val) => val.length === 1)) {
+          onComplete?.(code);
+        }
+
+        return newOtp;
+      });
     },
-    [otp, onChange, onComplete]
+    [onChange, onComplete]
   );
 
-  const handleKeyPress = useCallback(
-    (e: any, index: number) => {
-      if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-        inputsRef.current[index - 1]?.focus();
-      }
-    },
-    [otp]
-  );
+  const otpRef = useRef(otp);
+  otpRef.current = otp;
+
+  const handleKeyPress = useCallback((e: any, index: number) => {
+    if (e.nativeEvent.key === 'Backspace' && !otpRef.current[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
+    }
+  }, []);
 
   return (
     <View className="w-full items-center gap-2">
@@ -114,7 +131,6 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
                 inputsRef.current[index] = element;
               }}
               keyboardType="number-pad"
-              maxLength={1}
               onChangeText={(text) => handleTextChange(text, index)}
               onKeyPress={(event) => handleKeyPress(event, index)}
               value={otp[index]}
@@ -126,7 +142,9 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
         ))}
       </View>
 
-      {hasError && <Text className="w-full text-[14px] text-red-500">{error}</Text>}
+      {hasError && (
+        <Text className="w-full text-center text-[14px] leading-5 text-red-500">{error}</Text>
+      )}
 
       {countdownSecondsLeft > 0 ? (
         <View className="h-6 w-full items-center justify-center">

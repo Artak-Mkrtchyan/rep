@@ -20,6 +20,7 @@ export default function VerifyEmailScreen() {
   const { data, updateData } = useSignUpContext();
   const { goToPrevious } = useSignUpFlow();
   const otpInputRef = useRef<OtpInputHandle>(null);
+  const failedOtpAttemptsRef = useRef(0);
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittedRef = useRef(false);
@@ -28,6 +29,7 @@ export default function VerifyEmailScreen() {
     if (!data.email) return;
     try {
       await authService.requestEmailConfirmation(data.email);
+      failedOtpAttemptsRef.current = 0;
       setError('');
       otpInputRef.current?.reset();
     } catch (err) {
@@ -77,7 +79,17 @@ export default function VerifyEmailScreen() {
       } catch (err) {
         if (isApiError(err)) {
           const message = err.message?.toLowerCase() || '';
-          if (message.includes('expired')) {
+          if (err.statusCode === 400 || err.statusCode === 422) {
+            failedOtpAttemptsRef.current += 1;
+          }
+          const tooManyFailedAttempts = failedOtpAttemptsRef.current >= 4;
+          const looksExpired =
+            message.includes('expired') ||
+            message.includes('maximum') ||
+            message.includes('too many') ||
+            message.includes('exceeded') ||
+            message.includes('locked');
+          if (looksExpired || tooManyFailedAttempts) {
             setError(t('signup.verify.code_expired'));
           } else {
             setError(t('signup.verify.invalid_code'));

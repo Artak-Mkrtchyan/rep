@@ -105,7 +105,11 @@ export const yupSchemas = {
     .required(() => i18n.t('validation.required')),
   certifiedOn: Yup.string()
     .required(() => i18n.t('validation.required'))
-    .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format')),
+    .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format'))
+    .test('not-future-date', () => i18n.t('validation.date_cannot_be_future'), (value) => {
+      if (!value || !DATE_REGEX.test(value)) return true;
+      return new Date(value) <= new Date();
+    }),
 };
 
 export const validateEmail = (email: string): boolean => {

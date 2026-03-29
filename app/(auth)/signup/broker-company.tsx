@@ -208,6 +208,7 @@ export default function BrokerSignUpScreen() {
                 required
                 value={values.companyInfo.certifiedOn}
                 onChange={(date) => setFieldValue('companyInfo.certifiedOn', date)}
+                maximumDate={new Date()}
                 error={
                   touched.companyInfo?.certifiedOn && errors.companyInfo?.certifiedOn
                     ? errors.companyInfo.certifiedOn

@@ -23,7 +23,7 @@ import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
 import { useOtpResend } from '@/hooks/use-otp-resend';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { authService } from '@/lib/api/auth';
-import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
+import { ERROR_MESSAGES, isApiError, showErrorAlert } from '@/lib/error-handler';
 import { OTP_EXPIRATION_TIMEOUT } from '@/lib/auth-validation';
 
 export default function ForgotPasswordVerifyScreen() {
@@ -31,6 +31,7 @@ export default function ForgotPasswordVerifyScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const { data } = useForgotPasswordContext();
   const otpRef = useRef('');
+  const failedOtpAttemptsRef = useRef(0);
 
   const insets = useSafeAreaInsets();
   const { horizontalStyle } = useScreenEdgePadding();
@@ -38,6 +39,7 @@ export default function ForgotPasswordVerifyScreen() {
   const resendFn = useCallback(async () => {
     if (!data.email) return;
     await authService.sendPasswordOtp(data.email);
+    failedOtpAttemptsRef.current = 0;
     Alert.alert(
       t('forgot_password.verify.code_sent_title'),
       t('forgot_password.verify.code_sent_message')
@@ -66,11 +68,24 @@ export default function ForgotPasswordVerifyScreen() {
         await authService.confirmPasswordOtp(code);
         router.push(AUTH_ROUTES.FORGOT_PASSWORD_RESET);
       } catch (error) {
+        if (isApiError(error) && (error.statusCode === 400 || error.statusCode === 422)) {
+          failedOtpAttemptsRef.current += 1;
+        }
+        const msg = isApiError(error) ? (error.message?.toLowerCase() ?? '') : '';
+        const useExpiredMessage =
+          msg.includes('expired') ||
+          msg.includes('maximum') ||
+          msg.includes('too many') ||
+          msg.includes('exceeded') ||
+          msg.includes('locked') ||
+          failedOtpAttemptsRef.current >= 4;
+        const expiredMsg = t('signup.verify.code_expired');
+        const invalidMsg = ERROR_MESSAGES.INVALID_CODE;
         showErrorAlert(error, {
-          fallback: ERROR_MESSAGES.INVALID_CODE,
+          fallback: useExpiredMessage ? expiredMsg : invalidMsg,
           statusMessages: {
             0: ERROR_MESSAGES.NETWORK,
-            400: ERROR_MESSAGES.INVALID_CODE,
+            400: useExpiredMessage ? expiredMsg : invalidMsg,
             500: ERROR_MESSAGES.SERVER,
           },
         });
@@ -78,7 +93,7 @@ export default function ForgotPasswordVerifyScreen() {
         setIsLoading(false);
       }
     },
-    [isLoading]
+    [isLoading, t]
   );
 
   const handleOtpComplete = useCallback(

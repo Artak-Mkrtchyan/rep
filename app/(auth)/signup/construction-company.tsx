@@ -25,18 +25,10 @@ import {
 import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
-const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-
 const ConstructionCompanySchema = Yup.object().shape({
   attachmentIds: Yup.array().min(1, () => i18n.t('validation.at_least_one_file')).required(() => i18n.t('validation.required')),
   companyInfo: Yup.object().shape({
-    certifiedOn: Yup.string()
-      .required(() => i18n.t('validation.required'))
-      .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format'))
-      .test('not-future-date', () => i18n.t('validation.date_cannot_be_future'), (value) => {
-        if (!value || !DATE_REGEX.test(value)) return true;
-        return new Date(value) <= new Date();
-      }),
+    certifiedOn: yupSchemas.certifiedOn,
     certifiedBy: Yup.string().optional().max(255, () => i18n.t('validation.max_length_255')),
     email: yupSchemas.email,
     name: Yup.string().required(() => i18n.t('validation.required')).max(255, () => i18n.t('validation.max_length_255')),

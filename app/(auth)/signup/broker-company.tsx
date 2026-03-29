@@ -19,7 +19,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { NumberPicker } from '@/components/ui/number-picker';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { applicationsService, BrokerCompanyRegistrationRequest } from '@/lib/api/applications';
-import { yupSchemas } from '@/lib/auth-validation';
+import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const BrokerCompanySchema = Yup.object().shape({
@@ -146,6 +146,7 @@ export default function BrokerSignUpScreen() {
                     : undefined
                 }
                 placeholder=""
+                maxLength={FULL_NAME_MAX_LENGTH}
               />
 
               <PhoneInput

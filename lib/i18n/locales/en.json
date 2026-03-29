@@ -74,7 +74,7 @@
   "validation.email_invalid": "Please enter a valid email address (e.g. name@example.com)",
   "validation.full_name_required": "Full name is required",
   "validation.full_name_min_length": "Must be at least 2 characters",
-  "validation.full_name_max_length": "Must be no more than 100 characters",
+  "validation.full_name_max_length": "Must be no more than 255 characters",
   "validation.no_leading_trailing_spaces": "Must not start or end with a space",
   "validation.full_name_invalid_chars": "Full name may contain only letters, hyphens, and apostrophes",
   "validation.full_name_allowed_alphabets": "Only Latin (A-Z), Cyrillic Russian (A-Ya), and Uzbek letters are allowed",
@@ -210,6 +210,7 @@
   "change_password.success_message": "Your password has been changed successfully.",
   "change_password.failed_title": "Change Password Failed",
   "change_password.changing": "Changing...",
+  "change_password.session_expired": "Your session info is incomplete. Please log out and log back in to change your password.",
 
   "profile.title": "Profile",
   "profile.edit_profile": "Edit profile",

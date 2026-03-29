@@ -18,7 +18,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { NumberPicker } from '@/components/ui/number-picker';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { applicationsService } from '@/lib/api/applications';
-import { yupSchemas } from '@/lib/auth-validation';
+import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
 import type { BrokerSignUpForm } from '@/types/auth';
 import { router } from 'expo-router';
 
@@ -123,6 +123,7 @@ export default function BrokerSignUpScreen() {
                 onBlur={handleBlur('fullName')}
                 error={touched.fullName && errors.fullName ? errors.fullName : undefined}
                 placeholder=""
+                maxLength={FULL_NAME_MAX_LENGTH}
               />
 
               <DatePicker

@@ -22,7 +22,7 @@ import {
   applicationsService,
   ConstructionCompanyRegistrationRequest,
 } from '@/lib/api/applications';
-import { yupSchemas } from '@/lib/auth-validation';
+import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
@@ -158,6 +158,7 @@ export default function ConstructionCompanySignUpScreen() {
                     : undefined
                 }
                 placeholder=""
+                maxLength={FULL_NAME_MAX_LENGTH}
               />
 
               <PhoneInput

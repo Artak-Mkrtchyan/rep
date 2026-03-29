@@ -99,6 +99,26 @@ export interface ChangePasswordRequest {
   usingOtp: false;
 }
 
+export interface CurrentActorResponse {
+  id: string;
+  createdAt: string;
+  archived: boolean;
+  fullName: string;
+  roles: {
+    id: string;
+    createdAt: string;
+    name: string;
+    code: string;
+    description: string;
+    clientRole: boolean;
+    scope: AuthScope;
+  }[];
+  scope: AuthScope;
+  temporaryPassword: boolean;
+  email: string;
+  phone: string;
+}
+
 export const authService = {
   requestEmailConfirmation: async (email: string): Promise<void> => {
     try {
@@ -191,5 +211,13 @@ export const authService = {
 
   resetPassword: async (data: ResetPasswordRequest | ChangePasswordRequest): Promise<void> => {
     await httpClient.patch<void>('/v1/users/change-password', data, { skipAuth: true });
+  },
+
+  getCurrentActor: async (): Promise<CurrentActorResponse> => {
+    const response = await httpClient.get<ApiResponse<CurrentActorResponse>>(
+      '/v1/actors/current',
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as CurrentActorResponse);
   },
 };

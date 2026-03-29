@@ -15,6 +15,7 @@ import {
   getProcessOptions,
   getPropertyTypeOptions,
 } from '@/constants/announcement';
+import { Language } from '@/lib/i18n/i18n';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
@@ -22,23 +23,38 @@ import { router } from 'expo-router';
 
 type BasicInfoFormValues = RentForApartmentsFormStep1;
 
+/** LangFormDTO: хотя бы одна локаль заполнена непустой строкой */
+const langFormAtLeastOne = (message = 'Required') =>
+  Yup.object({
+    ru: Yup.string(),
+    en: Yup.string(),
+    uz: Yup.string(),
+  }).test('lang-form-at-least-one', message, (value) => {
+    if (!value) return false;
+    return [value.ru, value.en, value.uz].some((s) => typeof s === 'string' && s.trim().length > 0);
+  });
+
+const geoSchema = Yup.object({
+  formattedAddress: langFormAtLeastOne(),
+  country: langFormAtLeastOne(),
+  province: langFormAtLeastOne(),
+  locality: langFormAtLeastOne(),
+  street: langFormAtLeastOne(),
+  latitude: Yup.number().required('Required'),
+  longitude: Yup.number().required('Required'),
+});
+
 const BasicInfoSchema = Yup.object().shape({
-  geo: Yup.object()
-    .shape({
-      formattedAddress: Yup.string().required('Required'),
-      country: Yup.string().required('Required'),
-      province: Yup.string().required('Required'),
-      locality: Yup.string().required('Required'),
-      street: Yup.string().required('Required'),
-    })
-    .required('Required'),
+  geo: geoSchema.required('Required'),
   listingType: Yup.string().required('Required'),
   propertyType: Yup.string().required('Required'),
   processType: Yup.string().required('Required'),
 });
 
 export default function BasicInfoScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language as Language;
+
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
@@ -95,7 +111,7 @@ export default function BasicInfoScreen() {
         enableReinitialize
         onSubmit={saveBasicInfo}
         validationSchema={BasicInfoSchema}>
-        {({ handleChange, handleSubmit, setFieldValue, values, errors, touched }) => (
+        {({ handleChange, handleSubmit, setFieldValue, values, errors, touched, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -123,11 +139,12 @@ export default function BasicInfoScreen() {
                   <AddressInput
                     label={t('announcement.rent.address')}
                     placeholder={t('announcement.rent.enter_address')}
-                    value={values.geo.formattedAddress}
-                    onChangeText={handleChange('geo.formattedAddress')}
+                    value={values.geo.formattedAddress[currentLanguage] || ''}
+                    onChangeText={handleChange(`geo.formattedAddress.${currentLanguage}`)}
                     onSelectAddress={(geo) => setFieldValue('geo', geo)}
                     error={touched.geo && errors.geo ? t('validation.address_required') : undefined}
                     containerClassName="mb-1"
+                    lang={currentLanguage}
                   />
 
                   <Select
@@ -175,6 +192,7 @@ export default function BasicInfoScreen() {
             <AnnouncementFooter
               firstButtonLabel={t('common.next')}
               secondButtonLabel={t('common.save_and_exit')}
+              firstButtonDisabled={!isValid}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
             />

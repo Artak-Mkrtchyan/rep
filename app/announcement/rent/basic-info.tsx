@@ -15,6 +15,7 @@ import {
   getProcessOptions,
   getPropertyTypeOptions,
 } from '@/constants/announcement';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
 import { router } from 'expo-router';
@@ -38,6 +39,7 @@ const BasicInfoSchema = Yup.object().shape({
 
 export default function BasicInfoScreen() {
   const { t } = useTranslation();
+  const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
@@ -100,7 +102,7 @@ export default function BasicInfoScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="px-4 pt-[24px]">
+              <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-6 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.basic_info')}
                 </ThemedText>

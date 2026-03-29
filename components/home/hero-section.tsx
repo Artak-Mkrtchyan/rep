@@ -5,6 +5,7 @@ import { ImageBackground, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 
 const heroImage = require('@/assets/images/hero.png');
 
@@ -16,6 +17,7 @@ type HeroSectionProps = {
 export const HeroSection: React.FC<HeroSectionProps> = ({ onMenuPress, onSearchPress }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { horizontalStyle } = useScreenEdgePadding();
 
   return (
     <ImageBackground
@@ -23,7 +25,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onMenuPress, onSearchP
       resizeMode="cover"
       style={{ paddingTop: insets.top }}
       className="justify-center">
-      <View className="px-4 pb-8">
+      <View className="pb-8" style={horizontalStyle}>
         <View className="flex-row items-center justify-between py-3">
           <Pressable
             onPress={onMenuPress}

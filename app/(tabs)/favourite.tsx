@@ -8,6 +8,7 @@ import { AnnouncementSmallCard } from '@/components/announcement/announcement-sm
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFavourites } from '@/hooks/api/use-favourites';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { announcementsService } from '@/lib/api/announcements';
 import { seedAll } from '@/lib/dev/create-announcements';
 import {
@@ -25,6 +26,7 @@ export default function FavouriteScreen() {
   const router = useRouter();
   const { favourites, isLoading, error, refetch, toggle } = useFavourites();
   const [seeding, setSeeding] = useState(false);
+  const { horizontalStyle } = useScreenEdgePadding();
 
   const handleCardPress = useCallback(
     (id: string) => router.push(`/announcement/${id}` as any),
@@ -70,7 +72,10 @@ export default function FavouriteScreen() {
   if (error) {
     return (
       <ThemedView className="flex-1">
-        <SafeAreaView className="flex-1 items-center justify-center px-4" edges={['top']}>
+        <SafeAreaView
+          className="flex-1 items-center justify-center"
+          style={horizontalStyle}
+          edges={['top']}>
           <ThemedText className="mb-4 text-center text-foreground">{error}</ThemedText>
           <Pressable onPress={refetch} className="rounded-lg bg-main-500 px-6 py-3">
             <ThemedText className="font-semibold text-white">{t('common.retry')}</ThemedText>
@@ -82,9 +87,9 @@ export default function FavouriteScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <SafeAreaView className="flex-1" edges={['top']}>
+      <SafeAreaView className="flex-1" style={horizontalStyle} edges={['top']}>
         {favourites.length ? (
-          <ScrollView className="mt-[47px] flex-1 px-[16px]" showsVerticalScrollIndicator={false}>
+          <ScrollView className="mt-[47px] flex-1" showsVerticalScrollIndicator={false}>
             <ThemedText type="title" className="text-[34px]">
               {t('favourite.title')}
             </ThemedText>
@@ -123,7 +128,7 @@ export default function FavouriteScreen() {
             )}
           </ScrollView>
         ) : (
-          <View className="mt-[47px] flex-1 px-[16px]">
+          <View className="mt-[47px] flex-1">
             <ThemedText type="title" className="text-[34px]">
               {t('favourite.title')}
             </ThemedText>

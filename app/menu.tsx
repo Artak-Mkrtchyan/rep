@@ -7,11 +7,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { MenuAccordionItem } from '@/components/menu/menu-accordion-item';
 import { ThemedView } from '@/components/themed-view';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { MENU_SECTIONS } from '@/constants/search';
 
 export default function MenuScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { horizontalStyle } = useScreenEdgePadding();
   const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
 
   const handleToggle = useCallback((index: number) => {
@@ -29,7 +31,7 @@ export default function MenuScreen() {
   return (
     <ThemedView className="flex-1">
       <SafeAreaView className="flex-1" edges={['top']}>
-        <View className="px-4">
+        <View style={horizontalStyle}>
           <Pressable
             onPress={handleBack}
             className="h-10 w-10 items-center justify-center"

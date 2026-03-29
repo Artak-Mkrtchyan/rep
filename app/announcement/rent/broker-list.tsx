@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
+import { router } from 'expo-router';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { BrokerCard } from '@/components/announcement/broker-card';
@@ -8,7 +9,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { SearchInput } from '@/components/ui/search-input';
 import { SegmentedControl } from '@/components/ui/segmented-control';
-import { router } from 'expo-router';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 
 const EXAMPLE_BROKER = [
   {
@@ -84,6 +85,7 @@ const EXAMPLE_BROKER_COMPANY = [
 
 export default function BrokerListScreen() {
   const { t } = useTranslation();
+  const { horizontalStyle } = useScreenEdgePadding();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -97,7 +99,7 @@ export default function BrokerListScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <View className="gap-4 px-4 pt-[24px]">
+      <View className="gap-4 pt-[24px]" style={horizontalStyle}>
         <ThemedText className="text-[16px] font-bold text-foreground">{t('announcement.rent.broker_list.heading')}</ThemedText>
 
         <SegmentedControl
@@ -115,7 +117,8 @@ export default function BrokerListScreen() {
       </View>
 
       <ScrollView
-        className="flex-1 px-4 py-4"
+        className="flex-1 py-4"
+        style={horizontalStyle}
         contentContainerStyle={{ paddingBottom: 31, gap: 16 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">

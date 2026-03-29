@@ -6,6 +6,7 @@ import { AnnouncementSmallCard } from '@/components/announcement/announcement-sm
 import { BrokerProfileCard } from '@/components/announcement/broker-profile-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 
 const MOCK_BROKER = {
   avatar: require('@/assets/images/hero.png'),
@@ -57,6 +58,7 @@ const truncateByLength = (text: string, maxLength = 100, isExpanded = false) => 
 };
 
 export default function BrokerDetailsScreen() {
+  const { horizontalStyle } = useScreenEdgePadding();
   const [isBioExpanded, setIsBioExpanded] = useState(false);
 
   const handleNext = () => {};
@@ -70,7 +72,7 @@ export default function BrokerDetailsScreen() {
         contentContainerStyle={{ paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
-        <View className="px-4 pt-6">
+        <View className="pt-6" style={horizontalStyle}>
           <BrokerProfileCard
             avatar={MOCK_BROKER.avatar}
             name={MOCK_BROKER.name}

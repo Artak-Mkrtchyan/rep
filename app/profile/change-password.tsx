@@ -10,6 +10,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { useUserClaims } from '@/hooks/use-user-claims';
 import { authService } from '@/lib/api/auth';
@@ -25,6 +26,7 @@ export default function ChangePasswordScreen() {
 
   const userClaims = useUserClaims();
   const { tokens: theme } = useTheme();
+  const { horizontalStyle } = useScreenEdgePadding();
 
   const passwordRequirements = validatePassword(newPassword);
   const passwordsMatch = doPasswordsMatch(newPassword, confirmPassword);
@@ -74,7 +76,7 @@ export default function ChangePasswordScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
       <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
-        <ThemedView className="flex-1 px-4">
+        <ThemedView className="flex-1" style={horizontalStyle}>
           <SafeAreaView className="flex-1" edges={['top']}>
             <View className="mt-2">
               <Pressable

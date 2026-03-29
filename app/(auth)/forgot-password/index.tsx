@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
 import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
@@ -33,6 +34,7 @@ export default function ForgotPasswordEmailScreen() {
   const { updateData, data } = useForgotPasswordContext();
   const { tokens: theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const { horizontalStyle } = useScreenEdgePadding();
 
   React.useEffect(() => {
     if (data.email) {
@@ -88,13 +90,7 @@ export default function ForgotPasswordEmailScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={{ flex: 1 }}>
       <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
-        <ThemedView
-          className="flex-1"
-          style={{
-            paddingTop: insets.top,
-            paddingLeft: 16 + insets.left,
-            paddingRight: 16 + insets.right,
-          }}>
+        <ThemedView className="flex-1" style={[{ paddingTop: insets.top }, horizontalStyle]}>
           <View className="w-full flex-1">
             <View className="pt-2">
               <Pressable

@@ -17,6 +17,7 @@ import {
   getOwnershipTypeOptions,
   YEAR_BUILT_OPTIONS,
 } from '@/constants/announcement';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Attributes, Property } from '@/types/announcement';
 
@@ -24,6 +25,7 @@ type CharacteristicsFormValues = Attributes;
 
 export default function CharacteristicsScreen() {
   const { t } = useTranslation();
+  const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
@@ -81,7 +83,7 @@ export default function CharacteristicsScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="px-4 pt-6">
+              <View className="pt-6" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.characteristics_title')}
                 </ThemedText>

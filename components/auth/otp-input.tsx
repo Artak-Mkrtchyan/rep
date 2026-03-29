@@ -32,6 +32,8 @@ interface OtpInputProps {
   resendLabel: string;
   /** Label for the countdown (with {time} placeholder already resolved) */
   countdownLabel?: string;
+  /** When true, resend is not rendered here (e.g. host screen places it at the bottom). */
+  hideResend?: boolean;
 }
 
 export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpInput(
@@ -47,6 +49,7 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
     onResend,
     resendLabel,
     countdownLabel,
+    hideResend = false,
   },
   ref
 ) {
@@ -98,8 +101,8 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
   );
 
   return (
-    <View className="w-full items-end gap-[8px]">
-      <View className="flex-row items-center gap-[4px]">
+    <View className="w-full items-center gap-2">
+      <View className="flex-row items-center justify-center gap-1">
         {Array.from({ length: OTP_LENGTH }, (_, index) => (
           <View
             key={index}
@@ -125,25 +128,25 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
 
       {hasError && <Text className="w-full text-[14px] text-red-500">{error}</Text>}
 
-      <View className="w-full items-center">
-        {countdownSecondsLeft > 0 ? (
-          <ThemedText className="text-[16px] font-medium text-primary">
+      {countdownSecondsLeft > 0 ? (
+        <View className="h-6 w-full items-center justify-center">
+          <ThemedText className="text-center text-[16px] font-medium leading-6 text-primary">
             {countdownLabel ?? countdownDisplay}
           </ThemedText>
-        ) : onResend ? (
-          <Pressable
-            onPress={onResend}
-            disabled={!canResend}
-            accessibilityRole="button"
-            accessibilityLabel={resendLabel}
-            className="h-[48px] items-center justify-center rounded-[6px] px-[16px] py-[8px]">
-            <ThemedText
-              className={`text-[18px] font-medium ${canResend ? 'text-primary' : 'text-muted-foreground'}`}>
-              {resendLabel}
-            </ThemedText>
-          </Pressable>
-        ) : null}
-      </View>
+        </View>
+      ) : !hideResend && onResend ? (
+        <Pressable
+          onPress={onResend}
+          disabled={!canResend}
+          accessibilityRole="button"
+          accessibilityLabel={resendLabel}
+          className="h-12 w-full items-center justify-center rounded-[6px] px-4 py-2">
+          <ThemedText
+            className={`text-[18px] font-medium ${canResend ? 'text-primary' : 'text-muted-foreground'}`}>
+            {resendLabel}
+          </ThemedText>
+        </Pressable>
+      ) : null}
     </View>
   );
 });

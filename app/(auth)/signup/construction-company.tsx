@@ -233,6 +233,7 @@ export default function ConstructionCompanySignUpScreen() {
                     : undefined
                 }
                 placeholder=""
+                maxLength={255}
               />
 
               <NumberPicker

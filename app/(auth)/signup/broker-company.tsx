@@ -25,6 +25,7 @@ import { router } from 'expo-router';
 const BrokerCompanySchema = Yup.object().shape({
   attachmentIds: Yup.array().min(1, () => i18n.t('validation.at_least_one_file')).required(() => i18n.t('validation.required')),
   companyInfo: Yup.object().shape({
+    certifiedBy: Yup.string().optional().max(255, () => i18n.t('validation.max_length_255')),
     certifiedOn: yupSchemas.certifiedOn,
     email: yupSchemas.email,
     name: Yup.string().required(() => i18n.t('validation.required')),
@@ -227,6 +228,7 @@ export default function BrokerSignUpScreen() {
                     : undefined
                 }
                 placeholder=""
+                maxLength={255}
               />
 
               <NumberPicker

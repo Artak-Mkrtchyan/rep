@@ -14,7 +14,7 @@ import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
 import { useOtpResend } from '@/hooks/use-otp-resend';
 import { authService } from '@/lib/api/auth';
 import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
-import { RESEND_CODE_TIMEOUT } from '@/lib/auth-validation';
+import { OTP_EXPIRATION_TIMEOUT } from '@/lib/auth-validation';
 
 export default function ForgotPasswordVerifyScreen() {
   const { t } = useTranslation();
@@ -32,7 +32,7 @@ export default function ForgotPasswordVerifyScreen() {
   }, [data.email, t]);
 
   const { secondsLeft, canResend, resend, formatTime } = useOtpResend({
-    countdownSeconds: RESEND_CODE_TIMEOUT,
+    countdownSeconds: OTP_EXPIRATION_TIMEOUT,
     resendFn,
   });
 

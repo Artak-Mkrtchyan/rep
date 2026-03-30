@@ -15,6 +15,7 @@ const CARD_SHADOW = {
   elevation: 4,
 };
 export const BrokerCard: React.FC<BrokerCardProps> = ({
+  isSelected = false,
   avatar,
   name,
   rating,
@@ -37,7 +38,7 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
 
         <View className="min-w-0 flex-1 flex-row items-start justify-between gap-3">
           <ThemedText
-            className="text-[16px] font-bold leading-tight text-foreground"
+            className="w-[50%] text-[16px] font-bold leading-tight text-foreground"
             numberOfLines={1}>
             {name}
           </ThemedText>
@@ -80,7 +81,7 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
     return (
       <Pressable
         onPress={onPress}
-        className={cardClassName}
+        className={cn(cardClassName, isSelected && 'border-2 border-primary')}
         style={CARD_SHADOW}
         accessibilityRole="button"
         accessibilityLabel={`Broker ${name}, rating ${rating}`}>
@@ -90,7 +91,9 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
   }
 
   return (
-    <View className={cardClassName} style={CARD_SHADOW}>
+    <View
+      className={cn(cardClassName, isSelected && 'border-2 border-primary')}
+      style={CARD_SHADOW}>
       {content}
     </View>
   );

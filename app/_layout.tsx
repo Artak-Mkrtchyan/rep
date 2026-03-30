@@ -8,6 +8,7 @@ import React from 'react';
 import { Appearance } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { QueryProvider } from '@/components/providers/query-provider';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { loadSavedLanguage } from '@/hooks/use-language';
 import { NAV_THEME } from '@/lib/theme';
@@ -24,15 +25,17 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <AuthProvider>
-      <ThemeProvider value={NAV_THEME.light}>
-        <SafeAreaProvider>
-          <RootNavigator />
-          <StatusBar style="auto" />
-          <PortalHost />
-        </SafeAreaProvider>
-      </ThemeProvider>
-    </AuthProvider>
+    <QueryProvider>
+      <AuthProvider>
+        <ThemeProvider value={NAV_THEME.light}>
+          <SafeAreaProvider>
+            <RootNavigator />
+            <StatusBar style="auto" />
+            <PortalHost />
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </AuthProvider>
+    </QueryProvider>
   );
 }
 

@@ -1,7 +1,7 @@
 import { Formik } from 'formik';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -11,6 +11,7 @@ import { AddressInput } from '@/components/ui/address-input';
 import { CheckboxRow } from '@/components/ui/checkbox';
 import { Select } from '@/components/ui/select';
 import {
+  ANNOUNCEMENT_ROUTES,
   getListingTypeOptions,
   getProcessOptions,
   getPropertyTypeOptions,
@@ -56,7 +57,6 @@ export default function BasicInfoScreen() {
 
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
-  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
   let isNext = true;
 
@@ -79,16 +79,15 @@ export default function BasicInfoScreen() {
       needAssessmentExpert: values.needAssessmentExpert,
     });
 
-    if (isNext) {
-      nextStep();
+    if (!isNext) {
+      router.push('/(tabs)');
+      return;
+    }
+
+    if (values.processType === 'AS_BROKER') {
+      router.replace(ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.path);
     } else {
-      try {
-        await sendFormData();
-      } catch {
-        Alert.alert(t('common.error'), t('error.failed_to_send_form'));
-      } finally {
-        router.push('/(tabs)');
-      }
+      nextStep();
     }
   };
 

@@ -1,5 +1,13 @@
 import type { RentForApartmentsForm } from '@/types/announcement';
 
+import {
+  ApplicationDetails,
+  AssignBrokerRequest,
+  BrokerCompany,
+  IndividualBroker,
+  SearchRequest,
+  SearchResponse,
+} from '@/types/applications';
 import { ApiResponse } from './auth.types';
 import { httpClient } from './http/client';
 
@@ -276,6 +284,68 @@ export const applicationsService = {
       { requiresAuth: true }
     );
     return response.data || (response as unknown as AnnouncementPublicationResponse);
+  },
+
+  /**
+   * Search broker companies
+   * @param data Search parameters
+   * @returns A promise that resolves to the search results for broker companies.
+   */
+  searchBrokerCompanies: async (data: SearchRequest): Promise<SearchResponse<BrokerCompany>> => {
+    const response = await httpClient.post<ApiResponse<SearchResponse<BrokerCompany>>>(
+      `/v1/brokers/companies/search`,
+      data,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as SearchResponse<BrokerCompany>);
+  },
+  /**
+   * Search individual brokers
+   * @param data Search parameters
+   * @returns A promise that resolves to the search results for individual brokers.
+   */
+  searchIndividualBrokers: async (
+    data: SearchRequest
+  ): Promise<SearchResponse<IndividualBroker>> => {
+    const response = await httpClient.post<ApiResponse<SearchResponse<IndividualBroker>>>(
+      `/v1/brokers/individuals/search`,
+      data,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as SearchResponse<IndividualBroker>);
+  },
+
+  // TODO: check the API response structure and adjust the return type accordingly
+  getIndividualBrokerById: async (id: string): Promise<IndividualBroker> => {
+    const response = await httpClient.get<ApiResponse<IndividualBroker>>(
+      `/v1/brokers/individuals/${id}`,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as IndividualBroker);
+  },
+
+  // TODO: check the API response structure and adjust the return type accordingly
+  getBrokerCompanyById: async (id: string): Promise<BrokerCompany> => {
+    const response = await httpClient.get<ApiResponse<BrokerCompany>>(
+      `/v1/brokers/companies/${id}`,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as BrokerCompany);
+  },
+
+  /**
+   * Assign broker to announcement publication application
+   * @param id Application ID
+   * @param data Broker assignment data (brokerCompanyId or brokerId)
+   * @returns A promise that resolves to the updated application data
+   */
+  assignBroker: async (id: string, data: AssignBrokerRequest): Promise<ApplicationDetails> => {
+    const response = await httpClient.patch<ApiResponse<ApplicationDetails>>(
+      `/v1/applications/announcement-publication/${id}/assign-broker`,
+      data,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as ApplicationDetails);
   },
 
   /**

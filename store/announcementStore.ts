@@ -10,13 +10,16 @@ type PersistedState = {
   formData: RentForApartmentsForm;
   announcementId?: string;
   publicId?: string;
+  brokerId?: string;
 };
 
 interface AnnouncementForRentFormStore {
   announcementId?: string;
   publicId?: string;
+  brokerId?: string;
   formData: RentForApartmentsForm;
   nextStep: () => void;
+  setBrokerId: (id: string) => void;
   sendFormData: () => Promise<void>;
   publishFormData: () => Promise<void>;
   setCurrentStep: (step: number) => void;
@@ -49,11 +52,17 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
     subscribeWithSelector((set, get) => ({
       announcementId: undefined,
       publicId: undefined,
+      brokerId: undefined,
       formData: initialFormData,
 
       setCurrentStep: (step) =>
         set((state) => ({
           formData: { ...state.formData, stepNumber: step },
+        })),
+
+      setBrokerId: (id) =>
+        set(() => ({
+          brokerId: id,
         })),
 
       nextStep: () =>
@@ -103,6 +112,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         set({
           announcementId: undefined,
           publicId: undefined,
+          brokerId: undefined,
           formData: initialFormData,
         }),
     })),
@@ -114,6 +124,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
           formData: state.formData,
           announcementId: state.announcementId,
           publicId: state.publicId,
+          brokerId: state.brokerId,
         }) as PersistedState,
       merge: (persistedState, currentState) => {
         const persisted = persistedState as PersistedState | undefined;

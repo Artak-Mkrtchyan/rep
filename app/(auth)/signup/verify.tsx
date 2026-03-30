@@ -1,11 +1,12 @@
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
+import { Trans, useTranslation } from 'react-i18next';
+import { Pressable, Text, View } from 'react-native';
 
-import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
 import { OtpInput, type OtpInputHandle } from '@/components/auth/otp-input';
+import { ThemedText } from '@/components/themed-text';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { useOtpResend } from '@/hooks/use-otp-resend';
@@ -120,13 +121,32 @@ export default function VerifyEmailScreen() {
       </View>
 
       <View className="items-center gap-3 pt-6">
-        <AuthHeader
-          title={t('signup.verify.title')}
-          imageSource={require('@/assets/images/icon-email-verify.svg')}
-          imageWidth={IMAGE_DIMENSIONS.EMAIL_VERIFY.width}
-          imageHeight={IMAGE_DIMENSIONS.EMAIL_VERIFY.height}
-          description={t('signup.verify.description', { email: data.email })}
-        />
+        <View className="items-center gap-4">
+          <Image
+            style={{
+              width: IMAGE_DIMENSIONS.EMAIL_VERIFY.width,
+              height: IMAGE_DIMENSIONS.EMAIL_VERIFY.height,
+            }}
+            source={require('@/assets/images/icon-email-verify.svg')}
+            contentFit="contain"
+          />
+          <ThemedText type="title" className="text-center">
+            {t('signup.verify.title')}
+          </ThemedText>
+          {data.email ? (
+            <ThemedText className="text-center text-[16px] leading-6 text-muted-foreground">
+              <Trans
+                i18nKey="signup.verify.description"
+                values={{ email: data.email }}
+                components={{
+                  emailStyle: (
+                    <Text className="text-[16px] leading-6 text-muted-foreground" />
+                  ),
+                }}
+              />
+            </ThemedText>
+          ) : null}
+        </View>
       </View>
 
       <OtpInput

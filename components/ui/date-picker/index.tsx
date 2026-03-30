@@ -183,6 +183,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       if (validateDateParts(day, month, year)) {
         const date = new Date(apiFormat);
         if (!isNaN(date.getTime())) {
+          if (maximumDate && date > maximumDate) {
+            const clampedApi = formatDateToAPI(maximumDate);
+            setDisplayValue(formatDateForDisplay(clampedApi));
+            onChange?.(clampedApi);
+            return;
+          }
+          if (minimumDate && date < minimumDate) {
+            const clampedApi = formatDateToAPI(minimumDate);
+            setDisplayValue(formatDateForDisplay(clampedApi));
+            onChange?.(clampedApi);
+            return;
+          }
           onChange?.(apiFormat);
         }
       }

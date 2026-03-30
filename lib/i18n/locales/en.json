@@ -132,7 +132,7 @@
   "signup.something_went_wrong": "Something went wrong. Please try again.",
 
   "signup.verify.title": "Verify your email address",
-  "signup.verify.description": "We will send you a One Time Password via this mail: {{email}}",
+  "signup.verify.description": "We will send you a One Time Password via this mail: <emailStyle>{{email}}</emailStyle> email address",
   "signup.verify.code_expired": "Invalid code expired. Please request a new code. Please try again",
   "signup.verify.invalid_code": "Invalid code. Please try again.",
   "signup.verify.resend_code": "Re-send new code",
@@ -191,7 +191,7 @@
   "forgot_password.verify.verify_button": "Verify",
   "forgot_password.verify.otp_digit": "OTP digit {{number}}",
 
-  "forgot_password.reset.title": "Reset Password",
+  "forgot_password.reset.title": "Forgot Password",
   "forgot_password.reset.new_password": "New Password",
   "forgot_password.reset.enter_new_password": "Enter new password",
   "forgot_password.reset.confirm_password": "Confirm Password",

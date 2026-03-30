@@ -132,7 +132,7 @@
   "signup.something_went_wrong": "Что-то пошло не так. Пожалуйста, попробуйте снова.",
 
   "signup.verify.title": "Подтвердите ваш адрес электронной почты",
-  "signup.verify.description": "Мы отправим вам одноразовый пароль на эту почту: {{email}}",
+  "signup.verify.description": "Мы отправим вам одноразовый пароль на эту почту: <emailStyle>{{email}}</emailStyle>",
   "signup.verify.code_expired": "Недействительный код истёк. Пожалуйста, запросите новый код. Попробуйте снова",
   "signup.verify.invalid_code": "Неверный код. Пожалуйста, попробуйте снова.",
   "signup.verify.resend_code": "Отправить новый код",

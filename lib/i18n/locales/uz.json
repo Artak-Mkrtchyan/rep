@@ -132,7 +132,7 @@
     "signup.something_went_wrong": "Nimadir xato ketdi. Iltimos, qayta urinib ko'ring.",
 
     "signup.verify.title": "Elektron pochta manzilingizni tasdiqlang",
-    "signup.verify.description": "Biz sizga ushbu pochta orqali bir martalik parol yuboramiz: {{email}}",
+    "signup.verify.description": "Biz sizga ushbu pochta orqali bir martalik parol yuboramiz: <emailStyle>{{email}}</emailStyle>",
     "signup.verify.code_expired": "Kod muddati tugagan. Iltimos, yangi kod so'rang. Qayta urinib ko'ring",
     "signup.verify.invalid_code": "Noto'g'ri kod. Iltimos, qayta urinib ko'ring.",
     "signup.verify.resend_code": "Yangi kodni qayta yuborish",

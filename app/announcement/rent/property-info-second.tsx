@@ -11,9 +11,13 @@ import { InputLabel } from '@/components/ui/input/label';
 import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { RentForApartmentsFormStep3 } from '@/types/announcement';
+import * as Yup from 'yup';
 
 type DescriptionFormValues = { description: RentForApartmentsFormStep3['description'] };
 
+const DescriptionSchema = Yup.object().shape({
+  description: Yup.string().required('Required'),
+});
 export default function PropertyInfoSecondScreen() {
   const { t } = useTranslation();
   const placeholderColor = useThemeValue('placeholder');
@@ -59,9 +63,11 @@ export default function PropertyInfoSecondScreen() {
     <ThemedView className="flex-1">
       <Formik<DescriptionFormValues>
         initialValues={initialValues}
+        validationSchema={DescriptionSchema}
         enableReinitialize
+        validateOnMount={true}
         onSubmit={saveTitle}>
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -103,6 +109,7 @@ export default function PropertyInfoSecondScreen() {
 
             <AnnouncementFooter
               firstButtonLabel={t('common.next')}
+              firstButtonDisabled={!isValid}
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}

@@ -26,7 +26,7 @@ export default function BrokerListScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const brokerId = useAnnouncementForRentFormStore((s) => s.brokerId);
-  const announcementId = useAnnouncementForRentFormStore((s) => s.announcementId);
+
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
 
@@ -79,15 +79,13 @@ export default function BrokerListScreen() {
 
   const handleNext = async () => {
     try {
-      await sendFormData();
+      const { id } = await sendFormData();
 
-      if (announcementId && brokerId) {
-        assignBroker({ id: announcementId, data: { brokerId } });
+      assignBroker({ id, data: { brokerId } });
 
-        resetForm();
+      resetForm();
 
-        router.push('/(tabs)');
-      }
+      router.push('/(tabs)');
     } catch {
       console.error('Assign broker error');
     }

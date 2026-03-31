@@ -107,6 +107,7 @@ export default function BasicInfoScreen() {
         initialValues={initialValues}
         enableReinitialize
         onSubmit={saveBasicInfo}
+        validateOnMount={true}
         validationSchema={BasicInfoSchema}>
         {({ handleChange, handleSubmit, setFieldValue, values, errors, touched, isValid }) => (
           <>

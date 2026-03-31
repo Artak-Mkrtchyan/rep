@@ -20,7 +20,7 @@ interface AnnouncementForRentFormStore {
   formData: RentForApartmentsForm;
   nextStep: () => void;
   setBrokerId: (id: string) => void;
-  sendFormData: () => Promise<void>;
+  sendFormData: () => Promise<{ id: string }>;
   publishFormData: () => Promise<void>;
   setCurrentStep: (step: number) => void;
   updateFormData: (data: Partial<RentForApartmentsForm>) => void;
@@ -78,12 +78,14 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
 
           if (announcementId) {
             await applicationsService.updateAnnouncementPublication(announcementId, formData);
+            return { id: announcementId };
           } else {
             const response = await applicationsService.announcementPublication(formData);
             set(() => ({
               announcementId: response.id,
               publicId: response.publicId,
             }));
+            return { id: response.id };
           }
         } catch (error) {
           throw error;

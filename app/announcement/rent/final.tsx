@@ -15,15 +15,18 @@ import {
   getObjectCharacteristics,
   getPetItemsConfig,
 } from '@/constants/announcement';
+import { Language } from '@/lib/i18n/i18n';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
 
 export default function FinalScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLanguage = i18n.language as Language;
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const publicId = useAnnouncementForRentFormStore((s) => s.publicId);
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
+  const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const handlePublish = async () => {
     try {
@@ -36,8 +39,14 @@ export default function FinalScreen() {
     }
   };
 
-  const handleSaveAndExit = () => {
-    router.push('/(tabs)');
+  const handleSaveAndExit = async () => {
+    try {
+      await sendFormData();
+    } catch {
+      Alert.alert(t('common.error'), t('error.failed_to_send_form'));
+    } finally {
+      router.push('/(tabs)');
+    }
   };
 
   const handleViewOnMap = () => {
@@ -76,7 +85,9 @@ export default function FinalScreen() {
   const formatYesNo = (v: boolean | undefined) => (v ? t('common.yes') : t('common.no'));
 
   const typeLabel =
-    formData.listingType === 'FOR_RENT' ? t('announcement.rent.final.apartment_for_rent') : t('announcement.rent.final.apartment_for_sale');
+    formData.listingType === 'FOR_RENT'
+      ? t('announcement.rent.final.apartment_for_rent')
+      : t('announcement.rent.final.apartment_for_sale');
 
   const imageSources: { uri: string }[] = [];
 
@@ -132,10 +143,10 @@ export default function FinalScreen() {
             typeLabel={typeLabel}
             price="-"
             location={{
-              country: formData.geo.country,
-              city: formData.geo.locality,
-              district: formData.geo.province,
-              address: `${formData.geo.street} ${formData.geo.house || ''}`,
+              country: formData.geo.country[currentLanguage],
+              city: formData.geo.locality[currentLanguage],
+              district: formData.geo.province[currentLanguage],
+              address: `${formData.geo.street[currentLanguage]} ${formData.geo.house?.[currentLanguage] || ''}`,
             }}
             distances={{
               metro: '-',
@@ -162,7 +173,9 @@ export default function FinalScreen() {
           </View>
 
           {/* Object characteristics + Security deposit */}
-          <AnnouncementCard title={t('announcement.rent.final.object_characteristics')} className="mb-4 gap-[24px]">
+          <AnnouncementCard
+            title={t('announcement.rent.final.object_characteristics')}
+            className="mb-4 gap-[24px]">
             <View className="flex-row flex-wrap gap-y-4">
               {getObjectCharacteristics(t).map((config) => (
                 <View key={config.iconKey} className="w-1/2 pr-2">
@@ -212,7 +225,9 @@ export default function FinalScreen() {
 
           {/* Pets allowed */}
           {allowedPets.length > 0 ? (
-            <AnnouncementCard title={t('announcement.rent.final.pets_allowed')} className="gap-[12px]">
+            <AnnouncementCard
+              title={t('announcement.rent.final.pets_allowed')}
+              className="gap-[12px]">
               <View className="flex-row gap-2">
                 {allowedPets.map((config) => (
                   <View

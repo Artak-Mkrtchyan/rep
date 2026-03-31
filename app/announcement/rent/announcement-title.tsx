@@ -11,6 +11,11 @@ import { InputLabel } from '@/components/ui/input/label';
 import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { RentForApartmentsFormStep2 } from '@/types/announcement';
+import * as Yup from 'yup';
+
+const AnnouncementTitleSchema = Yup.object().shape({
+  title: Yup.string().required('Required'),
+});
 
 export default function AnnouncementTitleScreen() {
   const { t } = useTranslation();
@@ -58,8 +63,10 @@ export default function AnnouncementTitleScreen() {
       <Formik<RentForApartmentsFormStep2>
         initialValues={initialValues}
         enableReinitialize
+        validationSchema={AnnouncementTitleSchema}
+        validateOnMount={true}
         onSubmit={saveTitle}>
-        {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -90,17 +97,13 @@ export default function AnnouncementTitleScreen() {
                     accessibilityLabel={t('announcement.rent.title_heading')}
                     accessibilityHint={t('announcement.rent.title_hint')}
                   />
-                  {touched.title && errors.title ? (
-                    <ThemedText className="mt-1 text-[12px] text-destructive">
-                      {errors.title}
-                    </ThemedText>
-                  ) : null}
                 </View>
               </View>
             </ScrollView>
 
             <AnnouncementFooter
               firstButtonLabel={t('common.next')}
+              firstButtonDisabled={!isValid}
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}

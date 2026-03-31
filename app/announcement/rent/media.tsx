@@ -14,8 +14,7 @@ export default function MediaScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
-  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
-
+  const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
   const mediaFileIds = formData.mediaFileIds ?? [];
 
   const handlePhotoIdsChange = (ids: string[]) => {
@@ -57,6 +56,7 @@ export default function MediaScreen() {
 
       <AnnouncementFooter
         firstButtonLabel={t('common.next')}
+        firstButtonDisabled={!mediaFileIds.length}
         secondButtonLabel={t('common.save_and_exit')}
         onNextPress={handleNext}
         onSaveAndExitPress={handleSaveAndExit}

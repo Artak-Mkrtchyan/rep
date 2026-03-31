@@ -3,11 +3,12 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Modal, Pressable, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ComparisonCard } from '@/components/announcement/comparison-card';
 import { ThemedText } from '@/components/themed-text';
 import { useComparisons } from '@/hooks/api/use-comparisons';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import {
   getAddress,
   getBathsLabel,
@@ -21,6 +22,8 @@ export default function ComparisonsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { announcements, isLoading, error, refetch } = useComparisons();
+  const { horizontalStyle } = useScreenEdgePadding();
+  const insets = useSafeAreaInsets();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [tooManyVisible, setTooManyVisible] = useState(false);
 
@@ -72,7 +75,7 @@ export default function ComparisonsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
+      <View style={[styles.header, horizontalStyle]}>
         <Pressable onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={24} color="#111111" />
         </Pressable>
@@ -101,13 +104,21 @@ export default function ComparisonsScreen() {
           data={announcements}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, horizontalStyle]}
           showsVerticalScrollIndicator={false}
         />
       )}
 
       {announcements.length > 0 && (
-        <SafeAreaView edges={['bottom']} style={styles.bottomBar}>
+        <SafeAreaView
+          edges={['bottom']}
+          style={[
+            styles.bottomBar,
+            {
+              paddingLeft: 10 + insets.left,
+              paddingRight: 10 + insets.right,
+            },
+          ]}>
           <Pressable
             onPress={handleCompare}
             style={[styles.compareButton, selectedIds.size < 2 && styles.compareButtonDisabled]}>
@@ -152,7 +163,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
     paddingVertical: 12,
   },
   center: {
@@ -161,7 +171,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   list: {
-    paddingHorizontal: 16,
     gap: 12,
     paddingBottom: 100,
   },
@@ -171,7 +180,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 10,
     paddingTop: 24,
     borderTopWidth: 1,
     borderTopColor: '#F1F1F1',

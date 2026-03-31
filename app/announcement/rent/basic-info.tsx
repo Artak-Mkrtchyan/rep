@@ -17,6 +17,7 @@ import {
   getPropertyTypeOptions,
 } from '@/constants/announcement';
 import { Language } from '@/lib/i18n/i18n';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
 import { router } from 'expo-router';
@@ -55,6 +56,7 @@ export default function BasicInfoScreen() {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as Language;
 
+  const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
@@ -116,7 +118,7 @@ export default function BasicInfoScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="px-4 pt-[24px]">
+              <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-6 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.basic_info')}
                 </ThemedText>

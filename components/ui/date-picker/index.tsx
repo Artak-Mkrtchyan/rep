@@ -108,36 +108,34 @@ const isValidPartialDate = (part: string, type: 'day' | 'month' | 'year'): boole
   }
 };
 
-const applyDateMask = (input: string, previousValue: string): string => {
+const applyDateMask = (input: string): string => {
   const digits = input.replace(/\D/g, '');
 
-  const limited = digits.slice(0, 8);
+  // Build the valid prefix digit by digit
+  let validDigits = '';
+  for (let i = 0; i < digits.length && validDigits.length < 8; i++) {
+    const candidate = validDigits + digits[i];
+    const len = candidate.length;
 
+    // Validate as we go: positions 0-1 = day, 2-3 = month, 4-7 = year
+    if (len <= 2) {
+      if (!isValidPartialDate(candidate, 'day')) continue;
+    } else if (len <= 4) {
+      if (!isValidPartialDate(candidate.slice(2), 'month')) continue;
+    } else {
+      if (!isValidPartialDate(candidate.slice(4), 'year')) continue;
+    }
+
+    validDigits = candidate;
+  }
+
+  // Insert dots after day and month
   let formatted = '';
-  for (let i = 0; i < limited.length; i++) {
-    if (i === 2) {
-      formatted += '.';
-    } else if (i === 4) {
+  for (let i = 0; i < validDigits.length; i++) {
+    if (i === 2 || i === 4) {
       formatted += '.';
     }
-    formatted += limited[i];
-  }
-
-  const parts = formatted.split('.');
-  const day = parts[0] || '';
-  const month = parts[1] || '';
-  const year = parts[2] || '';
-
-  if (day && !isValidPartialDate(day, 'day')) {
-    return previousValue;
-  }
-
-  if (month && !isValidPartialDate(month, 'month')) {
-    return previousValue;
-  }
-
-  if (year && !isValidPartialDate(year, 'year')) {
-    return previousValue;
+    formatted += validDigits[i];
   }
 
   return formatted;
@@ -174,7 +172,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   }, [value]);
 
   const handleTextChange = (text: string) => {
-    const masked = applyDateMask(text, displayValue);
+    const masked = applyDateMask(text);
 
     setDisplayValue(masked);
 
@@ -185,6 +183,18 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       if (validateDateParts(day, month, year)) {
         const date = new Date(apiFormat);
         if (!isNaN(date.getTime())) {
+          if (maximumDate && date > maximumDate) {
+            const clampedApi = formatDateToAPI(maximumDate);
+            setDisplayValue(formatDateForDisplay(clampedApi));
+            onChange?.(clampedApi);
+            return;
+          }
+          if (minimumDate && date < minimumDate) {
+            const clampedApi = formatDateToAPI(minimumDate);
+            setDisplayValue(formatDateForDisplay(clampedApi));
+            onChange?.(clampedApi);
+            return;
+          }
           onChange?.(apiFormat);
         }
       }

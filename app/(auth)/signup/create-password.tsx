@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES } from '@/constants/auth';
 import { useTheme } from '@/hooks/use-theme';
-import { validatePassword, yupSchemas } from '@/lib/auth-validation';
+import { FULL_NAME_MAX_LENGTH, validatePassword, yupSchemas } from '@/lib/auth-validation';
 
 import { PhoneInput } from '@/components/ui/phone-input';
 import { useSignUpContext } from '@/context/SignUpContext';
@@ -122,6 +122,7 @@ export default function CreatePasswordScreen() {
                 onBlur={handleBlur('fullName')}
                 error={touched.fullName && errors.fullName ? errors.fullName : undefined}
                 placeholder=""
+                maxLength={FULL_NAME_MAX_LENGTH}
               />
 
               <PhoneInput

@@ -18,6 +18,7 @@ import { PetsAllowed } from '@/components/announcement/pets-allowed';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAnnouncementDetails } from '@/hooks/api/use-announcement-details';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { getPriceLabel } from '@/lib/utils/announcement-helpers';
 import {
   hasLocationData,
@@ -34,6 +35,7 @@ export default function AnnouncementDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { announcement, isLoading, error, refetch, toggleFavourite, toggleComparison } =
     useAnnouncementDetails(id!);
+  const { horizontalStyle } = useScreenEdgePadding();
 
   const handleBack = useCallback(() => router.back(), [router]);
 
@@ -79,7 +81,7 @@ export default function AnnouncementDetailScreen() {
 
   if (error || !announcement) {
     return (
-      <ThemedView className="flex-1 items-center justify-center px-4">
+      <ThemedView className="flex-1 items-center justify-center" style={horizontalStyle}>
         <ThemedText className="mb-4 text-center text-foreground">
           {error || t('announcement.detail.not_found')}
         </ThemedText>
@@ -120,7 +122,7 @@ export default function AnnouncementDetailScreen() {
 
           <DescriptionSection description={announcement.description} />
 
-          <View className="px-[16px]">
+          <View style={horizontalStyle}>
             <ObjectCharacteristics
               propertyType={announcement.propertyType}
               propertyDetails={announcement.property}
@@ -129,14 +131,17 @@ export default function AnnouncementDetailScreen() {
           </View>
 
           {pets && (
-            <View className="px-[16px]">
+            <View style={horizontalStyle}>
               <PetsAllowed pets={pets} />
             </View>
           )}
         </View>
       </ScrollView>
 
-      <SafeAreaView className="absolute left-0 right-0 top-0 z-10 px-[16px]" edges={['top']}>
+      <SafeAreaView
+        className="absolute left-0 right-0 top-0 z-10"
+        style={horizontalStyle}
+        edges={['top']}>
         <View className="flex-row items-center justify-between" style={{ marginTop: 16 }}>
           <Pressable
             onPress={handleBack}

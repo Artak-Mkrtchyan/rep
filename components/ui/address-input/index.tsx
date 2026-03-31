@@ -186,7 +186,7 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
   const showNoResults = !isLoading && results.length === 0 && showEmptyState;
 
   return (
-    <View className={cn('w-full gap-1', containerClassName)}>
+    <View className={cn('w-full gap-1', containerClassName)} style={showDropdown ? { zIndex: 100 } : undefined}>
       {label ? (
         <ThemedText className="mb-1 text-[16px] font-bold text-foreground">{label}</ThemedText>
       ) : null}
@@ -224,7 +224,9 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
       </Pressable>
 
       {showDropdown ? (
-        <View className="z-[100] mt-1 max-h-[240px] rounded-[12px] border border-default bg-card">
+        <View
+          className="max-h-[240px] rounded-[12px] border border-default bg-card"
+          style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, marginTop: 4, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 6 }}>
           <ScrollView
             keyboardShouldPersistTaps="handled"
             nestedScrollEnabled

@@ -13,6 +13,7 @@ import {
   useSearchBrokerCompaniesInfinite,
   useSearchIndividualBrokersInfinite,
 } from '@/hooks/api/use-applications';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router } from 'expo-router';
 
@@ -22,6 +23,7 @@ const ON_END_REACHED_THRESHOLD = 0.35;
 
 export default function BrokerListScreen() {
   const { t } = useTranslation();
+  const { horizontalStyle } = useScreenEdgePadding();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -111,7 +113,7 @@ export default function BrokerListScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <View className="gap-4 px-4 pt-[24px]">
+      <View className="gap-4 pt-[24px]" style={horizontalStyle}>
         <ThemedText className="text-[16px] font-bold text-foreground">
           {t('announcement.rent.broker_list.heading')}
         </ThemedText>
@@ -133,6 +135,7 @@ export default function BrokerListScreen() {
       {isIndividualBroker ? (
         <FlatList
           className="flex-1 px-4 py-4"
+          style={horizontalStyle}
           contentContainerStyle={{ paddingBottom: 31, gap: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -161,6 +164,7 @@ export default function BrokerListScreen() {
       ) : (
         <FlatList
           className="flex-1 px-4 py-4"
+          style={horizontalStyle}
           contentContainerStyle={{ paddingBottom: 31, gap: 16 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"

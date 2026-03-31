@@ -1,4 +1,4 @@
-import { authService } from '@/lib/api/auth';
+import { AuthScope, authService } from '@/lib/api/auth';
 import {
   clearAllTokens as clearHttpClientTokens,
   initializeTokenStorage,
@@ -12,10 +12,20 @@ type AuthTokens = {
   refreshToken: string;
 };
 
+export type UserInfo = {
+  id: string;
+  email: string;
+  fullName: string;
+  phone: string;
+  role: string;
+  scope: AuthScope;
+};
+
 type AuthContextValue = {
   accessToken: string | null;
   refreshToken: string | null;
   user: { accessToken: string; refreshToken: string } | null;
+  userInfo: UserInfo | null;
   isAuthenticated: boolean;
   isRestoring: boolean;
   isLoading: boolean;
@@ -32,7 +42,25 @@ const AuthContext = React.createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = React.useState<string | null>(null);
   const [refreshToken, setRefreshToken] = React.useState<string | null>(null);
+  const [userInfo, setUserInfo] = React.useState<UserInfo | null>(null);
   const [isRestoring, setIsRestoring] = React.useState(true);
+
+  const fetchUserInfo = React.useCallback(async () => {
+    try {
+      const actor = await authService.getCurrentActor();
+      setUserInfo({
+        id: actor.id,
+        email: actor.email,
+        fullName: actor.fullName,
+        phone: actor.phone || '',
+        role: actor.roles[0]?.name || 'user',
+        scope: actor.scope,
+      });
+    } catch {
+      // Non-critical — userInfo will be null
+      setUserInfo(null);
+    }
+  }, []);
 
   // Sync tokens with HTTP client cache whenever they change
   React.useEffect(() => {
@@ -70,6 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 SecureStore.setItemAsync(ACCESS_TOKEN_KEY, response.accessToken),
                 SecureStore.setItemAsync(REFRESH_TOKEN_KEY, response.refreshToken),
               ]);
+
+              // Fetch user info from API (like web does)
+              await fetchUserInfo();
             } else {
               // Invalid response - clear tokens
               await clearStoredTokens();
@@ -98,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const clearStoredTokens = async () => {
       setAccessToken(null);
       setRefreshToken(null);
+      setUserInfo(null);
       clearHttpClientTokens();
       await Promise.all([
         SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
@@ -110,20 +142,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [fetchUserInfo]);
 
-  const setTokens = React.useCallback(async (tokens: AuthTokens) => {
-    setAccessToken(tokens.accessToken);
-    setRefreshToken(tokens.refreshToken);
-    await Promise.all([
-      SecureStore.setItemAsync(ACCESS_TOKEN_KEY, tokens.accessToken),
-      SecureStore.setItemAsync(REFRESH_TOKEN_KEY, tokens.refreshToken),
-    ]);
-  }, []);
+  const setTokens = React.useCallback(
+    async (tokens: AuthTokens) => {
+      setAccessToken(tokens.accessToken);
+      setRefreshToken(tokens.refreshToken);
+      await Promise.all([
+        SecureStore.setItemAsync(ACCESS_TOKEN_KEY, tokens.accessToken),
+        SecureStore.setItemAsync(REFRESH_TOKEN_KEY, tokens.refreshToken),
+      ]);
+
+      // Fetch user info after login (like web does)
+      await fetchUserInfo();
+    },
+    [fetchUserInfo]
+  );
 
   const logout = React.useCallback(async () => {
     setAccessToken(null);
     setRefreshToken(null);
+    setUserInfo(null);
     clearHttpClientTokens();
     await Promise.all([
       SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
@@ -144,6 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       accessToken,
       refreshToken,
       user: accessToken && refreshToken ? { accessToken, refreshToken } : null,
+      userInfo,
       isAuthenticated: Boolean(accessToken),
       isRestoring,
       isLoading: isRestoring,
@@ -151,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logout,
       getAuthHeader,
     }),
-    [accessToken, refreshToken, isRestoring, setTokens, logout, getAuthHeader]
+    [accessToken, refreshToken, userInfo, isRestoring, setTokens, logout, getAuthHeader]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

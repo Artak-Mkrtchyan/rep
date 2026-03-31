@@ -11,7 +11,7 @@ export const OTP_LENGTH = 6;
 export const RESEND_CODE_TIMEOUT = 60;
 export const OTP_EXPIRATION_TIMEOUT = 300; // 5 minutes
 export const FULL_NAME_MIN_LENGTH = 2;
-export const FULL_NAME_MAX_LENGTH = 100;
+export const FULL_NAME_MAX_LENGTH = 255;
 export const FULL_NAME_REGEX = /^[a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'\u2018\u2019\-\s]+$/;
 export const EMAIL_REGEX =
   /^(?=^.{1,64}@)(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
@@ -105,7 +105,11 @@ export const yupSchemas = {
     .required(() => i18n.t('validation.required')),
   certifiedOn: Yup.string()
     .required(() => i18n.t('validation.required'))
-    .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format')),
+    .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format'))
+    .test('not-future-date', () => i18n.t('validation.date_cannot_be_future'), (value) => {
+      if (!value || !DATE_REGEX.test(value)) return true;
+      return new Date(value) <= new Date();
+    }),
 };
 
 export const validateEmail = (email: string): boolean => {

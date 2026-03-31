@@ -12,6 +12,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { ANNOUNCEMENT_ROUTES, BATHROOMS_OPTIONS, BEDROOMS_OPTIONS } from '@/constants/announcement';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep3 } from '@/types/announcement';
 
@@ -33,6 +34,7 @@ const PropertyInfoSchema = Yup.object().shape({
 export default function PropertyInfoFirstScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
@@ -96,7 +98,7 @@ export default function PropertyInfoFirstScreen() {
               contentContainerStyle={{ paddingBottom: scrollPaddingBottom }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="px-4 pt-6">
+              <View className="pt-6" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.property_info_first_title')}
                 </ThemedText>

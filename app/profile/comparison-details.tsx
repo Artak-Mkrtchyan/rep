@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, StyleSheet, View , Pressable } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
@@ -10,6 +10,7 @@ import {
   ComparisonDetailCard,
 } from '@/components/announcement/comparison-detail-card';
 import { ThemedText } from '@/components/themed-text';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { announcementsService } from '@/lib/api/announcements';
 import type { Announcement } from '@/types/api';
 
@@ -18,6 +19,7 @@ const CARD_GAP = 8;
 export default function ComparisonDetailsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { horizontalStyle } = useScreenEdgePadding();
   const { ids } = useLocalSearchParams<{ ids: string }>();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,7 +57,7 @@ export default function ComparisonDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
-      <View style={styles.header}>
+      <View style={[styles.header, horizontalStyle]}>
         <Pressable onPress={() => router.back()} hitSlop={12}>
           <Ionicons name="chevron-back" size={24} color="#111111" />
         </Pressable>
@@ -83,7 +85,7 @@ export default function ComparisonDetailsScreen() {
           snapToInterval={CARD_WIDTH + CARD_GAP}
           decelerationRate="fast"
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.list}
+          contentContainerStyle={[styles.list, horizontalStyle]}
         />
       )}
     </SafeAreaView>
@@ -99,7 +101,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
     paddingVertical: 12,
   },
   center: {
@@ -108,7 +109,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   list: {
-    paddingHorizontal: 16,
     gap: CARD_GAP,
     paddingBottom: 24,
   },

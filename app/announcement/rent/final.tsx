@@ -15,6 +15,7 @@ import {
   getObjectCharacteristics,
   getPetItemsConfig,
 } from '@/constants/announcement';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { Language } from '@/lib/i18n/i18n';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
@@ -22,6 +23,8 @@ import { Image } from 'expo-image';
 export default function FinalScreen() {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as Language;
+
+  const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const publicId = useAnnouncementForRentFormStore((s) => s.publicId);
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
@@ -104,7 +107,7 @@ export default function FinalScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 31 }}
         showsVerticalScrollIndicator={false}>
-        <View className="px-4 pt-6">
+        <View className="pt-6" style={horizontalStyle}>
           <View className="mb-4">
             <ImageSlider
               images={imageSources}

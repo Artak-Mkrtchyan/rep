@@ -8,6 +8,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { InputLabel } from '@/components/ui/input/label';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { RentForApartmentsFormStep3 } from '@/types/announcement';
@@ -20,6 +21,7 @@ const DescriptionSchema = Yup.object().shape({
 });
 export default function PropertyInfoSecondScreen() {
   const { t } = useTranslation();
+  const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
@@ -74,7 +76,7 @@ export default function PropertyInfoSecondScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="px-4 pt-[24px]">
+              <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.describe_property')}
                 </ThemedText>

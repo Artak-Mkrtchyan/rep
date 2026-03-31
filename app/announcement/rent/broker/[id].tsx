@@ -7,6 +7,7 @@ import { BrokerProfileCard } from '@/components/announcement/broker-profile-card
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useGetBrokerCompanyById, useGetIndividualBrokerById } from '@/hooks/api/use-applications';
+import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -16,6 +17,7 @@ const truncateByLength = (text: string, maxLength = 100, isExpanded = false) => 
 };
 
 export default function BrokerDetailsScreen() {
+  const { horizontalStyle } = useScreenEdgePadding();
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const { id, type } = useLocalSearchParams<{ id: string; type: 'individual' | 'company' }>();
   const isIndividualBroker = type === 'individual';
@@ -40,7 +42,7 @@ export default function BrokerDetailsScreen() {
         contentContainerStyle={{ paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
-        <View className="px-4 pt-6">
+        <View className="pt-6" style={horizontalStyle}>
           <BrokerProfileCard
             avatar={require('@/assets/images/hero.png')}
             name={data?.fullName || data?.name || ''}

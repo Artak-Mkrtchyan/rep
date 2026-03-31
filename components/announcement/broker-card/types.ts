@@ -6,6 +6,7 @@ export type BrokerCardStat = {
 };
 
 export type BrokerCardProps = {
+  isSelected?: boolean;
   avatar: ImageSourcePropType;
   name: string;
   rating: number;

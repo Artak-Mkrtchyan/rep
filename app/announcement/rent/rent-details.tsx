@@ -79,9 +79,10 @@ export default function RentDetailsScreen() {
       <Formik<RentDetailsFormValues>
         initialValues={initialValues}
         validationSchema={RentDetailsSchema}
+        validateOnMount={true}
         enableReinitialize
         onSubmit={saveRentDetails}>
-        {({ setFieldValue, handleSubmit, values, errors, touched }) => (
+        {({ setFieldValue, handleSubmit, values, errors, touched, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -148,6 +149,7 @@ export default function RentDetailsScreen() {
 
             <AnnouncementFooter
               firstButtonLabel="Next"
+              firstButtonDisabled={!isValid}
               secondButtonLabel="Save & exit"
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}

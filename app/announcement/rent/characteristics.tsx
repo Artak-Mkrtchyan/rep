@@ -11,9 +11,9 @@ import { CheckboxRow } from '@/components/ui/checkbox';
 import { ChipGroup } from '@/components/ui/chip-group';
 import { Select } from '@/components/ui/select';
 import {
+  FLOORS_OPTIONS,
   getBuildingTypeOptions,
   getConditionOptions,
-  FLOORS_OPTIONS,
   getOwnershipTypeOptions,
   YEAR_BUILT_OPTIONS,
 } from '@/constants/announcement';
@@ -21,8 +21,19 @@ import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Attributes, Property } from '@/types/announcement';
 
+import * as Yup from 'yup';
 type CharacteristicsFormValues = Attributes;
 
+const CharacteristicsSchema = Yup.object().shape({
+  building: Yup.object().shape({
+    buildingType: Yup.string().required('Required'),
+    yearBuilt: Yup.number().required('Required').typeError('Must be a number'),
+  }),
+  ownershipAndCondition: Yup.object().shape({
+    condition: Yup.string().required('Required'),
+    ownershipType: Yup.string().required('Required'),
+  }),
+});
 export default function CharacteristicsScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
@@ -47,11 +58,11 @@ export default function CharacteristicsScreen() {
     }
 
     try {
-      await sendFormData();
-
       if (isNext) {
         nextStep();
       } else {
+        await sendFormData();
+
         router.push('/(tabs)');
       }
     } catch {
@@ -74,9 +85,11 @@ export default function CharacteristicsScreen() {
     <ThemedView className="flex-1">
       <Formik<CharacteristicsFormValues>
         initialValues={initialValues}
+        validateOnMount={true}
         enableReinitialize
+        validationSchema={CharacteristicsSchema}
         onSubmit={saveCharacteristics}>
-        {({ handleSubmit, setFieldValue, values }) => (
+        {({ handleSubmit, setFieldValue, values, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -112,7 +125,7 @@ export default function CharacteristicsScreen() {
 
                   <View className="rounded-[12px] bg-muted p-4">
                     <ChipGroup
-                      label={t('announcement.rent.parking')}
+                      label={t('announcement.rent.buildingType')}
                       options={getBuildingTypeOptions(t)}
                       value={values.building?.buildingType || ''}
                       onChange={(v) => setFieldValue('building.buildingType', v)}
@@ -255,6 +268,7 @@ export default function CharacteristicsScreen() {
 
             <AnnouncementFooter
               firstButtonLabel={t('common.next')}
+              firstButtonDisabled={!isValid}
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}

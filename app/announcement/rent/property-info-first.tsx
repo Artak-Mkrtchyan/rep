@@ -21,19 +21,13 @@ const FOOTER_APPROX_HEIGHT = 152;
 
 type PropertyInfoFormValues = RentForApartmentsFormStep3;
 
-const isFilled = (v: unknown) => v !== undefined && v !== null && v !== '';
-
 const PropertyInfoSchema = Yup.object().shape({
   property: Yup.object().shape({
-    areaM2: Yup.number().when(
-      ['attributes.bedroomCount', 'attributes.bathroomCount'],
-      (values: unknown[], schema: Yup.NumberSchema) => {
-        const [bedroomCount, bathroomCount] = values;
-        return isFilled(bedroomCount) || isFilled(bathroomCount)
-          ? schema.required('Required').typeError('Must be a number')
-          : schema;
-      }
-    ),
+    areaM2: Yup.number().required('Required').typeError('Must be a number'),
+    attributes: Yup.object().shape({
+      bedroomCount: Yup.number().required('Required').typeError('Must be a number'),
+      bathroomCount: Yup.number().required('Required').typeError('Must be a number'),
+    }),
   }),
 });
 
@@ -94,9 +88,10 @@ export default function PropertyInfoFirstScreen() {
       <Formik<PropertyInfoFormValues>
         initialValues={initialValues}
         validationSchema={PropertyInfoSchema}
+        validateOnMount={true}
         enableReinitialize
         onSubmit={savePropertyInfo}>
-        {({ handleChange, handleBlur, handleSubmit, setFieldValue, values, errors, touched }) => (
+        {({ handleSubmit, setFieldValue, values, errors, touched, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -154,6 +149,7 @@ export default function PropertyInfoFirstScreen() {
             <AnnouncementFooter
               firstButtonLabel={t('common.next')}
               secondButtonLabel={t('common.save_and_exit')}
+              firstButtonDisabled={!isValid}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
             />

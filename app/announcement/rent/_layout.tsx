@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AnnouncementHeader } from '@/components/announcement/announcement-header';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useStepRedirect } from '@/hooks/use-announcement';
+import { getTargetRoute } from '@/lib/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
 import { Pressable } from 'react-native';
@@ -17,12 +18,22 @@ export default function AnnouncementRentLayout() {
     return <Redirect href={targetRoute} />;
   }
 
-  const handleBackPress = (step: number) => {
+  const handleBackPress = (step: number, routeName: string) => {
+    if (
+      routeName === ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.name ||
+      routeName === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.name
+    ) {
+      const href = getTargetRoute(step);
+      router.replace(href);
+      return;
+    }
+
     if (step === 1) {
       router.push('/(tabs)');
-    } else {
-      setCurrentStep(--step);
+      return;
     }
+
+    setCurrentStep(--step);
   };
 
   return (
@@ -37,7 +48,7 @@ export default function AnnouncementRentLayout() {
               <AnnouncementHeader
                 label={t(route.labelKey)}
                 completedStep={route.completedStep}
-                onHandleBackPress={() => handleBackPress(route.completedStep)}
+                onHandleBackPress={() => handleBackPress(route.completedStep, route.name)}
               />
             ),
           }}

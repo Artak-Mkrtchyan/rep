@@ -34,7 +34,9 @@ export const ComparisonDetailCard: React.FC<ComparisonDetailCardProps> = ({ anno
   return (
     <View style={cardStyles.shadowWrapper}>
       <View style={cardStyles.container}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 24 }}>
           <View style={cardStyles.imageWrapper}>
             {imageUrl ? (
               <Image source={{ uri: imageUrl }} style={cardStyles.image} contentFit="cover" />
@@ -71,9 +73,7 @@ export const ComparisonDetailCard: React.FC<ComparisonDetailCardProps> = ({ anno
               </>
             )}
 
-            {characteristics.length > 0 && (
-              <CharacteristicsBlock items={characteristics} />
-            )}
+            {characteristics.length > 0 && <CharacteristicsBlock items={characteristics} />}
           </View>
         </ScrollView>
       </View>
@@ -151,10 +151,26 @@ const LocationBlock: React.FC<{ location: LocationInfo }> = ({ location }) => {
 };
 
 const DISTANCE_CONFIGS: { type: string; labelKey: string; icon: ImageSource }[] = [
-  { type: 'METRO', labelKey: 'announcement.detail.metro', icon: require('@/assets/images/announcement-icons/metro-icon.svg') },
-  { type: 'HOSPITAL', labelKey: 'announcement.detail.hospital', icon: require('@/assets/images/announcement-icons/hospital-icon.svg') },
-  { type: 'SCHOOL', labelKey: 'announcement.detail.school', icon: require('@/assets/images/announcement-icons/school-icon.svg') },
-  { type: 'SUPERMARKET', labelKey: 'announcement.detail.grocery_shop', icon: require('@/assets/images/announcement-icons/grocery-icon.svg') },
+  {
+    type: 'METRO',
+    labelKey: 'announcement.detail.metro',
+    icon: require('@/assets/images/announcement-icons/metro-icon.svg'),
+  },
+  {
+    type: 'HOSPITAL',
+    labelKey: 'announcement.detail.hospital',
+    icon: require('@/assets/images/announcement-icons/hospital-icon.svg'),
+  },
+  {
+    type: 'SCHOOL',
+    labelKey: 'announcement.detail.school',
+    icon: require('@/assets/images/announcement-icons/school-icon.svg'),
+  },
+  {
+    type: 'SUPERMARKET',
+    labelKey: 'announcement.detail.supermarket',
+    icon: require('@/assets/images/announcement-icons/supermarket-icon.svg'),
+  },
 ];
 
 const DistancesBlock: React.FC<{ distances: DistanceInfo[] }> = ({ distances }) => {
@@ -172,7 +188,11 @@ const DistancesBlock: React.FC<{ distances: DistanceInfo[] }> = ({ distances }) 
           return (
             <View key={d.type} style={cardStyles.distItem}>
               <View style={cardStyles.distIcon}>
-                <Image source={config.icon} style={{ width: 20, height: 20 }} contentFit="contain" />
+                <Image
+                  source={config.icon}
+                  style={{ width: 20, height: 20 }}
+                  contentFit="contain"
+                />
               </View>
               <View className="gap-[4px]">
                 <ThemedText className="text-[10px] text-[#919191]">{t(config.labelKey)}</ThemedText>
@@ -198,16 +218,56 @@ const DistancesBlock: React.FC<{ distances: DistanceInfo[] }> = ({ distances }) 
 type CharItem = { label: string; value: string; icon: ImageSource };
 
 const CHAR_CONFIGS: { key: string; labelKey: string; icon: ImageSource }[] = [
-  { key: 'areaM2', labelKey: 'property_details.area', icon: require('@/assets/images/announcement-icons/size-icon.svg') },
-  { key: 'bathroomCount', labelKey: 'property_details.bathrooms', icon: require('@/assets/images/announcement-icons/bath-icon.svg') },
-  { key: 'bedroomCount', labelKey: 'property_details.bedrooms', icon: require('@/assets/images/announcement-icons/bed-icon.svg') },
-  { key: 'buildingType', labelKey: 'property_details.building_type', icon: require('@/assets/images/announcement-icons/buildingType-icon.svg') },
-  { key: 'hvac', labelKey: 'property_details.hvac', icon: require('@/assets/images/announcement-icons/condition-icon.svg') },
-  { key: 'numberOfFloors', labelKey: 'property_details.floors', icon: require('@/assets/images/announcement-icons/floors-icon.svg') },
-  { key: 'floorNo', labelKey: 'property_details.floors', icon: require('@/assets/images/announcement-icons/floors-icon.svg') },
-  { key: 'condition', labelKey: 'property_details.condition', icon: require('@/assets/images/announcement-icons/condition-icon.svg') },
-  { key: 'elevator', labelKey: 'property_details.elevator', icon: require('@/assets/images/announcement-icons/floors-icon.svg') },
-  { key: 'offStreetParking', labelKey: 'property_details.parking', icon: require('@/assets/images/announcement-icons/parking-icon.svg') },
+  {
+    key: 'areaM2',
+    labelKey: 'property_details.area',
+    icon: require('@/assets/images/announcement-icons/size-icon.svg'),
+  },
+  {
+    key: 'bathroomCount',
+    labelKey: 'property_details.bathrooms',
+    icon: require('@/assets/images/announcement-icons/bath-icon.svg'),
+  },
+  {
+    key: 'bedroomCount',
+    labelKey: 'property_details.bedrooms',
+    icon: require('@/assets/images/announcement-icons/bed-icon.svg'),
+  },
+  {
+    key: 'buildingType',
+    labelKey: 'property_details.building_type',
+    icon: require('@/assets/images/announcement-icons/buildingType-icon.svg'),
+  },
+  {
+    key: 'hvac',
+    labelKey: 'property_details.hvac',
+    icon: require('@/assets/images/announcement-icons/condition-icon.svg'),
+  },
+  {
+    key: 'numberOfFloors',
+    labelKey: 'property_details.floors',
+    icon: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  },
+  {
+    key: 'floorNo',
+    labelKey: 'property_details.floors',
+    icon: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  },
+  {
+    key: 'condition',
+    labelKey: 'property_details.condition',
+    icon: require('@/assets/images/announcement-icons/condition-icon.svg'),
+  },
+  {
+    key: 'elevator',
+    labelKey: 'property_details.elevator',
+    icon: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  },
+  {
+    key: 'offStreetParking',
+    labelKey: 'property_details.parking',
+    icon: require('@/assets/images/announcement-icons/parking-icon.svg'),
+  },
 ];
 
 function flattenAttributes(attrs: Record<string, unknown> | undefined): Record<string, unknown> {
@@ -235,8 +295,7 @@ function buildCharacteristics(
   return CHAR_CONFIGS.map((c) => {
     const raw = c.key === 'areaM2' ? property?.areaM2 : flat[c.key];
     if (raw == null || raw === '') return null;
-    const val =
-      typeof raw === 'boolean' ? (raw ? t('common.yes') : t('common.no')) : String(raw);
+    const val = typeof raw === 'boolean' ? (raw ? t('common.yes') : t('common.no')) : String(raw);
     return { label: t(c.labelKey), value: val, icon: c.icon };
   }).filter(Boolean) as CharItem[];
 }
@@ -256,7 +315,11 @@ const CharacteristicsBlock: React.FC<{ items: CharItem[] }> = ({ items }) => {
             {col.map((item) => (
               <View key={item.label} className="flex-row items-center gap-[4px]">
                 <View style={cardStyles.distIcon}>
-                  <Image source={item.icon} style={{ width: 16, height: 16 }} contentFit="contain" />
+                  <Image
+                    source={item.icon}
+                    style={{ width: 16, height: 16 }}
+                    contentFit="contain"
+                  />
                 </View>
                 <View className="gap-[2px]">
                   <ThemedText className="text-[10px] text-[#777777]">{item.label}</ThemedText>

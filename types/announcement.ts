@@ -1,4 +1,6 @@
 import { CHARACTERISTIC_ICONS } from '@/constants/announcement';
+import { ApplicationStatus } from '@/lib/api/applications';
+import { InfrastructureObjectType } from '@/lib/api/infrastructure';
 import { Language } from '@/lib/i18n/i18n';
 
 export type RentForApartmentsForm = { stepNumber: number } & RentForApartmentsFormStep1 &
@@ -37,6 +39,11 @@ export type RentForApartmentsFormStep1 = {
   geo: GeoDetailsDto;
   propertyType: Property | '';
   processType: 'AS_INDIVIDUAL' | 'AS_BROKER' | '';
+
+  infrastructureObjects?: {
+    distanceInMeters: number;
+    type: InfrastructureObjectType;
+  }[];
   needPhotographer?: boolean;
   needAssessmentExpert?: boolean;
 };
@@ -111,4 +118,16 @@ export type CharacteristicConfig = {
       formatYesNo: (v: boolean | undefined) => string;
     }
   ) => string;
+};
+
+export type MetaData = {
+  response?: {
+    id: string;
+    publicId: string;
+    status: ApplicationStatus;
+    createdAt: string;
+    createdBy: string;
+    applicantEmail: string;
+  };
+  brokerId?: string;
 };

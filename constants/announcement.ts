@@ -89,6 +89,13 @@ export const CHARACTERISTIC_ICONS: Record<string, string> = {
   bicycleStorage: require('@/assets/images/announcement-icons/bike-icon.svg'),
 };
 
+export const INFRASTRUCTURE_ICONS: Record<string, string> = {
+  metro: require('@/assets/images/announcement-icons/metro-icon.svg'),
+  hospital: require('@/assets/images/announcement-icons/hospital-icon.svg'),
+  school: require('@/assets/images/announcement-icons/school-icon.svg'),
+  supermarket: require('@/assets/images/announcement-icons/supermarket-icon.svg'),
+};
+
 export const getPetItemsConfig = (
   t: TFunction
 ): {

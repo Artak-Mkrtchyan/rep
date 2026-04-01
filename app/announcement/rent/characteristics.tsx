@@ -58,11 +58,11 @@ export default function CharacteristicsScreen() {
     }
 
     try {
+      await sendFormData();
+
       if (isNext) {
         nextStep();
       } else {
-        await sendFormData();
-
         router.push('/(tabs)');
       }
     } catch {

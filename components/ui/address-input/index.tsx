@@ -9,6 +9,7 @@ import type { YandexSuggestRequestResults } from '@/lib/api/yandex';
 import { cn } from '@/lib/utils';
 import { flatGeoFromMultilangGeocode } from '@/lib/yandex-geocode-to-flat-geo';
 
+import { detectInfrastructureObjects } from '@/lib/api/infrastructure';
 import { EMPTY_FLAT_GEO } from '@/store/announcementStore';
 import type { AddressInputProps } from './types';
 
@@ -90,8 +91,11 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
   const emitEmptyGeo = useCallback(
     (text = '') => {
       onSelectAddress?.({
-        ...EMPTY_FLAT_GEO,
-        formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: text },
+        address: {
+          ...EMPTY_FLAT_GEO,
+          formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: text },
+        },
+        infrastructureObjects: undefined,
       });
     },
     [onSelectAddress, lang]
@@ -147,21 +151,33 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
       if (item.uri) {
         try {
           const geocodeData = await geocodeByUri.mutate({ uri: item.uri });
-
           const flat = flatGeoFromMultilangGeocode(geocodeData);
+
+          const infrastructureObjects = await detectInfrastructureObjects(
+            flat.latitude,
+            flat.longitude
+          );
+
           onSelectAddress?.({
-            ...flat,
+            address: flat,
+            infrastructureObjects,
           });
         } catch {
           onSelectAddress?.({
-            ...EMPTY_FLAT_GEO,
-            formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: title },
+            address: {
+              ...EMPTY_FLAT_GEO,
+              formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: title },
+            },
+            infrastructureObjects: undefined,
           });
         }
       } else {
         onSelectAddress?.({
-          ...EMPTY_FLAT_GEO,
-          formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: title },
+          address: {
+            ...EMPTY_FLAT_GEO,
+            formattedAddress: { ...EMPTY_FLAT_GEO.formattedAddress, [lang]: title },
+          },
+          infrastructureObjects: undefined,
         });
       }
 
@@ -186,7 +202,9 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
   const showNoResults = !isLoading && results.length === 0 && showEmptyState;
 
   return (
-    <View className={cn('w-full gap-1', containerClassName)} style={showDropdown ? { zIndex: 100 } : undefined}>
+    <View
+      className={cn('w-full gap-1', containerClassName)}
+      style={{ zIndex: showDropdown ? 100 : 0 }}>
       {label ? (
         <ThemedText className="mb-1 text-[16px] font-bold text-foreground">{label}</ThemedText>
       ) : null}
@@ -226,7 +244,19 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
       {showDropdown ? (
         <View
           className="max-h-[240px] rounded-[12px] border border-default bg-card"
-          style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100, marginTop: 4, elevation: 5, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.15, shadowRadius: 6 }}>
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            marginTop: 4,
+            elevation: 5,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.15,
+            shadowRadius: 6,
+          }}>
           <ScrollView
             keyboardShouldPersistTaps="handled"
             nestedScrollEnabled

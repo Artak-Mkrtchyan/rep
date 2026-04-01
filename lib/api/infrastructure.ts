@@ -113,43 +113,50 @@ const CATEGORY_CONFIG: CategoryConfig[] = [
 ];
 
 export const detectInfrastructureObjects = async (
-  latitude: number,
-  longitude: number
-): Promise<InfrastructureObject[]> => {
-  const ll = `${longitude},${latitude}`;
+  latitude?: number,
+  longitude?: number
+): Promise<InfrastructureObject[] | undefined> => {
+  try {
+    if (!latitude || !longitude) return undefined;
 
-  const requests = CATEGORY_CONFIG.map((category) =>
-    yandexService.searchObjects(category.searchText, {
-      ll,
-      spn: SEARCH_SPAN,
-      types: category.suggestType,
-      results: RESULTS_PER_CATEGORY,
-    })
-  );
+    const ll = `${longitude},${latitude}`;
 
-  const results = await Promise.allSettled(requests);
-
-  const nearestPerCategory: InfrastructureObject[] = [];
-
-  for (let i = 0; i < CATEGORY_CONFIG.length; i++) {
-    const result = results[i]!;
-    if (result.status !== 'fulfilled') continue;
-
-    const withinRadius =
-      result.value.results?.filter((r) => r.distance && r.distance.value <= MAX_DISTANCE_METERS) ??
-      [];
-
-    if (withinRadius.length === 0) continue;
-
-    const nearest = withinRadius.reduce((min, current) =>
-      current.distance!.value < min.distance!.value ? current : min
+    const requests = CATEGORY_CONFIG.map((category) =>
+      yandexService.searchObjects(category.searchText, {
+        ll,
+        spn: SEARCH_SPAN,
+        types: category.suggestType,
+        results: RESULTS_PER_CATEGORY,
+      })
     );
 
-    nearestPerCategory.push({
-      type: CATEGORY_CONFIG[i]!.type,
-      distanceInMeters: Math.round(nearest.distance!.value),
-    });
-  }
+    const results = await Promise.allSettled(requests);
 
-  return nearestPerCategory.slice(0, MAX_RESULTS);
+    const nearestPerCategory: InfrastructureObject[] = [];
+
+    for (let i = 0; i < CATEGORY_CONFIG.length; i++) {
+      const result = results[i]!;
+      if (result.status !== 'fulfilled') continue;
+
+      const withinRadius =
+        result.value.results?.filter(
+          (r) => r.distance && r.distance.value <= MAX_DISTANCE_METERS
+        ) ?? [];
+
+      if (withinRadius.length === 0) continue;
+
+      const nearest = withinRadius.reduce((min, current) =>
+        current.distance!.value < min.distance!.value ? current : min
+      );
+
+      nearestPerCategory.push({
+        type: CATEGORY_CONFIG[i]!.type,
+        distanceInMeters: Math.round(nearest.distance!.value),
+      });
+    }
+
+    return nearestPerCategory.slice(0, MAX_RESULTS);
+  } catch {
+    return undefined;
+  }
 };

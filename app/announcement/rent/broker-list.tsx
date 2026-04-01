@@ -27,7 +27,7 @@ export default function BrokerListScreen() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const brokerId = useAnnouncementForRentFormStore((s) => s.brokerId);
+  const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
 
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);

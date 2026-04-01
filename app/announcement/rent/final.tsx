@@ -26,13 +26,15 @@ export default function FinalScreen() {
 
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const publicId = useAnnouncementForRentFormStore((s) => s.publicId);
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData?.response);
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const handlePublish = async () => {
     try {
+      await sendFormData();
+
       await publishFormData();
       resetForm();
     } catch {
@@ -142,26 +144,21 @@ export default function FinalScreen() {
 
           <PropertyAnnouncementDetail
             title={formData.title || ''}
-            id={publicId}
+            id={metaData?.publicId}
             typeLabel={typeLabel}
-            price="-"
+            price=""
             location={{
               country: formData.geo.country[currentLanguage],
               city: formData.geo.locality[currentLanguage],
               district: formData.geo.province[currentLanguage],
               address: `${formData.geo.street[currentLanguage]} ${formData.geo.house?.[currentLanguage] || ''}`,
             }}
-            distances={{
-              metro: '-',
-              hospital: '-',
-              school: '-',
-              grocery: '-',
-            }}
+            distances={formData.infrastructureObjects}
             placedBy={{
-              name: '-',
+              name: metaData?.applicantEmail || '',
             }}
-            postedDate="-"
-            updatedDate="-"
+            postedDate={''}
+            updatedDate=""
             onViewMap={handleViewOnMap}
           />
 

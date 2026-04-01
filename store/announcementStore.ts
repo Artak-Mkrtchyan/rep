@@ -1,23 +1,19 @@
 import { applicationsService } from '@/lib/api/applications';
+import { MetaData, RentForApartmentsForm } from '@/types/announcement';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist, subscribeWithSelector } from 'zustand/middleware';
-import { RentForApartmentsForm } from '../types/announcement';
 
-const PERSIST_KEY = 'announcement-rent-form-v1';
+const PERSIST_KEY = 'announcement-rent-form-v3';
 
 type PersistedState = {
   formData: RentForApartmentsForm;
-  announcementId?: string;
-  publicId?: string;
-  brokerId?: string;
+  metaData?: MetaData;
 };
 
 interface AnnouncementForRentFormStore {
-  announcementId?: string;
-  publicId?: string;
-  brokerId?: string;
   formData: RentForApartmentsForm;
+  metaData?: MetaData;
   nextStep: () => void;
   setBrokerId: (id: string) => void;
   sendFormData: () => Promise<{ id: string }>;
@@ -50,9 +46,7 @@ const initialFormData: RentForApartmentsForm = {
 export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormStore>()(
   persist(
     subscribeWithSelector((set, get) => ({
-      announcementId: undefined,
-      publicId: undefined,
-      brokerId: undefined,
+      metaData: undefined,
       formData: initialFormData,
 
       setCurrentStep: (step) =>
@@ -61,8 +55,8 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         })),
 
       setBrokerId: (id) =>
-        set(() => ({
-          brokerId: id,
+        set((state) => ({
+          metaData: { ...state?.metaData, brokerId: id },
         })),
 
       nextStep: () =>
@@ -74,16 +68,25 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
 
       sendFormData: async () => {
         try {
-          const { formData, announcementId } = get();
+          const { formData, metaData } = get();
 
-          if (announcementId) {
-            await applicationsService.updateAnnouncementPublication(announcementId, formData);
-            return { id: announcementId };
+          if (metaData?.response?.id) {
+            await applicationsService.updateAnnouncementPublication(metaData.response.id, formData);
+            return { id: metaData.response.id };
           } else {
             const response = await applicationsService.announcementPublication(formData);
             set(() => ({
-              announcementId: response.id,
-              publicId: response.publicId,
+              metaData: {
+                ...metaData,
+                response: {
+                  id: response.id,
+                  status: response.status,
+                  createdAt: response.createdAt,
+                  createdBy: response.createdBy,
+                  applicantEmail: response.applicantEmail,
+                  publicId: response.publicId,
+                },
+              },
             }));
             return { id: response.id };
           }
@@ -94,12 +97,12 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
 
       publishFormData: async () => {
         try {
-          const { announcementId } = get();
-          if (!announcementId) {
+          const { metaData } = get();
+          if (!metaData?.response?.id) {
             const error = new Error('Save the form first before publishing');
             throw error;
           }
-          await applicationsService.publishApplication(announcementId);
+          await applicationsService.publishApplication(metaData.response.id);
         } catch (error) {
           throw error;
         }
@@ -112,9 +115,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
 
       resetForm: () =>
         set({
-          announcementId: undefined,
-          publicId: undefined,
-          brokerId: undefined,
+          metaData: undefined,
           formData: initialFormData,
         }),
     })),
@@ -124,9 +125,7 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
       partialize: (state) =>
         ({
           formData: state.formData,
-          announcementId: state.announcementId,
-          publicId: state.publicId,
-          brokerId: state.brokerId,
+          metaData: state?.metaData,
         }) as PersistedState,
       merge: (persistedState, currentState) => {
         const persisted = persistedState as PersistedState | undefined;

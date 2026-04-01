@@ -13,10 +13,26 @@ type DistanceConfig = {
 };
 
 const DISTANCE_CONFIGS: DistanceConfig[] = [
-  { type: 'METRO', labelKey: 'announcement.detail.metro', icon: require('@/assets/images/announcement-icons/metro-icon.svg') },
-  { type: 'HOSPITAL', labelKey: 'announcement.detail.hospital', icon: require('@/assets/images/announcement-icons/hospital-icon.svg') },
-  { type: 'SCHOOL', labelKey: 'announcement.detail.school', icon: require('@/assets/images/announcement-icons/school-icon.svg') },
-  { type: 'SUPERMARKET', labelKey: 'announcement.detail.grocery_shop', icon: require('@/assets/images/announcement-icons/grocery-icon.svg') },
+  {
+    type: 'METRO',
+    labelKey: 'announcement.detail.metro',
+    icon: require('@/assets/images/announcement-icons/metro-icon.svg'),
+  },
+  {
+    type: 'HOSPITAL',
+    labelKey: 'announcement.detail.hospital',
+    icon: require('@/assets/images/announcement-icons/hospital-icon.svg'),
+  },
+  {
+    type: 'SCHOOL',
+    labelKey: 'announcement.detail.school',
+    icon: require('@/assets/images/announcement-icons/school-icon.svg'),
+  },
+  {
+    type: 'SUPERMARKET',
+    labelKey: 'announcement.detail.supermarket',
+    icon: require('@/assets/images/announcement-icons/supermarket-icon.svg'),
+  },
 ];
 
 type NotableDistancesSectionProps = {

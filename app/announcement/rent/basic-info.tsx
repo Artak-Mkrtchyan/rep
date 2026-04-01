@@ -16,8 +16,8 @@ import {
   getProcessOptions,
   getPropertyTypeOptions,
 } from '@/constants/announcement';
-import { Language } from '@/lib/i18n/i18n';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { Language } from '@/lib/i18n/i18n';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
 import { router } from 'expo-router';
@@ -69,6 +69,7 @@ export default function BasicInfoScreen() {
     processType: formData.processType,
     needPhotographer: formData.needPhotographer,
     needAssessmentExpert: formData.needAssessmentExpert,
+    infrastructureObjects: formData.infrastructureObjects,
   };
 
   const saveBasicInfo = async (values: BasicInfoFormValues) => {
@@ -79,6 +80,7 @@ export default function BasicInfoScreen() {
       propertyType: values.propertyType,
       needPhotographer: values.needPhotographer,
       needAssessmentExpert: values.needAssessmentExpert,
+      infrastructureObjects: values.infrastructureObjects,
     });
 
     if (!isNext) {
@@ -141,7 +143,10 @@ export default function BasicInfoScreen() {
                     placeholder={t('announcement.rent.enter_address')}
                     value={values.geo.formattedAddress[currentLanguage] || ''}
                     onChangeText={handleChange(`geo.formattedAddress.${currentLanguage}`)}
-                    onSelectAddress={(geo) => setFieldValue('geo', geo)}
+                    onSelectAddress={(geo) => {
+                      setFieldValue('geo', geo.address);
+                      setFieldValue('infrastructureObjects', geo.infrastructureObjects);
+                    }}
                     error={touched.geo && errors.geo ? t('validation.address_required') : undefined}
                     containerClassName="mb-1"
                     lang={currentLanguage}

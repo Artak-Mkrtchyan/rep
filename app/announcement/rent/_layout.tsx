@@ -1,7 +1,7 @@
 import { Redirect, router, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { AnnouncementHeader } from '@/components/announcement/announcement-header';
+import { Header } from '@/components/ui/header';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useStepRedirect } from '@/hooks/use-announcement';
 import { getTargetRoute } from '@/lib/announcement';
@@ -46,7 +46,8 @@ export default function AnnouncementRentLayout() {
           options={{
             headerShown: true,
             header: () => (
-              <AnnouncementHeader
+              <Header
+                headerTitle={t('announcement.add')}
                 label={t(route.labelKey)}
                 completedStep={route.completedStep}
                 onHandleBackPress={() => handleBackPress(route.completedStep, route.name)}
@@ -62,8 +63,8 @@ export default function AnnouncementRentLayout() {
         options={{
           headerShown: true,
           header: () => (
-            <AnnouncementHeader
-              headerTitle="Broker details"
+            <Header
+              headerTitle={t('announcement.broker_details')}
               isStepProgressVisible={false}
               rightComponent={
                 <Pressable onPress={() => {}}>

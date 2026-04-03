@@ -1,7 +1,12 @@
-import { applicationsService } from '@/lib/api/applications';
+import {
+  AnnouncementPublicationResponse,
+  applicationsService,
+  ApplicationStatusType,
+} from '@/lib/api/applications';
 import { ApiError } from '@/lib/api/auth.types';
 import {
   ApplicationDetails,
+  ApplicationStatisticsByStatusResponse,
   AssignBrokerRequest,
   BrokerCompany,
   IndividualBroker,
@@ -18,7 +23,7 @@ const brokerListSorts = [
   },
 ];
 
-const getNextBrokerPageParam = (lastPage: SearchResponse<unknown>) => {
+const getNextPageParam = (lastPage: SearchResponse<unknown>) => {
   if (lastPage.totalPages <= 0) return undefined;
   if (lastPage.pageNumber + 1 >= lastPage.totalPages) return undefined;
   return lastPage.pageNumber + 2;
@@ -97,7 +102,36 @@ export const useSearchIndividualBrokersInfinite = (
         },
         sorts: brokerListSorts,
       }),
-    getNextPageParam: getNextBrokerPageParam,
+    getNextPageParam,
+    enabled,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useGetMyApplicationsInfinite = (
+  params: { filter?: ApplicationStatusType; pageSize?: number } = {},
+  enabled = true
+) => {
+  return useInfiniteQuery<SearchResponse<AnnouncementPublicationResponse>, ApiError>({
+    queryKey: [APPLICATIONS_QUERY_KEY, 'my-applications', params],
+    initialPageParam: 1,
+    queryFn: ({ pageParam }) =>
+      applicationsService.getMyApplications({
+        filter: {
+          ...(params.filter && { status: params.filter }),
+        },
+        pagination: {
+          pageNumber: (pageParam as number) - 1, // API uses 0-based indexing
+          pageSize: params.pageSize || 5,
+        },
+        sorts: [
+          {
+            sort: 'UPDATED_AT',
+            direction: 'DESC',
+          },
+        ],
+      }),
+    getNextPageParam,
     enabled,
     staleTime: 5 * 60 * 1000,
   });
@@ -122,7 +156,7 @@ export const useSearchBrokerCompaniesInfinite = (
         },
         sorts: brokerListSorts,
       }),
-    getNextPageParam: getNextBrokerPageParam,
+    getNextPageParam,
     enabled,
     staleTime: 5 * 60 * 1000,
   });
@@ -158,5 +192,15 @@ export const useAssignBroker = () => {
     onError: (error) => {
       console.error('Assign broker error:', error);
     },
+  });
+};
+
+export const useGetApplicationStatisticsByStatuses = (enabled = true) => {
+  return useQuery<ApplicationStatisticsByStatusResponse, ApiError>({
+    queryKey: [APPLICATIONS_QUERY_KEY, 'statistics', 'by-statuses'],
+    queryFn: () => applicationsService.getApplicationStatisticsByStatuses(),
+    enabled,
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
 };

@@ -2,6 +2,7 @@ import type { RentForApartmentsForm } from '@/types/announcement';
 
 import {
   ApplicationDetails,
+  ApplicationStatisticsByStatusResponse,
   AssignBrokerRequest,
   BrokerCompany,
   IndividualBroker,
@@ -25,8 +26,17 @@ export interface BrokerRegistrationRequest {
   yearsOfActivity: number;
 }
 
+export type ApplicationStatusType =
+  | 'DRAFT'
+  | 'APPROVED'
+  | 'COMPLETED'
+  | 'RETURNED_TO_APPLICANT'
+  | 'UNDER_REVIEW'
+  | 'SUBMITTED'
+  | 'REJECTED';
+
 export interface ApplicationStatus {
-  code: string; // e.g., "DRAFT"
+  code: ApplicationStatusType; // e.g., "DRAFT"
   name: string;
 }
 
@@ -365,5 +375,34 @@ export const applicationsService = {
       requiresAuth: true,
     });
     return response;
+  },
+  /**
+   * Retrieves a list of applications for the current user, optionally filtered by type and paginated.
+   * @param data An object containing optional filter, page, and pageSize parameters to customize the query.
+   * @returns A promise that resolves to an object containing the list of applications, total count, pagination info, and counts by status.
+   */
+  getMyApplications: async (
+    data: SearchRequest
+  ): Promise<SearchResponse<AnnouncementPublicationResponse>> => {
+    const response = await httpClient.post<
+      ApiResponse<SearchResponse<AnnouncementPublicationResponse>>
+    >(`/v1/applications/search/for-screen/my-announcement-applications`, data, {
+      requiresAuth: true,
+    });
+    return (
+      response.data || (response as unknown as SearchResponse<AnnouncementPublicationResponse>)
+    );
+  },
+
+  /**
+   * Get statistics for applications in different statuses
+   * @returns A promise that resolves to application statistics by status
+   */
+  getApplicationStatisticsByStatuses: async (): Promise<ApplicationStatisticsByStatusResponse> => {
+    const response = await httpClient.post<ApiResponse<ApplicationStatisticsByStatusResponse>>(
+      `/v1/applications/statistics/by-statuses`,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as ApplicationStatisticsByStatusResponse);
   },
 };

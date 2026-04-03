@@ -411,6 +411,7 @@
   "announcement.detail.request_tour": "Ekskursiya so'rash",
   "announcement.detail.contact_info": "Aloqa ma'lumotlari",
   "announcement.detail.photos": "Suratlar",
+  "announcement.broker_details": "Broker haqida ma'lumotlar",
 
   "property_details.see_all_photos": "Barcha rasmlarni ko'rish",
   "property_details.announcement_information": "E'lon ma'lumotlari",
@@ -556,5 +557,20 @@
   "property_details.pets_allowed": "Uy hayvonlari ruxsat etiladi",
   "property_details.pet.cat": "Mushuk",
   "property_details.pet.small_dogs": "Kichik itlar (40kg dan kam)",
-  "property_details.pet.large_dogs": "Katta itlar (40kg dan ko'p)"
+  "property_details.pet.large_dogs": "Katta itlar (40kg dan ko'p)",
+
+  "applications.title": "Ijaralar",
+  "applications.status_all": "Hammasi",
+  "applications.status_approved": "Tasdiqlangan",
+  "applications.status_under_review": "Ko‘rib chiqilmoqda",
+  "applications.status_draft": "Qoralama",
+  "applications.status_rejected": "Rad etilgan",
+  "applications.status_returned": "Qaytarilgan ariza",
+  "applications.empty": "Sizda hali arizalar yo‘q",
+  "applications.announcement_application": "E’lon arizasi",
+  "applications.role_broker": "Broker",
+  "applications.role_owner": "Egasi",
+  "applications.listing_id": "ID: {{id}}",
+  "applications.updated": "Yangilangan",
+  "applications.add_broker": "Broker qo‘shish"
 }

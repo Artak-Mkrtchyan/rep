@@ -411,6 +411,7 @@
   "announcement.detail.request_tour": "Запросить экскурсию",
   "announcement.detail.contact_info": "Контактная информация",
   "announcement.detail.photos": "Фото",
+  "announcement.broker_details": "Детали брокера",
 
   "property_details.see_all_photos": "Посмотреть все фото",
   "property_details.announcement_information": "Информация об объявлении",
@@ -556,5 +557,20 @@
   "property_details.pets_allowed": "Домашние животные разрешены",
   "property_details.pet.cat": "Кошка",
   "property_details.pet.small_dogs": "Маленькие собаки (до 40 кг)",
-  "property_details.pet.large_dogs": "Большие собаки (свыше 40 кг)"
+  "property_details.pet.large_dogs": "Большие собаки (свыше 40 кг)",
+
+  "applications.title": "Заявки",
+  "applications.status_all": "Все",
+  "applications.status_approved": "Одобрено",
+  "applications.status_under_review": "На проверке",
+  "applications.status_draft": "Черновик",
+  "applications.status_rejected": "Отклонено",
+  "applications.status_returned": "Возвращённая заявка",
+  "applications.empty": "У вас пока нет заявок",
+  "applications.announcement_application": "Заявка на объявление",
+  "applications.role_broker": "Брокер",
+  "applications.role_owner": "Владелец",
+  "applications.listing_id": "ID: {{id}}",
+  "applications.updated": "Обновлено",
+  "applications.add_broker": "Добавить брокера"
 }

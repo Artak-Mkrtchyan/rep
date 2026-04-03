@@ -411,6 +411,7 @@
   "announcement.detail.request_tour": "Request a tour",
   "announcement.detail.contact_info": "Contact information",
   "announcement.detail.photos": "Photos",
+  "announcement.broker_details": "Broker details",
 
   "property_details.see_all_photos": "See all photos",
   "property_details.announcement_information": "Announcement information",
@@ -556,5 +557,20 @@
   "property_details.pets_allowed": "Pets allowed",
   "property_details.pet.cat": "Cat",
   "property_details.pet.small_dogs": "Small dogs (under 40 kg)",
-  "property_details.pet.large_dogs": "Large dogs (over 40 kg)"
+  "property_details.pet.large_dogs": "Large dogs (over 40 kg)",
+
+  "applications.title": "Applications",
+  "applications.status_all": "All",
+  "applications.status_approved": "Approved",
+  "applications.status_under_review": "Under review",
+  "applications.status_draft": "Draft",
+  "applications.status_rejected": "Rejected",
+  "applications.status_returned": "Returned application",
+  "applications.empty": "You Don't Have Any applications",
+  "applications.announcement_application": "Announcement application",
+  "applications.role_broker": "Broker",
+  "applications.role_owner": "Owner",
+  "applications.listing_id": "ID: {{id}}",
+  "applications.updated": "Updated",
+  "applications.add_broker": "Add broker"
 }

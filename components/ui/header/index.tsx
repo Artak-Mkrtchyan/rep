@@ -8,14 +8,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 
+import type { StepProgressProps } from '@/components/ui/header/step-progress';
+import { StepProgress } from '@/components/ui/header/step-progress';
 import { cn } from '@/lib/utils';
-import type { StepProgressProps } from './step-progress';
-import { StepProgress } from './step-progress';
 
 type Props = {
   completedStep?: number;
   totalSteps?: number;
-  headerTitle?: string;
+  headerTitle: string;
   label?: string;
   stepProgressContainerClassName?: string;
   isStepProgressVisible?: boolean;
@@ -24,7 +24,7 @@ type Props = {
   headerClassName?: string;
 };
 
-export const AnnouncementHeader: React.FC<Props> = ({
+export const Header: React.FC<Props> = ({
   completedStep = 1,
   totalSteps = 7,
   headerTitle,
@@ -38,7 +38,6 @@ export const AnnouncementHeader: React.FC<Props> = ({
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const { horizontalStyle } = useScreenEdgePadding();
-  const resolvedHeaderTitle = headerTitle ?? t('announcement.add');
   const resolvedLabel = label ?? t('announcement.steps.list');
 
   const handleBackPress = () => {
@@ -72,7 +71,7 @@ export const AnnouncementHeader: React.FC<Props> = ({
           <ThemedText
             className="text-[17px] font-semibold leading-[22px] text-foreground"
             numberOfLines={1}>
-            {resolvedHeaderTitle}
+            {headerTitle}
           </ThemedText>
           <View className="absolute right-0 h-10 items-center justify-center">
             {rightComponent}

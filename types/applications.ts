@@ -1,3 +1,5 @@
+import { ApplicationStatusType } from '@/lib/api/applications';
+
 export interface SearchRequest {
   filter?: {
     _and_?: Record<string, unknown>[];
@@ -75,4 +77,8 @@ export type ApplicationDetails = {
 export interface AssignBrokerRequest {
   brokerCompanyId?: string;
   brokerId?: string;
+}
+
+export interface ApplicationStatisticsByStatusResponse {
+  countersByStatuses: Record<ApplicationStatusType, number>;
 }

@@ -23,9 +23,13 @@ import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const BrokerCompanySchema = Yup.object().shape({
-  attachmentIds: Yup.array().min(1, () => i18n.t('validation.at_least_one_file')).required(() => i18n.t('validation.required')),
+  attachments: Yup.array()
+    .min(1, () => i18n.t('validation.at_least_one_file'))
+    .required(() => i18n.t('validation.required')),
   companyInfo: Yup.object().shape({
-    certifiedBy: Yup.string().optional().max(255, () => i18n.t('validation.max_length_255')),
+    certifiedBy: Yup.string()
+      .optional()
+      .max(255, () => i18n.t('validation.max_length_255')),
     certifiedOn: yupSchemas.certifiedOn,
     email: yupSchemas.email,
     name: Yup.string().required(() => i18n.t('validation.required')),
@@ -44,12 +48,16 @@ export default function BrokerSignUpScreen() {
   const { data, resetData } = useSignUpContext();
 
   const handleContinue = async (
-    values: BrokerCompanyRegistrationRequest,
+    values: BrokerCompanyRegistrationRequest & {
+      attachments: { id: string; uri: string; type?: string; name?: string }[];
+    },
     { setSubmitting }: any
   ) => {
     try {
+      const attachmentIds = values.attachments.map((attachment) => attachment.id);
+
       await applicationsService.brokerCompanyRegistration({
-        attachmentIds: values.attachmentIds,
+        attachmentIds,
         companyInfo: values.companyInfo,
         managerInfo: values.managerInfo,
       });
@@ -80,6 +88,7 @@ export default function BrokerSignUpScreen() {
     <AuthLayout scrollable>
       <Formik
         initialValues={{
+          attachments: [],
           attachmentIds: [],
           companyInfo: {
             certifiedBy: '',
@@ -248,13 +257,12 @@ export default function BrokerSignUpScreen() {
 
               <FileUpload
                 label={t('signup.broker_company.files_upload')}
-                value={values.attachmentIds}
-                onChange={(attachmentIds) => setFieldValue('attachmentIds', attachmentIds)}
+                hint={t('ui.upload_your_photo')}
+                value={values.attachments}
+                onChange={(attachments) => setFieldValue('attachments', attachments)}
                 required
                 error={
-                  touched.attachmentIds && errors.attachmentIds
-                    ? String(errors.attachmentIds)
-                    : undefined
+                  touched.attachments && errors.attachments ? String(errors.attachments) : undefined
                 }
               />
 

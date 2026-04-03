@@ -21,7 +21,8 @@ export default function AnnouncementRentLayout() {
   const handleBackPress = (step: number, routeName: string) => {
     if (
       routeName === ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.name ||
-      routeName === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.name
+      routeName === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.name ||
+      routeName === ANNOUNCEMENT_ROUTES.RENT_MEDIA_SECOND.name
     ) {
       const href = getTargetRoute(step);
       router.replace(href);

@@ -11,9 +11,8 @@ import { Input } from '@/components/ui/input';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep4 } from '@/types/announcement';
+import { useTranslation } from 'react-i18next';
 
-const SCREEN_TITLE = 'How much are the monthly rent and the security deposit?';
-const SCREEN_SUBTITLE = 'Security deposit is optional, but you may choose to request one.';
 const MONTHLY_RENT_SUFFIX = '/month';
 const CURRENCY_PREFIX = '$';
 const SQUARE_METERS_SUFFIX = 'm²';
@@ -27,11 +26,11 @@ const RentDetailsSchema = Yup.object().shape({
     .nullable()
     .shape({
       monthlyRent: Yup.number().required('Required').typeError('Must be a number'),
-      securityDeposit: Yup.number().required('Required').typeError('Must be a number'),
     }),
 });
 
 export default function RentDetailsScreen() {
+  const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
@@ -46,7 +45,7 @@ export default function RentDetailsScreen() {
       updateFormData({
         rentDetails: {
           monthlyRent: rentDetails.monthlyRent,
-          securityDeposit: rentDetails.securityDeposit,
+          securityDeposit: rentDetails.securityDeposit || 0,
         },
       });
     }
@@ -91,15 +90,15 @@ export default function RentDetailsScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="pt-6" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-                  {SCREEN_TITLE}
+                  {t('announcement.rent.rent_details_title')}
                 </ThemedText>
                 <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-                  {SCREEN_SUBTITLE}
+                  {t('announcement.rent.rent_details_subtitle')}
                 </ThemedText>
 
                 <View className="gap-4">
                   <Input
-                    label="Monthly rent"
+                    label={t('announcement.rent.monthly_rent')}
                     numericOnly
                     placeholder=""
                     value={`${values.rentDetails?.monthlyRent ?? ''}`}
@@ -122,7 +121,7 @@ export default function RentDetailsScreen() {
                   />
 
                   <Input
-                    label="Security deposit"
+                    label={t('announcement.rent.security_deposit')}
                     placeholder=""
                     numericOnly
                     value={`${values.rentDetails?.securityDeposit ?? ''}`}

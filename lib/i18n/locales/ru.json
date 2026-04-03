@@ -35,6 +35,7 @@
   "ui.upload_failed": "Загрузка не удалась",
   "ui.uploading": "Загрузка...",
   "ui.upload_your_photo": "Загрузите ваше фото",
+  "ui.upload_your_file": "Загрузите ваш файл",
   "ui.select_file": "Выбрать файл",
   "ui.remove_file": "Удалить файл",
   "ui.add_file": "Добавить файл",
@@ -283,7 +284,8 @@
   "announcement.steps.property_info_1": "Информация об объекте(1/2)",
   "announcement.steps.property_info_2": "Информация об объекте(2/2)",
   "announcement.steps.rent_details": "Детали аренды",
-  "announcement.steps.media": "Медиа",
+  "announcement.steps.media_1": "Медиа (1/2)",
+  "announcement.steps.media_2": "Медиа (2/2)",
   "announcement.steps.characteristics": "Характеристики",
   "announcement.steps.review_and_publish": "Проверка и публикация",
 
@@ -348,6 +350,8 @@
 
   "announcement.rent.add_photos_title": "Добавьте фотографии",
   "announcement.rent.add_photos_subtitle": "Фотографии помогают арендаторам представить жизнь в вашем жилье.",
+  "announcement.rent.add_documents_title": "Добавьте файлы",
+  "announcement.rent.add_documents_subtitle": "Файлы предоставляют дополнительные детали и помогают потенциальным покупателям или арендаторам доверять вам.",
 
   "announcement.rent.final.description": "Описание",
   "announcement.rent.final.object_characteristics": "Характеристики объекта",
@@ -364,6 +368,11 @@
   "announcement.rent.broker_list.broker_type": "Тип брокера",
   "announcement.rent.broker_list.sales_last_12_months": "продаж за последние 12 месяцев",
   "announcement.rent.broker_list.sales_in_city": "продаж в Чикаго",
+
+  "announcement.rent.monthly_rent": "Ежемесячная арендная плата",
+  "announcement.rent.security_deposit": "Залоговый депозит",
+  "announcement.rent.rent_details_title": "Сколько стоит ежемесячная арендная плата и залоговый депозит?",
+  "announcement.rent.rent_details_subtitle": "Залоговый депозит является необязательным, но вы можете выбрать его по желанию.",
 
   "announcement.detail.status_active": "Активно",
   "announcement.detail.announcement_info": "Информация об объявлении",

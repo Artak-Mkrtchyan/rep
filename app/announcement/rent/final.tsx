@@ -26,7 +26,7 @@ export default function FinalScreen() {
 
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const metaData = useAnnouncementForRentFormStore((s) => s.metaData?.response);
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData);
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
@@ -94,7 +94,8 @@ export default function FinalScreen() {
       ? t('announcement.rent.final.apartment_for_rent')
       : t('announcement.rent.final.apartment_for_sale');
 
-  const imageSources: { uri: string }[] = [];
+  const imageSources: { uri: string }[] =
+    metaData?.tempMediaFiles?.map((file) => ({ uri: file.uri })) || [];
 
   const characteristicHelpers = {
     conditionLabel,
@@ -144,7 +145,7 @@ export default function FinalScreen() {
 
           <PropertyAnnouncementDetail
             title={formData.title || ''}
-            id={metaData?.publicId}
+            id={metaData?.response?.publicId}
             typeLabel={typeLabel}
             price=""
             location={{
@@ -155,7 +156,7 @@ export default function FinalScreen() {
             }}
             distances={formData.infrastructureObjects}
             placedBy={{
-              name: metaData?.applicantEmail || '',
+              name: metaData?.response?.applicantEmail || '',
             }}
             postedDate={''}
             updatedDate=""

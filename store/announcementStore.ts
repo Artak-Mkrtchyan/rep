@@ -20,6 +20,14 @@ interface AnnouncementForRentFormStore {
   publishFormData: () => Promise<void>;
   setCurrentStep: (step: number) => void;
   updateFormData: (data: Partial<RentForApartmentsForm>) => void;
+
+  update: ({
+    formData,
+    metaData,
+  }: {
+    formData?: Partial<RentForApartmentsForm>;
+    metaData?: Partial<MetaData>;
+  }) => void;
   resetForm: () => void;
 }
 
@@ -111,6 +119,12 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
       updateFormData: (data) =>
         set((state) => ({
           formData: { ...state.formData, ...data },
+        })),
+
+      update: ({ formData, metaData }) =>
+        set((state) => ({
+          formData: { ...state.formData, ...formData },
+          metaData: { ...state?.metaData, ...metaData },
         })),
 
       resetForm: () =>

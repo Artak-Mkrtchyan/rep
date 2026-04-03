@@ -35,7 +35,8 @@
   "ui.upload_failed": "Upload Failed",
   "ui.uploading": "Uploading...",
   "ui.upload_your_photo": "Upload your photo",
-  "ui.select_file": "Select file",
+  "ui.upload_your_file": "Upload your file",
+  "ui.select_file": "Upload",
   "ui.remove_file": "Remove file",
   "ui.add_file": "Add file",
   "ui.phone_placeholder": "(90)121 13 23",
@@ -283,7 +284,8 @@
   "announcement.steps.property_info_1": "Property info(1/2)",
   "announcement.steps.property_info_2": "Property info(2/2)",
   "announcement.steps.rent_details": "Rent details",
-  "announcement.steps.media": "Media",
+  "announcement.steps.media_1": "Media (1/2)",
+  "announcement.steps.media_2": "Media (2/2)",
   "announcement.steps.characteristics": "Characteristics",
   "announcement.steps.review_and_publish": "Review and publish",
 
@@ -348,6 +350,8 @@
 
   "announcement.rent.add_photos_title": "Add photos",
   "announcement.rent.add_photos_subtitle": "Photos help renters imagine living in your place.",
+  "announcement.rent.add_documents_title": "Add files",
+  "announcement.rent.add_documents_subtitle": "Documents provide additional details and build trust with potential buyers or renters.",
 
   "announcement.rent.final.description": "Description",
   "announcement.rent.final.object_characteristics": "Object characteristics",
@@ -364,6 +368,11 @@
   "announcement.rent.broker_list.broker_type": "Broker type",
   "announcement.rent.broker_list.sales_last_12_months": "sales last 12 months",
   "announcement.rent.broker_list.sales_in_city": "sales in Chicago",
+
+  "announcement.rent.monthly_rent": "Monthly rent",
+  "announcement.rent.security_deposit": "Security deposit",
+  "announcement.rent.rent_details_title": "How much are the monthly rent and the security deposit?",
+  "announcement.rent.rent_details_subtitle": "Security deposit is optional, but you may choose to request one.",
 
   "announcement.detail.status_active": "Active",
   "announcement.detail.announcement_info": "Announcement information",

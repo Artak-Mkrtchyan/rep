@@ -28,13 +28,6 @@ export const getEnvironment = (): Environment => {
 export const getApiUrl = (): string => 'https://rep-test.utspdev.com/api';
 
 /**
- * Yandex Geosuggest API key for address autocomplete.
- * Set EXPO_PUBLIC_YANDEX_SUGGEST_API_KEY in .env or app config.
- */
-export const YANDEX_SUGGEST_API_KEY =
-  typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_YANDEX_SUGGEST_API_KEY : undefined;
-
-/**
  * Universal link base for the mobile app.
  * On mobile: OS intercepts the URL and opens the app if installed,
  * otherwise the web fallback page redirects to the app store.

@@ -18,8 +18,6 @@ export type AddressInputProps = Omit<
     address: GeoDetailsDto;
     infrastructureObjects?: InfrastructureObject[];
   }) => void;
-  /** Yandex Geosuggest API key. Falls back to EXPO_PUBLIC_YANDEX_SUGGEST_API_KEY if not set. */
-  apiKey?: string;
   /** Language for suggestions (e.g. en_US, ru_RU). */
   lang?: string;
 };

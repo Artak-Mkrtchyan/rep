@@ -71,6 +71,7 @@ export type RentForApartmentsFormStep4 = {
 
 export type RentForApartmentsFormStep5 = {
   mediaFileIds?: string[];
+  documentIds?: string[];
 };
 
 export type Attributes = {
@@ -130,4 +131,5 @@ export type MetaData = {
     applicantEmail: string;
   };
   brokerId?: string;
+  tempMediaFiles?: { id: string; uri: string; type?: string; name?: string }[];
 };

@@ -248,11 +248,17 @@ export const ANNOUNCEMENT_ROUTES = {
     completedStep: 4,
     path: '/announcement/rent/rent-details',
   },
-  RENT_MEDIA: {
-    name: 'media',
-    labelKey: 'announcement.steps.media',
+  RENT_MEDIA_FIRST: {
+    name: 'media-first',
+    labelKey: 'announcement.steps.media_1',
     completedStep: 5,
-    path: '/announcement/rent/media',
+    path: '/announcement/rent/media-first',
+  },
+  RENT_MEDIA_SECOND: {
+    name: 'media-second',
+    labelKey: 'announcement.steps.media_2',
+    completedStep: 5,
+    path: '/announcement/rent/media-second',
   },
   RENT_CHARACTERISTICS: {
     name: 'characteristics',

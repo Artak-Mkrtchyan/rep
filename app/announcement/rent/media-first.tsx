@@ -7,24 +7,33 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
+import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 
 export default function MediaScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
-  const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
-  const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
+  const mediaFileIds = useAnnouncementForRentFormStore((s) => s.formData.mediaFileIds);
+  const tempMediaFiles = useAnnouncementForRentFormStore((s) => s.metaData?.tempMediaFiles);
+  const update = useAnnouncementForRentFormStore((s) => s.update);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
-  const mediaFileIds = formData.mediaFileIds ?? [];
 
-  const handlePhotoIdsChange = (ids: string[]) => {
-    updateFormData({ mediaFileIds: ids });
+  const mediaFiles =
+    mediaFileIds?.map((id) => {
+      const file = tempMediaFiles?.find((f) => f.id === id);
+      return { id, uri: file?.uri || '' };
+    }) || [];
+
+  const handlePhotoIdsChange = (
+    attachments: { id: string; uri: string; type?: string; name?: string }[]
+  ) => {
+    const mediaFileIds = attachments.map((attachment) => attachment.id);
+    update({ formData: { mediaFileIds }, metaData: { tempMediaFiles: attachments } });
   };
 
   const handleNext = () => {
-    nextStep();
+    router.replace(ANNOUNCEMENT_ROUTES.RENT_MEDIA_SECOND.path);
   };
 
   const handleSaveAndExit = async () => {
@@ -52,13 +61,17 @@ export default function MediaScreen() {
             {t('announcement.rent.add_photos_subtitle')}
           </ThemedText>
 
-          <FileUpload value={mediaFileIds} onChange={handlePhotoIdsChange} />
+          <FileUpload
+            hint={t('ui.upload_your_photo')}
+            value={mediaFiles}
+            onChange={handlePhotoIdsChange}
+          />
         </View>
       </ScrollView>
 
       <AnnouncementFooter
         firstButtonLabel={t('common.next')}
-        firstButtonDisabled={!mediaFileIds.length}
+        firstButtonDisabled={!mediaFiles?.length}
         secondButtonLabel={t('common.save_and_exit')}
         onNextPress={handleNext}
         onSaveAndExitPress={handleSaveAndExit}

@@ -35,6 +35,7 @@
   "ui.upload_failed": "Yuklash muvaffaqiyatsiz",
   "ui.uploading": "Yuklanmoqda...",
   "ui.upload_your_photo": "Rasmingizni yuklang",
+  "ui.upload_your_file": "Faylni yuklang",
   "ui.select_file": "Fayl tanlash",
   "ui.remove_file": "Faylni o'chirish",
   "ui.add_file": "Fayl qo'shish",
@@ -283,7 +284,8 @@
   "announcement.steps.property_info_1": "Mulk ma'lumotlari (1/2)",
   "announcement.steps.property_info_2": "Mulk ma'lumotlari (2/2)",
   "announcement.steps.rent_details": "Ijara tafsilotlari",
-  "announcement.steps.media": "Media",
+  "announcement.steps.media_1": "Rasm (1/2)",
+  "announcement.steps.media_2": "Rasm (2/2)",
   "announcement.steps.characteristics": "Xususiyatlar",
   "announcement.steps.review_and_publish": "Ko'rib chiqish va e'lon qilish",
 
@@ -348,6 +350,8 @@
 
   "announcement.rent.add_photos_title": "Rasmlar qo'shish",
   "announcement.rent.add_photos_subtitle": "Rasmlar ijarachilarga sizning joyingizda yashashni tasavvur qilishga yordam beradi.",
+  "announcement.rent.add_documents_title": "Fayllarni qo'shish",
+  "announcement.rent.add_documents_subtitle": "Fayllar qo'shimcha ma'lumotlar va potensial sotuvchilarga yoki ijarachilarga ishonchlilik hosil qilishga yordam beradi.",
 
   "announcement.rent.final.description": "Tavsif",
   "announcement.rent.final.object_characteristics": "Obyekt xususiyatlari",
@@ -364,6 +368,11 @@
   "announcement.rent.broker_list.broker_type": "Broker turi",
   "announcement.rent.broker_list.sales_last_12_months": "oxirgi 12 oydagi sotuvlar",
   "announcement.rent.broker_list.sales_in_city": "Chicagodagi sotuvlar",
+
+  "announcement.rent.monthly_rent": "Ijara narx",
+  "announcement.rent.security_deposit": "Garov pul",
+  "announcement.rent.rent_details_title": "Ijara narx va garov pul nechada?",
+  "announcement.rent.rent_details_subtitle": "Garov pul ijarachilarga uyingizni tasavvur qilishga yordam beradi.",
 
   "announcement.detail.status_active": "Faol",
   "announcement.detail.announcement_info": "E'lon ma'lumotlari",

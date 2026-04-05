@@ -38,6 +38,7 @@ export function useSearchAnnouncements(): UseSearchAnnouncementsResult {
 
     try {
       const request = buildSearchRequest(filters, 0, PAGE_SIZE);
+
       const response = await announcementsService.searchAnnouncements(request);
       if (mountedRef.current) {
         setAnnouncements(response.content);

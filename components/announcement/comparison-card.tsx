@@ -3,14 +3,13 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import type { CardAttribute } from '@/lib/utils/announcement-helpers';
 
 type ComparisonCardProps = {
   imageSource: any;
   title: string;
   address: string;
-  bedsLabel: string;
-  bathsLabel: string;
-  sizeLabel: string;
+  attributes?: CardAttribute[];
   priceLabel: string;
   isSelected: boolean;
   onToggleSelect: () => void;
@@ -21,9 +20,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
   imageSource,
   title,
   address,
-  bedsLabel,
-  bathsLabel,
-  sizeLabel,
+  attributes,
   priceLabel,
   isSelected,
   onToggleSelect,
@@ -57,30 +54,14 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
       </View>
 
       <View className="flex-row flex-wrap items-center gap-[12px]">
-        <View className="flex-row items-center gap-[4px]">
-          <Image
-            source={require('@/assets/images/announcement-icons/bed-icon.svg')}
-            style={cardStyles.icon}
-            contentFit="contain"
-          />
-          <ThemedText className="text-[10px] text-foreground">{bedsLabel}</ThemedText>
-        </View>
-        <View className="flex-row items-center gap-[4px]">
-          <Image
-            source={require('@/assets/images/announcement-icons/bath-icon.svg')}
-            style={cardStyles.icon}
-            contentFit="contain"
-          />
-          <ThemedText className="text-[10px] text-foreground">{bathsLabel}</ThemedText>
-        </View>
-        <View className="flex-row items-center gap-[4px]">
-          <Image
-            source={require('@/assets/images/announcement-icons/size-icon.svg')}
-            style={cardStyles.icon}
-            contentFit="contain"
-          />
-          <ThemedText className="text-[10px] text-foreground">{sizeLabel}</ThemedText>
-        </View>
+        {attributes
+          ?.filter((attr) => attr.label !== '')
+          .map((attr, index) => (
+            <View key={index} className="flex-row items-center gap-[4px]">
+              <Image source={attr.icon} style={cardStyles.icon} contentFit="contain" />
+              <ThemedText className="text-[10px] text-foreground">{attr.label}</ThemedText>
+            </View>
+          ))}
       </View>
 
       <ThemedText className="text-[14px] font-bold leading-[17px] text-foreground">

@@ -6,6 +6,7 @@ import { ComparisonIcon } from '@/components/icons/comparison-icon';
 import { HeartIcon } from '@/components/icons/heart-icon';
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
+import type { CardAttribute } from '@/lib/utils/announcement-helpers';
 
 import { styles } from './announcement-small-card.styles';
 
@@ -13,9 +14,13 @@ export type AnnouncementSmallCardProps = {
   imageSource: any;
   title: string;
   address: string;
-  bedsLabel: string;
-  bathsLabel: string;
-  sizeLabel: string;
+  /** @deprecated Use `attributes` instead */
+  bedsLabel?: string;
+  /** @deprecated Use `attributes` instead */
+  bathsLabel?: string;
+  /** @deprecated Use `attributes` instead */
+  sizeLabel?: string;
+  attributes?: CardAttribute[];
   priceLabel: string;
   className?: string;
   isArrowUpRight?: boolean;
@@ -33,6 +38,7 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
   bedsLabel,
   bathsLabel,
   sizeLabel,
+  attributes,
   priceLabel,
   className,
   isArrowUpRight = true,
@@ -44,6 +50,13 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
 }) => {
   const bgHeartIcon = isFavourite ? 'bg-[#11111199]' : 'bg-[#1111114d]';
   const Container = onPress ? Pressable : View;
+
+  // Fallback to legacy props if attributes not provided
+  const displayAttributes: CardAttribute[] = attributes ?? [
+    { icon: require('@/assets/images/announcement-icons/bed-icon.svg'), label: bedsLabel ?? '' },
+    { icon: require('@/assets/images/announcement-icons/bath-icon.svg'), label: bathsLabel ?? '' },
+    { icon: require('@/assets/images/announcement-icons/size-icon.svg'), label: sizeLabel ?? '' },
+  ];
 
   return (
     <Container
@@ -84,41 +97,33 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
 
       <View className="gap-2">
         <View className="gap-1">
-          <ThemedText className="text-[14px] font-bold leading-[17px] text-foreground">
+          <ThemedText
+            className="text-[14px] font-bold leading-[17px] text-foreground"
+            numberOfLines={1}
+          >
             {title}
           </ThemedText>
-          <ThemedText className="text-[8px] text-muted-foreground">{address}</ThemedText>
+          <ThemedText className="text-[8px] text-muted-foreground" numberOfLines={1}>
+            {address}
+          </ThemedText>
         </View>
 
         <View className="flex-row flex-wrap items-center gap-2">
-          <View className="flex-row items-center gap-1">
-            <Image
-              source={require('@/assets/images/announcement-icons/bed-icon.svg')}
-              style={styles.detailIcon}
-              contentFit="contain"
-            />
-            <ThemedText className="text-[10px] text-foreground">{bedsLabel}</ThemedText>
-          </View>
-          <View className="flex-row items-center gap-1">
-            <Image
-              source={require('@/assets/images/announcement-icons/bath-icon.svg')}
-              style={styles.detailIcon}
-              contentFit="contain"
-            />
-            <ThemedText className="text-[10px] text-foreground">{bathsLabel}</ThemedText>
-          </View>
-          <View className="flex-row items-center gap-1">
-            <Image
-              source={require('@/assets/images/announcement-icons/size-icon.svg')}
-              style={styles.detailIcon}
-              contentFit="contain"
-            />
-            <ThemedText className="text-[10px] text-foreground">{sizeLabel}</ThemedText>
-          </View>
+          {displayAttributes
+            .filter((attr) => attr.label !== '')
+            .map((attr, index) => (
+              <View key={index} className="flex-row items-center gap-1">
+                <Image source={attr.icon} style={styles.detailIcon} contentFit="contain" />
+                <ThemedText className="text-[10px] text-foreground">{attr.label}</ThemedText>
+              </View>
+            ))}
         </View>
 
         <View className="flex-row items-center justify-between">
-          <ThemedText className="text-[14px] font-bold leading-[17px] text-foreground">
+          <ThemedText
+            className="flex-1 text-[14px] font-bold leading-[17px] text-foreground"
+            numberOfLines={1}
+          >
             {priceLabel}
           </ThemedText>
           {isArrowUpRight && (

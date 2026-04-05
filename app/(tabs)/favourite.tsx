@@ -13,11 +13,9 @@ import { announcementsService } from '@/lib/api/announcements';
 import { seedAll } from '@/lib/dev/create-announcements';
 import {
   getAddress,
-  getBathsLabel,
-  getBedsLabel,
+  getCardAttributes,
   getImageSource,
   getPriceLabel,
-  getSizeLabel,
 } from '@/lib/utils/announcement-helpers';
 import { Image } from 'expo-image';
 
@@ -102,9 +100,7 @@ export default function FavouriteScreen() {
                   imageSource={getImageSource(item)}
                   title={item.title}
                   address={getAddress(item)}
-                  bedsLabel={getBedsLabel(item)}
-                  bathsLabel={getBathsLabel(item)}
-                  sizeLabel={getSizeLabel(item)}
+                  attributes={getCardAttributes(item)}
                   priceLabel={getPriceLabel(item)}
                   isArrowUpRight={false}
                   isFavourite

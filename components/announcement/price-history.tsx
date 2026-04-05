@@ -94,8 +94,9 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({ announcementId }) =>
           {data.map((item, index) => {
             const difference = item.newPrice - item.oldPrice;
             const percentage = Math.round((difference / item.oldPrice) * 100);
-            const isPositive = difference >= 0;
-            const colorClass = isPositive ? 'text-primary' : 'text-destructive';
+            const isIncrease = difference >= 0;
+            // AC: increase = red, decrease = green
+            const colorClass = isIncrease ? 'text-destructive' : 'text-primary';
 
             return (
               <View
@@ -118,10 +119,10 @@ export const PriceHistory: React.FC<PriceHistoryProps> = ({ announcementId }) =>
                 </View>
                 <View className="w-[120px] flex-row items-center">
                   <ThemedText className={`text-[12px] ${colorClass}`}>
-                    {isPositive ? '+' : '-'}${formatNumber(Math.abs(difference))}
+                    {isIncrease ? '+' : '-'}${formatNumber(Math.abs(difference))}
                   </ThemedText>
                   <ThemedText className={`ml-1 text-[12px] font-semibold ${colorClass}`}>
-                    {isPositive ? '+' : ''}{percentage}%
+                    {isIncrease ? '+' : ''}{percentage}%
                   </ThemedText>
                 </View>
               </View>

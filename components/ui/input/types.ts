@@ -24,6 +24,8 @@ export type InputProps = TextInputProps & {
   numericOnly?: boolean;
   /** When true and numericOnly, allows one decimal point (e.g. "45.5"). */
   allowDecimal?: boolean;
+  /** Rendered after the field row, before error/helper (e.g. “Forgot password”). */
+  afterField?: React.ReactNode;
 };
 
 export type InputLabelProps = {

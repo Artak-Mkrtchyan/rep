@@ -109,6 +109,7 @@
   "error.service_unavailable": "The password reset service is currently unavailable. Please try again later.",
   "error.failed_to_send_form": "Failed to send form data",
   "error.failed_to_publish": "Failed to publish",
+  "error.failed_to_load_application": "Failed to load application",
 
   "login.title": "Log in",
   "login.description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took.",

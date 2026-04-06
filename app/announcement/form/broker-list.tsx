@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { BrokerCard } from '@/components/announcement/broker-card';
@@ -30,7 +30,6 @@ export default function BrokerListScreen() {
   const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
 
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
-  const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
 
   const { mutate: assignBroker } = useAssignBroker();
   useEffect(() => {
@@ -84,17 +83,19 @@ export default function BrokerListScreen() {
       const { id } = await sendFormData();
 
       assignBroker({ id, data: { brokerId } });
-
-      resetForm();
-
-      router.push('/(tabs)');
     } catch {
       console.error('Assign broker error');
     }
   };
 
-  const handleSaveAndExit = () => {
-    router.push('/(tabs)');
+  const handleSaveAndExit = async () => {
+    try {
+      await sendFormData();
+    } catch {
+      Alert.alert(t('common.error'), t('Assign broker error'));
+    } finally {
+      router.push('/(tabs)');
+    }
   };
 
   const renderIndividualFooter = () =>
@@ -154,7 +155,7 @@ export default function BrokerListScreen() {
               stats={[]}
               onPress={() =>
                 router.push({
-                  pathname: '/announcement/rent/broker/[id]',
+                  pathname: '/announcement/form/broker/[id]',
                   params: { id: item.id, type: 'individual' },
                 })
               }
@@ -183,7 +184,7 @@ export default function BrokerListScreen() {
               stats={[]}
               onPress={() =>
                 router.push({
-                  pathname: '/announcement/rent/broker/[id]',
+                  pathname: '/announcement/form/broker/[id]',
                   params: { id: item.id, type: 'company' },
                 })
               }

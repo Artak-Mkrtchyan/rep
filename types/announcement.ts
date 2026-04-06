@@ -17,6 +17,10 @@ export type Property =
   | 'LAND'
   | 'PARKING_SPACE';
 
+export type ListingType = 'FOR_RENT' | 'FOR_SALE';
+
+export type ProcessType = 'AS_INDIVIDUAL' | 'AS_BROKER';
+
 export type LangFormDTO = {
   [key in Language]?: string;
 };
@@ -35,10 +39,11 @@ export type GeoDetailsDto = {
 };
 
 export type RentForApartmentsFormStep1 = {
-  listingType: 'FOR_RENT' | 'FOR_SALE' | '';
+  listingType: ListingType | '';
   geo: GeoDetailsDto;
   propertyType: Property | '';
-  processType: 'AS_INDIVIDUAL' | 'AS_BROKER' | '';
+  processType: ProcessType | '';
+  brokerAssignmentNeeded: boolean;
 
   infrastructureObjects?: {
     distanceInMeters: number;

@@ -78,6 +78,14 @@ export default function AnnouncementRentLayout() {
           ),
         }}
       />
+
+      <Stack.Screen
+        key="[id]"
+        name="[id]"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 }

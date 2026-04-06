@@ -109,6 +109,7 @@
   "error.service_unavailable": "Parolni tiklash xizmati hozirda mavjud emas. Iltimos, keyinroq qayta urinib ko'ring.",
   "error.failed_to_send_form": "Forma ma'lumotlarini yuborib bo'lmadi",
   "error.failed_to_publish": "E'lon qilib bo'lmadi",
+  "error.failed_to_load_application": "Ijara e'lonini yuklash muvaffaqiyatsiz bo'ldi",
 
   "login.title": "Kirish",
   "login.description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took.",

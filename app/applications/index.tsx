@@ -13,6 +13,7 @@ import {
 import { ApplicationStatusType } from '@/lib/api/applications';
 import { ApplicationStatisticsByStatusResponse } from '@/types/applications';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 
 const STATUS_SEGMENTS: { value: string; label: ApplicationStatusType | 'ALL' }[] = [
   { value: 'applications.status_all', label: 'ALL' },
@@ -63,8 +64,11 @@ export default function ApplicationsScreen() {
     [t, statistics]
   );
 
-  const handleAddBroker = () => {
-    // Hook up navigation or modal when flow exists
+  const handleAddBroker = (id: string) => {
+    router.push({
+      pathname: '/announcement/form/[id]',
+      params: { id },
+    });
   };
 
   return (
@@ -98,7 +102,11 @@ export default function ApplicationsScreen() {
           </View>
         }
         renderItem={({ item: row }) => (
-          <ApplicationCard item={row} onAddBrokerPress={handleAddBroker} className="max-w-full" />
+          <ApplicationCard
+            item={row}
+            onAddBrokerPress={() => handleAddBroker(row.id)}
+            className="max-w-full"
+          />
         )}
         showsVerticalScrollIndicator={false}
       />

@@ -62,11 +62,14 @@ export default function BasicInfoScreen() {
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
   let isNext = true;
 
+  const processType = formData.brokerAssignmentNeeded ? 'AS_BROKER' : 'AS_INDIVIDUAL';
+
   const initialValues: BasicInfoFormValues = {
     listingType: formData.listingType,
+    brokerAssignmentNeeded: formData.brokerAssignmentNeeded,
     geo: formData.geo,
     propertyType: formData.propertyType,
-    processType: formData.processType,
+    processType,
     needPhotographer: formData.needPhotographer,
     needAssessmentExpert: formData.needAssessmentExpert,
     infrastructureObjects: formData.infrastructureObjects,
@@ -81,6 +84,7 @@ export default function BasicInfoScreen() {
       needPhotographer: values.needPhotographer,
       needAssessmentExpert: values.needAssessmentExpert,
       infrastructureObjects: values.infrastructureObjects,
+      brokerAssignmentNeeded: values.processType === 'AS_BROKER',
     });
 
     if (!isNext) {

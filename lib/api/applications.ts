@@ -1,5 +1,13 @@
-import type { RentForApartmentsForm } from '@/types/announcement';
+import type {
+  Attributes,
+  GeoDetailsDto,
+  ListingType,
+  ProcessType,
+  Property,
+  RentForApartmentsForm,
+} from '@/types/announcement';
 
+import { InfrastructureObjectType } from '@/lib/api/infrastructure';
 import {
   ApplicationDetails,
   ApplicationStatisticsByStatusResponse,
@@ -124,6 +132,8 @@ export type FileInput = { uri: string; type: string; name: string }; // React Na
 export interface AnnouncementPublicationResponse {
   applicantEmail: string;
   createdAt: string;
+
+  brokerAssignmentNeeded: boolean;
   createdBy: string;
   id: string;
   reviewerId: string;
@@ -131,21 +141,16 @@ export interface AnnouncementPublicationResponse {
   type: 'ANNOUNCEMENT_PUBLICATION';
   assignedBrokerCompanyId: string;
   assignedBrokerId: string;
+
+  infrastructureObjects?: {
+    distanceInMeters: number;
+    type: InfrastructureObjectType;
+  }[];
   description: string;
   documentIds: string[];
-  geo: {
-    country: string;
-    district: string;
-    formattedAddress: string;
-    house: string;
-    latitude: number;
-    locality: string;
-    longitude: number;
-    province: string;
-    street: string;
-  };
+  geo: GeoDetailsDto;
   initiallySubmittedAt: string;
-  listingType: string;
+  listingType: ListingType;
   mediaFiles: {
     createdAt: string;
     fileName: string;
@@ -157,14 +162,14 @@ export interface AnnouncementPublicationResponse {
   }[];
   needAssessmentExpert: boolean;
   needPhotographer: boolean;
-  processType: string;
+  processType: ProcessType;
   property: {
     areaM2: number;
-    attributes: Record<string, unknown>;
+    attributes: Attributes;
     description: string;
-    propertyType: string;
+    propertyType: Property;
   };
-  propertyType: string;
+  propertyType: Property;
   publicId: string;
   publishedAnnouncementId: string;
   rentDetails: {
@@ -404,5 +409,20 @@ export const applicationsService = {
       { requiresAuth: true }
     );
     return response.data || (response as unknown as ApplicationStatisticsByStatusResponse);
+  },
+
+  /**
+   * Get application by ID
+   * @param id Application ID
+   * @returns A promise that resolves to the application data
+   */
+  getApplicationById: async (id: string): Promise<AnnouncementPublicationResponse> => {
+    const response = await httpClient.get<ApiResponse<AnnouncementPublicationResponse>>(
+      `/v1/applications/${id}`,
+      {
+        requiresAuth: true,
+      }
+    );
+    return response.data || (response as unknown as AnnouncementPublicationResponse);
   },
 };

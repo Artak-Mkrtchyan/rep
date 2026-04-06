@@ -26,13 +26,15 @@ export default function FinalScreen() {
 
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const publicId = useAnnouncementForRentFormStore((s) => s.publicId);
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData);
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const handlePublish = async () => {
     try {
+      await sendFormData();
+
       await publishFormData();
       resetForm();
     } catch {
@@ -48,7 +50,7 @@ export default function FinalScreen() {
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
     } finally {
-      router.push('/(tabs)');
+      router.back();
     }
   };
 
@@ -92,7 +94,8 @@ export default function FinalScreen() {
       ? t('announcement.rent.final.apartment_for_rent')
       : t('announcement.rent.final.apartment_for_sale');
 
-  const imageSources: { uri: string }[] = [];
+  const imageSources: { uri: string }[] =
+    metaData?.tempMediaFiles?.map((file) => ({ uri: file.uri })) || [];
 
   const characteristicHelpers = {
     conditionLabel,
@@ -142,26 +145,21 @@ export default function FinalScreen() {
 
           <PropertyAnnouncementDetail
             title={formData.title || ''}
-            id={publicId}
+            id={metaData?.response?.publicId}
             typeLabel={typeLabel}
-            price="-"
+            price=""
             location={{
               country: formData.geo.country[currentLanguage],
               city: formData.geo.locality[currentLanguage],
               district: formData.geo.province[currentLanguage],
               address: `${formData.geo.street[currentLanguage]} ${formData.geo.house?.[currentLanguage] || ''}`,
             }}
-            distances={{
-              metro: '-',
-              hospital: '-',
-              school: '-',
-              grocery: '-',
-            }}
+            distances={formData.infrastructureObjects}
             placedBy={{
-              name: '-',
+              name: metaData?.response?.applicantEmail || '',
             }}
-            postedDate="-"
-            updatedDate="-"
+            postedDate={''}
+            updatedDate=""
             onViewMap={handleViewOnMap}
           />
 

@@ -1,7 +1,7 @@
 import { Redirect, router, Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { AnnouncementHeader } from '@/components/announcement/announcement-header';
+import { Header } from '@/components/ui/header';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useStepRedirect } from '@/hooks/use-announcement';
 import { getTargetRoute } from '@/lib/announcement';
@@ -21,7 +21,8 @@ export default function AnnouncementRentLayout() {
   const handleBackPress = (step: number, routeName: string) => {
     if (
       routeName === ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.name ||
-      routeName === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.name
+      routeName === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.name ||
+      routeName === ANNOUNCEMENT_ROUTES.RENT_MEDIA_SECOND.name
     ) {
       const href = getTargetRoute(step);
       router.replace(href);
@@ -29,7 +30,7 @@ export default function AnnouncementRentLayout() {
     }
 
     if (step === 1) {
-      router.push('/(tabs)');
+      router.back();
       return;
     }
 
@@ -45,7 +46,8 @@ export default function AnnouncementRentLayout() {
           options={{
             headerShown: true,
             header: () => (
-              <AnnouncementHeader
+              <Header
+                headerTitle={t('announcement.add')}
                 label={t(route.labelKey)}
                 completedStep={route.completedStep}
                 onHandleBackPress={() => handleBackPress(route.completedStep, route.name)}
@@ -61,8 +63,8 @@ export default function AnnouncementRentLayout() {
         options={{
           headerShown: true,
           header: () => (
-            <AnnouncementHeader
-              headerTitle="Broker details"
+            <Header
+              headerTitle={t('announcement.broker_details')}
               isStepProgressVisible={false}
               rightComponent={
                 <Pressable onPress={() => {}}>
@@ -74,6 +76,14 @@ export default function AnnouncementRentLayout() {
               }
             />
           ),
+        }}
+      />
+
+      <Stack.Screen
+        key="[id]"
+        name="[id]"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>

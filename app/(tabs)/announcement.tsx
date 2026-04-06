@@ -8,13 +8,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
-import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 
 export default function AnnouncementScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
   const handleAddPress = () => {
-    router.push(ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path);
+    router.push('/announcement/form/new');
   };
 
   return (

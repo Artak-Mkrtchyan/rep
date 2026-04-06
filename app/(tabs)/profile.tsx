@@ -1,22 +1,19 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { LANGUAGE_FLAGS, LanguagePickerModal } from '@/components/profile/language-picker-modal';
 import { ProfileHeader } from '@/components/profile/profile-header';
-import {
-  LanguagePickerModal,
-  LANGUAGE_FLAGS,
-} from '@/components/profile/language-picker-modal';
 import {
   ProfileMenuSection,
   ProfileMenuSectionItem,
 } from '@/components/profile/profile-menu-section';
 import { ProfileSocialLinks, SocialLinkItem } from '@/components/profile/profile-social-links';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 import { useLogout } from '@/hooks/api/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { useThemeValue } from '@/hooks/use-theme';
@@ -53,7 +50,7 @@ function useProfileMenuItems(
       id: 'my-application',
       label: t('profile.my_application'),
       icon: <Ionicons name="document-text-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/(tabs)/profile'),
+      onPress: () => router.push('/applications'),
     },
     {
       id: 'brokers-management',

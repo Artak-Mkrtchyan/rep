@@ -11,14 +11,15 @@ import { InputLabel } from '@/components/ui/input/label';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
-import { RentForApartmentsFormStep2 } from '@/types/announcement';
+import { RentForApartmentsFormStep3 } from '@/types/announcement';
 import * as Yup from 'yup';
 
-const AnnouncementTitleSchema = Yup.object().shape({
-  title: Yup.string().required('Required'),
-});
+type DescriptionFormValues = { description: RentForApartmentsFormStep3['description'] };
 
-export default function AnnouncementTitleScreen() {
+const DescriptionSchema = Yup.object().shape({
+  description: Yup.string().required('Required'),
+});
+export default function PropertyInfoSecondScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
@@ -28,13 +29,13 @@ export default function AnnouncementTitleScreen() {
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
-  const initialValues: RentForApartmentsFormStep2 = {
-    title: formData.title,
+  const initialValues: DescriptionFormValues = {
+    description: formData.description,
   };
 
-  const saveTitle = async (values: RentForApartmentsFormStep2) => {
-    if (values.title) {
-      updateFormData({ title: values.title });
+  const saveTitle = async (values: DescriptionFormValues) => {
+    if (values.description) {
+      updateFormData({ description: values.description });
     }
 
     if (isNext) {
@@ -45,7 +46,7 @@ export default function AnnouncementTitleScreen() {
       } catch {
         Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       } finally {
-        router.push('/(tabs)');
+        router.back();
       }
     }
   };
@@ -62,13 +63,13 @@ export default function AnnouncementTitleScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <Formik<RentForApartmentsFormStep2>
+      <Formik<DescriptionFormValues>
         initialValues={initialValues}
+        validationSchema={DescriptionSchema}
         enableReinitialize
-        validationSchema={AnnouncementTitleSchema}
         validateOnMount={true}
         onSubmit={saveTitle}>
-        {({ handleChange, handleBlur, handleSubmit, values, isValid }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -77,28 +78,33 @@ export default function AnnouncementTitleScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-                  {t('announcement.rent.title_heading')}
+                  {t('announcement.rent.describe_property')}
                 </ThemedText>
                 <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-                  {t('announcement.rent.title_helper')}
+                  {t('announcement.rent.describe_property_helper')}
                 </ThemedText>
 
                 <View className="gap-1">
-                  <InputLabel>{t('announcement.rent.title_label')}</InputLabel>
+                  <InputLabel>{t('announcement.rent.property_description')}</InputLabel>
                   <TextInput
-                    value={values.title}
-                    onChangeText={handleChange('title')}
-                    onBlur={handleBlur('title')}
-                    placeholder={t('announcement.rent.title_placeholder')}
+                    value={values.description}
+                    onChangeText={handleChange('description')}
+                    onBlur={handleBlur('description')}
+                    placeholder={t('announcement.rent.description_placeholder')}
                     placeholderTextColor={placeholderColor}
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
                     className="min-h-[120px] w-full rounded-[12px] border border-default bg-card px-3 py-3 text-[16px] text-foreground"
                     style={{ paddingTop: 12 }}
-                    accessibilityLabel={t('announcement.rent.title_heading')}
-                    accessibilityHint={t('announcement.rent.title_hint')}
+                    accessibilityLabel="Announcement title"
+                    accessibilityHint="Enter the title for your property listing"
                   />
+                  {touched.description && errors.description ? (
+                    <ThemedText className="mt-1 text-[12px] text-destructive">
+                      {errors.description}
+                    </ThemedText>
+                  ) : null}
                 </View>
               </View>
             </ScrollView>

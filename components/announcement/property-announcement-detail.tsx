@@ -7,6 +7,8 @@ import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { PlacedByItem } from '@/components/announcement/placed-by-item';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
+import { INFRASTRUCTURE_ICONS } from '@/constants/announcement';
+import { InfrastructureObject, InfrastructureObjectType } from '@/lib/api/infrastructure';
 import { cn } from '@/lib/utils';
 import { Image } from 'expo-image';
 
@@ -49,10 +51,21 @@ export type PropertyAnnouncementDetailProps = {
   postedDate?: string;
   updatedDate?: string;
   location?: PropertyAnnouncementDetailLocation;
-  distances?: PropertyAnnouncementDetailDistances;
+  distances?: InfrastructureObject[];
   onViewMap?: () => void;
   containerClassName?: string;
 };
+
+const formatDistance = (meters: number) => {
+  if (!Number.isFinite(meters)) return '—';
+  if (meters < 1000) return `${meters}m`;
+  return `${(meters / 1000).toFixed(1)}km`;
+};
+
+const getDistanceMeta = (type: InfrastructureObjectType) => ({
+  label: `announcement.detail.${type.toLowerCase()}`,
+  icon: INFRASTRUCTURE_ICONS[type.toLowerCase()],
+});
 
 export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProps> = ({
   status,
@@ -60,7 +73,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
   onFavoritePress,
   onMenuPress,
   onSharePress,
-  id,
+  id = '',
   typeLabel,
   title,
   price,
@@ -75,8 +88,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
 }) => {
   const { t } = useTranslation();
   const resolvedStatus = status ?? t('announcement.detail.status_active');
-  const hasDistances =
-    distances && (distances.metro || distances.hospital || distances.school || distances.grocery);
+  const hasDistances = Array.isArray(distances) && distances.length > 0;
 
   return (
     <View
@@ -148,9 +160,8 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
           </View>
         </View>
         <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1">
-          {id != null ? (
-            <ThemedText className="text-[14px] font-semibold  text-foreground">ID: {id}</ThemedText>
-          ) : null}
+          <ThemedText className="text-[14px] font-semibold  text-foreground">ID: {id}</ThemedText>
+
           {typeLabel ? (
             <View className="flex-row items-center gap-1.5">
               <View className="h-[16px] w-[16px] rounded-full bg-destructive" />
@@ -187,7 +198,11 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
             />
           ) : null}
           {postedDate != null ? (
-            <PlacedByItem name={`(${postedDate})`} label={t('announcement.detail.posted')} nameClassName="text-foreground" />
+            <PlacedByItem
+              name={`(${postedDate})`}
+              label={t('announcement.detail.posted')}
+              nameClassName="text-foreground"
+            />
           ) : null}
           {updatedDate != null ? (
             <PlacedByItem
@@ -201,7 +216,9 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
 
       {/* Location */}
       {location && (location.country || location.city || location.district || location.address) ? (
-        <AnnouncementCard className="gap-[16px] rounded-[8px] px-[16px] py-[12px]" title={t('announcement.detail.location')}>
+        <AnnouncementCard
+          className="gap-[16px] rounded-[8px] px-[16px] py-[12px]"
+          title={t('announcement.detail.location')}>
           <View className="flex-row flex-wrap gap-x-8 gap-y-4">
             {location.country ? (
               <PlacedByItem
@@ -211,7 +228,11 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               />
             ) : null}
             {location.city ? (
-              <PlacedByItem name={location.city} label={t('announcement.detail.city')} nameClassName="text-foreground" />
+              <PlacedByItem
+                name={location.city}
+                label={t('announcement.detail.city')}
+                nameClassName="text-foreground"
+              />
             ) : null}
             {location.district ? (
               <PlacedByItem
@@ -238,82 +259,40 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
         {hasDistances ? (
           <>
             <View className="flex-row flex-wrap gap-x-6 gap-y-6">
-              {distances?.metro ? (
-                <PlacedByItem
-                  icon={
-                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
-                      <Image
-                        source={require('@/assets/images/announcement-icons/metro-icon.svg')}
-                        style={{
-                          width: 20,
-                          height: 20,
-                        }}
-                        contentFit="contain"
-                      />
-                    </View>
-                  }
-                  name={distances.metro}
-                  label={t('announcement.detail.metro')}
-                  nameClassName="text-foreground"
-                />
-              ) : null}
-              {distances?.hospital ? (
-                <PlacedByItem
-                  icon={
-                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
-                      <Image
-                        source={require('@/assets/images/announcement-icons/hospital-icon.svg')}
-                        style={{
-                          width: 20,
-                          height: 20,
-                        }}
-                        contentFit="contain"
-                      />
-                    </View>
-                  }
-                  name={distances.hospital}
-                  label={t('announcement.detail.hospital')}
-                  nameClassName="text-foreground"
-                />
-              ) : null}
-              {distances?.school ? (
-                <PlacedByItem
-                  icon={
-                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
-                      <Image
-                        source={require('@/assets/images/announcement-icons/school-icon.svg')}
-                        style={{
-                          width: 20,
-                          height: 20,
-                        }}
-                        contentFit="contain"
-                      />
-                    </View>
-                  }
-                  name={distances.school}
-                  label={t('announcement.detail.school')}
-                  nameClassName="text-foreground"
-                />
-              ) : null}
-              {distances?.grocery ? (
-                <PlacedByItem
-                  icon={
-                    <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
-                      <Image
-                        source={require('@/assets/images/announcement-icons/grocery-icon.svg')}
-                        style={{
-                          width: 20,
-                          height: 20,
-                        }}
-                        contentFit="contain"
-                      />
-                    </View>
-                  }
-                  name={distances.grocery}
-                  label={t('announcement.detail.grocery_shop')}
-                  nameClassName="text-foreground"
-                />
-              ) : null}
+              {distances?.map((item, index) => {
+                const meta = getDistanceMeta(item.type);
+                return (
+                  <PlacedByItem
+                    key={`${item.type}-${index}`}
+                    icon={
+                      <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
+                        <Image
+                          source={meta.icon}
+                          style={{
+                            width: 20,
+                            height: 20,
+                          }}
+                          contentFit="contain"
+                        />
+                      </View>
+                    }
+                    name={
+                      <View className="flex-row items-center gap-1">
+                        <ThemedText className="text-[14px] font-semibold text-foreground">
+                          {formatDistance(item.distanceInMeters)}
+                        </ThemedText>
+                        <Image
+                          source={require('@/assets/images/announcement-icons/walking-icon.svg')}
+                          style={{ width: 14, height: 14 }}
+                          contentFit="contain"
+                        />
+                      </View>
+                    }
+                    label={t(meta.label)}
+                    nameClassName="text-foreground"
+                  />
+                );
+              })}
             </View>
             {onViewMap ? (
               <Button

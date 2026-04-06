@@ -58,16 +58,16 @@ export default function CharacteristicsScreen() {
     }
 
     try {
+      await sendFormData();
+
       if (isNext) {
         nextStep();
       } else {
-        await sendFormData();
-
-        router.push('/(tabs)');
+        router.back();
       }
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
-      router.push('/(tabs)');
+      router.back();
     }
   };
 

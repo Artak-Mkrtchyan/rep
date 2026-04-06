@@ -26,12 +26,18 @@ import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const ConstructionCompanySchema = Yup.object().shape({
-  attachmentIds: Yup.array().min(1, () => i18n.t('validation.at_least_one_file')).required(() => i18n.t('validation.required')),
+  attachments: Yup.array()
+    .min(1, () => i18n.t('validation.at_least_one_file'))
+    .required(() => i18n.t('validation.required')),
   companyInfo: Yup.object().shape({
     certifiedOn: yupSchemas.certifiedOn,
-    certifiedBy: Yup.string().optional().max(255, () => i18n.t('validation.max_length_255')),
+    certifiedBy: Yup.string()
+      .optional()
+      .max(255, () => i18n.t('validation.max_length_255')),
     email: yupSchemas.email,
-    name: Yup.string().required(() => i18n.t('validation.required')).max(255, () => i18n.t('validation.max_length_255')),
+    name: Yup.string()
+      .required(() => i18n.t('validation.required'))
+      .max(255, () => i18n.t('validation.max_length_255')),
     phoneNumber: yupSchemas.phone,
     yearsOfActivity: Yup.number().required(() => i18n.t('validation.required')),
   }),
@@ -47,12 +53,16 @@ export default function ConstructionCompanySignUpScreen() {
   const { data, resetData } = useSignUpContext();
 
   const handleContinue = async (
-    values: ConstructionCompanyRegistrationRequest,
+    values: ConstructionCompanyRegistrationRequest & {
+      attachments: { id: string; uri: string; type?: string; name?: string }[];
+    },
     { setSubmitting }: any
   ) => {
     try {
+      const attachmentIds = values.attachments.map((attachment) => attachment.id);
+
       await applicationsService.constructionCompanyRegistration({
-        attachmentIds: values.attachmentIds,
+        attachmentIds,
         companyInfo: values.companyInfo,
         managerInfo: values.managerInfo,
       });
@@ -83,6 +93,7 @@ export default function ConstructionCompanySignUpScreen() {
     <AuthLayout scrollable>
       <Formik
         initialValues={{
+          attachments: [],
           attachmentIds: [],
           companyInfo: {
             certifiedBy: '',
@@ -253,13 +264,12 @@ export default function ConstructionCompanySignUpScreen() {
 
               <FileUpload
                 label={t('signup.construction_company.files_upload')}
-                value={values.attachmentIds}
-                onChange={(attachmentIds) => setFieldValue('attachmentIds', attachmentIds)}
+                hint={t('ui.upload_your_photo')}
+                value={values.attachments}
+                onChange={(attachments) => setFieldValue('attachments', attachments)}
                 required
                 error={
-                  touched.attachmentIds && errors.attachmentIds
-                    ? String(errors.attachmentIds)
-                    : undefined
+                  touched.attachments && errors.attachments ? String(errors.attachments) : undefined
                 }
               />
 

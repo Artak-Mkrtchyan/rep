@@ -26,8 +26,10 @@ import { router } from 'expo-router';
 const BrokerSchema = Yup.object().shape({
   email: yupSchemas.email,
   fullName: yupSchemas.fullName,
-  attachmentIds: Yup.array().min(1).required('Required'),
-  certifiedBy: Yup.string().optional().max(255, () => i18n.t('validation.max_length_255')),
+  attachments: Yup.array().min(1).required('Required'),
+  certifiedBy: Yup.string()
+    .optional()
+    .max(255, () => i18n.t('validation.max_length_255')),
   certifiedOn: yupSchemas.certifiedOn,
   phoneNumber: yupSchemas.phone,
   yearsOfActivity: Yup.number().required(),
@@ -37,12 +39,19 @@ export default function BrokerSignUpScreen() {
   const { t } = useTranslation();
   const { data, resetData } = useSignUpContext();
 
-  const handleContinue = async (values: BrokerSignUpForm, { setSubmitting }: any) => {
+  const handleContinue = async (
+    values: BrokerSignUpForm & {
+      attachments: { id: string; uri: string; type?: string; name?: string }[];
+    },
+    { setSubmitting }: any
+  ) => {
     try {
+      const attachmentIds = values.attachments.map((attachment) => attachment.id);
+
       await applicationsService.brokerRegistration({
         fullName: values.fullName,
         email: values.email,
-        attachmentIds: values.attachmentIds,
+        attachmentIds,
         certifiedBy: values.certifiedBy,
         certifiedOn: values.certifiedOn,
         phoneNumber: values.phoneNumber,
@@ -76,6 +85,7 @@ export default function BrokerSignUpScreen() {
       <Formik
         initialValues={{
           fullName: '',
+          attachments: [],
           email: data.email || '',
           attachmentIds: [],
           certifiedBy: '',
@@ -173,14 +183,13 @@ export default function BrokerSignUpScreen() {
 
               <FileUpload
                 label={t('signup.broker.files_upload')}
+                hint={t('ui.upload_your_photo')}
                 description={t('signup.broker.files_description')}
-                value={values.attachmentIds}
-                onChange={(attachmentIds) => setFieldValue('attachmentIds', attachmentIds)}
+                value={values.attachments}
+                onChange={(attachments) => setFieldValue('attachments', attachments)}
                 required
                 error={
-                  touched.attachmentIds && errors.attachmentIds
-                    ? String(errors.attachmentIds)
-                    : undefined
+                  touched.attachments && errors.attachments ? String(errors.attachments) : undefined
                 }
               />
 

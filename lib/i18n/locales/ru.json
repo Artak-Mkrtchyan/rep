@@ -116,7 +116,7 @@
   "login.log_in_as": "Войти как",
   "login.forgot_password": "Забыли пароль?",
   "login.failed_title": "Ошибка входа",
-  "login.failed_message": "Неверный адрес электронной почты или пароль. Пожалуйста, попробуйте снова.",
+  "login.failed_message": "Неверный email или пароль",
   "login.google_sign_in_title": "Вход через Google",
   "login.google_sign_in_coming_soon": "Вход через Google скоро будет доступен.",
   "login.apple_sign_in_title": "Вход через Apple",

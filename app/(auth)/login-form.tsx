@@ -23,7 +23,6 @@ import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { AuthScope } from '@/lib/api/auth';
 import { validateEmail } from '@/lib/auth-validation';
-import { getApiErrorMessage, isApiError } from '@/lib/error-handler';
 import type { AccountRole } from '@/types/auth';
 
 const ROLE_TO_SCOPE: Record<string, AuthScope> = {
@@ -102,13 +101,8 @@ export default function LoginFormScreen() {
 
     try {
       await login(email.trim(), password, scope);
-    } catch (err) {
-      const message = isApiError(err)
-        ? getApiErrorMessage(err, t('login.failed_message'))
-        : err instanceof Error
-          ? err.message
-          : t('login.failed_message');
-      setFormError(message);
+    } catch {
+      setFormError(t('login.failed_message'));
     }
   };
 
@@ -124,8 +118,8 @@ export default function LoginFormScreen() {
     // TODO: Implement Apple sign in
   };
 
-  // Combine inline error: password field shows validation error or login API error
   const passwordFieldError = passwordError || formError || undefined;
+  const credentialError = Boolean(formError);
 
   return (
     <ThemedView
@@ -175,6 +169,7 @@ export default function LoginFormScreen() {
                   autoComplete="email"
                   placeholderTextColor={theme.placeholder}
                   error={emailError || undefined}
+                  invalid={credentialError}
                   editable={!isLoading}
                 />
               </View>

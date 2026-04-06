@@ -116,7 +116,7 @@
   "login.log_in_as": "Sifatida kirish",
   "login.forgot_password": "Parolni unutdingizmi?",
   "login.failed_title": "Kirish muvaffaqiyatsiz",
-  "login.failed_message": "Noto'g'ri elektron pochta yoki parol. Iltimos, qayta urinib ko'ring.",
+  "login.failed_message": "Noto'g'ri email yoki parol",
   "login.google_sign_in_title": "Google orqali kirish",
   "login.google_sign_in_coming_soon": "Google orqali kirish tez orada.",
   "login.apple_sign_in_title": "Apple orqali kirish",

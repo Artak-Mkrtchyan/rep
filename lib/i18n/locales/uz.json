@@ -570,8 +570,15 @@
   "applications.empty": "Sizda hali arizalar yo‘q",
   "applications.announcement_application": "E’lon arizasi",
   "applications.role_broker": "Broker",
+  "applications.role_author": "Muallif",
   "applications.role_owner": "Egasi",
   "applications.listing_id": "ID: {{id}}",
   "applications.updated": "Yangilangan",
-  "applications.add_broker": "Broker qo‘shish"
+  "applications.add_broker": "Broker qo‘shish",
+  "applications.assign_broker.title": "Brokerni biriktirish",
+  "applications.assign_broker.subtitle": "Ushbu e’lon arizasiga menejer yoki xodim biriktiring",
+  "applications.assign_broker.assign": "Biriktirish",
+  "applications.assign_broker.close_a11y": "Yopish",
+  "applications.assign_broker.error": "Brokerni biriktirib bo‘lmadi. Qayta urinib ko‘ring.",
+  "applications.assign_broker.empty": "Brokerlar topilmadi"
 }

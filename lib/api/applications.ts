@@ -128,6 +128,57 @@ export interface ConstructionCompanyRegistrationResponse {
 
 export type FileInput = { uri: string; type: string; name: string }; // React Native format
 
+export interface AnnouncementPublicationListResponse {
+  announcementCreatedBy: {
+    fullName: string;
+    id: string;
+  };
+  assignedBroker: {
+    fullName: string;
+    id: string;
+  };
+  assignedBrokerCompany: {
+    id: string;
+    name: string;
+  };
+  createdAt: string;
+  createdBy: {
+    fullName: string;
+    id: string;
+  };
+  firstMediaFile: {
+    thumbnailUrl: string;
+  };
+  geo: {
+    country: string;
+    district: string;
+    formattedAddress: string;
+    house: string;
+    latitude: number;
+    locality: string;
+    longitude: number;
+    province: string;
+    street: string;
+  };
+  id: string;
+  listingType: ListingType;
+  publicId: string;
+  rentDetails: {
+    monthlyRent: number;
+    securityDeposit: number;
+  };
+  saleDetails: {
+    price: number;
+  };
+  status: {
+    code: ApplicationStatusType;
+    name: string;
+  };
+  title: string;
+  type: 'ANNOUNCEMENT_PUBLICATION';
+  updatedAt: string;
+}
+
 /** Response for POST /api/v1/applications/announcement-publication */
 export interface AnnouncementPublicationResponse {
   applicantEmail: string;
@@ -388,14 +439,14 @@ export const applicationsService = {
    */
   getMyApplications: async (
     data: SearchRequest
-  ): Promise<SearchResponse<AnnouncementPublicationResponse>> => {
+  ): Promise<SearchResponse<AnnouncementPublicationListResponse>> => {
     const response = await httpClient.post<
-      ApiResponse<SearchResponse<AnnouncementPublicationResponse>>
+      ApiResponse<SearchResponse<AnnouncementPublicationListResponse>>
     >(`/v1/applications/search/for-screen/my-announcement-applications`, data, {
       requiresAuth: true,
     });
     return (
-      response.data || (response as unknown as SearchResponse<AnnouncementPublicationResponse>)
+      response.data || (response as unknown as SearchResponse<AnnouncementPublicationListResponse>)
     );
   },
 

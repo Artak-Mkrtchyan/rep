@@ -88,7 +88,7 @@ export default function BasicInfoScreen() {
     });
 
     if (!isNext) {
-      router.push('/(tabs)');
+      router.back();
       return;
     }
 

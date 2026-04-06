@@ -1,5 +1,5 @@
 import {
-  AnnouncementPublicationResponse,
+  AnnouncementPublicationListResponse,
   applicationsService,
   ApplicationStatusType,
 } from '@/lib/api/applications';
@@ -112,13 +112,14 @@ export const useGetMyApplicationsInfinite = (
   params: { filter?: ApplicationStatusType; pageSize?: number } = {},
   enabled = true
 ) => {
-  return useInfiniteQuery<SearchResponse<AnnouncementPublicationResponse>, ApiError>({
+  return useInfiniteQuery<SearchResponse<AnnouncementPublicationListResponse>, ApiError>({
     queryKey: [APPLICATIONS_QUERY_KEY, 'my-applications', params],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
       applicationsService.getMyApplications({
         filter: {
-          ...(params.filter && { status: params.filter }),
+          ...(params.filter && { statuses: [params.filter] }),
+          types: ['ANNOUNCEMENT_PUBLICATION', 'ANNOUNCEMENT_MODIFICATION'],
         },
         pagination: {
           pageNumber: (pageParam as number) - 1, // API uses 0-based indexing
@@ -133,7 +134,6 @@ export const useGetMyApplicationsInfinite = (
       }),
     getNextPageParam,
     enabled,
-    staleTime: 5 * 60 * 1000,
   });
 };
 

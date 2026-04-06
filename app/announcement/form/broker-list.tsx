@@ -28,7 +28,7 @@ export default function BrokerListScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
-
+  const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const { mutate: assignBroker } = useAssignBroker();
@@ -83,6 +83,8 @@ export default function BrokerListScreen() {
       const { id } = await sendFormData();
 
       assignBroker({ id, data: { brokerId } });
+
+      nextStep();
     } catch {
       console.error('Assign broker error');
     }
@@ -94,7 +96,7 @@ export default function BrokerListScreen() {
     } catch {
       Alert.alert(t('common.error'), t('Assign broker error'));
     } finally {
-      router.push('/(tabs)');
+      router.back();
     }
   };
 
@@ -154,7 +156,7 @@ export default function BrokerListScreen() {
               reviewCount={1024}
               stats={[]}
               onPress={() =>
-                router.push({
+                router.replace({
                   pathname: '/announcement/form/broker/[id]',
                   params: { id: item.id, type: 'individual' },
                 })
@@ -183,7 +185,7 @@ export default function BrokerListScreen() {
               reviewCount={1024}
               stats={[]}
               onPress={() =>
-                router.push({
+                router.replace({
                   pathname: '/announcement/form/broker/[id]',
                   params: { id: item.id, type: 'company' },
                 })

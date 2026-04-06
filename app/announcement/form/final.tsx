@@ -50,7 +50,7 @@ export default function FinalScreen() {
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
     } finally {
-      router.push('/(tabs)');
+      router.back();
     }
   };
 

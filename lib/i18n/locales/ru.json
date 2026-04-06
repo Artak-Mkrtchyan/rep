@@ -570,8 +570,15 @@
   "applications.empty": "У вас пока нет заявок",
   "applications.announcement_application": "Заявка на объявление",
   "applications.role_broker": "Брокер",
+  "applications.role_author": "Автор",
   "applications.role_owner": "Владелец",
   "applications.listing_id": "ID: {{id}}",
   "applications.updated": "Обновлено",
-  "applications.add_broker": "Добавить брокера"
+  "applications.add_broker": "Добавить брокера",
+  "applications.assign_broker.title": "Назначить брокера",
+  "applications.assign_broker.subtitle": "Назначьте менеджера или сотрудника на эту заявку на объявление",
+  "applications.assign_broker.assign": "Назначить",
+  "applications.assign_broker.close_a11y": "Закрыть",
+  "applications.assign_broker.error": "Не удалось назначить брокера. Попробуйте ещё раз.",
+  "applications.assign_broker.empty": "Брокеры не найдены"
 }

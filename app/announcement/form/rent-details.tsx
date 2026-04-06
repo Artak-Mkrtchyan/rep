@@ -58,7 +58,7 @@ export default function RentDetailsScreen() {
       } catch {
         Alert.alert('Error', 'Failed to send form data');
       } finally {
-        router.push('/(tabs)');
+        router.back();
       }
     }
   };

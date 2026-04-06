@@ -1,7 +1,7 @@
-import { AnnouncementPublicationResponse } from '@/lib/api/applications';
+import { AnnouncementPublicationListResponse } from '@/lib/api/applications';
 
 export type ApplicationCardProps = {
-  item: Partial<AnnouncementPublicationResponse>;
+  item: Partial<AnnouncementPublicationListResponse>;
   onPress?: () => void;
   onAddBrokerPress?: () => void;
   className?: string;

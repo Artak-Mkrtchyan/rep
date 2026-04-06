@@ -30,7 +30,7 @@ export default function AnnouncementRentLayout() {
     }
 
     if (step === 1) {
-      router.push('/(tabs)');
+      router.back();
       return;
     }
 

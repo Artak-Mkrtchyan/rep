@@ -570,8 +570,15 @@
   "applications.empty": "You Don't Have Any applications",
   "applications.announcement_application": "Announcement application",
   "applications.role_broker": "Broker",
+  "applications.role_author": "Author",
   "applications.role_owner": "Owner",
   "applications.listing_id": "ID: {{id}}",
   "applications.updated": "Updated",
-  "applications.add_broker": "Add broker"
+  "applications.add_broker": "Add broker",
+  "applications.assign_broker.title": "Assign broker",
+  "applications.assign_broker.subtitle": "Assign a manager or employee to this announcement application",
+  "applications.assign_broker.assign": "Assign",
+  "applications.assign_broker.close_a11y": "Close",
+  "applications.assign_broker.error": "Could not assign broker. Please try again.",
+  "applications.assign_broker.empty": "No brokers found"
 }

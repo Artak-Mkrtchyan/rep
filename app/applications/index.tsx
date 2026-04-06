@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, View } from 'react-native';
 
-import { ApplicationCard } from '@/components/applications';
+import { ApplicationCard, AssignBrokerModal } from '@/components/applications';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { HorizontalSegmentedControl } from '@/components/ui/segmented-control';
@@ -39,6 +39,7 @@ const getCountByStatus = (
 export default function ApplicationsScreen() {
   const { t } = useTranslation();
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [assignBrokerApplicationId, setAssignBrokerApplicationId] = useState<string | null>(null);
 
   const filter =
     selectedIndex === 0
@@ -64,11 +65,15 @@ export default function ApplicationsScreen() {
     [t, statistics]
   );
 
-  const handleAddBroker = (id: string) => {
+  const handlePress = (id: string) => {
     router.push({
       pathname: '/announcement/form/[id]',
       params: { id },
     });
+  };
+
+  const handleCloseAssignBroker = () => {
+    setAssignBrokerApplicationId(null);
   };
 
   return (
@@ -104,11 +109,18 @@ export default function ApplicationsScreen() {
         renderItem={({ item: row }) => (
           <ApplicationCard
             item={row}
-            onAddBrokerPress={() => handleAddBroker(row.id)}
+            onAddBrokerPress={() => setAssignBrokerApplicationId(row.id)}
+            onPress={() => handlePress(row.id)}
             className="max-w-full"
           />
         )}
         showsVerticalScrollIndicator={false}
+      />
+
+      <AssignBrokerModal
+        visible={assignBrokerApplicationId !== null}
+        applicationId={assignBrokerApplicationId ?? ''}
+        onClose={handleCloseAssignBroker}
       />
     </ThemedView>
   );

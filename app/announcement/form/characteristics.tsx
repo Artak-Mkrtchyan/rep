@@ -63,11 +63,11 @@ export default function CharacteristicsScreen() {
       if (isNext) {
         nextStep();
       } else {
-        router.push('/(tabs)');
+        router.back();
       }
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
-      router.push('/(tabs)');
+      router.back();
     }
   };
 

@@ -11,11 +11,9 @@ import { useComparisons } from '@/hooks/api/use-comparisons';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import {
   getAddress,
-  getBathsLabel,
-  getBedsLabel,
+  getCardAttributes,
   getImageSource,
   getPriceLabel,
-  getSizeLabel,
 } from '@/lib/utils/announcement-helpers';
 
 export default function ComparisonsScreen() {
@@ -61,9 +59,7 @@ export default function ComparisonsScreen() {
         imageSource={getImageSource(item)}
         title={item.title}
         address={getAddress(item)}
-        bedsLabel={getBedsLabel(item)}
-        bathsLabel={getBathsLabel(item)}
-        sizeLabel={getSizeLabel(item)}
+        attributes={getCardAttributes(item)}
         priceLabel={getPriceLabel(item)}
         isSelected={selectedIds.has(item.id)}
         onToggleSelect={() => toggleSelection(item.id)}

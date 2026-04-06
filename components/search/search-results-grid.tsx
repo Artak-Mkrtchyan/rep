@@ -1,19 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 
+import { AnnouncementListCard } from '@/components/announcement/announcement-list-card';
 import { AnnouncementSmallCard } from '@/components/announcement/announcement-small-card';
 import { ThemedText } from '@/components/themed-text';
 import {
   getAddress,
-  getBathsLabel,
-  getBedsLabel,
+  getCardAttributes,
   getImageSource,
   getPriceLabel,
-  getSizeLabel,
 } from '@/lib/utils/announcement-helpers';
 import type { Announcement } from '@/types/api';
+
+type ViewMode = 'grid' | 'list';
 
 type SearchResultsGridProps = {
   announcements: Announcement[];
@@ -41,6 +42,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   onComparisonPress,
 }) => {
   const { t } = useTranslation();
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
 
   const isCloseToBottom = useCallback(
     ({ layoutMeasurement, contentOffset, contentSize }: any) =>
@@ -84,9 +86,33 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
       contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 27, paddingBottom: 34 }}
       onScroll={handleScroll}
       scrollEventThrottle={400}>
-      <ThemedText className="text-[20px] font-bold leading-[24px] text-foreground">
-        {t('search.results_title', { count: totalElements })}
-      </ThemedText>
+      <View className="flex-row items-center justify-between">
+        <ThemedText className="text-[20px] font-bold leading-[24px] text-foreground">
+          {t('search.results_title', { count: totalElements })}
+        </ThemedText>
+        <View className="flex-row items-center gap-[4px]">
+          <Pressable
+            onPress={() => setViewMode('grid')}
+            className="h-[32px] w-[32px] items-center justify-center rounded-[8px]"
+            style={viewMode === 'grid' ? { backgroundColor: '#F1F1F1' } : undefined}>
+            <Ionicons
+              name="grid-outline"
+              size={18}
+              color={viewMode === 'grid' ? '#111111' : '#ABABAB'}
+            />
+          </Pressable>
+          <Pressable
+            onPress={() => setViewMode('list')}
+            className="h-[32px] w-[32px] items-center justify-center rounded-[8px]"
+            style={viewMode === 'list' ? { backgroundColor: '#F1F1F1' } : undefined}>
+            <Ionicons
+              name="list-outline"
+              size={18}
+              color={viewMode === 'list' ? '#111111' : '#ABABAB'}
+            />
+          </Pressable>
+        </View>
+      </View>
 
       {announcements.length === 0 ? (
         <View className="mt-16 items-center">
@@ -95,7 +121,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
             {t('search.no_results')}
           </ThemedText>
         </View>
-      ) : (
+      ) : viewMode === 'grid' ? (
         <View className="mt-[16px] flex-row flex-wrap gap-x-[8px] gap-y-[16px]">
           {announcements.map((item) => (
             <AnnouncementSmallCard
@@ -104,9 +130,26 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               imageSource={getImageSource(item)}
               title={item.title}
               address={getAddress(item)}
-              bedsLabel={getBedsLabel(item)}
-              bathsLabel={getBathsLabel(item)}
-              sizeLabel={getSizeLabel(item)}
+              attributes={getCardAttributes(item)}
+              priceLabel={getPriceLabel(item)}
+              isFavourite={item.favourite}
+              isForComparison={item.forComparison}
+              onPress={onCardPress ? () => onCardPress(item.id) : undefined}
+              onComparisonPress={
+                onComparisonPress ? () => onComparisonPress(item.id, item.forComparison) : undefined
+              }
+            />
+          ))}
+        </View>
+      ) : (
+        <View className="mt-[16px] gap-[12px]">
+          {announcements.map((item) => (
+            <AnnouncementListCard
+              key={item.id}
+              imageSource={getImageSource(item)}
+              title={item.title}
+              address={getAddress(item)}
+              attributes={getCardAttributes(item)}
               priceLabel={getPriceLabel(item)}
               isFavourite={item.favourite}
               isForComparison={item.forComparison}

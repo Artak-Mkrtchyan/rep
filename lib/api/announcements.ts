@@ -1,6 +1,11 @@
 import { ApiResponse } from './auth.types';
 import { httpClient } from './http/client';
-import { Announcement, ItemsListApiResponse, SearchRequest } from '@/types/api';
+import {
+  Announcement,
+  ItemsListApiResponse,
+  PriceChangeHistory,
+  SearchRequest,
+} from '@/types/api';
 
 export const announcementsService = {
   getAnnouncementById: async (id: string): Promise<Announcement> => {
@@ -78,5 +83,16 @@ export const announcementsService = {
       { requiresAuth: true }
     );
     return response.data || response;
+  },
+
+  getAnnouncementsHistory: async (
+    data: SearchRequest
+  ): Promise<ItemsListApiResponse<PriceChangeHistory>> => {
+    const response = await httpClient.post<
+      ApiResponse<ItemsListApiResponse<PriceChangeHistory>>
+    >('/v1/announcements/history/search', data, {
+      requiresAuth: true,
+    });
+    return response.data || (response as unknown as ItemsListApiResponse<PriceChangeHistory>);
   },
 };

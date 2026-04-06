@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, ScrollView, Share, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AttachedFiles } from '@/components/announcement/attached-files';
 import { DescriptionSection } from '@/components/announcement/description-section';
 import { detailStyles } from '@/components/announcement/detail/announcement-detail.styles';
 import { DetailHeaderSection } from '@/components/announcement/detail/detail-header-section';
@@ -15,6 +16,7 @@ import { ImageCarousel } from '@/components/announcement/image-carousel';
 import { ObjectCharacteristics } from '@/components/announcement/object-characteristics';
 import { PhotoGallery } from '@/components/announcement/photo-gallery';
 import { PetsAllowed } from '@/components/announcement/pets-allowed';
+import { PriceHistory } from '@/components/announcement/price-history';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAnnouncementDetails } from '@/hooks/api/use-announcement-details';
@@ -133,6 +135,16 @@ export default function AnnouncementDetailScreen() {
           {pets && (
             <View style={horizontalStyle}>
               <PetsAllowed pets={pets} />
+            </View>
+          )}
+
+          <View style={horizontalStyle}>
+            <PriceHistory announcementId={id!} />
+          </View>
+
+          {announcement.documents && announcement.documents.length > 0 && (
+            <View style={horizontalStyle}>
+              <AttachedFiles documents={announcement.documents} />
             </View>
           )}
         </View>

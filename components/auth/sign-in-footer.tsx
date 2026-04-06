@@ -29,7 +29,7 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
   const resolvedSignInActionLabel = signInActionLabel ?? t('auth.sign_in');
   return (
     <>
-      <FormDivider />
+      <FormDivider className="mb-6" />
 
       <SocialAuthButtons onGooglePress={onGooglePress} onApplePress={onApplePress} />
 

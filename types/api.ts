@@ -104,9 +104,45 @@ export interface Announcement {
   forComparison: boolean;
   publicId: string;
   infrastructureObjects?: InfrastructureObject[];
+  documents?: AnnouncementDocument[];
 }
 
 export interface InfrastructureObject {
   type: string;
   distanceInMeters: number;
+}
+
+export interface PriceChangeHistory {
+  announcementId: string;
+  createdAt: string;
+  createdBy: string;
+  type: 'announcement-price-changed';
+  listingType: ListingType;
+  rentDetailsChange: {
+    monthlyRent: {
+      changed: boolean;
+      newValue: number;
+      oldValue: number;
+    };
+    securityDeposit: {
+      changed: boolean;
+      newValue: number;
+      oldValue: number;
+    };
+  };
+  saleDetailsChange: {
+    price: {
+      changed: boolean;
+      newValue: number;
+      oldValue: number;
+    };
+  };
+}
+
+export interface AnnouncementDocument {
+  id: string;
+  fileName: string;
+  contentType: string;
+  url: string;
+  sizeInBytes: number;
 }

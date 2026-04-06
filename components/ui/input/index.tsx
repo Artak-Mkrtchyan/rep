@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useThemeValue } from '@/hooks/use-theme';
@@ -30,17 +30,19 @@ export const Input = React.forwardRef(function Input(
     inputClassName,
     left,
     right,
-  leftIcon,
-  rightIcon,
-  showPasswordToggle,
-  numericOnly,
-  allowDecimal,
-  onFocus,
-  onBlur,
-  secureTextEntry,
-  onChangeText,
-  ...props
-}: InputProps,
+    leftIcon,
+    rightIcon,
+    showPasswordToggle,
+    afterField,
+    numericOnly,
+    allowDecimal,
+    onFocus,
+    onBlur,
+    secureTextEntry,
+    textContentType: textContentTypeProp,
+    onChangeText,
+    ...props
+  }: InputProps,
   ref: React.Ref<TextInput>
 ) {
   const inputRef = React.useRef<TextInput>(null);
@@ -48,7 +50,7 @@ export const Input = React.forwardRef(function Input(
 
   const { t } = useTranslation();
   const [isFocused, setIsFocused] = React.useState(false);
-  const [showPassword, setShowPassword] = React.useState(!!secureTextEntry);
+  const [isSecure, setIsSecure] = React.useState(!!secureTextEntry);
   const resolvedDisabled = Boolean(isDisabled ?? disabled);
   const hasError = Boolean(isInvalid ?? invalid ?? error);
   const placeholderColor = useThemeValue('placeholder');
@@ -72,10 +74,7 @@ export const Input = React.forwardRef(function Input(
   const filterNumeric = React.useCallback(
     (text: string): string => {
       if (!numericOnly) return text;
-      const filtered = text.replace(
-        new RegExp(`[^${allowDecimal ? '0-9.' : '0-9'}]`, 'g'),
-        ''
-      );
+      const filtered = text.replace(new RegExp(`[^${allowDecimal ? '0-9.' : '0-9'}]`, 'g'), '');
       if (!allowDecimal) return filtered;
       const parts = filtered.split('.');
       if (parts.length <= 2) return filtered;
@@ -136,7 +135,11 @@ export const Input = React.forwardRef(function Input(
           )}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          secureTextEntry={secureTextEntry ? showPassword : false}
+          secureTextEntry={isSecure}
+          // Use `password` (not `oneTimeCode`) so iOS does not clear the field on Backspace after toggling visibility
+          textContentType={
+            showPasswordToggle ? (textContentTypeProp ?? 'password') : textContentTypeProp
+          }
           {...props}
           onChangeText={handleChangeText}
           keyboardType={
@@ -146,10 +149,24 @@ export const Input = React.forwardRef(function Input(
         {showPasswordToggle ? (
           <Pressable
             accessibilityLabel={t('ui.toggle_password_visibility')}
-            onPress={() => setShowPassword(!showPassword)}>
+            onPress={() => {
+              setIsSecure((prev) => {
+                const next = !prev;
+                // iOS bug: toggling secureTextEntry back to true causes backspace
+                // to delete the entire text. Workaround: blur and re-focus so iOS
+                // re-tokenizes the characters individually.
+                if (next && Platform.OS === 'ios' && inputRef.current) {
+                  const ref = inputRef.current;
+                  ref.blur();
+                  setTimeout(() => ref.focus(), 0);
+                }
+                return next;
+              });
+            }}
+            hitSlop={8}>
             <Image
               source={
-                showPassword
+                isSecure
                   ? require('@/assets/images/eye-icon.svg')
                   : require('@/assets/images/eye-open-icon.svg')
               }
@@ -166,6 +183,8 @@ export const Input = React.forwardRef(function Input(
       ) : (helper ?? description) ? (
         <Text className="text-[12px] text-muted-foreground">{helper ?? description}</Text>
       ) : null}
+
+      {afterField}
     </View>
   );
 });

@@ -18,11 +18,9 @@ import { useFeaturedAnnouncements } from '@/hooks/api/use-announcements';
 import { announcementsService } from '@/lib/api/announcements';
 import {
   getAddress,
-  getBathsLabel,
-  getBedsLabel,
+  getCardAttributes,
   getImageSource,
   getPriceLabel,
-  getSizeLabel,
 } from '@/lib/utils/announcement-helpers';
 
 const CARD_WIDTH = 175;
@@ -94,7 +92,9 @@ export const FeaturedProperties: React.FC = () => {
   return (
     <View className="mt-6">
       <View className="flex-row items-center justify-between px-4">
-        <ThemedText className="text-[20px] font-bold text-foreground">{t('home.featured_property')}</ThemedText>
+        <ThemedText className="text-[20px] font-bold text-foreground">
+          {t('home.featured_property')}
+        </ThemedText>
         <Pressable>
           <ThemedText className="text-[14px] text-foreground">{t('home.see_more')}</ThemedText>
         </Pressable>
@@ -115,9 +115,7 @@ export const FeaturedProperties: React.FC = () => {
             imageSource={getImageSource(item)}
             title={item.title}
             address={getAddress(item)}
-            bedsLabel={getBedsLabel(item)}
-            bathsLabel={getBathsLabel(item)}
-            sizeLabel={getSizeLabel(item)}
+            attributes={getCardAttributes(item)}
             priceLabel={getPriceLabel(item)}
             isFavourite={item.favourite}
             isForComparison={item.forComparison}

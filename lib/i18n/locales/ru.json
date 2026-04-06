@@ -112,7 +112,7 @@
   "error.failed_to_load_application": "Не удалось загрузить заявку",
 
   "login.title": "Войти",
-  "login.description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took.",
+  "login.description": "Войдите, чтобы изучать объекты недвижимости, сохранять избранное и управлять своими объявлениями — всё в одном месте.",
   "login.log_in_as": "Войти как",
   "login.forgot_password": "Забыли пароль?",
   "login.failed_title": "Ошибка входа",
@@ -413,6 +413,14 @@
   "announcement.detail.contact_info": "Контактная информация",
   "announcement.detail.photos": "Фото",
   "announcement.broker_details": "Детали брокера",
+  "announcement.detail.price_history": "История цен",
+  "announcement.detail.date": "Дата",
+  "announcement.detail.price": "Цена",
+  "announcement.detail.percentage": "Процент",
+  "announcement.detail.attached_files": "Загружаемые PDF файлы",
+  "announcement.detail.page": "Страница",
+  "announcement.detail.of_page": "из",
+  "announcement.detail.download_failed": "Не удалось скачать файл",
 
   "property_details.see_all_photos": "Посмотреть все фото",
   "property_details.announcement_information": "Информация об объявлении",

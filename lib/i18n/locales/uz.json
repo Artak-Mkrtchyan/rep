@@ -112,7 +112,7 @@
   "error.failed_to_load_application": "Ijara e'lonini yuklash muvaffaqiyatsiz bo'ldi",
 
   "login.title": "Kirish",
-  "login.description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took.",
+  "login.description": "Ko'chmas mulklarni ko'rish, sevimlilaringizni saqlash va e'lonlaringizni boshqarish uchun tizimga kiring — hammasi bir joyda.",
   "login.log_in_as": "Sifatida kirish",
   "login.forgot_password": "Parolni unutdingizmi?",
   "login.failed_title": "Kirish muvaffaqiyatsiz",
@@ -413,6 +413,14 @@
   "announcement.detail.contact_info": "Aloqa ma'lumotlari",
   "announcement.detail.photos": "Suratlar",
   "announcement.broker_details": "Broker haqida ma'lumotlar",
+  "announcement.detail.price_history": "Narx tarixi",
+  "announcement.detail.date": "Sana",
+  "announcement.detail.price": "Narx",
+  "announcement.detail.percentage": "Foiz",
+  "announcement.detail.attached_files": "Yuklab olinadigan PDF fayllar",
+  "announcement.detail.page": "Sahifa",
+  "announcement.detail.of_page": "dan",
+  "announcement.detail.download_failed": "Faylni yuklab bo'lmadi",
 
   "property_details.see_all_photos": "Barcha rasmlarni ko'rish",
   "property_details.announcement_information": "E'lon ma'lumotlari",

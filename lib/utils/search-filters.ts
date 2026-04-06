@@ -6,11 +6,7 @@ const LISTING_TYPE_MAP = {
   RENT: 'FOR_RENT',
 } as const;
 
-export function buildSearchRequest(
-  filters: SearchFilters,
-  page = 0,
-  pageSize = 10
-): SearchRequest {
+export function buildSearchRequest(filters: SearchFilters, page = 0, pageSize = 10): SearchRequest {
   const apiFilter: Record<string, unknown> = {};
 
   if (filters.query) {
@@ -41,6 +37,6 @@ export function buildSearchRequest(
   return {
     filter: apiFilter,
     pagination: { pageNumber: page, pageSize },
-    sorts: [{ sort: 'CREATED_AT', direction: 'DESC' }],
+    sorts: [{ sort: 'UPDATED_AT', direction: 'DESC' }],
   };
 }

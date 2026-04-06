@@ -85,8 +85,11 @@ export type PropertyDetailsDto = {
 export interface Announcement {
   id: string;
   createdAt?: string;
+  updatedAt?: string;
   createdBy?: string;
   archived: boolean;
+  closureReason?: { code: string; name?: string; comment?: string };
+  assignedBrokerId?: string;
   listingType: ListingType;
   propertyType: PropertyType;
   processType: ProcessType;

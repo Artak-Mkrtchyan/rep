@@ -6,6 +6,10 @@ import {
   PriceChangeHistory,
   SearchRequest,
 } from '@/types/api';
+import type {
+  AnnouncementListItem,
+  AnnouncementStatisticsByStatusResponse,
+} from '@/types/my-announcements';
 
 export const announcementsService = {
   getAnnouncementById: async (id: string): Promise<Announcement> => {
@@ -94,5 +98,45 @@ export const announcementsService = {
       requiresAuth: true,
     });
     return response.data || (response as unknown as ItemsListApiResponse<PriceChangeHistory>);
+  },
+
+  getMyAnnouncements: async (
+    request: SearchRequest
+  ): Promise<ItemsListApiResponse<AnnouncementListItem>> => {
+    const response = await httpClient.post<
+      ApiResponse<ItemsListApiResponse<AnnouncementListItem>>
+    >('/v1/announcements/search/for-screen/my-announcements', request, {
+      requiresAuth: true,
+    });
+    return response.data || (response as unknown as ItemsListApiResponse<AnnouncementListItem>);
+  },
+
+  getAnnouncementsStatisticsByStatuses: async (
+    data: object
+  ): Promise<AnnouncementStatisticsByStatusResponse> => {
+    const response = await httpClient.post<
+      ApiResponse<AnnouncementStatisticsByStatusResponse>
+    >('/v1/announcements/statistics/by-statuses', data, {
+      requiresAuth: true,
+    });
+    return response.data || (response as unknown as AnnouncementStatisticsByStatusResponse);
+  },
+
+  closeAnnouncement: async (id: string, closureReason: string): Promise<Announcement> => {
+    const response = await httpClient.patch<ApiResponse<Announcement>>(
+      `/v1/announcements/${id}/close`,
+      { closureReason },
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as Announcement);
+  },
+
+  reopenAnnouncement: async (id: string): Promise<Announcement> => {
+    const response = await httpClient.patch<ApiResponse<Announcement>>(
+      `/v1/announcements/${id}/reopen`,
+      {},
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as Announcement);
   },
 };

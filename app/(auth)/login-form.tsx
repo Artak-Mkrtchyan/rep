@@ -185,7 +185,7 @@ export default function LoginFormScreen() {
                   afterField={
                     <View className="mt-1 w-full items-end">
                       <Pressable onPress={handleForgotPassword} disabled={isLoading} hitSlop={8}>
-                        <ThemedText className="text-[14px] leading-[20px] text-primary">
+                        <ThemedText className="text-[16px] leading-[20px] text-primary">
                           {t('login.forgot_password')}
                         </ThemedText>
                       </Pressable>
@@ -210,7 +210,7 @@ export default function LoginFormScreen() {
                 )}
               </Pressable>
 
-              <View className="mt-6 w-full">
+              <View className="w-full">
                 <SignInFooter
                   onGooglePress={handleGoogleSignIn}
                   onApplePress={handleAppleSignIn}

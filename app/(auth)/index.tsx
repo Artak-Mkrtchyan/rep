@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -27,14 +27,6 @@ export default function LoginRoleScreen() {
       pathname: AUTH_ROUTES.LOGIN_FORM as any,
       params: { role: values.role },
     });
-  };
-
-  const handleGoogleSignIn = () => {
-    Alert.alert(t('login.google_sign_in_title'), t('login.google_sign_in_message'));
-  };
-
-  const handleAppleSignIn = () => {
-    Alert.alert(t('login.apple_sign_in_title'), t('login.apple_sign_in_message'));
   };
 
   return (
@@ -71,8 +63,6 @@ export default function LoginRoleScreen() {
             </Button>
 
             <SignInFooter
-              onGooglePress={handleGoogleSignIn}
-              onApplePress={handleAppleSignIn}
               onSignInPress={() => router.push('/(auth)/signup')}
               showSignInLink
               signInLabel={t('auth.dont_have_account')}

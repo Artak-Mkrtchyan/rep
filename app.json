@@ -32,11 +32,26 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "https", "host": "rep-dev.utspdev.com", "pathPrefix": "/app/open" },
-            { "scheme": "https", "host": "rep-test.utspdev.com", "pathPrefix": "/app/open" },
-            { "scheme": "https", "host": "rep.utspdev.com", "pathPrefix": "/app/open" }
+            {
+              "scheme": "https",
+              "host": "rep-dev.utspdev.com",
+              "pathPrefix": "/app/open"
+            },
+            {
+              "scheme": "https",
+              "host": "rep-test.utspdev.com",
+              "pathPrefix": "/app/open"
+            },
+            {
+              "scheme": "https",
+              "host": "rep.utspdev.com",
+              "pathPrefix": "/app/open"
+            }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -63,7 +78,10 @@
           "cameraPermission": "The app accesses your camera to let you take and upload photos."
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-community/datetimepicker",
+      "expo-localization",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

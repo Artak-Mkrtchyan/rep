@@ -27,11 +27,15 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
   const { t } = useTranslation();
   const resolvedSignInLabel = signInLabel ?? t('auth.already_have_account');
   const resolvedSignInActionLabel = signInActionLabel ?? t('auth.sign_in');
+  const showSocial = onGooglePress != null || onApplePress != null;
+
   return (
     <>
-      <FormDivider className="mb-6" />
+      <FormDivider className="mb-6 mt-6" />
 
-      <SocialAuthButtons onGooglePress={onGooglePress} onApplePress={onApplePress} />
+      {showSocial ? (
+        <SocialAuthButtons onGooglePress={onGooglePress} onApplePress={onApplePress} />
+      ) : null}
 
       {showSignInLink && onSignInPress ? (
         <Button

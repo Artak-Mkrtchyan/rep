@@ -5,12 +5,10 @@ import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   TouchableWithoutFeedback,
-  useWindowDimensions,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -48,8 +46,19 @@ export default function LoginFormScreen() {
   const { login, isLoading, reset: resetLoginError } = useLogin();
   const { tokens: theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { height: windowHeight } = useWindowDimensions();
   const { horizontalStyle } = useScreenEdgePadding();
+  const [keyboardOpen, setKeyboardOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSub = Keyboard.addListener(showEvt, () => setKeyboardOpen(true));
+    const hideSub = Keyboard.addListener(hideEvt, () => setKeyboardOpen(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const canContinue = email.length > 0 && password.length > 0 && !isLoading;
 
@@ -118,29 +127,30 @@ export default function LoginFormScreen() {
   // Combine inline error: password field shows validation error or login API error
   const passwordFieldError = passwordError || formError || undefined;
 
-  const scrollMinHeight = windowHeight - insets.top - insets.bottom;
-
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
-      style={{ flex: 1 }}>
-      <ThemedView
-        className="flex-1"
-        style={[{ paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        <ScrollView
-          contentContainerStyle={[
-            {
-              flexGrow: 1,
-              paddingTop: 8,
-              paddingBottom: 24,
-              minHeight: scrollMinHeight,
-            },
-            horizontalStyle,
-          ]}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
-          showsVerticalScrollIndicator={false}>
+    <ThemedView
+      className="flex-1"
+      style={[
+        {
+          paddingTop: insets.top,
+          // Bottom inset stacks above the keyboard and reads as a white gap; drop it while keyboard is open
+          paddingBottom: keyboardOpen ? 0 : insets.bottom,
+        },
+      ]}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          {
+            paddingTop: 8,
+            paddingBottom: 24,
+          },
+          horizontalStyle,
+        ]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+        showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+        contentInsetAdjustmentBehavior="automatic">
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View className="w-full items-center">
               <Image
@@ -222,8 +232,7 @@ export default function LoginFormScreen() {
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </ScrollView>
-      </ThemedView>
-    </KeyboardAvoidingView>
+      </ScrollView>
+    </ThemedView>
   );
 }

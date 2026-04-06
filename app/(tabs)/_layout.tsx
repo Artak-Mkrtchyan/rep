@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Tabs, router } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -62,6 +62,12 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault();
+            router.push('/announcement/form/new');
+          },
         }}
       />
       <Tabs.Screen

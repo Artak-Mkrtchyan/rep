@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { useThemeValue } from '@/hooks/use-theme';
@@ -46,8 +46,6 @@ export const Input = React.forwardRef(function Input(
   ref: React.Ref<TextInput>
 ) {
   const inputRef = React.useRef<TextInput | null>(null);
-  const secureInputRef = React.useRef<TextInput | null>(null);
-  const plainInputRef = React.useRef<TextInput | null>(null);
   React.useImperativeHandle(ref, () => inputRef.current as TextInput);
 
   const { t } = useTranslation();
@@ -56,6 +54,15 @@ export const Input = React.forwardRef(function Input(
   const resolvedDisabled = Boolean(isDisabled ?? disabled);
   const hasError = Boolean(isInvalid ?? invalid ?? error);
   const placeholderColor = useThemeValue('placeholder');
+
+  // iOS bug fix: after toggling to secure, iOS internally selects all text.
+  // The next edit (Backspace or typing) replaces the entire value instead of editing one char.
+  // We detect this and correct the behavior without a visual flash by:
+  // 1. Not propagating the bogus empty/replaced value to the parent
+  // 2. Forcing a re-render so React reverts the native field to the current props.value
+  // 3. Applying the corrected single-char edit on the next frame
+  const justToggledToSecure = React.useRef(false);
+  const [, forceRender] = React.useState(0);
 
   const handleFocus = React.useCallback(
     (e: any) => {
@@ -87,31 +94,44 @@ export const Input = React.forwardRef(function Input(
 
   const handleChangeText = React.useCallback(
     (text: string) => {
+      const prev = props.value ?? '';
+
+      // iOS select-all fix: after toggling to secure, if the entire value was replaced
+      // in a single edit, iOS selected-all before the keystroke. Correct it.
+      // Don't propagate the bogus value — force React to revert native field, then apply fix.
+      if (justToggledToSecure.current && prev.length > 1) {
+        if (text.length === 0) {
+          // Backspace on selected-all → delete only the last character
+          justToggledToSecure.current = false;
+          forceRender((c) => c + 1); // revert native field to current props.value
+          requestAnimationFrame(() => onChangeText?.(prev.slice(0, -1)));
+          return;
+        }
+        if (text.length === 1) {
+          // Typed a character over selected-all → append instead of replace
+          justToggledToSecure.current = false;
+          forceRender((c) => c + 1);
+          requestAnimationFrame(() => onChangeText?.(prev + text));
+          return;
+        }
+      }
+      justToggledToSecure.current = false;
+
       const next = numericOnly ? filterNumeric(text) : text;
       onChangeText?.(next);
     },
-    [onChangeText, numericOnly, filterNumeric]
+    [onChangeText, numericOnly, filterNumeric, props.value]
   );
 
-  // iOS: toggling `secureTextEntry` on one TextInput breaks Backspace. Keep two inputs mounted
-  // (masked + plain), fixed `secureTextEntry` on each, and only swap focus / pointer-events.
-  const prevIsSecure = React.useRef<boolean | undefined>(undefined);
-  React.useLayoutEffect(() => {
-    if (showPasswordToggle) {
-      inputRef.current = isSecure ? secureInputRef.current : plainInputRef.current;
-    }
-    if (!showPasswordToggle) return;
-    if (prevIsSecure.current === undefined) {
-      prevIsSecure.current = isSecure;
-      return;
-    }
-    if (prevIsSecure.current === isSecure) return;
-    prevIsSecure.current = isSecure;
-    const id = requestAnimationFrame(() => {
-      (isSecure ? secureInputRef : plainInputRef).current?.focus();
+  const handleToggleSecure = React.useCallback(() => {
+    setIsSecure((prev) => {
+      if (!prev) {
+        // Going from plain → secure: set intercept flag
+        justToggledToSecure.current = true;
+      }
+      return !prev;
     });
-    return () => cancelAnimationFrame(id);
-  }, [isSecure, showPasswordToggle]);
+  }, []);
 
   const sizeClasses =
     size === 'sm'
@@ -119,9 +139,6 @@ export const Input = React.forwardRef(function Input(
       : size === 'lg'
         ? 'h-14 rounded-[14px] px-4'
         : 'h-12 rounded-[12px] px-3';
-
-  const passwordStackMinHeightClass =
-    size === 'sm' ? 'min-h-10' : size === 'lg' ? 'min-h-14' : 'min-h-12';
 
   const variantClasses =
     variant === 'ghost' ? 'bg-transparent' : resolvedDisabled ? 'bg-muted' : 'bg-card';
@@ -149,8 +166,6 @@ export const Input = React.forwardRef(function Input(
   const iosPasswordExtra =
     Platform.OS === 'ios' && showPasswordToggle ? ({ smartInsertDelete: false } as const) : {};
 
-  const passwordFieldLayerStyle = StyleSheet.absoluteFillObject;
-
   return (
     <View className={cn('w-full gap-1', containerClassName)}>
       {label ? (
@@ -166,76 +181,26 @@ export const Input = React.forwardRef(function Input(
         accessibilityLabel={label}
         accessibilityState={{ disabled: resolvedDisabled, selected: isFocused }}>
         <InputLeftView>{left ?? leftIcon}</InputLeftView>
-        {showPasswordToggle ? (
-          <View className={cn('relative flex-1 self-stretch', passwordStackMinHeightClass)}>
-            <TextInput
-              ref={secureInputRef}
-              editable={!resolvedDisabled && isSecure}
-              pointerEvents={isSecure ? 'auto' : 'none'}
-              placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
-              className={inputClassNames}
-              style={[
-                passwordFieldLayerStyle,
-                {
-                  opacity: isSecure ? 1 : 0,
-                  zIndex: isSecure ? 2 : 0,
-                },
-              ]}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              secureTextEntry
-              textContentType={textContentTypeProp ?? 'password'}
-              {...props}
-              autoCorrect={false}
-              spellCheck={false}
-              onChangeText={handleChangeText}
-              keyboardType={keyboardTypeResolved}
-              {...iosPasswordExtra}
-            />
-            <TextInput
-              ref={plainInputRef}
-              editable={!resolvedDisabled && !isSecure}
-              pointerEvents={isSecure ? 'none' : 'auto'}
-              placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
-              className={inputClassNames}
-              style={[
-                passwordFieldLayerStyle,
-                {
-                  opacity: isSecure ? 0 : 1,
-                  zIndex: isSecure ? 0 : 2,
-                },
-              ]}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              secureTextEntry={false}
-              textContentType={Platform.OS === 'ios' ? 'none' : (textContentTypeProp ?? 'password')}
-              {...props}
-              autoCorrect={false}
-              spellCheck={false}
-              onChangeText={handleChangeText}
-              keyboardType={keyboardTypeResolved}
-              {...iosPasswordExtra}
-            />
-          </View>
-        ) : (
-          <TextInput
-            ref={inputRef}
-            editable={!resolvedDisabled}
-            placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
-            className={inputClassNames}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            secureTextEntry={isSecure}
-            textContentType={textContentTypeProp}
-            {...props}
-            onChangeText={handleChangeText}
-            keyboardType={keyboardTypeResolved}
-          />
-        )}
+        <TextInput
+          ref={inputRef}
+          editable={!resolvedDisabled}
+          placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
+          className={inputClassNames}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          secureTextEntry={isSecure}
+          textContentType={textContentTypeProp}
+          {...props}
+          autoCorrect={showPasswordToggle ? false : props.autoCorrect}
+          spellCheck={showPasswordToggle ? false : props.spellCheck}
+          onChangeText={handleChangeText}
+          keyboardType={keyboardTypeResolved}
+          {...iosPasswordExtra}
+        />
         {showPasswordToggle ? (
           <Pressable
             accessibilityLabel={t('ui.toggle_password_visibility')}
-            onPress={() => setIsSecure((prev) => !prev)}
+            onPress={handleToggleSecure}
             hitSlop={8}>
             <Image
               source={

@@ -6,6 +6,7 @@ import { AnnouncementSmallCard } from '@/components/announcement/announcement-sm
 import { BrokerProfileCard } from '@/components/announcement/broker-profile-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useGetBrokerCompanyById, useGetIndividualBrokerById } from '@/hooks/api/use-applications';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -30,7 +31,7 @@ export default function BrokerDetailsScreen() {
 
   const handleSelect = () => {
     setBrokerId(id);
-    router.back();
+    router.replace(ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.path);
   };
 
   const handleMoreDetails = () => {};

@@ -9,18 +9,26 @@ import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
+import { Image } from 'expo-image';
 
 export default function MediaScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
-  const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const documentIds = useAnnouncementForRentFormStore((s) => s.formData.documentIds);
+  const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
-  const mediaFileIds = formData.mediaFileIds ?? [];
 
-  const handlePhotoIdsChange = (ids: string[]) => {
-    updateFormData({ mediaFileIds: ids });
+  const documentFiles =
+    documentIds?.map((id) => {
+      return { id, uri: '', type: 'application/pdf' };
+    }) || [];
+
+  const handleDocumentIdsChange = (
+    attachments: { id: string; uri: string; type?: string; name?: string }[]
+  ) => {
+    const documentIds = attachments.map((attachment) => attachment.id);
+    update({ formData: { documentIds } });
   };
 
   const handleNext = () => {
@@ -33,7 +41,7 @@ export default function MediaScreen() {
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
     } finally {
-      router.push('/(tabs)');
+      router.back();
     }
   };
 
@@ -46,19 +54,31 @@ export default function MediaScreen() {
         keyboardShouldPersistTaps="handled">
         <View className="pt-[24px]" style={horizontalStyle}>
           <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-            {t('announcement.rent.add_photos_title')}
+            {t('announcement.rent.add_documents_title')}
           </ThemedText>
           <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-            {t('announcement.rent.add_photos_subtitle')}
+            {t('announcement.rent.add_documents_subtitle')}
           </ThemedText>
 
-          <FileUpload value={mediaFileIds} onChange={handlePhotoIdsChange} />
+          <FileUpload
+            hint={t('ui.upload_your_file')}
+            value={documentFiles}
+            allowedFileTypes={['application/pdf']}
+            icon={
+              <Image
+                source={require('@/assets/images/upload.svg')}
+                style={{ width: 24, height: 24 }}
+                tintColor="black"
+                contentFit="contain"
+              />
+            }
+            onChange={handleDocumentIdsChange}
+          />
         </View>
       </ScrollView>
 
       <AnnouncementFooter
         firstButtonLabel={t('common.next')}
-        firstButtonDisabled={!mediaFileIds.length}
         secondButtonLabel={t('common.save_and_exit')}
         onNextPress={handleNext}
         onSaveAndExitPress={handleSaveAndExit}

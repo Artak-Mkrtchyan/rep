@@ -1,7 +1,16 @@
-import type { RentForApartmentsForm } from '@/types/announcement';
+import type {
+  Attributes,
+  GeoDetailsDto,
+  ListingType,
+  ProcessType,
+  Property,
+  RentForApartmentsForm,
+} from '@/types/announcement';
 
+import { InfrastructureObjectType } from '@/lib/api/infrastructure';
 import {
   ApplicationDetails,
+  ApplicationStatisticsByStatusResponse,
   AssignBrokerRequest,
   BrokerCompany,
   IndividualBroker,
@@ -25,8 +34,17 @@ export interface BrokerRegistrationRequest {
   yearsOfActivity: number;
 }
 
+export type ApplicationStatusType =
+  | 'DRAFT'
+  | 'APPROVED'
+  | 'COMPLETED'
+  | 'RETURNED_TO_APPLICANT'
+  | 'UNDER_REVIEW'
+  | 'SUBMITTED'
+  | 'REJECTED';
+
 export interface ApplicationStatus {
-  code: string; // e.g., "DRAFT"
+  code: ApplicationStatusType; // e.g., "DRAFT"
   name: string;
 }
 
@@ -110,19 +128,27 @@ export interface ConstructionCompanyRegistrationResponse {
 
 export type FileInput = { uri: string; type: string; name: string }; // React Native format
 
-/** Response for POST /api/v1/applications/announcement-publication */
-export interface AnnouncementPublicationResponse {
-  applicantEmail: string;
+export interface AnnouncementPublicationListResponse {
+  announcementCreatedBy: {
+    fullName: string;
+    id: string;
+  };
+  assignedBroker: {
+    fullName: string;
+    id: string;
+  };
+  assignedBrokerCompany: {
+    id: string;
+    name: string;
+  };
   createdAt: string;
-  createdBy: string;
-  id: string;
-  reviewerId: string;
-  status: ApplicationStatus;
-  type: 'ANNOUNCEMENT_PUBLICATION';
-  assignedBrokerCompanyId: string;
-  assignedBrokerId: string;
-  description: string;
-  documentIds: string[];
+  createdBy: {
+    fullName: string;
+    id: string;
+  };
+  firstMediaFile: {
+    thumbnailUrl: string;
+  };
   geo: {
     country: string;
     district: string;
@@ -134,8 +160,48 @@ export interface AnnouncementPublicationResponse {
     province: string;
     street: string;
   };
+  id: string;
+  listingType: ListingType;
+  publicId: string;
+  rentDetails: {
+    monthlyRent: number;
+    securityDeposit: number;
+  };
+  saleDetails: {
+    price: number;
+  };
+  status: {
+    code: ApplicationStatusType;
+    name: string;
+  };
+  title: string;
+  type: 'ANNOUNCEMENT_PUBLICATION';
+  updatedAt: string;
+}
+
+/** Response for POST /api/v1/applications/announcement-publication */
+export interface AnnouncementPublicationResponse {
+  applicantEmail: string;
+  createdAt: string;
+
+  brokerAssignmentNeeded: boolean;
+  createdBy: string;
+  id: string;
+  reviewerId: string;
+  status: ApplicationStatus;
+  type: 'ANNOUNCEMENT_PUBLICATION';
+  assignedBrokerCompanyId: string;
+  assignedBrokerId: string;
+
+  infrastructureObjects?: {
+    distanceInMeters: number;
+    type: InfrastructureObjectType;
+  }[];
+  description: string;
+  documentIds: string[];
+  geo: GeoDetailsDto;
   initiallySubmittedAt: string;
-  listingType: string;
+  listingType: ListingType;
   mediaFiles: {
     createdAt: string;
     fileName: string;
@@ -147,14 +213,14 @@ export interface AnnouncementPublicationResponse {
   }[];
   needAssessmentExpert: boolean;
   needPhotographer: boolean;
-  processType: string;
+  processType: ProcessType;
   property: {
     areaM2: number;
-    attributes: Record<string, unknown>;
+    attributes: Attributes;
     description: string;
-    propertyType: string;
+    propertyType: Property;
   };
-  propertyType: string;
+  propertyType: Property;
   publicId: string;
   publishedAnnouncementId: string;
   rentDetails: {
@@ -365,5 +431,49 @@ export const applicationsService = {
       requiresAuth: true,
     });
     return response;
+  },
+  /**
+   * Retrieves a list of applications for the current user, optionally filtered by type and paginated.
+   * @param data An object containing optional filter, page, and pageSize parameters to customize the query.
+   * @returns A promise that resolves to an object containing the list of applications, total count, pagination info, and counts by status.
+   */
+  getMyApplications: async (
+    data: SearchRequest
+  ): Promise<SearchResponse<AnnouncementPublicationListResponse>> => {
+    const response = await httpClient.post<
+      ApiResponse<SearchResponse<AnnouncementPublicationListResponse>>
+    >(`/v1/applications/search/for-screen/my-announcement-applications`, data, {
+      requiresAuth: true,
+    });
+    return (
+      response.data || (response as unknown as SearchResponse<AnnouncementPublicationListResponse>)
+    );
+  },
+
+  /**
+   * Get statistics for applications in different statuses
+   * @returns A promise that resolves to application statistics by status
+   */
+  getApplicationStatisticsByStatuses: async (): Promise<ApplicationStatisticsByStatusResponse> => {
+    const response = await httpClient.post<ApiResponse<ApplicationStatisticsByStatusResponse>>(
+      `/v1/applications/statistics/by-statuses`,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as ApplicationStatisticsByStatusResponse);
+  },
+
+  /**
+   * Get application by ID
+   * @param id Application ID
+   * @returns A promise that resolves to the application data
+   */
+  getApplicationById: async (id: string): Promise<AnnouncementPublicationResponse> => {
+    const response = await httpClient.get<ApiResponse<AnnouncementPublicationResponse>>(
+      `/v1/applications/${id}`,
+      {
+        requiresAuth: true,
+      }
+    );
+    return response.data || (response as unknown as AnnouncementPublicationResponse);
   },
 };

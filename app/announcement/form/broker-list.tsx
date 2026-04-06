@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { BrokerCard } from '@/components/announcement/broker-card';
@@ -27,10 +27,9 @@ export default function BrokerListScreen() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const brokerId = useAnnouncementForRentFormStore((s) => s.brokerId);
-
+  const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
+  const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
-  const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
 
   const { mutate: assignBroker } = useAssignBroker();
   useEffect(() => {
@@ -85,16 +84,20 @@ export default function BrokerListScreen() {
 
       assignBroker({ id, data: { brokerId } });
 
-      resetForm();
-
-      router.push('/(tabs)');
+      nextStep();
     } catch {
       console.error('Assign broker error');
     }
   };
 
-  const handleSaveAndExit = () => {
-    router.push('/(tabs)');
+  const handleSaveAndExit = async () => {
+    try {
+      await sendFormData();
+    } catch {
+      Alert.alert(t('common.error'), t('Assign broker error'));
+    } finally {
+      router.back();
+    }
   };
 
   const renderIndividualFooter = () =>
@@ -153,8 +156,8 @@ export default function BrokerListScreen() {
               reviewCount={1024}
               stats={[]}
               onPress={() =>
-                router.push({
-                  pathname: '/announcement/rent/broker/[id]',
+                router.replace({
+                  pathname: '/announcement/form/broker/[id]',
                   params: { id: item.id, type: 'individual' },
                 })
               }
@@ -182,8 +185,8 @@ export default function BrokerListScreen() {
               reviewCount={1024}
               stats={[]}
               onPress={() =>
-                router.push({
-                  pathname: '/announcement/rent/broker/[id]',
+                router.replace({
+                  pathname: '/announcement/form/broker/[id]',
                   params: { id: item.id, type: 'company' },
                 })
               }

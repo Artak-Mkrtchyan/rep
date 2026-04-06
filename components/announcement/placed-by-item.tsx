@@ -8,7 +8,7 @@ const LABEL_CLASS = 'text-[12px] text-muted-foreground';
 const NAME_CLASS = 'text-[14px] font-semibold text-foreground';
 
 export type PlacedByItemProps = {
-  name: string;
+  name: React.ReactNode | string;
   className?: string;
   icon?: React.ReactNode;
   label: string;
@@ -29,7 +29,11 @@ export const PlacedByItem: React.FC<PlacedByItemProps> = ({
       {icon}
       <View className="gap-0.5">
         <ThemedText className={cn(LABEL_CLASS, labelClassName)}>{label}</ThemedText>
-        <ThemedText className={cn(NAME_CLASS, nameClassName)}>{name}</ThemedText>
+        {typeof name === 'string' ? (
+          <ThemedText className={cn(NAME_CLASS, nameClassName)}>{name}</ThemedText>
+        ) : (
+          name
+        )}
       </View>
     </View>
   </View>

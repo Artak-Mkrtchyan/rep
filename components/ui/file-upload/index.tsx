@@ -1,22 +1,33 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import React from 'react';
-import { Alert, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Alert, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { InputError } from '@/components/ui/input/error';
 import { InputLabel } from '@/components/ui/input/label';
-import { useThemeValue } from '@/hooks/use-theme';
 import { applicationsService } from '@/lib/api/applications';
 import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
 import { Image } from 'expo-image';
 
+type Attachment = {
+  id: string;
+  uri: string;
+  type?: string;
+  name?: string;
+};
+
 export interface FileUploadProps {
   label?: string;
   description?: string;
-  value?: string[];
-  onChange?: (attachmentIds: string[]) => void;
+  value?: Attachment[];
+
+  icon?: React.ReactNode;
+  hint: string;
+
+  allowedFileTypes?: string[];
+  onChange?: (attachments: Attachment[]) => void;
   error?: string;
   required?: boolean;
   disabled?: boolean;
@@ -30,6 +41,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   description,
   value = [],
   onChange,
+  hint,
+  icon,
+  allowedFileTypes,
   error,
   required,
   disabled = false,
@@ -37,8 +51,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 }) => {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadedFiles, setUploadedFiles] = React.useState<Record<string, string>>({});
-  const foregroundColor = useThemeValue('foreground');
+
   const handleFileUpload = async () => {
     if (disabled || isUploading) return;
 
@@ -46,7 +59,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       setIsUploading(true);
 
       const result = await DocumentPicker.getDocumentAsync({
-        type: ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
+        type: allowedFileTypes || ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
         copyToCacheDirectory: true,
       });
 
@@ -67,8 +80,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         } as any);
 
         const response = await applicationsService.uploadTemporaryAttachment(formData);
-        onChange?.([...value, response.id]);
-        setUploadedFiles((prev) => ({ ...prev, [response.id]: asset.uri }));
+        onChange?.([
+          ...value,
+          { id: response.id, uri: asset.uri, type: asset.mimeType, name: asset.name.toLowerCase() },
+        ]);
       }
     } catch (error) {
       handleUploadError(error);
@@ -83,13 +98,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   const handleRemoveFile = (indexToRemove: number) => {
     if (disabled) return;
-    const newIds = value.filter((_, index) => index !== indexToRemove);
-    setUploadedFiles((prev) => {
-      const next = { ...prev };
-      delete next[value[indexToRemove]];
-      return next;
-    });
-    onChange?.(newIds);
+    const newAttachments = value.filter((_, index) => index !== indexToRemove);
+    onChange?.(newAttachments);
   };
 
   return (
@@ -108,14 +118,16 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         /* Empty State - Original Design */
         <View className="w-full items-center gap-4 rounded-[12px] border border-default bg-muted p-6">
           <View className="h-12 w-12 items-center justify-center rounded-full bg-card">
-            <Image
-              source={require('@/assets/images/gallery.svg')}
-              style={{ width: 24, height: 24 }}
-              contentFit="contain"
-            />
+            {icon || (
+              <Image
+                source={require('@/assets/images/gallery.svg')}
+                style={{ width: 24, height: 24 }}
+                contentFit="contain"
+              />
+            )}
           </View>
           <ThemedText className="text-[14px] text-foreground">
-            {isUploading ? t('ui.uploading') : t('ui.upload_your_photo')}
+            {isUploading ? t('ui.uploading') : hint}
           </ThemedText>
           <Pressable
             onPress={handleFileUpload}
@@ -141,9 +153,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         /* Files List - wrap to next line */
         <View className="mt-2 w-full flex-row flex-wrap gap-3">
           {/* Uploaded Files */}
-          {value.map((id, index) => (
+          {value.map((attachment, index) => (
             <View
-              key={id}
+              key={attachment.id}
               className="relative h-[95px] w-[109px] overflow-visible rounded-[12px] border border-default bg-card">
               {/* Remove Button */}
               <Pressable
@@ -157,21 +169,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
               {/* File Preview */}
               <View className="h-full w-full items-center justify-center p-3">
-                {uploadedFiles[id] ? (
+                {attachment.type === 'application/pdf' ? (
                   <Image
-                    source={{ uri: uploadedFiles[id] }}
-                    style={{ width: 100, height: 100 }}
+                    source={require('@/assets/images/pdf-icon.svg')}
+                    style={{ width: 28, height: 28 }}
                     contentFit="contain"
                   />
                 ) : (
-                  <>
-                    <Ionicons name="document-outline" size={48} color={foregroundColor} />
-                    <ThemedText
-                      className="mt-2 text-center text-[11px] text-foreground"
-                      numberOfLines={2}>
-                      {`${t('ui.select_file')} ${index + 1}`}
-                    </ThemedText>
-                  </>
+                  <Image
+                    source={{ uri: attachment.uri }}
+                    style={{ width: 100, height: 100 }}
+                    contentFit="contain"
+                  />
                 )}
               </View>
             </View>
@@ -189,11 +198,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             accessibilityLabel={t('ui.add_file')}
             accessibilityState={{ disabled: disabled || isUploading }}>
             <View className="h-12 w-12 items-center justify-center rounded-full bg-card">
-              <Image
-                source={require('@/assets/images/gallery.svg')}
-                style={{ width: 24, height: 24 }}
-                contentFit="contain"
-              />
+              {icon || (
+                <Image
+                  source={require('@/assets/images/gallery.svg')}
+                  style={{ width: 24, height: 24 }}
+                  contentFit="contain"
+                />
+              )}
             </View>
             <ThemedText className="mt-2 text-[12px] text-foreground">
               {isUploading ? t('ui.uploading') : t('common.add')}

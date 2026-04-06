@@ -56,3 +56,6 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 );
 
 export type { SegmentedControlProps } from './types';
+
+export { HorizontalSegmentedControl } from './horizontal-segmented-control';
+export type { HorizontalSegmentedControlProps } from './horizontal-types';

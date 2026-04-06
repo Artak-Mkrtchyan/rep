@@ -1,4 +1,6 @@
 import { CHARACTERISTIC_ICONS } from '@/constants/announcement';
+import { ApplicationStatus } from '@/lib/api/applications';
+import { InfrastructureObjectType } from '@/lib/api/infrastructure';
 import { Language } from '@/lib/i18n/i18n';
 
 export type RentForApartmentsForm = { stepNumber: number } & RentForApartmentsFormStep1 &
@@ -14,6 +16,10 @@ export type Property =
   | 'HOUSE'
   | 'LAND'
   | 'PARKING_SPACE';
+
+export type ListingType = 'FOR_RENT' | 'FOR_SALE';
+
+export type ProcessType = 'AS_INDIVIDUAL' | 'AS_BROKER';
 
 export type LangFormDTO = {
   [key in Language]?: string;
@@ -33,10 +39,16 @@ export type GeoDetailsDto = {
 };
 
 export type RentForApartmentsFormStep1 = {
-  listingType: 'FOR_RENT' | 'FOR_SALE' | '';
+  listingType: ListingType | '';
   geo: GeoDetailsDto;
   propertyType: Property | '';
-  processType: 'AS_INDIVIDUAL' | 'AS_BROKER' | '';
+  processType: ProcessType | '';
+  brokerAssignmentNeeded: boolean;
+
+  infrastructureObjects?: {
+    distanceInMeters: number;
+    type: InfrastructureObjectType;
+  }[];
   needPhotographer?: boolean;
   needAssessmentExpert?: boolean;
 };
@@ -64,6 +76,7 @@ export type RentForApartmentsFormStep4 = {
 
 export type RentForApartmentsFormStep5 = {
   mediaFileIds?: string[];
+  documentIds?: string[];
 };
 
 export type Attributes = {
@@ -111,4 +124,17 @@ export type CharacteristicConfig = {
       formatYesNo: (v: boolean | undefined) => string;
     }
   ) => string;
+};
+
+export type MetaData = {
+  response?: {
+    id: string;
+    publicId: string;
+    status: ApplicationStatus;
+    createdAt: string;
+    createdBy: string;
+    applicantEmail: string;
+  };
+  brokerId?: string;
+  tempMediaFiles?: { id: string; uri: string; type?: string; name?: string }[];
 };

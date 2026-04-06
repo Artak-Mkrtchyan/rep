@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 
 import type { ImageSliderProps } from './types';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const DOT_SIZE = 8;
 const DOT_ACTIVE_WIDTH = 24;
 
@@ -23,7 +23,10 @@ export const ImageSlider: React.FC<ImageSliderProps> = ({
   className,
   accessibilityLabel = 'Image gallery',
 }) => {
-  const [containerWidth, setContainerWidth] = useState(SCREEN_WIDTH);
+  const [containerSize, setContainerSize] = useState({
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+  });
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
 
@@ -31,17 +34,17 @@ export const ImageSlider: React.FC<ImageSliderProps> = ({
   const isPlaceholder = images.length === 0;
 
   const handleLayout = useCallback((e: LayoutChangeEvent) => {
-    const { width } = e.nativeEvent.layout;
-    setContainerWidth(width);
+    const { width, height } = e.nativeEvent.layout;
+    setContainerSize({ width, height });
   }, []);
 
   const handleMomentumScrollEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offsetX = e.nativeEvent.contentOffset.x;
-      const index = Math.round(offsetX / containerWidth);
+      const index = Math.round(offsetX / containerSize.width);
       setActiveIndex(Math.min(index, slides.length - 1));
     },
-    [containerWidth, slides.length]
+    [containerSize.width, slides.length]
   );
 
   return (
@@ -58,12 +61,12 @@ export const ImageSlider: React.FC<ImageSliderProps> = ({
         onMomentumScrollEnd={handleMomentumScrollEnd}
         decelerationRate="fast"
         bounces={false}
-        contentContainerStyle={{ width: containerWidth * slides.length }}>
+        contentContainerStyle={{ width: containerSize.width * slides.length }}>
         {slides.map((source, index) => (
           <View
             key={index}
             style={{
-              width: containerWidth,
+              width: containerSize.width,
             }}
             className="items-center justify-center bg-muted">
             {isPlaceholder ? (
@@ -71,7 +74,7 @@ export const ImageSlider: React.FC<ImageSliderProps> = ({
             ) : source ? (
               <Image
                 source={source}
-                style={{ width: containerWidth }}
+                style={{ width: containerSize.width, height: containerSize.height }}
                 contentFit="cover"
                 className="w-full"
               />

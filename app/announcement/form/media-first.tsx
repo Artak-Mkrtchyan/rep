@@ -7,7 +7,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
-import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
+import { useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 
@@ -18,6 +18,7 @@ export default function MediaScreen() {
   const tempMediaFiles = useAnnouncementForRentFormStore((s) => s.metaData?.tempMediaFiles);
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
+  const nextStep = useHandleNextPress();
 
   const mediaFiles =
     mediaFileIds?.map((id) => {
@@ -30,10 +31,6 @@ export default function MediaScreen() {
   ) => {
     const mediaFileIds = attachments.map((attachment) => attachment.id);
     update({ formData: { mediaFileIds }, metaData: { tempMediaFiles: attachments } });
-  };
-
-  const handleNext = () => {
-    router.replace(ANNOUNCEMENT_ROUTES.RENT_MEDIA_SECOND.path);
   };
 
   const handleSaveAndExit = async () => {
@@ -73,7 +70,7 @@ export default function MediaScreen() {
         firstButtonLabel={t('common.next')}
         firstButtonDisabled={!mediaFiles?.length}
         secondButtonLabel={t('common.save_and_exit')}
-        onNextPress={handleNext}
+        onNextPress={nextStep}
         onSaveAndExitPress={handleSaveAndExit}
       />
     </ThemedView>

@@ -7,6 +7,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
+import { useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
@@ -16,7 +17,7 @@ export default function MediaScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const documentIds = useAnnouncementForRentFormStore((s) => s.formData.documentIds);
   const update = useAnnouncementForRentFormStore((s) => s.update);
-  const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
+  const nextStep = useHandleNextPress();
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const documentFiles =
@@ -29,10 +30,6 @@ export default function MediaScreen() {
   ) => {
     const documentIds = attachments.map((attachment) => attachment.id);
     update({ formData: { documentIds } });
-  };
-
-  const handleNext = () => {
-    nextStep();
   };
 
   const handleSaveAndExit = async () => {
@@ -80,7 +77,7 @@ export default function MediaScreen() {
       <AnnouncementFooter
         firstButtonLabel={t('common.next')}
         secondButtonLabel={t('common.save_and_exit')}
-        onNextPress={handleNext}
+        onNextPress={nextStep}
         onSaveAndExitPress={handleSaveAndExit}
       />
     </ThemedView>

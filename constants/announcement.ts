@@ -248,6 +248,12 @@ export const ANNOUNCEMENT_ROUTES = {
     completedStep: 4,
     path: '/announcement/form/rent-details',
   },
+  RENT_SALE_DETAILS: {
+    name: 'sale-details',
+    labelKey: 'announcement.steps.sale_details',
+    completedStep: 4,
+    path: '/announcement/form/sale-details',
+  },
   RENT_MEDIA_FIRST: {
     name: 'media-first',
     labelKey: 'announcement.steps.media_1',

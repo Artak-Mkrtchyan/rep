@@ -40,7 +40,7 @@ export default function FinalScreen() {
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_publish'));
     } finally {
-      router.replace('/(tabs)');
+      router.back();
     }
   };
 
@@ -97,6 +97,12 @@ export default function FinalScreen() {
   const imageSources: { uri: string }[] =
     metaData?.tempMediaFiles?.map((file) => ({ uri: file.uri })) || [];
 
+  const price = formData.rentDetails?.monthlyRent
+    ? `${formData.rentDetails.monthlyRent} / month`
+    : formData.saleDetails?.price
+      ? `${formData.saleDetails.price} $`
+      : '';
+
   const characteristicHelpers = {
     conditionLabel,
     buildingTypeLabel,
@@ -147,7 +153,7 @@ export default function FinalScreen() {
             title={formData.title || ''}
             id={metaData?.response?.publicId}
             typeLabel={typeLabel}
-            price=""
+            price={price}
             location={{
               country: formData.geo.country[currentLanguage],
               city: formData.geo.locality[currentLanguage],

@@ -40,7 +40,7 @@ export default function FinalScreen() {
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_publish'));
     } finally {
-      router.replace('/(tabs)');
+      router.back();
     }
   };
 

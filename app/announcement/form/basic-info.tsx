@@ -11,11 +11,11 @@ import { AddressInput } from '@/components/ui/address-input';
 import { CheckboxRow } from '@/components/ui/checkbox';
 import { Select } from '@/components/ui/select';
 import {
-  ANNOUNCEMENT_ROUTES,
   getListingTypeOptions,
   getProcessOptions,
   getPropertyTypeOptions,
 } from '@/constants/announcement';
+import { useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { Language } from '@/lib/i18n/i18n';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -59,7 +59,7 @@ export default function BasicInfoScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
-  const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
+  const nextStep = useHandleNextPress();
   let isNext = true;
 
   const processType = formData.brokerAssignmentNeeded ? 'AS_BROKER' : 'AS_INDIVIDUAL';
@@ -92,11 +92,7 @@ export default function BasicInfoScreen() {
       return;
     }
 
-    if (values.processType === 'AS_BROKER') {
-      router.replace(ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.path);
-    } else {
-      nextStep();
-    }
+    nextStep(values.processType === 'AS_BROKER');
   };
 
   const handleNext = (handleSubmit: () => void) => {

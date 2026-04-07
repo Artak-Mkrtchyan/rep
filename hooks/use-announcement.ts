@@ -1,5 +1,5 @@
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
-import { getTargetRoute, getTargetStep } from '@/lib/announcement';
+import { getCurrentStep, getTargetRoute, getTargetRouteByName } from '@/lib/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router, usePathname } from 'expo-router';
 
@@ -52,11 +52,15 @@ export function useHandleBackPress() {
 
 export function useStepRedirect() {
   const targetStep = useAnnouncementForRentFormStore((s) => s.formData.stepNumber);
+  const listingType = useAnnouncementForRentFormStore((s) => s.formData.listingType);
   const pathname = usePathname();
 
-  const currentStep = getTargetStep(pathname);
+  const currentStep = getCurrentStep(pathname);
   const shouldRedirect = currentStep !== undefined && currentStep !== targetStep;
-  const targetRoute = getTargetRoute(targetStep);
+
+  const routeName = listingType === 'FOR_RENT' ? 'rent-details' : 'sale-details';
+
+  const targetRoute = getTargetRouteByName(targetStep, routeName);
 
   return {
     currentStep,

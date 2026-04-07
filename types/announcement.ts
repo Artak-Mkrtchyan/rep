@@ -72,6 +72,9 @@ export type RentForApartmentsFormStep4 = {
     monthlyRent: number;
     securityDeposit: number;
   };
+  saleDetails?: {
+    price: number;
+  };
 };
 
 export type RentForApartmentsFormStep5 = {

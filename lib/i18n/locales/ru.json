@@ -285,6 +285,7 @@
   "announcement.steps.property_info_1": "Информация об объекте(1/2)",
   "announcement.steps.property_info_2": "Информация об объекте(2/2)",
   "announcement.steps.rent_details": "Детали аренды",
+  "announcement.steps.sale_details": "Детали продажи",
   "announcement.steps.media_1": "Медиа (1/2)",
   "announcement.steps.media_2": "Медиа (2/2)",
   "announcement.steps.characteristics": "Характеристики",
@@ -374,6 +375,9 @@
   "announcement.rent.security_deposit": "Залоговый депозит",
   "announcement.rent.rent_details_title": "Сколько стоит ежемесячная арендная плата и залоговый депозит?",
   "announcement.rent.rent_details_subtitle": "Залоговый депозит является необязательным, но вы можете выбрать его по желанию.",
+  "announcement.rent.sale_details_title": "Сколько стоит недвижимость?",
+  "announcement.rent.sale_details_subtitle": "Пожалуйста, укажите цену для вашей недвижимости.",
+  "announcement.rent.price": "Цена",
 
   "announcement.detail.status_active": "Активно",
   "announcement.detail.announcement_info": "Информация об объявлении",

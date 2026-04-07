@@ -285,6 +285,7 @@
   "announcement.steps.property_info_1": "Property info(1/2)",
   "announcement.steps.property_info_2": "Property info(2/2)",
   "announcement.steps.rent_details": "Rent details",
+  "announcement.steps.sale_details": "Sale details",
   "announcement.steps.media_1": "Media (1/2)",
   "announcement.steps.media_2": "Media (2/2)",
   "announcement.steps.characteristics": "Characteristics",
@@ -374,6 +375,9 @@
   "announcement.rent.security_deposit": "Security deposit",
   "announcement.rent.rent_details_title": "How much are the monthly rent and the security deposit?",
   "announcement.rent.rent_details_subtitle": "Security deposit is optional, but you may choose to request one.",
+  "announcement.rent.sale_details_title": "How much is the property?",
+  "announcement.rent.sale_details_subtitle": "Please specify the price for your property.",
+  "announcement.rent.price": "Price",
 
   "announcement.detail.status_active": "Active",
   "announcement.detail.announcement_info": "Announcement information",

@@ -4,9 +4,9 @@ import i18n from '@/lib/i18n/i18n';
 import type { PasswordRequirements } from '@/types/auth';
 
 export const PASSWORD_MIN_LENGTH = 8;
-export const ALLOWED_SPECIAL_CHARS = '-_!@#$%^&*()';
-export const ALLOWED_SPECIAL_CHARS_REGEX = /[-_!@#$%^&*()]/;
-export const PASSWORD_ALLOWED_CHARS_REGEX = /^[A-Za-z0-9\-_!@#$%^&*()]+$/;
+export const ALLOWED_SPECIAL_CHARS = '-_!@#$%^&*().+~{}[]|\\/<>=?,;:\'\"';
+export const ALLOWED_SPECIAL_CHARS_REGEX = /[^A-Za-z0-9\s]/;
+export const PASSWORD_ALLOWED_CHARS_REGEX = /^[^\s]+$/;
 export const OTP_LENGTH = 6;
 export const RESEND_CODE_TIMEOUT = 60;
 export const OTP_EXPIRATION_TIMEOUT = 300; // 5 minutes

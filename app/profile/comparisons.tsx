@@ -1,8 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { Image } from 'expo-image';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, Modal, Pressable, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ComparisonCard } from '@/components/announcement/comparison-card';
@@ -19,7 +29,8 @@ import {
 export default function ComparisonsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { announcements, isLoading, error, refetch } = useComparisons();
+  const { announcements, isLoading, error, refetch, removeFromComparison, toggleFavourite } =
+    useComparisons();
   const { horizontalStyle } = useScreenEdgePadding();
   const insets = useSafeAreaInsets();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -64,9 +75,13 @@ export default function ComparisonsScreen() {
         isSelected={selectedIds.has(item.id)}
         onToggleSelect={() => toggleSelection(item.id)}
         onPress={() => router.push(`/announcement/${item.id}` as any)}
+        isFavourite={item.favourite}
+        isForComparison
+        onComparisonPress={() => removeFromComparison(item.id)}
+        onFavouritePress={() => toggleFavourite(item.id, item.favourite)}
       />
     ),
-    [selectedIds, toggleSelection, router]
+    [selectedIds, toggleSelection, router, removeFromComparison, toggleFavourite]
   );
 
   return (
@@ -83,17 +98,24 @@ export default function ComparisonsScreen() {
 
       {isLoading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#13B86D" />
+          <ActivityIndicator size="large" color="#087443" />
         </View>
       ) : error ? (
         <View style={styles.center}>
           <ThemedText className="text-[14px] text-[#777777]">{error}</ThemedText>
         </View>
       ) : announcements.length === 0 ? (
-        <View style={styles.center}>
-          <ThemedText className="text-[20px] font-semibold text-[#1B1B1B]">
-            {t('comparisons.no_result')}
-          </ThemedText>
+        <View style={styles.emptyState}>
+          <View style={styles.emptyStateInner}>
+            <Image
+              source={require('@/assets/images/no-result-illustration.svg')}
+              style={styles.emptyIllustration}
+              contentFit="contain"
+            />
+            <ThemedText className="mt-4 text-center text-[24px] font-semibold leading-normal text-[#111111]">
+              {t('comparisons.no_result')}
+            </ThemedText>
+          </View>
         </View>
       ) : (
         <FlatList
@@ -131,18 +153,30 @@ export default function ComparisonsScreen() {
         animationType="fade"
         onRequestClose={() => setTooManyVisible(false)}>
         <View style={styles.overlay}>
+          <BlurView intensity={55} tint="dark" style={StyleSheet.absoluteFill} />
+          <View style={styles.overlayDim} pointerEvents="none" />
           <View style={styles.popup}>
-            <ThemedText className="text-[20px] font-semibold leading-[24px] text-[#1B1B1B]">
-              {t('comparisons.too_many_title')}
-            </ThemedText>
-            <ThemedText className="mt-[8px] text-[12px] text-[#777777]">
-              {t('comparisons.too_many_message')}
-            </ThemedText>
-            <Pressable onPress={() => setTooManyVisible(false)} style={styles.closeButton}>
-              <ThemedText className="text-[16px] font-semibold text-white">
-                {t('comparisons.close')}
+            <View style={styles.popupTextBlock}>
+              <ThemedText className="text-center text-[20px] font-bold leading-[24px] text-[#111111]">
+                {t('comparisons.too_many_title')}
               </ThemedText>
-            </Pressable>
+              <ThemedText className="mt-2 text-center text-[12px] leading-normal text-[#5E5E5E]">
+                {t('comparisons.too_many_message')}
+              </ThemedText>
+            </View>
+            <View style={styles.popupLower}>
+              <Image
+                source={require('@/assets/images/too-many-items.svg')}
+                style={styles.tooManyIllustration}
+                contentFit="contain"
+                accessibilityIgnoresInvertColors
+              />
+              <Pressable onPress={() => setTooManyVisible(false)} style={styles.closeButton}>
+                <ThemedText className="text-[16px] font-semibold text-white">
+                  {t('comparisons.close')}
+                </ThemedText>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
@@ -166,6 +200,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+  },
+  emptyStateInner: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    maxWidth: 280,
+    width: '100%',
+  },
+  emptyIllustration: {
+    width: 250,
+    height: 154,
+  },
   list: {
     gap: 12,
     paddingBottom: 100,
@@ -181,7 +231,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#F1F1F1',
   },
   compareButton: {
-    backgroundColor: '#13B86D',
+    backgroundColor: '#087443',
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
@@ -192,9 +242,12 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  overlayDim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.35)',
   },
   popup: {
     backgroundColor: '#FFFFFF',
@@ -204,13 +257,37 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     width: 358,
     alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#6E6E6E',
+        shadowOffset: { width: 2, height: 3 },
+        shadowOpacity: 0.15,
+        shadowRadius: 33,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
+  },
+  popupTextBlock: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  popupLower: {
+    marginTop: 24,
+    width: '100%',
+    alignItems: 'center',
+    gap: 32,
+  },
+  tooManyIllustration: {
+    width: 214,
+    height: 143,
   },
   closeButton: {
-    marginTop: 24,
-    backgroundColor: '#13B86D',
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 40,
+    backgroundColor: '#0E9457',
+    borderRadius: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     width: '100%',
     alignItems: 'center',
   },

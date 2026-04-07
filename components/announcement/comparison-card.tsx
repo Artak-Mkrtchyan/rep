@@ -1,9 +1,15 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { ComparisonIcon } from '@/components/icons/comparison-icon';
+import { HeartIcon } from '@/components/icons/heart-icon';
 import { ThemedText } from '@/components/themed-text';
 import type { CardAttribute } from '@/lib/utils/announcement-helpers';
+
+/** Main/500 — Figma checkbox border + check (Comparisons card). */
+const CHECKBOX_MAIN_500 = '#087443';
 
 type ComparisonCardProps = {
   imageSource: any;
@@ -14,6 +20,11 @@ type ComparisonCardProps = {
   isSelected: boolean;
   onToggleSelect: () => void;
   onPress?: () => void;
+  isFavourite?: boolean;
+  /** Items on this screen are in the comparison list; icon shows active (Main/300). */
+  isForComparison?: boolean;
+  onComparisonPress?: () => void;
+  onFavouritePress?: () => void;
 };
 
 export const ComparisonCard: React.FC<ComparisonCardProps> = ({
@@ -25,10 +36,50 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
   isSelected,
   onToggleSelect,
   onPress,
-}) => (
+  isFavourite = false,
+  isForComparison = true,
+  onComparisonPress,
+  onFavouritePress,
+}) => {
+  const showImageActions = onComparisonPress != null && onFavouritePress != null;
+  const heartBg = isFavourite ? 'bg-[#11111199]' : 'bg-[#1111114d]';
+
+  return (
   <Pressable onPress={onPress} style={cardStyles.container}>
     <View style={cardStyles.imageContainer}>
       <Image source={imageSource} style={cardStyles.image} contentFit="cover" />
+      {showImageActions && (
+        <View className="absolute right-2 top-2 flex-row items-center gap-2" pointerEvents="box-none">
+          <Pressable
+            onPress={onComparisonPress}
+            className={`h-6 w-6 items-center justify-center rounded-[36px] ${
+              isForComparison ? 'bg-[#11111199]' : 'bg-[#1111114d]'
+            }`}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel="Comparison">
+            <ComparisonIcon
+              width={20}
+              height={20}
+              stroke={isForComparison ? '#13B86D' : 'white'}
+              fill={isForComparison ? '#13B86D' : 'white'}
+            />
+          </Pressable>
+          <Pressable
+            onPress={onFavouritePress}
+            className={`h-6 w-6 items-center justify-center rounded-[36px] ${heartBg}`}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel="Favourite">
+            <HeartIcon
+              width={16}
+              height={16}
+              stroke={isFavourite ? '#13B86D' : 'white'}
+              fill={isFavourite ? '#13B86D' : 'none'}
+            />
+          </Pressable>
+        </View>
+      )}
     </View>
 
     <View style={cardStyles.info}>
@@ -42,9 +93,11 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
           <Pressable
             onPress={onToggleSelect}
             style={[cardStyles.checkbox, isSelected && cardStyles.checkboxSelected]}
-            hitSlop={8}>
+            hitSlop={8}
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: isSelected }}>
             {isSelected && (
-              <ThemedText className="text-[12px] text-white">✓</ThemedText>
+              <Ionicons name="checkmark" size={16} color={CHECKBOX_MAIN_500} />
             )}
           </Pressable>
         </View>
@@ -69,7 +122,8 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
       </ThemedText>
     </View>
   </Pressable>
-);
+  );
+};
 
 const cardStyles = StyleSheet.create({
   container: {
@@ -107,9 +161,10 @@ const cardStyles = StyleSheet.create({
     width: 12,
     height: 12,
   },
+  /** Figma: 24×24 control (was 20 — read small vs design). */
   checkbox: {
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#E2E2E2',
@@ -117,8 +172,9 @@ const cardStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  /** Figma: white fill + Main/500 stroke; green checkmark (not solid green box). */
   checkboxSelected: {
-    backgroundColor: '#13B86D',
-    borderColor: '#13B86D',
+    backgroundColor: '#FFFFFF',
+    borderColor: CHECKBOX_MAIN_500,
   },
 });

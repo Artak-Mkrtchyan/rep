@@ -40,6 +40,21 @@ export function useComparisons() {
     []
   );
 
+  const toggleFavourite = useCallback(async (id: string, wasFavourite: boolean) => {
+    try {
+      if (wasFavourite) {
+        await announcementsService.removeFromFavourites(id);
+      } else {
+        await announcementsService.addToFavourites(id);
+      }
+      setAnnouncements((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, favourite: !wasFavourite } : a))
+      );
+    } catch (err) {
+      console.error('Failed to toggle favourite:', err);
+    }
+  }, []);
+
   useEffect(() => {
     mountedRef.current = true;
     fetch();
@@ -48,5 +63,12 @@ export function useComparisons() {
     };
   }, [fetch]);
 
-  return { announcements, isLoading, error, refetch: fetch, removeFromComparison };
+  return {
+    announcements,
+    isLoading,
+    error,
+    refetch: fetch,
+    removeFromComparison,
+    toggleFavourite,
+  };
 }

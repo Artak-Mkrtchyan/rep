@@ -30,11 +30,11 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
     style={({ pressed }) => (pressed && !disabled ? { opacity: 0.8 } : undefined)}>
     <View
       className={cn(
-        'h-5 w-5 items-center justify-center rounded-[4px] border-2',
-        checked ? 'border-primary bg-primary' : 'border-default bg-card',
+        'h-5 w-5 items-center justify-center rounded-[4px] border',
+        checked ? 'border-[#087443] bg-card' : 'border-default bg-card',
         disabled && 'opacity-50'
       )}>
-      {checked && <Ionicons name="checkmark" size={14} color="#FFFFFF" />}
+      {checked && <Ionicons name="checkmark" size={14} color="#087443" />}
     </View>
     <ThemedText className="flex-1 text-[14px] text-foreground">{label}</ThemedText>
   </Pressable>

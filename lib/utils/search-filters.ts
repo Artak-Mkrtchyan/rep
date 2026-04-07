@@ -1,4 +1,4 @@
-import type { SearchRequest } from '@/types/api';
+import type { GeoRectangle, SearchRequest } from '@/types/api';
 import type { SearchFilters } from '@/types/search';
 
 const LISTING_TYPE_MAP = {
@@ -6,7 +6,12 @@ const LISTING_TYPE_MAP = {
   RENT: 'FOR_RENT',
 } as const;
 
-export function buildSearchRequest(filters: SearchFilters, page = 0, pageSize = 10): SearchRequest {
+export function buildSearchRequest(
+  filters: SearchFilters,
+  page = 0,
+  pageSize = 10,
+  geoRectangle?: GeoRectangle,
+): SearchRequest {
   const apiFilter: Record<string, unknown> = {};
 
   if (filters.query) {
@@ -32,6 +37,10 @@ export function buildSearchRequest(filters: SearchFilters, page = 0, pageSize = 
     } else {
       apiFilter.salePrice = range;
     }
+  }
+
+  if (geoRectangle) {
+    apiFilter.geoRectangle = geoRectangle;
   }
 
   return {

@@ -6,6 +6,13 @@ export interface ItemsListApiResponse<T> {
   totalPages: number;
 }
 
+export interface GeoRectangle {
+  bottomLeftCornerLatitude: number;
+  bottomLeftCornerLongitude: number;
+  topRightCornerLatitude: number;
+  topRightCornerLongitude: number;
+}
+
 export interface SearchRequest {
   filter?: {
     [key: string]: unknown;

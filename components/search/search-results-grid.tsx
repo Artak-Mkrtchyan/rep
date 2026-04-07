@@ -42,7 +42,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   onComparisonPress,
 }) => {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [viewMode] = useState<ViewMode>('grid');
 
   const isCloseToBottom = useCallback(
     ({ layoutMeasurement, contentOffset, contentSize }: any) =>
@@ -90,7 +90,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
         <ThemedText className="text-[20px] font-bold leading-[24px] text-foreground">
           {t('search.results_title', { count: totalElements })}
         </ThemedText>
-        <View className="flex-row items-center gap-[4px]">
+        {/* <View className="flex-row items-center gap-[4px]">
           <Pressable
             onPress={() => setViewMode('grid')}
             className="h-[32px] w-[32px] items-center justify-center rounded-[8px]"
@@ -111,7 +111,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               color={viewMode === 'list' ? '#111111' : '#ABABAB'}
             />
           </Pressable>
-        </View>
+        </View> */}
       </View>
 
       {announcements.length === 0 ? (

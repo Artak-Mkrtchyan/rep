@@ -1,30 +1,49 @@
 import React, { useEffect } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, {
+  type SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 
 import { COLLAPSED_RATIO, styles } from './search-results-sheet.styles';
 
 const SPRING_CONFIG = { damping: 20, stiffness: 200, mass: 0.5 };
 const VELOCITY_THRESHOLD = 500;
 const DEFAULT_EXPANDED_TOP = 140;
+const MINIMIZED_HEIGHT = 280; // Handle + title + one row of cards
+
+export type { SharedValue };
 
 type SearchResultsSheetProps = {
   children: React.ReactNode;
   expandedTop?: number;
+  collapsedRatio?: number;
+  onSheetPositionChange?: (sheetTop: SharedValue<number>) => void;
 };
 
 export const SearchResultsSheet: React.FC<SearchResultsSheetProps> = ({
   children,
   expandedTop = DEFAULT_EXPANDED_TOP,
+  collapsedRatio = COLLAPSED_RATIO,
+  onSheetPositionChange,
 }) => {
   const { height: screenHeight } = useWindowDimensions();
-  const collapsedTop = screenHeight * COLLAPSED_RATIO;
+  const collapsedTop = screenHeight * collapsedRatio;
+  const minimizedTop = screenHeight - MINIMIZED_HEIGHT;
 
   const translateY = useSharedValue(collapsedTop);
   const startY = useSharedValue(0);
   const expandedTopSV = useSharedValue(expandedTop);
   const collapsedTopSV = useSharedValue(collapsedTop);
+  const minimizedTopSV = useSharedValue(minimizedTop);
+
+  useEffect(() => {
+    onSheetPositionChange?.(translateY);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     expandedTopSV.value = expandedTop;
@@ -33,8 +52,9 @@ export const SearchResultsSheet: React.FC<SearchResultsSheetProps> = ({
 
   useEffect(() => {
     collapsedTopSV.value = collapsedTop;
+    minimizedTopSV.value = minimizedTop;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collapsedTop]);
+  }, [collapsedTop, minimizedTop]);
 
   const panGesture = Gesture.Pan()
     .onStart(() => {
@@ -42,18 +62,41 @@ export const SearchResultsSheet: React.FC<SearchResultsSheetProps> = ({
     })
     .onUpdate((event) => {
       const next = startY.value + event.translationY;
-      translateY.value = Math.max(expandedTopSV.value, Math.min(next, collapsedTopSV.value));
+      translateY.value = Math.max(expandedTopSV.value, Math.min(next, minimizedTopSV.value));
     })
     .onEnd((event) => {
-      const midpoint = (collapsedTopSV.value + expandedTopSV.value) / 2;
+      'worklet';
+      const expanded = expandedTopSV.value;
+      const collapsed = collapsedTopSV.value;
+      const minimized = minimizedTopSV.value;
+      const pos = translateY.value;
+
+      // Fast swipe
       if (event.velocityY < -VELOCITY_THRESHOLD) {
-        translateY.value = withSpring(expandedTopSV.value, SPRING_CONFIG);
-      } else if (event.velocityY > VELOCITY_THRESHOLD) {
-        translateY.value = withSpring(collapsedTopSV.value, SPRING_CONFIG);
-      } else {
-        const target = translateY.value < midpoint ? expandedTopSV.value : collapsedTopSV.value;
+        // Swipe up: go to next higher snap
+        const target = pos > collapsed ? collapsed : expanded;
         translateY.value = withSpring(target, SPRING_CONFIG);
+        return;
       }
+      if (event.velocityY > VELOCITY_THRESHOLD) {
+        // Swipe down: go to next lower snap
+        const target = pos < collapsed ? collapsed : minimized;
+        translateY.value = withSpring(target, SPRING_CONFIG);
+        return;
+      }
+
+      // Slow drag: snap to nearest
+      const snaps = [expanded, collapsed, minimized];
+      let nearest = expanded;
+      let minDist = Math.abs(pos - expanded);
+      for (let i = 1; i < snaps.length; i++) {
+        const dist = Math.abs(pos - snaps[i]);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = snaps[i];
+        }
+      }
+      translateY.value = withSpring(nearest, SPRING_CONFIG);
     });
 
   const animatedStyle = useAnimatedStyle(() => ({

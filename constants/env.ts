@@ -28,6 +28,23 @@ export const getEnvironment = (): Environment => {
 export const getApiUrl = (): string => 'https://rep-test.utspdev.com/api';
 
 /**
+ * Gets the web application base URL based on the current environment.
+ * Used for embedding web content (e.g. map) in WebView.
+ */
+export const getWebBaseUrl = (): string => {
+  if (__DEV__) {
+    return 'http://localhost:3000';
+  }
+  const env = getEnvironment();
+  switch (env) {
+    case 'production':
+      return 'https://rep.utspdev.com';
+    default:
+      return 'https://rep-test.utspdev.com';
+  }
+};
+
+/**
  * Universal link base for the mobile app.
  * On mobile: OS intercepts the URL and opens the app if installed,
  * otherwise the web fallback page redirects to the app store.

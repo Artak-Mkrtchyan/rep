@@ -5,7 +5,7 @@ import { buildSearchRequest } from '@/lib/utils/search-filters';
 import type { Announcement } from '@/types/api';
 import type { SearchFilters } from '@/types/search';
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 50;
 
 export interface UseSearchAnnouncementsResult {
   announcements: Announcement[];

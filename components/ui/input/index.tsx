@@ -45,7 +45,7 @@ export const Input = React.forwardRef(function Input(
   }: InputProps,
   ref: React.Ref<TextInput>
 ) {
-  const inputRef = React.useRef<TextInput>(null);
+  const inputRef = React.useRef<TextInput | null>(null);
   React.useImperativeHandle(ref, () => inputRef.current as TextInput);
 
   const { t } = useTranslation();
@@ -54,6 +54,15 @@ export const Input = React.forwardRef(function Input(
   const resolvedDisabled = Boolean(isDisabled ?? disabled);
   const hasError = Boolean(isInvalid ?? invalid ?? error);
   const placeholderColor = useThemeValue('placeholder');
+
+  // iOS bug fix: after toggling to secure, iOS internally selects all text.
+  // The next edit (Backspace or typing) replaces the entire value instead of editing one char.
+  // We detect this and correct the behavior without a visual flash by:
+  // 1. Not propagating the bogus empty/replaced value to the parent
+  // 2. Forcing a re-render so React reverts the native field to the current props.value
+  // 3. Applying the corrected single-char edit on the next frame
+  const justToggledToSecure = React.useRef(false);
+  const [, forceRender] = React.useState(0);
 
   const handleFocus = React.useCallback(
     (e: any) => {
@@ -85,11 +94,44 @@ export const Input = React.forwardRef(function Input(
 
   const handleChangeText = React.useCallback(
     (text: string) => {
+      const prev = props.value ?? '';
+
+      // iOS select-all fix: after toggling to secure, if the entire value was replaced
+      // in a single edit, iOS selected-all before the keystroke. Correct it.
+      // Don't propagate the bogus value — force React to revert native field, then apply fix.
+      if (justToggledToSecure.current && prev.length > 1) {
+        if (text.length === 0) {
+          // Backspace on selected-all → delete only the last character
+          justToggledToSecure.current = false;
+          forceRender((c) => c + 1); // revert native field to current props.value
+          requestAnimationFrame(() => onChangeText?.(prev.slice(0, -1)));
+          return;
+        }
+        if (text.length === 1) {
+          // Typed a character over selected-all → append instead of replace
+          justToggledToSecure.current = false;
+          forceRender((c) => c + 1);
+          requestAnimationFrame(() => onChangeText?.(prev + text));
+          return;
+        }
+      }
+      justToggledToSecure.current = false;
+
       const next = numericOnly ? filterNumeric(text) : text;
       onChangeText?.(next);
     },
-    [onChangeText, numericOnly, filterNumeric]
+    [onChangeText, numericOnly, filterNumeric, props.value]
   );
+
+  const handleToggleSecure = React.useCallback(() => {
+    setIsSecure((prev) => {
+      if (!prev) {
+        // Going from plain → secure: set intercept flag
+        justToggledToSecure.current = true;
+      }
+      return !prev;
+    });
+  }, []);
 
   const sizeClasses =
     size === 'sm'
@@ -110,6 +152,20 @@ export const Input = React.forwardRef(function Input(
       (hasError ? 'border-destructive' : isFocused ? 'border-primary' : 'border-default')
   );
 
+  const inputClassNames = cn(
+    'h-full flex-1 text-[16px] text-foreground placeholder:text-muted-foreground',
+    inputClassName
+  );
+
+  const keyboardTypeResolved = numericOnly
+    ? allowDecimal
+      ? 'decimal-pad'
+      : 'number-pad'
+    : props.keyboardType;
+
+  const iosPasswordExtra =
+    Platform.OS === 'ios' && showPasswordToggle ? ({ smartInsertDelete: false } as const) : {};
+
   return (
     <View className={cn('w-full gap-1', containerClassName)}>
       {label ? (
@@ -129,40 +185,22 @@ export const Input = React.forwardRef(function Input(
           ref={inputRef}
           editable={!resolvedDisabled}
           placeholderTextColor={props.placeholderTextColor ?? placeholderColor}
-          className={cn(
-            'h-full flex-1 text-[16px] text-foreground placeholder:text-muted-foreground',
-            inputClassName
-          )}
+          className={inputClassNames}
           onFocus={handleFocus}
           onBlur={handleBlur}
           secureTextEntry={isSecure}
-          // Use `password` (not `oneTimeCode`) so iOS does not clear the field on Backspace after toggling visibility
-          textContentType={
-            showPasswordToggle ? (textContentTypeProp ?? 'password') : textContentTypeProp
-          }
+          textContentType={textContentTypeProp}
           {...props}
+          autoCorrect={showPasswordToggle ? false : props.autoCorrect}
+          spellCheck={showPasswordToggle ? false : props.spellCheck}
           onChangeText={handleChangeText}
-          keyboardType={
-            numericOnly ? (allowDecimal ? 'decimal-pad' : 'number-pad') : props.keyboardType
-          }
+          keyboardType={keyboardTypeResolved}
+          {...iosPasswordExtra}
         />
         {showPasswordToggle ? (
           <Pressable
             accessibilityLabel={t('ui.toggle_password_visibility')}
-            onPress={() => {
-              setIsSecure((prev) => {
-                const next = !prev;
-                // iOS bug: toggling secureTextEntry back to true causes backspace
-                // to delete the entire text. Workaround: blur and re-focus so iOS
-                // re-tokenizes the characters individually.
-                if (next && Platform.OS === 'ios' && inputRef.current) {
-                  const ref = inputRef.current;
-                  ref.blur();
-                  setTimeout(() => ref.focus(), 0);
-                }
-                return next;
-              });
-            }}
+            onPress={handleToggleSecure}
             hitSlop={8}>
             <Image
               source={

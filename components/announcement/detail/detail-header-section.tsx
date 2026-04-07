@@ -16,7 +16,11 @@ type DetailHeaderSectionProps = {
   typeLabel: string;
   price: string;
   statusLabel?: string;
+  statusCode?: string;
   postedDate?: string;
+  updatedDate?: string;
+  placedByName?: string;
+  onStatusPress?: () => void;
 };
 
 function formatDate(iso?: string): string {
@@ -34,10 +38,20 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
   typeLabel,
   price,
   statusLabel,
+  statusCode,
   postedDate,
+  updatedDate,
+  placedByName,
+  onStatusPress,
 }) => {
   const { t } = useTranslation();
+  const isActive = !statusCode || statusCode === 'ACTIVE';
   const displayStatus = statusLabel || t('announcement.detail.status_active');
+
+  const badgeBg = isActive
+    ? 'bg-[#E3FEDE]'
+    : 'border border-red-400 bg-white';
+  const badgeTextColor = isActive ? 'text-[#5EBC39]' : 'text-red-500';
 
   return (
     <View style={detailStyles.headerSection}>
@@ -49,20 +63,26 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
           {title}
         </ThemedText>
         <Pressable
-          className="ml-2 flex-row items-center gap-[4px] rounded-[4px] bg-[#E3FEDE] px-[12px] py-[6px]"
+          onPress={onStatusPress}
+          disabled={!onStatusPress}
+          className={`ml-2 flex-row items-center gap-[4px] rounded-[4px] px-[12px] py-[6px] ${badgeBg}`}
           accessibilityRole="button"
           accessibilityLabel={`Status: ${displayStatus}`}>
-          <Image
-            source={require('@/assets/images/success-icon.svg')}
-            style={detailStyles.statusIcon}
-            contentFit="contain"
-          />
-          <ThemedText className="text-[12px] text-[#5EBC39]">{displayStatus}</ThemedText>
-          <Image
-            source={require('@/assets/images/chevron-down-icon.svg')}
-            style={detailStyles.chevronIcon}
-            contentFit="contain"
-          />
+          {isActive ? (
+            <Image
+              source={require('@/assets/images/success-icon.svg')}
+              style={detailStyles.statusIcon}
+              contentFit="contain"
+            />
+          ) : null}
+          <ThemedText className={`text-[12px] ${badgeTextColor}`}>{displayStatus}</ThemedText>
+          {isActive && onStatusPress ? (
+            <Image
+              source={require('@/assets/images/chevron-down-icon.svg')}
+              style={detailStyles.chevronIcon}
+              contentFit="contain"
+            />
+          ) : null}
         </Pressable>
       </View>
 
@@ -94,7 +114,7 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
         title={t('announcement.detail.announcement_info')}>
         <View className="flex-row flex-wrap items-center gap-x-[16px] gap-y-[8px]">
           <PlacedByItem
-            name="—"
+            name={placedByName || '—'}
             label={t('announcement.detail.placed_by')}
             labelClassName="text-[10px]"
             nameClassName="text-[12px] font-bold text-main-500"
@@ -111,7 +131,7 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
             nameClassName="text-[12px] font-bold text-foreground"
           />
           <PlacedByItem
-            name="—"
+            name={formatDate(updatedDate)}
             label={t('announcement.detail.updated')}
             labelClassName="text-[10px]"
             nameClassName="text-[12px] font-bold text-foreground"

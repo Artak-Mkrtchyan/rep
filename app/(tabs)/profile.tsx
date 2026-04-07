@@ -47,6 +47,12 @@ function useProfileMenuItems(
       onPress: () => router.push('/(tabs)/profile'),
     },
     {
+      id: 'my-announcements',
+      label: t('profile.my_announcements'),
+      icon: <Ionicons name="megaphone-outline" size={ICON_SIZE} color={iconColor} />,
+      onPress: () => router.push('/my-announcements'),
+    },
+    {
       id: 'my-application',
       label: t('profile.my_application'),
       icon: <Ionicons name="document-text-outline" size={ICON_SIZE} color={iconColor} />,

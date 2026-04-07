@@ -5,12 +5,10 @@ import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   TouchableWithoutFeedback,
-  useWindowDimensions,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -25,7 +23,6 @@ import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { AuthScope } from '@/lib/api/auth';
 import { validateEmail } from '@/lib/auth-validation';
-import { getApiErrorMessage, isApiError } from '@/lib/error-handler';
 import type { AccountRole } from '@/types/auth';
 
 const ROLE_TO_SCOPE: Record<string, AuthScope> = {
@@ -48,8 +45,19 @@ export default function LoginFormScreen() {
   const { login, isLoading, reset: resetLoginError } = useLogin();
   const { tokens: theme } = useTheme();
   const insets = useSafeAreaInsets();
-  const { height: windowHeight } = useWindowDimensions();
   const { horizontalStyle } = useScreenEdgePadding();
+  const [keyboardOpen, setKeyboardOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const showEvt = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSub = Keyboard.addListener(showEvt, () => setKeyboardOpen(true));
+    const hideSub = Keyboard.addListener(hideEvt, () => setKeyboardOpen(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const canContinue = email.length > 0 && password.length > 0 && !isLoading;
 
@@ -93,13 +101,8 @@ export default function LoginFormScreen() {
 
     try {
       await login(email.trim(), password, scope);
-    } catch (err) {
-      const message = isApiError(err)
-        ? getApiErrorMessage(err, t('login.failed_message'))
-        : err instanceof Error
-          ? err.message
-          : t('login.failed_message');
-      setFormError(message);
+    } catch {
+      setFormError(t('login.failed_message'));
     }
   };
 
@@ -115,32 +118,33 @@ export default function LoginFormScreen() {
     // TODO: Implement Apple sign in
   };
 
-  // Combine inline error: password field shows validation error or login API error
   const passwordFieldError = passwordError || formError || undefined;
-
-  const scrollMinHeight = windowHeight - insets.top - insets.bottom;
+  const credentialError = Boolean(formError);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
-      style={{ flex: 1 }}>
-      <ThemedView
-        className="flex-1"
-        style={[{ paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        <ScrollView
-          contentContainerStyle={[
-            {
-              flexGrow: 1,
-              paddingTop: 8,
-              paddingBottom: 24,
-              minHeight: scrollMinHeight,
-            },
-            horizontalStyle,
-          ]}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
-          showsVerticalScrollIndicator={false}>
+    <ThemedView
+      className="flex-1"
+      style={[
+        {
+          paddingTop: insets.top,
+          // Bottom inset stacks above the keyboard and reads as a white gap; drop it while keyboard is open
+          paddingBottom: keyboardOpen ? 0 : insets.bottom,
+        },
+      ]}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={[
+          {
+            paddingTop: 8,
+            paddingBottom: 24,
+          },
+          horizontalStyle,
+        ]}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+        showsVerticalScrollIndicator={false}
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+        contentInsetAdjustmentBehavior="automatic">
           <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View className="w-full items-center">
               <Image
@@ -165,6 +169,7 @@ export default function LoginFormScreen() {
                   autoComplete="email"
                   placeholderTextColor={theme.placeholder}
                   error={emailError || undefined}
+                  invalid={credentialError}
                   editable={!isLoading}
                 />
               </View>
@@ -185,7 +190,7 @@ export default function LoginFormScreen() {
                   afterField={
                     <View className="mt-1 w-full items-end">
                       <Pressable onPress={handleForgotPassword} disabled={isLoading} hitSlop={8}>
-                        <ThemedText className="text-[14px] leading-[20px] text-primary">
+                        <ThemedText className="text-[16px] leading-[20px] text-primary">
                           {t('login.forgot_password')}
                         </ThemedText>
                       </Pressable>
@@ -210,7 +215,7 @@ export default function LoginFormScreen() {
                 )}
               </Pressable>
 
-              <View className="mt-6 w-full">
+              <View className="w-full">
                 <SignInFooter
                   onGooglePress={handleGoogleSignIn}
                   onApplePress={handleAppleSignIn}
@@ -222,8 +227,7 @@ export default function LoginFormScreen() {
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </ScrollView>
-      </ThemedView>
-    </KeyboardAvoidingView>
+      </ScrollView>
+    </ThemedView>
   );
 }

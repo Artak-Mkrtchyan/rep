@@ -1,18 +1,16 @@
 import { ApiResponse } from './auth.types';
 import { httpClient } from './http/client';
-import {
-  Announcement,
-  ItemsListApiResponse,
-  PriceChangeHistory,
-  SearchRequest,
-} from '@/types/api';
+import { Announcement, ItemsListApiResponse, PriceChangeHistory, SearchRequest } from '@/types/api';
+import type {
+  AnnouncementListItem,
+  AnnouncementStatisticsByStatusResponse,
+} from '@/types/my-announcements';
 
 export const announcementsService = {
   getAnnouncementById: async (id: string): Promise<Announcement> => {
-    const response = await httpClient.get<ApiResponse<Announcement>>(
-      `/v1/announcements/${id}`,
-      { requiresAuth: true }
-    );
+    const response = await httpClient.get<ApiResponse<Announcement>>(`/v1/announcements/${id}`, {
+      requiresAuth: true,
+    });
     return response.data || (response as unknown as Announcement);
   },
 
@@ -88,11 +86,57 @@ export const announcementsService = {
   getAnnouncementsHistory: async (
     data: SearchRequest
   ): Promise<ItemsListApiResponse<PriceChangeHistory>> => {
-    const response = await httpClient.post<
-      ApiResponse<ItemsListApiResponse<PriceChangeHistory>>
-    >('/v1/announcements/history/search', data, {
-      requiresAuth: true,
-    });
+    const response = await httpClient.post<ApiResponse<ItemsListApiResponse<PriceChangeHistory>>>(
+      '/v1/announcements/history/search',
+      data,
+      {
+        requiresAuth: true,
+      }
+    );
     return response.data || (response as unknown as ItemsListApiResponse<PriceChangeHistory>);
+  },
+
+  getMyAnnouncements: async (
+    request: SearchRequest
+  ): Promise<ItemsListApiResponse<AnnouncementListItem>> => {
+    const response = await httpClient.post<ApiResponse<ItemsListApiResponse<AnnouncementListItem>>>(
+      '/v1/announcements/search/for-screen/my-announcements',
+      request,
+      {
+        requiresAuth: true,
+      }
+    );
+    return response.data || (response as unknown as ItemsListApiResponse<AnnouncementListItem>);
+  },
+
+  getAnnouncementsStatisticsByStatuses: async (
+    data: object
+  ): Promise<AnnouncementStatisticsByStatusResponse> => {
+    const response = await httpClient.post<ApiResponse<AnnouncementStatisticsByStatusResponse>>(
+      '/v1/announcements/statistics/by-statuses',
+      data,
+      {
+        requiresAuth: true,
+      }
+    );
+    return response.data || (response as unknown as AnnouncementStatisticsByStatusResponse);
+  },
+
+  closeAnnouncement: async (id: string, closureReason: string): Promise<Announcement> => {
+    const response = await httpClient.patch<ApiResponse<Announcement>>(
+      `/v1/announcements/${id}/close`,
+      { closureReason },
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as Announcement);
+  },
+
+  reopenAnnouncement: async (id: string): Promise<Announcement> => {
+    const response = await httpClient.patch<ApiResponse<Announcement>>(
+      `/v1/announcements/${id}/reopen`,
+      {},
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as Announcement);
   },
 };

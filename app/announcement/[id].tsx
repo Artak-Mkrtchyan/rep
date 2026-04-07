@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AttachedFiles } from '@/components/announcement/attached-files';
 import { DescriptionSection } from '@/components/announcement/description-section';
 import { detailStyles } from '@/components/announcement/detail/announcement-detail.styles';
+import { ClosingReasonBanner } from '@/components/announcement/detail/closing-reason-banner';
 import { DetailHeaderSection } from '@/components/announcement/detail/detail-header-section';
 import { LocationSection } from '@/components/announcement/detail/location-section';
 import { NotableDistancesSection } from '@/components/announcement/detail/notable-distances-section';
@@ -17,6 +18,7 @@ import { ObjectCharacteristics } from '@/components/announcement/object-characte
 import { PhotoGallery } from '@/components/announcement/photo-gallery';
 import { PetsAllowed } from '@/components/announcement/pets-allowed';
 import { PriceHistory } from '@/components/announcement/price-history';
+import { ChangeStatusBottomSheet } from '@/components/my-announcements';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useAnnouncementDetails } from '@/hooks/api/use-announcement-details';
@@ -53,13 +55,27 @@ export default function AnnouncementDetailScreen() {
     }
   }, [announcement]);
 
+  const handleEdit = useCallback(() => {
+    if (!id) return;
+    router.push({
+      pathname: '/announcement/form/[id]',
+      params: { id },
+    });
+  }, [id, router]);
+
   const [galleryVisible, setGalleryVisible] = useState(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
+  const [statusSheetVisible, setStatusSheetVisible] = useState(false);
 
   const handleImagePress = useCallback((index: number) => {
     setGalleryInitialIndex(index);
     setGalleryVisible(true);
   }, []);
+
+  const handleStatusChanged = useCallback(() => {
+    setStatusSheetVisible(false);
+    refetch();
+  }, [refetch]);
 
   const images = useMemo(() => (announcement ? mapImages(announcement) : []), [announcement]);
   const location = useMemo(
@@ -72,6 +88,9 @@ export default function AnnouncementDetailScreen() {
   );
   const distances = useMemo(() => (announcement ? mapDistances(announcement) : []), [announcement]);
   const pets = useMemo(() => (announcement ? mapPets(announcement) : null), [announcement]);
+
+  const isActive = announcement?.status?.code === 'ACTIVE';
+  const closureReason = announcement?.closureReason;
 
   if (isLoading) {
     return (
@@ -109,13 +128,23 @@ export default function AnnouncementDetailScreen() {
             <View style={detailStyles.pill} />
           </View>
 
+          {/* Closing reason banner */}
+          {closureReason ? (
+            <View className="mb-3">
+              <ClosingReasonBanner reason={closureReason.name || closureReason.code} />
+            </View>
+          ) : null}
+
           <DetailHeaderSection
             title={announcement.title}
             publicId={announcement.publicId}
             typeLabel={typeLabel}
             price={getPriceLabel(announcement)}
             statusLabel={announcement.status?.name}
+            statusCode={announcement.status?.code}
             postedDate={announcement.createdAt}
+            updatedDate={announcement.updatedAt}
+            onStatusPress={isActive ? () => setStatusSheetVisible(true) : undefined}
           />
 
           {hasLocationData(location) && <LocationSection location={location!} />}
@@ -150,6 +179,7 @@ export default function AnnouncementDetailScreen() {
         </View>
       </ScrollView>
 
+      {/* Top action bar */}
       <SafeAreaView
         className="absolute left-0 right-0 top-0 z-10"
         style={horizontalStyle}
@@ -181,27 +211,44 @@ export default function AnnouncementDetailScreen() {
             <Pressable onPress={handleShare} accessibilityLabel="Share">
               <Ionicons name="share-social-outline" size={24} color="#FFFFFF" />
             </Pressable>
+            {isActive ? (
+              <Pressable onPress={handleEdit} accessibilityLabel="Edit">
+                <Ionicons name="create-outline" size={24} color="#FFFFFF" />
+              </Pressable>
+            ) : null}
           </View>
         </View>
       </SafeAreaView>
 
-      <SafeAreaView
-        className="bottom-0 left-0 right-0 bg-white"
-        style={detailStyles.bottomBarShadow}
-        edges={['bottom']}>
-        <View style={detailStyles.bottomBar}>
-          <Pressable style={detailStyles.primaryButton}>
-            <ThemedText className="text-[16px] font-medium leading-[21px] text-white">
-              {t('announcement.detail.request_tour')}
-            </ThemedText>
-          </Pressable>
-          <Pressable style={detailStyles.secondaryButton}>
-            <ThemedText className="text-[16px] font-medium leading-[21px] text-[#0E9457]">
-              {t('announcement.detail.contact_info')}
-            </ThemedText>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      {/* Bottom action bar (only when active) */}
+      {isActive ? (
+        <SafeAreaView
+          className="bottom-0 left-0 right-0 bg-white"
+          style={detailStyles.bottomBarShadow}
+          edges={['bottom']}>
+          <View style={detailStyles.bottomBar}>
+            <Pressable style={detailStyles.primaryButton}>
+              <ThemedText className="text-[16px] font-medium leading-[21px] text-white">
+                {t('announcement.detail.request_tour')}
+              </ThemedText>
+            </Pressable>
+            <Pressable style={detailStyles.secondaryButton}>
+              <ThemedText className="text-[16px] font-medium leading-[21px] text-[#0E9457]">
+                {t('announcement.detail.contact_info')}
+              </ThemedText>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      ) : null}
+
+      {/* Change status bottom sheet */}
+      <ChangeStatusBottomSheet
+        visible={statusSheetVisible}
+        currentStatus={announcement.status?.code || 'ACTIVE'}
+        announcementId={id!}
+        onClose={() => setStatusSheetVisible(false)}
+        onStatusChanged={handleStatusChanged}
+      />
 
       <PhotoGallery
         visible={galleryVisible}

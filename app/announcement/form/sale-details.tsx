@@ -14,23 +14,21 @@ import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep4 } from '@/types/announcement';
 import { useTranslation } from 'react-i18next';
 
-const MONTHLY_RENT_SUFFIX = '/month';
 const CURRENCY_PREFIX = '$';
-const SQUARE_METERS_SUFFIX = 'm²';
 
-type RentDetailsFormValues = RentForApartmentsFormStep4;
+type SaleDetailsFormValues = RentForApartmentsFormStep4;
 
-/** When rentDetails is present, monthlyRent and securityDeposit are required. */
-const RentDetailsSchema = Yup.object().shape({
-  rentDetails: Yup.object()
+/** When saleDetails is present, price is required. */
+const SaleDetailsSchema = Yup.object().shape({
+  saleDetails: Yup.object()
     .optional()
     .nullable()
     .shape({
-      monthlyRent: Yup.number().required('Required').typeError('Must be a number'),
+      price: Yup.number().required('Required').typeError('Must be a number'),
     }),
 });
 
-export default function RentDetailsScreen() {
+export default function SaleDetailsScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
@@ -39,14 +37,13 @@ export default function RentDetailsScreen() {
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
-  const initialValues: RentDetailsFormValues = { rentDetails: formData.rentDetails };
+  const initialValues: SaleDetailsFormValues = { saleDetails: formData.saleDetails };
 
-  const saveRentDetails = async ({ rentDetails }: RentDetailsFormValues) => {
-    if (rentDetails) {
+  const saveSaleDetails = async ({ saleDetails }: SaleDetailsFormValues) => {
+    if (saleDetails) {
       updateFormData({
-        rentDetails: {
-          monthlyRent: rentDetails.monthlyRent,
-          securityDeposit: rentDetails.securityDeposit || 0,
+        saleDetails: {
+          price: saleDetails.price,
         },
       });
     }
@@ -76,12 +73,12 @@ export default function RentDetailsScreen() {
 
   return (
     <ThemedView className="flex-1">
-      <Formik<RentDetailsFormValues>
+      <Formik<SaleDetailsFormValues>
         initialValues={initialValues}
-        validationSchema={RentDetailsSchema}
+        validationSchema={SaleDetailsSchema}
         validateOnMount={true}
         enableReinitialize
-        onSubmit={saveRentDetails}>
+        onSubmit={saveSaleDetails}>
         {({ setFieldValue, handleSubmit, values, errors, touched, isValid }) => (
           <>
             <ScrollView
@@ -91,57 +88,29 @@ export default function RentDetailsScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="pt-6" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
-                  {t('announcement.rent.rent_details_title')}
+                  {t('announcement.rent.sale_details_title')}
                 </ThemedText>
                 <ThemedText className="mb-6 text-[14px] text-muted-foreground">
-                  {t('announcement.rent.rent_details_subtitle')}
+                  {t('announcement.rent.sale_details_subtitle')}
                 </ThemedText>
 
                 <View className="gap-4">
                   <Input
-                    label={t('announcement.rent.monthly_rent')}
+                    label={t('announcement.rent.price')}
                     numericOnly
                     placeholder=""
-                    value={`${values.rentDetails?.monthlyRent ?? ''}`}
-                    onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', Number(v))}
-                    error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
+                    value={`${values.saleDetails?.price ?? ''}`}
+                    onChangeText={(v) => setFieldValue('saleDetails.price', Number(v))}
+                    error={touched.saleDetails && errors.saleDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}
                       </ThemedText>
                     }
-                    right={
-                      <ThemedText className="text-[16px] text-muted-foreground">
-                        {MONTHLY_RENT_SUFFIX}
-                      </ThemedText>
-                    }
                     containerClassName="mb-1"
                     keyboardType="decimal-pad"
-                    accessibilityLabel="Monthly rent"
-                    accessibilityHint="Enter monthly rent amount in dollars"
-                  />
-
-                  <Input
-                    label={t('announcement.rent.security_deposit')}
-                    placeholder=""
-                    numericOnly
-                    value={`${values.rentDetails?.securityDeposit ?? ''}`}
-                    onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', Number(v))}
-                    error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
-                    left={
-                      <ThemedText className="text-[16px] text-muted-foreground">
-                        {CURRENCY_PREFIX}
-                      </ThemedText>
-                    }
-                    right={
-                      <ThemedText className="text-[16px] text-muted-foreground">
-                        {SQUARE_METERS_SUFFIX}
-                      </ThemedText>
-                    }
-                    containerClassName="mb-1"
-                    keyboardType="decimal-pad"
-                    accessibilityLabel="Security deposit"
-                    accessibilityHint="Optional. Enter security deposit amount in dollars"
+                    accessibilityLabel="Sale price"
+                    accessibilityHint="Enter sale price amount in dollars"
                   />
                 </View>
               </View>

@@ -21,6 +21,7 @@ import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Attributes, Property } from '@/types/announcement';
 
+import { useHandleNextPress } from '@/hooks/use-announcement';
 import * as Yup from 'yup';
 type CharacteristicsFormValues = Attributes;
 
@@ -39,7 +40,7 @@ export default function CharacteristicsScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
-  const nextStep = useAnnouncementForRentFormStore((s) => s.nextStep);
+  const nextStep = useHandleNextPress();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 

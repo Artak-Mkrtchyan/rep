@@ -12,7 +12,19 @@ export const getTargetRoute = (step: number): AnnouncementRoutePath => {
   return (route?.path ?? ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path) as AnnouncementRoutePath;
 };
 
-export const getTargetStep = (path: string): number | undefined => {
+export const getTargetRouteByName = (step: number, routeName?: string): AnnouncementRoutePath => {
+  const routes = ROUTES.filter((route) => route.completedStep === step);
+
+  if (routes.length === 0) {
+    return ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path;
+  }
+
+  const found = routes.find((route) => route.name === routeName);
+
+  return found ? found.path : routes[0].path;
+};
+
+export const getCurrentStep = (path: string): number | undefined => {
   const route = ROUTES.find((r) => r.path === path);
   return route?.completedStep;
 };
@@ -59,6 +71,7 @@ export const getParsedAnnouncementData = (
         property: response.property,
         description: response.description,
         rentDetails: response.rentDetails,
+        saleDetails: response.saleDetails,
         mediaFileIds,
         documentIds: response.documentIds,
         title: response.title,

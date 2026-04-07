@@ -11,7 +11,8 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { ANNOUNCEMENT_ROUTES, BATHROOMS_OPTIONS, BEDROOMS_OPTIONS } from '@/constants/announcement';
+import { BATHROOMS_OPTIONS, BEDROOMS_OPTIONS } from '@/constants/announcement';
+import { useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep3 } from '@/types/announcement';
@@ -38,6 +39,7 @@ export default function PropertyInfoFirstScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
+  const nextStep = useHandleNextPress();
 
   const footerPaddingBottom = insets.bottom > 0 ? insets.bottom : 24;
   const scrollPaddingBottom = FOOTER_APPROX_HEIGHT + footerPaddingBottom + 24;
@@ -61,7 +63,7 @@ export default function PropertyInfoFirstScreen() {
     }
 
     if (isNext) {
-      router.replace(ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path);
+      nextStep();
     } else {
       try {
         await sendFormData();

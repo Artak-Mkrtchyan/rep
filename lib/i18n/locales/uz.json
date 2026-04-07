@@ -285,6 +285,7 @@
   "announcement.steps.property_info_1": "Mulk ma'lumotlari (1/2)",
   "announcement.steps.property_info_2": "Mulk ma'lumotlari (2/2)",
   "announcement.steps.rent_details": "Ijara tafsilotlari",
+  "announcement.steps.sale_details": "Sotuv tafsilotlari",
   "announcement.steps.media_1": "Rasm (1/2)",
   "announcement.steps.media_2": "Rasm (2/2)",
   "announcement.steps.characteristics": "Xususiyatlar",
@@ -374,6 +375,9 @@
   "announcement.rent.security_deposit": "Garov pul",
   "announcement.rent.rent_details_title": "Ijara narx va garov pul nechada?",
   "announcement.rent.rent_details_subtitle": "Garov pul ijarachilarga uyingizni tasavvur qilishga yordam beradi.",
+  "announcement.rent.sale_details_title": "Mulk necha meva?",
+  "announcement.rent.sale_details_subtitle": "Mulk narxini kiriting.",
+  "announcement.rent.price": "Narx",
 
   "announcement.detail.status_active": "Faol",
   "announcement.detail.announcement_info": "E'lon ma'lumotlari",

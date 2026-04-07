@@ -139,6 +139,7 @@ export default function ComparisonsScreen() {
           ]}>
           <Pressable
             onPress={handleCompare}
+            disabled={selectedIds.size < 2}
             style={[styles.compareButton, selectedIds.size < 2 && styles.compareButtonDisabled]}>
             <ThemedText className="text-[16px] font-semibold text-white">
               {t('comparisons.compare')}

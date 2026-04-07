@@ -31,7 +31,7 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
 
   return (
     <>
-      <FormDivider className="mb-6 mt-6" />
+      <FormDivider className="mb-4 mt-6" />
 
       {showSocial ? (
         <SocialAuthButtons onGooglePress={onGooglePress} onApplePress={onApplePress} />
@@ -41,6 +41,7 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
         <Button
           variant="ghost"
           onPress={onSignInPress}
+          style={{ height: 48, paddingVertical: 8 }}
           accessibilityLabel={`${resolvedSignInLabel} ${resolvedSignInActionLabel}`}>
           <ThemedText className="text-[18px] font-[400] leading-[24px] text-[#ABABAB]">
             {resolvedSignInLabel}{' '}

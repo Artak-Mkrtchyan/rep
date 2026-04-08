@@ -248,6 +248,8 @@
   "search.buy": "Sotib olish",
   "search.rent": "Ijara",
   "search.title": "Qidirish",
+  "search.show_on_map": "Xaritada ko'rsatish",
+  "search.save_search": "Qidiruvni saqlash",
   "search.close": "Qidiruvni yopish",
   "search.searching": "Qidirilmoqda...",
   "search.results_count": "{{count}} ta natija topildi",

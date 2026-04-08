@@ -148,7 +148,7 @@ export default function SearchMapScreen() {
 
   const locale = i18n.language || 'ru';
   const embedUrl = `${getWebBaseUrl()}/${locale}/embed/map?ll=${DEFAULT_CENTER[0]},${DEFAULT_CENTER[1]}&zoom=${DEFAULT_ZOOM}`;
-  console.log('embedUrl', embedUrl);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemedView className="flex-1">
@@ -164,7 +164,7 @@ export default function SearchMapScreen() {
             overScrollMode="never"
             style={{ flex: 1 }}
           />
-          <SaveSearchButton onPress={handleSaveSearch} />
+          <SaveSearchButton onPress={handleSaveSearch} variant="saveSearch" />
         </View>
 
         <SearchMapHeader

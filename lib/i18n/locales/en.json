@@ -248,6 +248,8 @@
   "search.buy": "Buy",
   "search.rent": "Rent",
   "search.title": "Search",
+  "search.show_on_map": "Show on the map",
+  "search.save_search": "Save Search",
   "search.close": "Close search",
   "search.searching": "Searching...",
   "search.results_count": "{{count}} results found",

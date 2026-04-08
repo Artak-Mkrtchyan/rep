@@ -3,6 +3,8 @@ import { useWindowDimensions, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
   type SharedValue,
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -13,7 +15,8 @@ import { COLLAPSED_RATIO, styles } from './search-results-sheet.styles';
 const SPRING_CONFIG = { damping: 20, stiffness: 200, mass: 0.5 };
 const VELOCITY_THRESHOLD = 500;
 const DEFAULT_EXPANDED_TOP = 140;
-const MINIMIZED_HEIGHT = 280; // Handle + title + one row of cards
+/** Sheet top Y within this distance of expanded snap counts as "full height" */
+const FULL_EXPAND_EPS = 14;
 
 export type { SharedValue };
 
@@ -22,6 +25,8 @@ type SearchResultsSheetProps = {
   expandedTop?: number;
   collapsedRatio?: number;
   onSheetPositionChange?: (sheetTop: SharedValue<number>) => void;
+  /** Fires when sheet snaps to full height (expanded) vs not — for toggling chrome over the map */
+  onFullyExpandedChange?: (fullyExpanded: boolean) => void;
 };
 
 export const SearchResultsSheet: React.FC<SearchResultsSheetProps> = ({
@@ -29,10 +34,12 @@ export const SearchResultsSheet: React.FC<SearchResultsSheetProps> = ({
   expandedTop = DEFAULT_EXPANDED_TOP,
   collapsedRatio = COLLAPSED_RATIO,
   onSheetPositionChange,
+  onFullyExpandedChange,
 }) => {
   const { height: screenHeight } = useWindowDimensions();
   const collapsedTop = screenHeight * collapsedRatio;
-  const minimizedTop = screenHeight - MINIMIZED_HEIGHT;
+  /** Lowest snap = half screen (max map visible while sheet still open); was a ~280px peek */
+  const minimizedTop = screenHeight * collapsedRatio;
 
   const translateY = useSharedValue(collapsedTop);
   const startY = useSharedValue(0);
@@ -55,6 +62,21 @@ export const SearchResultsSheet: React.FC<SearchResultsSheetProps> = ({
     minimizedTopSV.value = minimizedTop;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collapsedTop, minimizedTop]);
+
+  useAnimatedReaction(
+    () => translateY.value,
+    (y, prev) => {
+      if (!onFullyExpandedChange) return;
+      const exp = expandedTopSV.value;
+      const fullyExpanded = Math.abs(y - exp) < FULL_EXPAND_EPS;
+      if (prev != null) {
+        const wasFull = Math.abs(prev - exp) < FULL_EXPAND_EPS;
+        if (fullyExpanded === wasFull) return;
+      }
+      runOnJS(onFullyExpandedChange)(fullyExpanded);
+    },
+    [onFullyExpandedChange],
+  );
 
   const panGesture = Gesture.Pan()
     .onStart(() => {

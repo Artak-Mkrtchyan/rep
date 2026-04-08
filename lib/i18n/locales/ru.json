@@ -248,6 +248,8 @@
   "search.buy": "Купить",
   "search.rent": "Снять",
   "search.title": "Поиск",
+  "search.show_on_map": "Показать на карте",
+  "search.save_search": "Сохранить поиск",
   "search.close": "Закрыть поиск",
   "search.searching": "Поиск...",
   "search.results_count": "{{count}} результатов найдено",

@@ -11,6 +11,8 @@ const DEFAULT_ZOOM = 14;
 export type UseSearchMapWebViewOptions = {
   /** Fit camera to all markers (fullscreen results map); default follows first marker only */
   fitBoundsToMarkers?: boolean;
+  /** Embed posts `{ type: 'markerClick', id: publicId }` from the map */
+  onMarkerPress?: (publicId: string) => void;
 };
 
 function buildMarkers(announcements: Announcement[]) {
@@ -63,6 +65,7 @@ export function useSearchMapWebView(
 ) {
   const { i18n } = useTranslation();
   const fitBoundsToMarkers = options?.fitBoundsToMarkers ?? false;
+  const onMarkerPress = options?.onMarkerPress;
   const webViewRef = useRef<WebView>(null);
   const hasCenteredRef = useRef(false);
   const announcementsSignatureRef = useRef<string>('');
@@ -86,9 +89,20 @@ export function useSearchMapWebView(
     sendMessage({ type: 'zoom', direction: 'out' });
   }, [sendMessage]);
 
-  const handleMessage = useCallback((_event: WebViewMessageEvent) => {
-    // Map bounds events can be handled here for geo-filtered search
-  }, []);
+  const handleMessage = useCallback(
+    (event: WebViewMessageEvent) => {
+      if (!onMarkerPress) return;
+      try {
+        const data = JSON.parse(event.nativeEvent.data) as { type?: string; id?: string };
+        if (data.type === 'markerClick' && data.id != null && data.id !== '') {
+          onMarkerPress(data.id);
+        }
+      } catch {
+        /* ignore non-JSON messages from the map */
+      }
+    },
+    [onMarkerPress],
+  );
 
   const resetCenter = useCallback(() => {
     hasCenteredRef.current = false;

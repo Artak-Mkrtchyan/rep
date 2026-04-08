@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
+import { MapAnnouncementPinCard } from '@/components/search/map/map-announcement-pin-card';
 import { SearchMapWebView } from '@/components/search/map/search-map-webview';
 import { ZoomControls } from '@/components/search/map/zoom-controls';
 import { SearchModal } from '@/components/search/search-modal';
@@ -46,10 +47,17 @@ export default function SearchMapFullscreenScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [mapPinAnnouncement, setMapPinAnnouncement] = useState<Announcement | null>(null);
+
+  const handleMapMarkerPress = useCallback((publicId: string) => {
+    const match = announcements.find((a) => a.publicId === publicId || a.id === publicId);
+    if (!match) return;
+    setMapPinAnnouncement((prev) => (prev?.id === match.id ? null : match));
+  }, [announcements]);
 
   const { webViewRef, embedUrl, zoomIn, zoomOut, handleMessage, resetCenter } = useSearchMapWebView(
     announcements,
-    { fitBoundsToMarkers: true },
+    { fitBoundsToMarkers: true, onMarkerPress: handleMapMarkerPress },
   );
 
   useEffect(() => {
@@ -83,6 +91,13 @@ export default function SearchMapFullscreenScreen() {
     };
   }, [currentFilters, resetCenter]);
 
+  useEffect(() => {
+    setMapPinAnnouncement((prev) => {
+      if (!prev) return prev;
+      return announcements.find((a) => a.id === prev.id) ?? null;
+    });
+  }, [announcements]);
+
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
@@ -91,6 +106,7 @@ export default function SearchMapFullscreenScreen() {
     (filters: SearchFilters) => {
       setCurrentFilters(filters);
       setIsModalVisible(false);
+      setMapPinAnnouncement(null);
       resetCenter();
       router.setParams({ filters: JSON.stringify(filters) });
     },
@@ -102,6 +118,32 @@ export default function SearchMapFullscreenScreen() {
     [currentFilters, handleSearch],
   );
 
+  const handleMapPinOpenDetails = useCallback(
+    (id: string) => {
+      setMapPinAnnouncement(null);
+      router.push(`/announcement/${id}` as any);
+    },
+    [router],
+  );
+
+  const handleMapPinComparison = useCallback(
+    async (id: string, isForComparison: boolean) => {
+      try {
+        if (isForComparison) {
+          await announcementsService.removeFromComparison(id);
+        } else {
+          await announcementsService.addToComparison(id);
+        }
+        const request = buildSearchRequest(currentFilters, 0, MAP_RESULTS_PAGE_SIZE);
+        const response = await announcementsService.searchAnnouncements(request);
+        setAnnouncements(response.content);
+      } catch (err) {
+        console.error('Failed to toggle comparison:', err);
+      }
+    },
+    [currentFilters],
+  );
+
   return (
     <ThemedView className="flex-1">
       <SearchMapWebView webViewRef={webViewRef} embedUrl={embedUrl} onMessage={handleMessage} />
@@ -109,9 +151,20 @@ export default function SearchMapFullscreenScreen() {
       <SearchResultsHeader
         query={currentFilters.query}
         onBack={handleBack}
-        onOpenFilters={() => setIsModalVisible(true)}
+        onOpenFilters={() => {
+          setMapPinAnnouncement(null);
+          setIsModalVisible(true);
+        }}
         onClearQuery={handleClearQuery}
         onHeightMeasured={setHeaderHeight}
+      />
+
+      <MapAnnouncementPinCard
+        announcement={mapPinAnnouncement}
+        headerOffset={headerHeight}
+        onClose={() => setMapPinAnnouncement(null)}
+        onOpenDetails={handleMapPinOpenDetails}
+        onComparisonPress={handleMapPinComparison}
       />
 
       <ZoomControls top={headerHeight + 20} onZoomIn={zoomIn} onZoomOut={zoomOut} />

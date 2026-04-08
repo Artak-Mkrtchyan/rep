@@ -14,6 +14,7 @@ import {
 import { ProfileSocialLinks, SocialLinkItem } from '@/components/profile/profile-social-links';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/context/AuthContext';
 import { useLogout } from '@/hooks/api/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { useThemeValue } from '@/hooks/use-theme';
@@ -32,7 +33,7 @@ function useProfileMenuItems(
       id: 'personal-info',
       label: t('profile.personal_info'),
       icon: <Ionicons name="person-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/(tabs)/profile'),
+      onPress: () => router.push('/profile/personal-information' as any),
     },
     {
       id: 'change-password',
@@ -120,6 +121,7 @@ const SOCIAL_LINKS: SocialLinkItem[] = [
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
+  const { userInfo } = useAuth();
   const { logout, isLoading } = useLogout();
   const iconColor = useThemeValue('foreground');
   const { language, changeLanguage } = useLanguage();
@@ -133,7 +135,7 @@ export default function ProfileScreen() {
   };
 
   const handleEditProfile = () => {
-    // TODO: Navigate to edit profile screen when available
+    router.push('/profile/personal-information' as any);
   };
 
   const { mainItems, secondaryItems } = useProfileMenuItems(
@@ -163,8 +165,8 @@ export default function ProfileScreen() {
           </ThemedText>
 
           <ProfileHeader
-            name="Gloria Duasa"
-            email="nune.yesayan@gmail.com"
+            name={userInfo?.fullName || ''}
+            email={userInfo?.email || ''}
             onEditPress={handleEditProfile}
           />
 

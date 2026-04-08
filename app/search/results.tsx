@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { MapAnnouncementPinCard } from '@/components/search/map/map-announcement-pin-card';
 import { SaveSearchButton } from '@/components/search/map/save-search-button';
 import { SearchMapWebView } from '@/components/search/map/search-map-webview';
 import { SearchModal } from '@/components/search/search-modal';
@@ -12,6 +13,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useSearchAnnouncements } from '@/hooks/api/use-search-announcements';
 import { useSearchMapWebView } from '@/hooks/use-search-map-webview';
 import { announcementsService } from '@/lib/api/announcements';
+import type { Announcement } from '@/types/api';
 import type { SearchFilters } from '@/types/search';
 
 const DEFAULT_FILTERS: SearchFilters = {
@@ -51,6 +53,7 @@ export default function SearchResultsScreen() {
   const [headerHeight, setHeaderHeight] = useState(0);
   const [sheetTop, setSheetTop] = useState<SharedValue<number> | undefined>(undefined);
   const [showMapButton, setShowMapButton] = useState(true);
+  const [mapPinAnnouncement, setMapPinAnnouncement] = useState<Announcement | null>(null);
 
   const handleSheetFullyExpandedChange = useCallback((fullyExpanded: boolean) => {
     setShowMapButton((prev) => {
@@ -62,12 +65,27 @@ export default function SearchResultsScreen() {
   const { announcements, isLoading, isLoadingMore, error, totalElements, hasMore, search, loadMore } =
     useSearchAnnouncements();
 
-  const { webViewRef, embedUrl, handleMessage, resetCenter } = useSearchMapWebView(announcements);
+  const handleMapMarkerPress = useCallback((publicId: string) => {
+    const match = announcements.find((a) => a.publicId === publicId || a.id === publicId);
+    if (!match) return;
+    setMapPinAnnouncement((prev) => (prev?.id === match.id ? null : match));
+  }, [announcements]);
+
+  const { webViewRef, embedUrl, handleMessage, resetCenter } = useSearchMapWebView(announcements, {
+    onMarkerPress: handleMapMarkerPress,
+  });
 
   useEffect(() => {
     search(currentFilters);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    setMapPinAnnouncement((prev) => {
+      if (!prev) return prev;
+      return announcements.find((a) => a.id === prev.id) ?? null;
+    });
+  }, [announcements]);
 
   const handleBack = useCallback(() => router.back(), [router]);
 
@@ -75,6 +93,7 @@ export default function SearchResultsScreen() {
     (filters: SearchFilters) => {
       setCurrentFilters(filters);
       setIsModalVisible(false);
+      setMapPinAnnouncement(null);
       resetCenter();
       search(filters);
     },
@@ -88,6 +107,14 @@ export default function SearchResultsScreen() {
 
   const handleCardPress = useCallback(
     (id: string) => router.push(`/announcement/${id}` as any),
+    [router],
+  );
+
+  const handleMapPinOpenDetails = useCallback(
+    (id: string) => {
+      setMapPinAnnouncement(null);
+      router.push(`/announcement/${id}` as any);
+    },
     [router],
   );
 
@@ -121,9 +148,20 @@ export default function SearchResultsScreen() {
       <SearchResultsHeader
         query={currentFilters.query}
         onBack={handleBack}
-        onOpenFilters={() => setIsModalVisible(true)}
+        onOpenFilters={() => {
+          setMapPinAnnouncement(null);
+          setIsModalVisible(true);
+        }}
         onClearQuery={handleClearQuery}
         onHeightMeasured={setHeaderHeight}
+      />
+
+      <MapAnnouncementPinCard
+        announcement={mapPinAnnouncement}
+        headerOffset={headerHeight}
+        onClose={() => setMapPinAnnouncement(null)}
+        onOpenDetails={handleMapPinOpenDetails}
+        onComparisonPress={handleComparisonPress}
       />
 
       <GestureHandlerRootView style={GESTURE_OVERLAY_STYLE}>

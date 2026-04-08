@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useThemeValue } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
@@ -9,15 +10,19 @@ import { InputError } from '@/components/ui/input/error';
 import { InputLabel } from '@/components/ui/input/label';
 import type { InputProps } from '@/components/ui/input/types';
 
+/** Figma `10597:116334` — profile phone sheet vs default token-based field */
+export type PhoneInputVariant = 'default' | 'rep';
+
 export interface PhoneInputProps extends Omit<
   InputProps,
-  'value' | 'onChangeText' | 'keyboardType'
+  'value' | 'onChangeText' | 'keyboardType' | 'variant'
 > {
   value?: string; // Format: "+998901211323" (full number with country code) or "901211323" (without code)
   onChangeText?: (text: string) => void; // Returns full number with country code: "+998901211323"
   countryCode?: string; // Default: "+998"
   onCountryCodeChange?: (code: string) => void;
   containerClassName?: string;
+  variant?: PhoneInputVariant;
 }
 
 /**
@@ -67,6 +72,16 @@ const extractPhoneNumber = (fullNumber: string, countryCode: string): string => 
   return numberDigits;
 };
 
+/** Figma REP phone field tokens */
+const REP = {
+  prefixBg: '#F7F7F6',
+  border: '#E5E4E2',
+  borderFocus: '#087443',
+  prefixText: '#777777',
+  inputText: '#18181B',
+  clearIcon: '#777777',
+};
+
 export const PhoneInput: React.FC<PhoneInputProps> = ({
   label,
   value = '',
@@ -80,6 +95,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   containerClassName,
   onFocus,
   onBlur,
+  variant = 'default',
   ...inputProps
 }) => {
   const { t } = useTranslation();
@@ -125,6 +141,55 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     hasError ? 'border-destructive' : isFocused ? 'border-primary' : 'border-default'
   );
 
+  const rightBorderColor = hasError ? '#ef4444' : isFocused ? REP.borderFocus : REP.border;
+
+  const handleClear = () => {
+    onChangeText?.(countryCode);
+  };
+
+  if (variant === 'rep') {
+    return (
+      <View className={cn('w-full gap-1', containerClassName)}>
+        {label ? <InputLabel required={required}>{label}</InputLabel> : null}
+
+        <View style={[styles.repRow, resolvedDisabled && styles.disabled]}>
+          <View style={[styles.repPrefix, hasError && styles.repPrefixError]}>
+            <Text style={styles.repPrefixText}>{countryCode}</Text>
+          </View>
+          <View style={[styles.repInputWrap, { borderColor: rightBorderColor }]}>
+            <View style={styles.repInputHolder}>
+              <TextInput
+                ref={inputRef}
+                value={formatPhoneNumber(displayValue)}
+                onChangeText={handleTextChange}
+                editable={!resolvedDisabled}
+                placeholderTextColor={REP.prefixText}
+                style={styles.repInput}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
+                keyboardType="phone-pad"
+                maxLength={14}
+                placeholder={t('ui.phone_placeholder')}
+                {...inputProps}
+              />
+            </View>
+            {!!displayValue && !resolvedDisabled ? (
+              <Pressable
+                onPress={handleClear}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.close', 'Clear')}>
+                <Ionicons name="close" size={20} color={REP.clearIcon} />
+              </Pressable>
+            ) : null}
+          </View>
+        </View>
+
+        {error ? <InputError>{error}</InputError> : null}
+      </View>
+    );
+  }
+
   return (
     <View className={cn('w-full gap-1', containerClassName)}>
       {label ? <InputLabel required={required}>{label}</InputLabel> : null}
@@ -162,3 +227,59 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  repRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    height: 48,
+  },
+  disabled: { opacity: 0.5 },
+  repPrefix: {
+    width: 66,
+    backgroundColor: REP.prefixBg,
+    borderWidth: 1,
+    borderColor: REP.border,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  repPrefixError: {
+    borderColor: '#ef4444',
+  },
+  repPrefixText: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: REP.prefixText,
+  },
+  repInputWrap: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    marginLeft: -1,
+    borderTopRightRadius: 12,
+    borderBottomRightRadius: 12,
+    paddingHorizontal: 12,
+    minWidth: 0,
+  },
+  repInputHolder: {
+    flex: 1,
+    minWidth: 0,
+    justifyContent: 'center',
+  },
+  repInput: {
+    width: '100%',
+    fontSize: 16,
+    color: REP.inputText,
+    padding: 0,
+    margin: 0,
+    ...(Platform.OS === 'android'
+      ? { textAlignVertical: 'center' as const, includeFontPadding: false }
+      : {}),
+  },
+});

@@ -44,44 +44,52 @@ export const EditFieldSheet: React.FC<EditFieldSheetProps> = ({
   }, []);
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={onClose} />
         <View style={styles.sheet}>
-          <ThemedText className="mb-2 text-[14px] font-medium text-[#333]">{label}</ThemedText>
+          <View style={styles.handleWrap}>
+            <View style={styles.handle} />
+          </View>
 
-          {type === 'phone' ? (
-            <PhoneInput value={editValue} onChangeText={setEditValue} />
-          ) : (
-            <Input
-              value={editValue}
-              onChangeText={setEditValue}
-              placeholder={placeholder}
-              keyboardType={keyboardType}
-              autoFocus
-              rightIcon={
-                editValue ? (
-                  <Pressable onPress={handleClear}>
-                    <Ionicons name="close" size={18} color="#ABABAB" />
-                  </Pressable>
-                ) : undefined
-              }
-            />
-          )}
+          <View style={styles.sheetBody}>
+            <ThemedText className="mb-2 text-[12px] font-bold text-[#111111]">{label}</ThemedText>
 
-          <View className="mt-4 flex-row gap-3">
-            <Pressable onPress={onClose} style={styles.closeButton}>
-              <ThemedText className="text-[16px] font-semibold text-[#087443]">
-                {t('common.close', 'Close')}
-              </ThemedText>
-            </Pressable>
-            <Pressable onPress={handleSave} style={styles.saveButton}>
-              <ThemedText className="text-[16px] font-semibold text-white">
-                {t('common.save', 'Save')}
-              </ThemedText>
-            </Pressable>
+            {type === 'phone' ? (
+              <PhoneInput value={editValue} onChangeText={setEditValue} variant="rep" autoFocus />
+            ) : (
+              <Input
+                value={editValue}
+                onChangeText={setEditValue}
+                placeholder={placeholder}
+                keyboardType={keyboardType}
+                autoFocus
+                rightIcon={
+                  editValue ? (
+                    <Pressable onPress={handleClear}>
+                      <Ionicons name="close" size={18} color="#ABABAB" />
+                    </Pressable>
+                  ) : undefined
+                }
+              />
+            )}
+          </View>
+
+          <View style={styles.footer}>
+            <View style={styles.actions}>
+              <Pressable onPress={onClose} style={styles.closeButton}>
+                <ThemedText className="text-[16px] font-semibold text-[#0E9457]">
+                  {t('common.close', 'Close')}
+                </ThemedText>
+              </Pressable>
+              <Pressable onPress={handleSave} style={styles.saveButton}>
+                <ThemedText className="text-[16px] font-semibold text-white">
+                  {t('common.save', 'Save')}
+                </ThemedText>
+              </Pressable>
+            </View>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -96,33 +104,60 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   sheet: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 34,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F1F1',
+    shadowColor: '#2B2B2B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 8,
+  },
+  handleWrap: {
+    paddingTop: 5,
+    alignItems: 'center',
+  },
+  handle: {
+    width: 45,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#E2E2E2',
+  },
+  sheetBody: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  footer: {
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F1F1',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 34,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
   },
   closeButton: {
     flex: 1,
-    paddingVertical: 14,
+    height: 49,
+    justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#087443',
+    backgroundColor: '#F1F1F1',
   },
   saveButton: {
     flex: 1,
-    paddingVertical: 14,
+    height: 49,
+    justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 12,
-    backgroundColor: '#087443',
+    backgroundColor: '#0E9457',
   },
 });

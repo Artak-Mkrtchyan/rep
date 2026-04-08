@@ -117,6 +117,7 @@ export default function ConstructionCompanySignUpScreen() {
           handleBlur,
           handleSubmit,
           setFieldValue,
+          setFieldTouched,
           values,
           errors,
           touched,
@@ -225,6 +226,7 @@ export default function ConstructionCompanySignUpScreen() {
                 required
                 value={values.companyInfo.certifiedOn}
                 onChange={(date) => setFieldValue('companyInfo.certifiedOn', date)}
+                onBlur={() => setFieldTouched('companyInfo.certifiedOn', true, false)}
                 maximumDate={new Date()}
                 error={
                   touched.companyInfo?.certifiedOn && errors.companyInfo?.certifiedOn

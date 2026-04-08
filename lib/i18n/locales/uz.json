@@ -225,6 +225,10 @@
   "profile.my_application": "Mening arizam",
   "profile.brokers_management": "Brokerlarni boshqarish",
   "profile.comparisons": "Taqqoslashlar",
+  "profile.bookings": "Bronlar",
+  "profile.applications": "Arizalar",
+  "profile.uploaded_files": "Yuklangan fayllar",
+  "profile.uploaded_files_empty": "Yuklangan fayl yo'q",
 
   "comparisons.title": "Taqqoslashlar",
   "comparisons.compare": "Taqqoslash",

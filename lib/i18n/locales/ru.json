@@ -225,6 +225,10 @@
   "profile.my_application": "Моя заявка",
   "profile.brokers_management": "Управление брокерами",
   "profile.comparisons": "Сравнения",
+  "profile.bookings": "Бронирования",
+  "profile.applications": "Заявки",
+  "profile.uploaded_files": "Загруженные файлы",
+  "profile.uploaded_files_empty": "Нет загруженных файлов",
 
   "comparisons.title": "Сравнения",
   "comparisons.compare": "Сравнить",

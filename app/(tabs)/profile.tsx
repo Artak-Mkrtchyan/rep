@@ -1,27 +1,24 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { LANGUAGE_FLAGS, LanguagePickerModal } from '@/components/profile/language-picker-modal';
+import { LanguagePickerModal } from '@/components/profile/language-picker-modal';
 import { ProfileHeader } from '@/components/profile/profile-header';
-import {
-  ProfileMenuSection,
-  type ProfileMenuSectionItem,
-} from '@/components/profile/profile-menu-section';
+import { ProfileMenuSection } from '@/components/profile/profile-menu-section';
 import { ProfileSocialLinks } from '@/components/profile/profile-social-links';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { MAIN_MENU_ITEMS, SOCIAL_LINKS } from '@/constants/profile-menu';
 import { useAuth } from '@/context/AuthContext';
 import { useLogout } from '@/hooks/api/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { useThemeValue } from '@/hooks/use-theme';
-
-const ICON_SIZE = 22;
-const LOGOUT_COLOR = '#FF7070';
+import {
+  buildMainProfileSectionItems,
+  buildProfileSocialLinks,
+  buildSecondaryProfileSectionItems,
+} from '@/lib/profile/profile-screen-menu';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -42,49 +39,26 @@ export default function ProfileScreen() {
     router.push('/profile/personal-information' as any);
   }, []);
 
-  const mainItems = useMemo<ProfileMenuSectionItem[]>(
+  const openLanguagePicker = useCallback(() => setLanguagePickerVisible(true), []);
+
+  const mainItems = useMemo(
+    () => buildMainProfileSectionItems(userInfo, t, iconColor),
+    [userInfo, t, iconColor],
+  );
+
+  const secondaryItems = useMemo(
     () =>
-      MAIN_MENU_ITEMS.map((item) => ({
-        id: item.id,
-        label: t(item.labelKey),
-        icon: <Ionicons name={item.icon} size={ICON_SIZE} color={iconColor} />,
-        onPress: () => {
-          if (item.route) router.push(item.route as any);
-        },
-      })),
-    [t, iconColor],
+      buildSecondaryProfileSectionItems({
+        t,
+        iconColor,
+        language,
+        onOpenLanguagePicker: openLanguagePicker,
+        onLogout: handleLogout,
+      }),
+    [t, iconColor, language, openLanguagePicker, handleLogout],
   );
 
-  const secondaryItems = useMemo<ProfileMenuSectionItem[]>(
-    () => [
-      {
-        id: 'help',
-        label: t('profile.help'),
-        icon: <Ionicons name="information-circle-outline" size={ICON_SIZE} color={iconColor} />,
-        onPress: () => {},
-      },
-      {
-        id: 'languages',
-        label: t('profile.languages'),
-        icon: <ThemedText className="text-base leading-none">{LANGUAGE_FLAGS[language]}</ThemedText>,
-        onPress: () => setLanguagePickerVisible(true),
-      },
-      {
-        id: 'logout',
-        label: t('profile.logout'),
-        icon: <Ionicons name="log-out-outline" size={ICON_SIZE} color={LOGOUT_COLOR} />,
-        onPress: handleLogout,
-        showChevron: false,
-        isDestructive: true,
-      },
-    ],
-    [t, iconColor, language, handleLogout],
-  );
-
-  const socialLinks = useMemo(
-    () => SOCIAL_LINKS.map((link) => ({ ...link, onPress: () => {} })),
-    [],
-  );
+  const socialLinks = useMemo(() => buildProfileSocialLinks(), []);
 
   if (isLoading) {
     return (

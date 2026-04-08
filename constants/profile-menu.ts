@@ -53,6 +53,55 @@ export const MAIN_MENU_ITEMS: MenuItemConfig[] = [
   },
 ];
 
+/** Figma `10602:124212` — Profile / individual broker main block */
+export const INDIVIDUAL_BROKER_MAIN_MENU_ITEMS: MenuItemConfig[] = [
+  {
+    id: 'personal-info',
+    labelKey: 'profile.personal_info',
+    icon: 'person-outline',
+    route: '/profile/personal-information',
+  },
+  {
+    id: 'comparisons',
+    labelKey: 'profile.comparisons',
+    icon: 'git-compare-outline',
+    route: '/profile/comparisons',
+  },
+  {
+    id: 'bookings',
+    labelKey: 'profile.bookings',
+    icon: 'calendar-outline',
+  },
+  {
+    id: 'announcements',
+    labelKey: 'profile.my_announcements',
+    icon: 'megaphone-outline',
+    route: '/my-announcements',
+  },
+  {
+    id: 'applications',
+    labelKey: 'profile.applications',
+    icon: 'clipboard-outline',
+    route: '/applications',
+  },
+  {
+    id: 'brokers-management',
+    labelKey: 'profile.brokers_management',
+    icon: 'people-outline',
+  },
+  {
+    id: 'account-security',
+    labelKey: 'profile.account_and_security',
+    icon: 'shield-checkmark-outline',
+    route: '/profile/change-password',
+  },
+  {
+    id: 'notifications',
+    labelKey: 'profile.notifications',
+    icon: 'notifications-outline',
+  },
+];
+
 export const SOCIAL_LINKS = [
   { id: 'facebook', icon: 'logo-facebook' as const, accessibilityLabel: 'Facebook', url: '' },
   { id: 'instagram', icon: 'logo-instagram' as const, accessibilityLabel: 'Instagram', url: '' },

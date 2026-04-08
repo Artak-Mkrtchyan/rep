@@ -1,110 +1,29 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ActivityIndicator,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ProfileEditIcon } from '@/components/icons/profile-edit-icon';
+import { BrokerUploadedFilesCard } from '@/components/profile/broker-uploaded-files-card';
 import { EditFieldSheet } from '@/components/profile/edit-field-sheet';
+import { PersonalInfoRow } from '@/components/profile/personal-info-row';
+import { PROFILE_CARD_SHADOW } from '@/components/profile/profile-card-tokens';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/context/AuthContext';
-import { AuthScope } from '@/lib/api/auth';
 import { useIndividualBrokerProfile } from '@/hooks/api/use-profile';
+import { AuthScope } from '@/lib/api/auth';
+import {
+  buildPersonalInfoEditSheetProps,
+  buildPersonalInformationRows,
+  type PersonalInfoEditableField,
+} from '@/lib/profile/personal-information-helpers';
 
-type EditingField = 'fullName' | 'phone' | 'dateOfBirth' | null;
+type EditingField = PersonalInfoEditableField | null;
 
-/** Figma `10562:114110` / `10582:115174` — Personal information */
 const NEUTRAL_900 = '#1B1B1B';
 const NEUTRAL_950 = '#111111';
-const NEUTRAL_500 = '#777777';
-const NEUTRAL_50 = '#F1F1F1';
 const MAIN_500 = '#087443';
-const EDIT_ICON = 20;
-const EDIT_CHIP = 32;
-
-const CARD_SHADOW = Platform.select({
-  ios: {
-    shadowColor: '#6E6E6E',
-    shadowOffset: { width: 2, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 33,
-  },
-  android: { elevation: 4 },
-  default: {},
-});
-
-/**
- * Formats a phone number like "+998901211323" to "+998 (90)121 13 23"
- */
-function formatPhoneDisplay(phone: string): string {
-  if (!phone) return '';
-  const digits = phone.replace(/\D/g, '');
-  if (digits.startsWith('998') && digits.length >= 12) {
-    const local = digits.slice(3);
-    return `+998 (${local.slice(0, 2)})${local.slice(2, 5)} ${local.slice(5, 7)} ${local.slice(7, 9)}`;
-  }
-  return phone;
-}
-
-type InfoRowProps = {
-  label: string;
-  value: string;
-  onPress?: () => void;
-  showDivider: boolean;
-};
-
-function InfoRow({ label, value, onPress, showDivider }: InfoRowProps) {
-  const body = (
-    <>
-      <View style={styles.rowText}>
-        <ThemedText style={styles.rowLabel}>{label}</ThemedText>
-        <ThemedText style={styles.rowValue} numberOfLines={2}>
-          {value || '—'}
-        </ThemedText>
-      </View>
-      {onPress ? (
-        <View style={styles.editChip} pointerEvents="none">
-          <ProfileEditIcon width={EDIT_ICON} height={EDIT_ICON} color={MAIN_500} />
-        </View>
-      ) : null}
-    </>
-  );
-
-  if (onPress) {
-    return (
-      <Pressable
-        onPress={onPress}
-        style={[styles.row, showDivider && styles.rowDivider]}
-        accessibilityRole="button"
-        accessibilityLabel={`${label}. ${value || '—'}`}>
-        {body}
-      </Pressable>
-    );
-  }
-
-  return (
-    <View
-      style={[styles.row, showDivider && styles.rowDivider]}
-      accessibilityLabel={`${label}. ${value || '—'}`}>
-      {body}
-    </View>
-  );
-}
-
-type RowSpec = {
-  key: string;
-  label: string;
-  value: string;
-  onPress?: () => void;
-};
 
 export default function PersonalInformationScreen() {
   const { t } = useTranslation();
@@ -119,92 +38,44 @@ export default function PersonalInformationScreen() {
     isBroker ? userInfo?.id : undefined,
   );
 
+  const onEditField = useCallback((field: PersonalInfoEditableField) => {
+    setEditingField(field);
+  }, []);
+
   const handleSave = useCallback((_value: string) => {
     setEditingField(null);
   }, []);
 
-  const rows: RowSpec[] = [];
+  const handleUploadedFilesEdit = useCallback(() => {
+    // Wire when upload / document API is available
+  }, []);
 
-  rows.push(
-    {
-      key: 'fullName',
-      label: t('profile.full_name', 'Full name'),
-      value: userInfo?.fullName || '',
-      onPress: () => setEditingField('fullName'),
-    },
-    {
-      key: 'email',
-      label: t('profile.email', 'Email'),
-      value: userInfo?.email || '',
-    },
+  const rows = useMemo(
+    () =>
+      buildPersonalInformationRows(
+        t,
+        userInfo,
+        brokerProfile,
+        isBroker,
+        isBrokerCompany,
+        onEditField,
+      ),
+    [t, userInfo, brokerProfile, isBroker, isBrokerCompany, onEditField],
   );
 
-  if (isBroker && brokerProfile) {
-    rows.push(
-      {
-        key: 'certifiedBy',
-        label: t('profile.certified_by', 'Certified by'),
-        value: brokerProfile.certifiedBy || '',
-      },
-      {
-        key: 'phone',
-        label: t('profile.phone_number', 'Phone number'),
-        value: formatPhoneDisplay(brokerProfile.phoneNumber || userInfo?.phone || ''),
-        onPress: () => setEditingField('phone'),
-      },
-      {
-        key: 'certifiedOn',
-        label: t('profile.certified_on', 'Certified on'),
-        value: brokerProfile.certifiedOn || '',
-      },
-      {
-        key: 'years',
-        label: t('profile.years_of_activity', 'Years of activity'),
-        value: brokerProfile.yearsOfActivity?.toString() || '',
-      },
-    );
-  } else if (!isBroker && !isBrokerCompany) {
-    rows.push(
-      {
-        key: 'phone',
-        label: t('profile.phone_number', 'Phone number'),
-        value: formatPhoneDisplay(userInfo?.phone || ''),
-        onPress: () => setEditingField('phone'),
-      },
-      {
-        key: 'dob',
-        label: t('profile.date_of_birth', 'Date of birth'),
-        value: '',
-        onPress: () => setEditingField('dateOfBirth'),
-      },
-    );
-  }
+  const editSheetProps = useMemo(
+    () =>
+      buildPersonalInfoEditSheetProps(
+        editingField,
+        t,
+        userInfo,
+        isBroker,
+        brokerProfile?.phoneNumber,
+      ),
+    [editingField, t, userInfo, isBroker, brokerProfile?.phoneNumber],
+  );
 
-  const getEditSheetProps = () => {
-    switch (editingField) {
-      case 'fullName':
-        return {
-          label: t('profile.full_name', 'Full name'),
-          value: userInfo?.fullName || '',
-          placeholder: t('profile.full_name', 'Full name'),
-        };
-      case 'phone':
-        return {
-          label: t('profile.phone_number', 'Phone number'),
-          value:
-            (isBroker && brokerProfile?.phoneNumber) || userInfo?.phone || '',
-          type: 'phone' as const,
-        };
-      case 'dateOfBirth':
-        return {
-          label: t('profile.date_of_birth', 'Date of birth'),
-          value: '',
-          placeholder: 'DD/MM/YYYY',
-        };
-      default:
-        return null;
-    }
-  };
+  const showBrokerPersonalLayout = Boolean(isBroker && brokerProfile);
 
   if (brokerLoading) {
     return (
@@ -215,8 +86,6 @@ export default function PersonalInformationScreen() {
       </SafeAreaView>
     );
   }
-
-  const editSheetProps = getEditSheetProps();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -232,10 +101,13 @@ export default function PersonalInformationScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={[
+          styles.scrollContent,
+          showBrokerPersonalLayout && styles.scrollContentBroker,
+        ]}>
         <View style={styles.card}>
           {rows.map((row, index) => (
-            <InfoRow
+            <PersonalInfoRow
               key={row.key}
               label={row.label}
               value={row.value}
@@ -244,6 +116,10 @@ export default function PersonalInformationScreen() {
             />
           ))}
         </View>
+
+        {showBrokerPersonalLayout ? (
+          <BrokerUploadedFilesCard files={[]} onEditPress={handleUploadedFilesEdit} />
+        ) : null}
       </ScrollView>
 
       {editSheetProps && (
@@ -296,49 +172,15 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 32,
   },
+  scrollContentBroker: {
+    gap: 16,
+  },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     gap: 16,
-    ...CARD_SHADOW,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-  },
-  rowDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: NEUTRAL_50,
-  },
-  rowText: {
-    flex: 1,
-    gap: 4,
-    marginRight: 12,
-    minHeight: 48,
-    justifyContent: 'center',
-  },
-  rowLabel: {
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 20,
-    color: NEUTRAL_500,
-  },
-  rowValue: {
-    fontSize: 16,
-    fontWeight: '500',
-    lineHeight: 24,
-    color: NEUTRAL_950,
-  },
-  editChip: {
-    width: EDIT_CHIP,
-    height: EDIT_CHIP,
-    borderRadius: EDIT_CHIP / 2,
-    backgroundColor: NEUTRAL_50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    ...PROFILE_CARD_SHADOW,
   },
 });

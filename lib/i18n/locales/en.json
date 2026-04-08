@@ -225,6 +225,10 @@
   "profile.my_application": "My application",
   "profile.brokers_management": "Brokers management",
   "profile.comparisons": "Comparisons",
+  "profile.bookings": "Bookings",
+  "profile.applications": "Applications",
+  "profile.uploaded_files": "Uploaded files",
+  "profile.uploaded_files_empty": "No files uploaded",
 
   "comparisons.title": "Comparisons",
   "comparisons.compare": "Compare",

@@ -101,6 +101,7 @@ export default function BrokerSignUpScreen() {
           handleBlur,
           handleSubmit,
           setFieldValue,
+          setFieldTouched,
           values,
           errors,
           touched,
@@ -142,7 +143,10 @@ export default function BrokerSignUpScreen() {
                 label={t('signup.broker.certified_on')}
                 required
                 value={values.certifiedOn}
-                onChange={(date) => setFieldValue('certifiedOn', date)}
+                onChange={(date) => {
+                  setFieldValue('certifiedOn', date);
+                }}
+                onBlur={() => setFieldTouched('certifiedOn', true, false)}
                 maximumDate={new Date()}
                 error={touched.certifiedOn && errors.certifiedOn ? errors.certifiedOn : undefined}
               />

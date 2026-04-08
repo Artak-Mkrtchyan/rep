@@ -1,7 +1,7 @@
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import React from 'react';
-import { Modal, Platform, Pressable, Text, TextInputChangeEvent, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Modal, Platform, Pressable, Text, TextInputChangeEvent, View } from 'react-native';
 
 import { Input } from '@/components/ui/input';
 import type { InputProps } from '@/components/ui/input/types';
@@ -61,73 +61,9 @@ const validateDateParts = (day: string, month: string, year: string): boolean =>
   return true;
 };
 
-const isValidPartialDate = (part: string, type: 'day' | 'month' | 'year'): boolean => {
-  if (!part) return true;
-
-  const num = parseInt(part, 10);
-  if (isNaN(num)) return false;
-
-  switch (type) {
-    case 'day':
-      if (part.length === 1) {
-        return num >= 0 && num <= 3;
-      }
-      if (part.length === 2) {
-        return num >= 1 && num <= 31;
-      }
-      return false;
-
-    case 'month':
-      if (part.length === 1) {
-        return num >= 0 && num <= 1;
-      }
-      if (part.length === 2) {
-        return num >= 1 && num <= 12;
-      }
-      return false;
-
-    case 'year':
-      if (part.length === 1) {
-        return num >= 1 && num <= 2;
-      }
-      if (part.length === 2) {
-        const firstTwo = parseInt(part, 10);
-        return firstTwo >= 19 && firstTwo <= 29;
-      }
-      if (part.length === 3) {
-        const firstThree = parseInt(part, 10);
-        return firstThree >= 190 && firstThree <= 299;
-      }
-      if (part.length === 4) {
-        return num >= 1900 && num <= 2999;
-      }
-      return false;
-
-    default:
-      return true;
-  }
-};
-
 const applyDateMask = (input: string): string => {
-  const digits = input.replace(/\D/g, '');
-
-  // Build the valid prefix digit by digit
-  let validDigits = '';
-  for (let i = 0; i < digits.length && validDigits.length < 8; i++) {
-    const candidate = validDigits + digits[i];
-    const len = candidate.length;
-
-    // Validate as we go: positions 0-1 = day, 2-3 = month, 4-7 = year
-    if (len <= 2) {
-      if (!isValidPartialDate(candidate, 'day')) continue;
-    } else if (len <= 4) {
-      if (!isValidPartialDate(candidate.slice(2), 'month')) continue;
-    } else {
-      if (!isValidPartialDate(candidate.slice(4), 'year')) continue;
-    }
-
-    validDigits = candidate;
-  }
+  // Soft mask: never drops typed digits, only strips non-digits and formats.
+  const validDigits = input.replace(/\D/g, '').slice(0, 8);
 
   // Insert dots after day and month
   let formatted = '';
@@ -166,8 +102,13 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   const [displayValue, setDisplayValue] = React.useState(formatDateForDisplay(value));
   const [showPicker, setShowPicker] = React.useState(false);
   const [tempDate, setTempDate] = React.useState<Date>(parseValueToDate(value));
+  const skipNextEmptyValueSyncRef = React.useRef(false);
 
   React.useEffect(() => {
+    if (value === '' && skipNextEmptyValueSyncRef.current) {
+      skipNextEmptyValueSyncRef.current = false;
+      return;
+    }
     setDisplayValue(formatDateForDisplay(value));
   }, [value]);
 
@@ -199,6 +140,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         }
       }
     } else {
+      // Keep partial date visible while exposing empty value to form state.
+      skipNextEmptyValueSyncRef.current = true;
       onChange?.('');
     }
   };

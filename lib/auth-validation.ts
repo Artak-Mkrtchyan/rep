@@ -104,12 +104,16 @@ export const yupSchemas = {
     .oneOf([Yup.ref('password')], () => i18n.t('validation.passwords_do_not_match'))
     .required(() => i18n.t('validation.required')),
   certifiedOn: Yup.string()
-    .required(() => i18n.t('validation.required'))
+    .required(() => i18n.t('validation.date_incorrect_format'))
     .matches(DATE_REGEX, () => i18n.t('validation.date_incorrect_format'))
-    .test('not-future-date', () => i18n.t('validation.date_cannot_be_future'), (value) => {
-      if (!value || !DATE_REGEX.test(value)) return true;
-      return new Date(value) <= new Date();
-    }),
+    .test(
+      'not-future-date',
+      () => i18n.t('validation.date_cannot_be_future'),
+      (value) => {
+        if (!value || !DATE_REGEX.test(value)) return true;
+        return new Date(value) <= new Date();
+      }
+    ),
 };
 
 export const validateEmail = (email: string): boolean => {

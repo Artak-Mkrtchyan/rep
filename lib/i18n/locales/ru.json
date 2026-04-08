@@ -20,6 +20,7 @@
   "common.search": "Поиск",
   "common.publish": "Опубликовать",
   "common.add": "Добавить",
+  "common.edit": "Изменить",
 
   "tabs.home": "Главная",
   "tabs.favourite": "Избранное",
@@ -218,6 +219,7 @@
   "profile.title": "Профиль",
   "profile.edit_profile": "Редактировать профиль",
   "profile.personal_info": "Личная информация",
+  "profile.account_and_security": "Аккаунт и безопасность",
   "profile.change_password": "Изменить пароль",
   "profile.notifications": "Уведомления",
   "profile.my_application": "Моя заявка",

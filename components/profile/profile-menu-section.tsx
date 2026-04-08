@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ProfileMenuItem } from './profile-menu-item';
 
@@ -18,8 +18,8 @@ export interface ProfileMenuSectionProps {
 
 export const ProfileMenuSection: React.FC<ProfileMenuSectionProps> = ({ items }) => {
   return (
-    <View className="mx-5 mb-4 overflow-hidden rounded-2xl bg-card">
-      {items.map((item, index) => (
+    <View className="mx-4 mb-3" style={sectionStyles.card}>
+      {items.map((item) => (
         <ProfileMenuItem
           key={item.id}
           label={item.label}
@@ -27,9 +27,25 @@ export const ProfileMenuSection: React.FC<ProfileMenuSectionProps> = ({ items })
           onPress={item.onPress}
           showChevron={item.showChevron ?? true}
           isDestructive={item.isDestructive ?? false}
-          showDivider={index < items.length - 1}
         />
       ))}
     </View>
   );
 };
+
+const sectionStyles = StyleSheet.create({
+  card: {
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#F1F1F1',
+    backgroundColor: '#FFFFFF',
+    /** Figma `2060:73630` — `gap-[2px]` between rows, no row dividers */
+    gap: 2,
+    overflow: 'hidden',
+    shadowColor: '#6E6E6E',
+    shadowOffset: { width: 2, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 33,
+    elevation: 4,
+  },
+});

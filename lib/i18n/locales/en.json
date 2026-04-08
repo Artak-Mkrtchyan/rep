@@ -20,6 +20,7 @@
   "common.search": "Search",
   "common.publish": "Publish",
   "common.add": "Add",
+  "common.edit": "Edit",
 
   "tabs.home": "Home",
   "tabs.favourite": "Favourite",
@@ -218,6 +219,7 @@
   "profile.title": "Profile",
   "profile.edit_profile": "Edit profile",
   "profile.personal_info": "Personal information",
+  "profile.account_and_security": "Account & security",
   "profile.change_password": "Change password",
   "profile.notifications": "Notifications",
   "profile.my_application": "My application",

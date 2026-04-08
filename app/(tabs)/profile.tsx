@@ -1,123 +1,27 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LANGUAGE_FLAGS, LanguagePickerModal } from '@/components/profile/language-picker-modal';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import {
   ProfileMenuSection,
-  ProfileMenuSectionItem,
+  type ProfileMenuSectionItem,
 } from '@/components/profile/profile-menu-section';
-import { ProfileSocialLinks, SocialLinkItem } from '@/components/profile/profile-social-links';
+import { ProfileSocialLinks } from '@/components/profile/profile-social-links';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { MAIN_MENU_ITEMS, SOCIAL_LINKS } from '@/constants/profile-menu';
 import { useAuth } from '@/context/AuthContext';
 import { useLogout } from '@/hooks/api/use-auth';
 import { useLanguage } from '@/hooks/use-language';
 import { useThemeValue } from '@/hooks/use-theme';
 
-const ICON_SIZE = 20;
-
-function useProfileMenuItems(
-  iconColor: string,
-  onLogout: () => void,
-  onLanguagePress: () => void,
-  currentFlag: string,
-  t: (key: string) => string
-): { mainItems: ProfileMenuSectionItem[]; secondaryItems: ProfileMenuSectionItem[] } {
-  const mainItems: ProfileMenuSectionItem[] = [
-    {
-      id: 'personal-info',
-      label: t('profile.personal_info'),
-      icon: <Ionicons name="person-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/profile/personal-information' as any),
-    },
-    {
-      id: 'change-password',
-      label: t('profile.change_password'),
-      icon: <Ionicons name="settings-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/profile/change-password'),
-    },
-    {
-      id: 'notifications',
-      label: t('profile.notifications'),
-      icon: <Ionicons name="notifications-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/(tabs)/profile'),
-    },
-    {
-      id: 'my-announcements',
-      label: t('profile.my_announcements'),
-      icon: <Ionicons name="megaphone-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/my-announcements'),
-    },
-    {
-      id: 'my-application',
-      label: t('profile.my_application'),
-      icon: <Ionicons name="document-text-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/applications'),
-    },
-    {
-      id: 'brokers-management',
-      label: t('profile.brokers_management'),
-      icon: <Ionicons name="people-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/(tabs)/profile'),
-    },
-    {
-      id: 'comparisons',
-      label: t('profile.comparisons'),
-      icon: <Ionicons name="git-compare-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/profile/comparisons' as any),
-    },
-  ];
-
-  const secondaryItems: ProfileMenuSectionItem[] = [
-    {
-      id: 'help',
-      label: t('profile.help'),
-      icon: <Ionicons name="information-circle-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: () => router.push('/(tabs)/profile'),
-    },
-    {
-      id: 'languages',
-      label: t('profile.languages'),
-      icon: <ThemedText className="text-[18px] leading-none">{currentFlag}</ThemedText>,
-      onPress: onLanguagePress,
-    },
-    {
-      id: 'logout',
-      label: t('profile.logout'),
-      icon: <Ionicons name="log-out-outline" size={ICON_SIZE} color={iconColor} />,
-      onPress: onLogout,
-      showChevron: false,
-    },
-  ];
-
-  return { mainItems, secondaryItems };
-}
-
-const SOCIAL_LINKS: SocialLinkItem[] = [
-  {
-    id: 'facebook',
-    icon: 'logo-facebook',
-    onPress: () => {},
-    accessibilityLabel: 'Facebook',
-  },
-  {
-    id: 'instagram',
-    icon: 'logo-instagram',
-    onPress: () => {},
-    accessibilityLabel: 'Instagram',
-  },
-  {
-    id: 'youtube',
-    icon: 'logo-youtube',
-    onPress: () => {},
-    accessibilityLabel: 'YouTube',
-  },
-];
+const ICON_SIZE = 22;
+const LOGOUT_COLOR = '#FF7070';
 
 export default function ProfileScreen() {
   const { t } = useTranslation();
@@ -127,53 +31,90 @@ export default function ProfileScreen() {
   const { language, changeLanguage } = useLanguage();
   const [languagePickerVisible, setLanguagePickerVisible] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     Alert.alert(t('profile.logout'), t('profile.logout_confirm'), [
       { text: t('common.cancel'), style: 'cancel' },
       { text: t('profile.logout'), style: 'destructive', onPress: logout },
     ]);
-  };
+  }, [t, logout]);
 
-  const handleEditProfile = () => {
+  const navigateToPersonalInfo = useCallback(() => {
     router.push('/profile/personal-information' as any);
-  };
+  }, []);
 
-  const { mainItems, secondaryItems } = useProfileMenuItems(
-    iconColor,
-    handleLogout,
-    () => setLanguagePickerVisible(true),
-    LANGUAGE_FLAGS[language],
-    t
+  const mainItems = useMemo<ProfileMenuSectionItem[]>(
+    () =>
+      MAIN_MENU_ITEMS.map((item) => ({
+        id: item.id,
+        label: t(item.labelKey),
+        icon: <Ionicons name={item.icon} size={ICON_SIZE} color={iconColor} />,
+        onPress: () => {
+          if (item.route) router.push(item.route as any);
+        },
+      })),
+    [t, iconColor],
+  );
+
+  const secondaryItems = useMemo<ProfileMenuSectionItem[]>(
+    () => [
+      {
+        id: 'help',
+        label: t('profile.help'),
+        icon: <Ionicons name="information-circle-outline" size={ICON_SIZE} color={iconColor} />,
+        onPress: () => {},
+      },
+      {
+        id: 'languages',
+        label: t('profile.languages'),
+        icon: <ThemedText className="text-base leading-none">{LANGUAGE_FLAGS[language]}</ThemedText>,
+        onPress: () => setLanguagePickerVisible(true),
+      },
+      {
+        id: 'logout',
+        label: t('profile.logout'),
+        icon: <Ionicons name="log-out-outline" size={ICON_SIZE} color={LOGOUT_COLOR} />,
+        onPress: handleLogout,
+        showChevron: false,
+        isDestructive: true,
+      },
+    ],
+    [t, iconColor, language, handleLogout],
+  );
+
+  const socialLinks = useMemo(
+    () => SOCIAL_LINKS.map((link) => ({ ...link, onPress: () => {} })),
+    [],
   );
 
   if (isLoading) {
     return (
-      <ThemedView className="flex-1 items-center justify-center">
+      <ThemedView className="flex-1 items-center justify-center bg-[#F5F5F5]">
         <ActivityIndicator color="#0e9457" />
       </ThemedView>
     );
   }
 
   return (
-    <ThemedView className="flex-1 bg-muted">
+    <ThemedView className="flex-1 bg-[#F5F5F5]">
       <SafeAreaView className="flex-1" edges={['top']}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 24 }}>
-          <ThemedText className="px-5 pb-6 pt-6 text-[28px] font-bold text-foreground">
-            {t('profile.title')}
-          </ThemedText>
+          <View className="px-4 pb-6 pt-3">
+            <ThemedText className="text-[34px] font-bold leading-[41px] text-[#111111]">
+              {t('profile.title')}
+            </ThemedText>
+          </View>
 
           <ProfileHeader
             name={userInfo?.fullName || ''}
             email={userInfo?.email || ''}
-            onEditPress={handleEditProfile}
+            onEditPress={navigateToPersonalInfo}
           />
 
           <ProfileMenuSection items={mainItems} />
           <ProfileMenuSection items={secondaryItems} />
-
-          <ProfileSocialLinks links={SOCIAL_LINKS} />
+          <ProfileSocialLinks links={socialLinks} />
         </ScrollView>
 
         <LanguagePickerModal

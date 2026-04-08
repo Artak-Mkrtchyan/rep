@@ -5,13 +5,15 @@ import { Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { useThemeValue } from '@/hooks/use-theme';
 
+/** Figma Profile — menu chevron secondary */
+const CHEVRON_SIZE = 16;
+
 export interface ProfileMenuItemProps {
   label: string;
   icon: React.ReactElement;
   onPress: () => void;
   showChevron?: boolean;
   isDestructive?: boolean;
-  showDivider?: boolean;
 }
 
 export const ProfileMenuItem: React.FC<ProfileMenuItemProps> = ({
@@ -20,31 +22,27 @@ export const ProfileMenuItem: React.FC<ProfileMenuItemProps> = ({
   onPress,
   showChevron = true,
   isDestructive = false,
-  showDivider = true,
 }) => {
   const mutedForeground = useThemeValue('mutedForeground');
-  const destructiveColor = useThemeValue('destructive');
+  /** Figma Profile — Log out label #ff7070 */
+  const destructiveLabel = '#FF7070';
 
   return (
-    <>
-      <Pressable
-        onPress={onPress}
-        className="flex-row items-center px-4 py-[14px]"
-        style={({ pressed }) => (pressed ? { opacity: 0.6 } : undefined)}
-        accessibilityRole="button"
-        accessibilityLabel={label}>
-        <View className="mr-3 h-[22px] w-[22px] items-center justify-center">{icon}</View>
+    <Pressable
+      onPress={onPress}
+      className="min-h-[52px] flex-row items-center px-4 py-1.5"
+      style={({ pressed }) => (pressed ? { opacity: 0.6 } : undefined)}
+      accessibilityRole="button"
+      accessibilityLabel={label}>
+      <View className="mr-3 h-6 w-6 items-center justify-center">{icon}</View>
 
-        <ThemedText
-          className={`flex-1 text-[15px] font-normal ${isDestructive ? '' : 'text-foreground'}`}
-          style={isDestructive ? { color: destructiveColor } : undefined}>
-          {label}
-        </ThemedText>
+      <ThemedText
+        className={`flex-1 text-[14px] font-normal leading-5 ${isDestructive ? '' : 'text-[#111111]'}`}
+        style={isDestructive ? { color: destructiveLabel } : undefined}>
+        {label}
+      </ThemedText>
 
-        {showChevron && <Ionicons name="chevron-forward" size={18} color={mutedForeground} />}
-      </Pressable>
-
-      {showDivider && <View className="ml-[54px] h-px" />}
-    </>
+      {showChevron && <Ionicons name="chevron-forward" size={CHEVRON_SIZE} color={mutedForeground} />}
+    </Pressable>
   );
 };

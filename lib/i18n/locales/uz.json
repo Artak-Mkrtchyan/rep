@@ -20,6 +20,7 @@
   "common.search": "Qidirish",
   "common.publish": "E'lon qilish",
   "common.add": "Qo'shish",
+  "common.edit": "Tahrirlash",
 
   "tabs.home": "Bosh sahifa",
   "tabs.favourite": "Sevimlilar",
@@ -218,6 +219,7 @@
   "profile.title": "Profil",
   "profile.edit_profile": "Profilni tahrirlash",
   "profile.personal_info": "Shaxsiy ma'lumotlar",
+  "profile.account_and_security": "Hisob va xavfsizlik",
   "profile.change_password": "Parolni o'zgartirish",
   "profile.notifications": "Bildirishnomalar",
   "profile.my_application": "Mening arizam",

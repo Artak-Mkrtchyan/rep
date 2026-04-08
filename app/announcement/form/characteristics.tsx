@@ -97,7 +97,7 @@ export default function CharacteristicsScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="pt-6" style={horizontalStyle}>
+              <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.characteristics_title')}
                 </ThemedText>
@@ -245,7 +245,7 @@ export default function CharacteristicsScreen() {
 
                   <View className="gap-1">
                     <ThemedText className="mb-2 text-[16px] font-semibold text-foreground">
-                      {t('announcement.rent.condition')}
+                      {t('announcement.rent.pets_allowed')}
                     </ThemedText>
                     <CheckboxRow
                       label={t('announcement.rent.pet_cat')}

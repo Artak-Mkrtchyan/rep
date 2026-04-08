@@ -86,7 +86,7 @@ export default function SaleDetailsScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="pt-6" style={horizontalStyle}>
+              <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.sale_details_title')}
                 </ThemedText>

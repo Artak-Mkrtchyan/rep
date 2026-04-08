@@ -62,7 +62,12 @@ export default function BasicInfoScreen() {
   const nextStep = useHandleNextPress();
   let isNext = true;
 
-  const processType = formData.brokerAssignmentNeeded ? 'AS_BROKER' : 'AS_INDIVIDUAL';
+  const processType =
+    formData.brokerAssignmentNeeded !== undefined
+      ? formData.brokerAssignmentNeeded
+        ? 'AS_BROKER'
+        : 'AS_INDIVIDUAL'
+      : '';
 
   const initialValues: BasicInfoFormValues = {
     listingType: formData.listingType,

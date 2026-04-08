@@ -116,7 +116,7 @@ export default function FinalScreen() {
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 31 }}
         showsVerticalScrollIndicator={false}>
-        <View className="pt-6" style={horizontalStyle}>
+        <View className="pt-[24px]" style={horizontalStyle}>
           <View className="mb-4">
             <ImageSlider
               images={imageSources}

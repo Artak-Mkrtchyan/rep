@@ -9,6 +9,7 @@ import type { YandexSuggestRequestResults } from '@/lib/api/yandex';
 import { cn } from '@/lib/utils';
 import { flatGeoFromMultilangGeocode } from '@/lib/yandex-geocode-to-flat-geo';
 
+import { InputLabel } from '@/components/ui/input/label';
 import { detectInfrastructureObjects } from '@/lib/api/infrastructure';
 import { EMPTY_FLAT_GEO } from '@/store/announcementStore';
 import type { AddressInputProps } from './types';
@@ -205,9 +206,7 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
     <View
       className={cn('w-full gap-1', containerClassName)}
       style={{ zIndex: showDropdown ? 100 : 0 }}>
-      {label ? (
-        <ThemedText className="mb-1 text-[16px] font-bold text-foreground">{label}</ThemedText>
-      ) : null}
+      {label ? <InputLabel>{label}</InputLabel> : null}
 
       <Pressable
         onPress={() => inputRef.current?.focus()}

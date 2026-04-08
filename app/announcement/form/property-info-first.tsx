@@ -100,7 +100,7 @@ export default function PropertyInfoFirstScreen() {
               contentContainerStyle={{ paddingBottom: scrollPaddingBottom }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="pt-6" style={horizontalStyle}>
+              <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.property_info_first_title')}
                 </ThemedText>

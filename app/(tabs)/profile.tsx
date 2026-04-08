@@ -43,7 +43,7 @@ export default function ProfileScreen() {
 
   const mainItems = useMemo(
     () => buildMainProfileSectionItems(userInfo, t, iconColor),
-    [userInfo, t, iconColor],
+    [userInfo, t, iconColor]
   );
 
   const secondaryItems = useMemo(
@@ -55,7 +55,7 @@ export default function ProfileScreen() {
         onOpenLanguagePicker: openLanguagePicker,
         onLogout: handleLogout,
       }),
-    [t, iconColor, language, openLanguagePicker, handleLogout],
+    [t, iconColor, language, openLanguagePicker, handleLogout]
   );
 
   const socialLinks = useMemo(() => buildProfileSocialLinks(), []);

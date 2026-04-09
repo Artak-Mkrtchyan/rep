@@ -72,7 +72,7 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
             <View key={index} className="flex-row items-center">
               <ThemedText className="text-[12px] font-bold leading-[11px] text-foreground">
                 {stat.value}{' '}
-                <ThemedText className="text-[12px] font-normal leading-normal text-neutral-400">
+                <ThemedText className="font-regular text-[12px] leading-normal text-neutral-400">
                   {stat.label}
                 </ThemedText>
               </ThemedText>

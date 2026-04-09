@@ -127,7 +127,7 @@ export default function BasicInfoScreen() {
               keyboardShouldPersistTaps="handled">
               <View className="pt-[24px]" style={horizontalStyle}>
                 <View className="gap-4">
-                  <ThemedText className="text-[20px] font-bold text-foreground">
+                  <ThemedText className="text-[16px] font-bold text-foreground">
                     {t('announcement.rent.basic_info')}
                   </ThemedText>
 

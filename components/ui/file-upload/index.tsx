@@ -126,7 +126,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
               />
             )}
           </View>
-          <ThemedText className="text-[14px] text-foreground">
+          <ThemedText className="font-regular text-[12px] text-foreground">
             {isUploading ? t('ui.uploading') : hint}
           </ThemedText>
           <Pressable
@@ -139,7 +139,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
             accessibilityRole="button"
             accessibilityLabel={t('ui.select_file')}
             accessibilityState={{ disabled: disabled || isUploading }}>
-            <ThemedText className="text-[14px] font-medium text-white">
+            <ThemedText className="text-[16px] font-medium text-white">
               {isUploading ? t('ui.uploading') : t('ui.select_file')}
             </ThemedText>
             <Image
@@ -206,7 +206,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                 />
               )}
             </View>
-            <ThemedText className="mt-2 text-[12px] text-foreground">
+            <ThemedText className="mt-2 text-[14px] font-medium text-foreground">
               {isUploading ? t('ui.uploading') : t('common.add')}
             </ThemedText>
           </Pressable>

@@ -227,7 +227,7 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
           onBlur={handleBlur}
           placeholder={placeholder}
           placeholderTextColor={placeholderColor}
-          className="flex-1 text-[16px] text-foreground placeholder:text-muted-foreground"
+          className="font-regular flex-1 text-[16px] text-foreground placeholder:text-muted-foreground"
           returnKeyType="done"
           {...textInputProps}
         />

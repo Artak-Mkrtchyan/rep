@@ -34,9 +34,7 @@ export function ChipGroup<T extends string = string>({
   return (
     <View className={cn('gap-3', containerClassName)}>
       {label ? (
-        <ThemedText className="text-[16px] font-semibold text-foreground">
-          {label}
-        </ThemedText>
+        <ThemedText className="text-[14px] font-bold text-foreground">{label}</ThemedText>
       ) : null}
       <View className="flex-row flex-wrap gap-2">
         {options.map((option) => {
@@ -54,13 +52,11 @@ export function ChipGroup<T extends string = string>({
               accessibilityRole="button"
               accessibilityLabel={option.label}
               accessibilityState={{ selected, disabled }}
-              style={({ pressed }) =>
-                pressed && !disabled ? { opacity: 0.9 } : undefined
-              }>
+              style={({ pressed }) => (pressed && !disabled ? { opacity: 0.9 } : undefined)}>
               <ThemedText
                 className={cn(
-                  'text-[14px]',
-                  selected ? 'font-medium text-white' : 'font-normal text-foreground'
+                  'text-[12px]',
+                  selected ? 'font-medium text-white' : 'font-regular text-foreground'
                 )}>
                 {option.label}
               </ThemedText>

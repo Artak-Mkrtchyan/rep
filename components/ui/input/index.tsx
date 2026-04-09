@@ -154,7 +154,7 @@ export const Input = React.forwardRef(function Input(
   );
 
   const inputClassNames = cn(
-    'h-full flex-1 text-[16px] text-foreground placeholder:text-muted-foreground',
+    'h-full flex-1 text-[16px] font-regular text-foreground placeholder:text-muted-foreground',
     inputClassName
   );
 

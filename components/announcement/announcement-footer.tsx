@@ -41,7 +41,7 @@ export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
         ...FOOTER_SHADOW,
       }}>
       <Button onPress={onNextPress} accessibilityLabel="Next" disabled={firstButtonDisabled}>
-        {firstButtonLabel}
+        <ThemedText className="text-[16px] font-medium text-white">{firstButtonLabel}</ThemedText>
       </Button>
       <Button
         variant="secondary"

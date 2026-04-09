@@ -36,6 +36,6 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       )}>
       {checked && <Ionicons name="checkmark" size={14} color="#087443" />}
     </View>
-    <ThemedText className="flex-1 text-[14px] text-foreground">{label}</ThemedText>
+    <ThemedText className="flex-1 text-[14px] font-medium text-foreground">{label}</ThemedText>
   </Pressable>
 );

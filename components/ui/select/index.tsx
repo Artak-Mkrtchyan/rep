@@ -97,7 +97,11 @@ export function Select<T extends string = string>({
           error && 'border-destructive',
           !error && (open ? 'border-primary' : 'border-default')
         )}>
-        <Text className={cn('text-[16px]', selected ? 'text-foreground' : 'text-muted-foreground')}>
+        <Text
+          className={cn(
+            'font-regular text-[16px]',
+            selected ? 'text-foreground' : 'text-muted-foreground'
+          )}>
           {selected ? selected.label : (placeholder ?? t('common.select_placeholder'))}
         </Text>
         <Svg

@@ -63,7 +63,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                   <Ionicons name="checkmark" size={14} color={STEP_COLORS.completedFg} />
                 ) : (
                   <ThemedText
-                    className="text-[14px] font-semibold"
+                    className="text-[14px] font-medium text-foreground"
                     style={{ color: STEP_COLORS.incompleteFg }}>
                     {stepIndex}
                   </ThemedText>
@@ -85,7 +85,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
         })}
       </View>
       <View className="mt-1.5 flex-row">
-        <ThemedText className="text-[12px] font-medium text-foreground" numberOfLines={1}>
+        <ThemedText className="text-[12px] font-semibold text-neutral-900" numberOfLines={1}>
           {resolvedLabel}
         </ThemedText>
       </View>

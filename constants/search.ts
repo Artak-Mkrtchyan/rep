@@ -29,6 +29,6 @@ export const MENU_SECTIONS: MenuSection[] = [
   },
   {
     title: 'Partners',
-    items: [],
+    items: ['Brokers', 'Construction companies'],
   },
 ];

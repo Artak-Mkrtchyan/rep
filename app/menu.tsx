@@ -24,9 +24,14 @@ export default function MenuScreen() {
     router.back();
   }, [router]);
 
-  const handleItemPress = useCallback((_item: string) => {
-    // TODO: Navigate to category listing
-  }, []);
+  const handleItemPress = useCallback(
+    (item: string, sectionTitle: string) => {
+      if (sectionTitle === 'Partners' && item === 'Brokers') {
+        router.push('/partners/brokers');
+      }
+    },
+    [router]
+  );
 
   return (
     <ThemedView className="flex-1">
@@ -49,7 +54,7 @@ export default function MenuScreen() {
               items={section.items}
               isExpanded={expandedIndex === index}
               onToggle={() => handleToggle(index)}
-              onItemPress={handleItemPress}
+              onItemPress={(item) => handleItemPress(item, section.title)}
             />
           ))}
         </ScrollView>

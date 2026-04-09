@@ -8,26 +8,18 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { useAssignBroker, useSearchIndividualBrokersInfinite } from '@/hooks/api/use-applications';
 import { cn } from '@/lib/utils';
+import { initialsFrom } from '@/lib/utils/initials';
 import type { IndividualBroker } from '@/types/applications';
 
 const PAGE_SIZE = 15;
 const ON_END_THRESHOLD = 0.35;
 
-/** stile/card — совпадает с карточками приложения */
 const FOOTER_CARD_SHADOW = {
   shadowColor: '#6E6E6E',
   shadowOffset: { width: 2, height: 3 },
   shadowOpacity: 0.15,
   shadowRadius: 33,
   elevation: 4,
-};
-
-const initialsFrom = (fullName: string): string => {
-  const parts = fullName.trim().split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase().slice(0, 2);
-  }
-  return fullName.slice(0, 2).toUpperCase() || '?';
 };
 
 export type AssignBrokerModalProps = {

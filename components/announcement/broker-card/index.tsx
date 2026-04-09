@@ -4,6 +4,7 @@ import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
+import { initialsFrom } from '@/lib/utils/initials';
 
 import type { BrokerCardProps } from './types';
 
@@ -14,6 +15,7 @@ const CARD_SHADOW = {
   shadowRadius: 33,
   elevation: 4,
 };
+
 export const BrokerCard: React.FC<BrokerCardProps> = ({
   isSelected = false,
   avatar,
@@ -27,13 +29,19 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
   const content = (
     <>
       <View className="flex-row items-center gap-2">
-        <View className="h-[42px] w-[42px] rounded-full bg-muted">
-          <Image
-            source={avatar}
-            className="h-[42px] w-[42px] rounded-full bg-muted"
-            contentFit="cover"
-            accessibilityLabel={`Avatar of ${name}`}
-          />
+        <View className="h-[42px] w-[42px] items-center justify-center rounded-full bg-muted">
+          {avatar ? (
+            <Image
+              source={avatar}
+              className="h-[42px] w-[42px] rounded-full bg-muted"
+              contentFit="cover"
+              accessibilityLabel={`Avatar of ${name}`}
+            />
+          ) : (
+            <ThemedText className="text-[16px] font-bold text-neutral-600">
+              {initialsFrom(name)}
+            </ThemedText>
+          )}
         </View>
 
         <View className="min-w-0 flex-1 flex-row items-start justify-between gap-3">

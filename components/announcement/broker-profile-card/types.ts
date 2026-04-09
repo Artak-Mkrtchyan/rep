@@ -1,7 +1,7 @@
 import type { ImageSourcePropType } from 'react-native';
 
 export type BrokerProfileCardProps = {
-  avatar: ImageSourcePropType;
+  avatar?: ImageSourcePropType;
   name: string;
   phone: string;
   email: string;

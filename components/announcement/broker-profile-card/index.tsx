@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
+import { initialsFrom } from '@/lib/utils/initials';
 
 import type { BrokerProfileCardProps } from './types';
 
@@ -39,13 +40,19 @@ export const BrokerProfileCard: React.FC<BrokerProfileCardProps> = ({
       />
 
       <View className="w-[233px] items-center gap-4">
-        <View className="h-[125px] w-[125px] rounded-full bg-muted">
-          <Image
-            source={avatar}
-            className="h-[125px] w-[125px] rounded-full bg-muted"
-            contentFit="cover"
-            accessibilityLabel={`Avatar of ${name}`}
-          />
+        <View className="h-[125px] w-[125px] items-center justify-center rounded-full bg-muted">
+          {avatar ? (
+            <Image
+              source={avatar}
+              className="h-[125px] w-[125px] rounded-full bg-muted"
+              contentFit="cover"
+              accessibilityLabel={`Avatar of ${name}`}
+            />
+          ) : (
+            <ThemedText className="text-[40px] font-bold text-neutral-600">
+              {initialsFrom(name)}
+            </ThemedText>
+          )}
         </View>
 
         <View className="items-center gap-3">

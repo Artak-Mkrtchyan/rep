@@ -5,6 +5,7 @@ import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
+import { initialsFrom } from '@/lib/utils/initials';
 import { AnnouncementStatus, ClosureReason, type AnnouncementListItem } from '@/types/my-announcements';
 
 export type MyAnnouncementCardProps = {
@@ -87,14 +88,6 @@ const getBrokerName = (item: AnnouncementListItem): string => {
   const company = item.assignedBrokerCompany?.name?.trim();
   if (company) return company;
   return '';
-};
-
-const initialsFrom = (label: string): string => {
-  const parts = label.split(/[\s@._-]+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase().slice(0, 2);
-  }
-  return label.slice(0, 2).toUpperCase() || '?';
 };
 
 export const MyAnnouncementCard = ({ item, onPress, className }: MyAnnouncementCardProps) => {

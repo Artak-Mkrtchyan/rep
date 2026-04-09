@@ -32,15 +32,12 @@ export const getApiUrl = (): string => 'https://rep-test.utspdev.com/api';
  * Used for embedding web content (e.g. map) in WebView.
  */
 export const getWebBaseUrl = (): string => {
-  if (__DEV__) {
-    return 'http://localhost:3000';
-  }
   const env = getEnvironment();
   switch (env) {
-    case 'production':
-      return 'https://rep.utspdev.com';
+    // case 'production':
+    //   return 'https://rep.utspdev.com';
     default:
-      return 'https://rep-test.utspdev.com';
+      return 'https://rep-dev.utspdev.com';
   }
 };
 

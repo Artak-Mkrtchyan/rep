@@ -622,5 +622,26 @@
   "applications.assign_broker.assign": "Назначить",
   "applications.assign_broker.close_a11y": "Закрыть",
   "applications.assign_broker.error": "Не удалось назначить брокера. Попробуйте ещё раз.",
-  "applications.assign_broker.empty": "Брокеры не найдены"
+  "applications.assign_broker.empty": "Брокеры не найдены",
+
+  "partners.brokers": "Брокеры",
+  "partners.construction_companies": "Строительные компании",
+  "partners.individual_broker": "Индивидуальный брокер",
+  "partners.broker_company": "Брокерская компания",
+  "partners.search_placeholder": "Поиск",
+  "partners.broker_details": "Детали брокера",
+  "partners.recent_deals": "Последние сделки",
+  "partners.get_to_know": "Узнайте больше о {{name}}",
+  "partners.show_more": "Показать больше",
+  "partners.show_less": "Показать меньше",
+  "partners.listings_and_deals": "Объявления и сделки ({{count}})",
+  "partners.for_sale": "Продажа",
+  "partners.for_rent": "Аренда",
+  "partners.sold": "Продано",
+  "partners.sales_last_12_months": "Продажи за 12 месяцев",
+  "partners.total_sales": "Всего продаж",
+  "partners.price_range": "Диапазон цен",
+  "partners.average_price": "Средняя цена",
+  "partners.no_results": "Брокеры не найдены",
+  "partners.see_all": "Смотреть все"
 }

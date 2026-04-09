@@ -622,5 +622,26 @@
   "applications.assign_broker.assign": "Assign",
   "applications.assign_broker.close_a11y": "Close",
   "applications.assign_broker.error": "Could not assign broker. Please try again.",
-  "applications.assign_broker.empty": "No brokers found"
+  "applications.assign_broker.empty": "No brokers found",
+
+  "partners.brokers": "Brokers",
+  "partners.construction_companies": "Construction companies",
+  "partners.individual_broker": "Individual broker",
+  "partners.broker_company": "Broker company",
+  "partners.search_placeholder": "Search",
+  "partners.broker_details": "Broker details",
+  "partners.recent_deals": "Recent deals",
+  "partners.get_to_know": "Get to know {{name}}",
+  "partners.show_more": "Show more",
+  "partners.show_less": "Show less",
+  "partners.listings_and_deals": "Listings & deals ({{count}})",
+  "partners.for_sale": "For sale",
+  "partners.for_rent": "For rent",
+  "partners.sold": "Sold",
+  "partners.sales_last_12_months": "Sales last 12 months",
+  "partners.total_sales": "Total sales",
+  "partners.price_range": "Price range",
+  "partners.average_price": "Average price",
+  "partners.no_results": "No brokers found",
+  "partners.see_all": "See all"
 }

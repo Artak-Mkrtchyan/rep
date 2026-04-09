@@ -15,6 +15,14 @@ const CARD_SHADOW = {
   elevation: 4,
 };
 
+const initialsFrom = (fullName: string): string => {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase().slice(0, 2);
+  }
+  return fullName.slice(0, 2).toUpperCase() || '?';
+};
+
 export const BrokerProfileCard: React.FC<BrokerProfileCardProps> = ({
   avatar,
   name,
@@ -39,13 +47,19 @@ export const BrokerProfileCard: React.FC<BrokerProfileCardProps> = ({
       />
 
       <View className="w-[233px] items-center gap-4">
-        <View className="h-[125px] w-[125px] rounded-full bg-muted">
-          <Image
-            source={avatar}
-            className="h-[125px] w-[125px] rounded-full bg-muted"
-            contentFit="cover"
-            accessibilityLabel={`Avatar of ${name}`}
-          />
+        <View className="h-[125px] w-[125px] items-center justify-center rounded-full bg-muted">
+          {avatar ? (
+            <Image
+              source={avatar}
+              className="h-[125px] w-[125px] rounded-full bg-muted"
+              contentFit="cover"
+              accessibilityLabel={`Avatar of ${name}`}
+            />
+          ) : (
+            <ThemedText className="text-[40px] font-bold text-neutral-600">
+              {initialsFrom(name)}
+            </ThemedText>
+          )}
         </View>
 
         <View className="items-center gap-3">

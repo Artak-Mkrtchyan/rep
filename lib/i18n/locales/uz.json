@@ -622,5 +622,26 @@
   "applications.assign_broker.assign": "Biriktirish",
   "applications.assign_broker.close_a11y": "Yopish",
   "applications.assign_broker.error": "Brokerni biriktirib bo‘lmadi. Qayta urinib ko‘ring.",
-  "applications.assign_broker.empty": "Brokerlar topilmadi"
+  "applications.assign_broker.empty": "Brokerlar topilmadi",
+
+  "partners.brokers": "Brokerlar",
+  "partners.construction_companies": "Qurilish kompaniyalari",
+  "partners.individual_broker": "Individual broker",
+  "partners.broker_company": "Broker kompaniyasi",
+  "partners.search_placeholder": "Qidirish",
+  "partners.broker_details": "Broker tafsilotlari",
+  "partners.recent_deals": "So'nggi bitimlar",
+  "partners.get_to_know": "{{name}} bilan tanishing",
+  "partners.show_more": "Ko'proq ko'rsatish",
+  "partners.show_less": "Kamroq ko'rsatish",
+  "partners.listings_and_deals": "E'lonlar va bitimlar ({{count}})",
+  "partners.for_sale": "Sotuvda",
+  "partners.for_rent": "Ijaraga",
+  "partners.sold": "Sotilgan",
+  "partners.sales_last_12_months": "12 oylik savdolar",
+  "partners.total_sales": "Jami savdolar",
+  "partners.price_range": "Narx oralig'i",
+  "partners.average_price": "O'rtacha narx",
+  "partners.no_results": "Brokerlar topilmadi",
+  "partners.see_all": "Hammasini ko'rish"
 }

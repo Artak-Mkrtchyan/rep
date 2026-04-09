@@ -42,9 +42,11 @@ const PLACEHOLDER_STATS: BrokerStat[] = [
 ];
 
 const PLACEHOLDER_BIO =
-  'Tyler was born in Manhattan Beach before moving to North Carolina.Tyler began his real estate career running a top producing team on the Westside of Los Angeles. The home buying/selling process can be daunting an...';
+  'Tyler was born in Manhattan Beach before moving to North Carolina. Tyler began his real estate career running a top producing team on the Westside of Los Angeles. The home buying/selling process can be daunting an...';
 
-const truncateByLength = (text: string, maxLength = 170, isExpanded = false) => {
+const BIO_MAX_LENGTH = 170;
+
+const truncateByLength = (text: string, maxLength: number, isExpanded: boolean) => {
   if (text.length <= maxLength || isExpanded) return text;
   return text.substring(0, maxLength) + '...';
 };
@@ -54,22 +56,21 @@ export default function BrokerDetailsScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const { id, type } = useLocalSearchParams<{ id: string; type: 'individual' | 'company' }>();
-  const isIndividualBroker = type === 'individual';
 
-  const individualBrokerQuery = useGetIndividualBrokerById(id, isIndividualBroker);
-  const brokerCompanyQuery = useGetBrokerCompanyById(id, !isIndividualBroker);
+  const isIndividual = type === 'individual';
+  const individualQuery = useGetIndividualBrokerById(id, isIndividual);
+  const companyQuery = useGetBrokerCompanyById(id, !isIndividual);
 
-  const isLoading = isIndividualBroker
-    ? individualBrokerQuery.isLoading
-    : brokerCompanyQuery.isLoading;
-
-  const brokerData = isIndividualBroker ? individualBrokerQuery.data : brokerCompanyQuery.data;
-
-  const name = brokerData
-    ? 'fullName' in brokerData
-      ? brokerData.fullName
-      : brokerData.name
-    : '';
+  const isLoading = isIndividual ? individualQuery.isLoading : companyQuery.isLoading;
+  const name = isIndividual
+    ? (individualQuery.data?.fullName ?? '')
+    : (companyQuery.data?.name ?? '');
+  const phone = isIndividual
+    ? (individualQuery.data?.phoneNumber ?? '')
+    : (companyQuery.data?.phoneNumber ?? '');
+  const email = isIndividual
+    ? (individualQuery.data?.email ?? '')
+    : (companyQuery.data?.email ?? '');
 
   if (isLoading) {
     return (
@@ -89,8 +90,8 @@ export default function BrokerDetailsScreen() {
         <View className="pt-6" style={horizontalStyle}>
           <BrokerProfileCard
             name={name}
-            phone={brokerData?.phoneNumber || ''}
-            email={brokerData?.email || ''}
+            phone={phone}
+            email={email}
             rating={5.0}
             reviewCount={1024}
             className="mb-6"
@@ -137,7 +138,7 @@ export default function BrokerDetailsScreen() {
 
             <ThemedText>
               <ThemedText className="text-[14px] leading-5 text-neutral-500">
-                {truncateByLength(PLACEHOLDER_BIO, 170, isBioExpanded)}{' '}
+                {truncateByLength(PLACEHOLDER_BIO, BIO_MAX_LENGTH, isBioExpanded)}{' '}
               </ThemedText>
 
               <ThemedText

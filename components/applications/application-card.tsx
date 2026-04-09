@@ -6,6 +6,7 @@ import { Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import type { AnnouncementPublicationListResponse } from '@/lib/api/applications';
 import { cn } from '@/lib/utils';
+import { initialsFrom } from '@/lib/utils/initials';
 
 import type { ApplicationCardProps } from './application-card.types';
 
@@ -103,14 +104,6 @@ const displayBrokerName = (item: Partial<AnnouncementPublicationListResponse>): 
     return companyId;
   }
   return '';
-};
-
-const initialsFrom = (label: string): string => {
-  const parts = label.split(/[\s@._-]+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase().slice(0, 2);
-  }
-  return label.slice(0, 2).toUpperCase() || '?';
 };
 
 const isRentListing = (item: Partial<AnnouncementPublicationListResponse>): boolean => {

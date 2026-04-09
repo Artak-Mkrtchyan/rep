@@ -4,6 +4,7 @@ import { View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
+import { initialsFrom } from '@/lib/utils/initials';
 
 import type { BrokerProfileCardProps } from './types';
 
@@ -13,14 +14,6 @@ const CARD_SHADOW = {
   shadowOpacity: 0.15,
   shadowRadius: 33,
   elevation: 4,
-};
-
-const initialsFrom = (fullName: string): string => {
-  const parts = fullName.trim().split(/\s+/).filter(Boolean);
-  if (parts.length >= 2) {
-    return `${parts[0]![0] ?? ''}${parts[1]![0] ?? ''}`.toUpperCase().slice(0, 2);
-  }
-  return fullName.slice(0, 2).toUpperCase() || '?';
 };
 
 export const BrokerProfileCard: React.FC<BrokerProfileCardProps> = ({

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 
 import { AnnouncementSmallCard } from '@/components/announcement/announcement-small-card';
 import { ThemedText } from '@/components/themed-text';
-import { useTranslation } from 'react-i18next';
 
 type ListingFilter = 'for_sale' | 'for_rent' | 'sold';
 
@@ -29,26 +29,14 @@ const FilterChip: React.FC<FilterChipProps> = ({ label, count, color, isSelected
   </Pressable>
 );
 
-const PLACEHOLDER_LISTINGS = [
-  {
-    id: '1',
-    title: 'White house villa',
-    address: '974 Valencia St San Francisco, CA94110 San Francisco, CA94110',
-    bedsLabel: 'Bed 4',
-    bathsLabel: 'Bath 3',
-    sizeLabel: '1,442',
-    priceLabel: '$ 820,420',
-  },
-  {
-    id: '2',
-    title: 'White house villa',
-    address: '974 Valencia St San Francisco, CA94110 San Francisco, CA94110',
-    bedsLabel: 'Bed 4',
-    bathsLabel: 'Bath 3',
-    sizeLabel: '1,442',
-    priceLabel: '$ 820,420',
-  },
-];
+const PLACEHOLDER_LISTING = {
+  title: 'White house villa',
+  address: '974 Valencia St San Francisco, CA94110 San Francisco, CA94110',
+  bedsLabel: 'Bed 4',
+  bathsLabel: 'Bath 3',
+  sizeLabel: '1,442',
+  priceLabel: '$ 820,420',
+} as const;
 
 type BrokerListingsSectionProps = {
   className?: string;
@@ -106,12 +94,12 @@ export const BrokerListingsSection: React.FC<BrokerListingsSectionProps> = ({ cl
 
           <AnnouncementSmallCard
             imageSource={require('@/assets/images/hero.png')}
-            title={PLACEHOLDER_LISTINGS[0].title}
-            address={PLACEHOLDER_LISTINGS[0].address}
-            bedsLabel={PLACEHOLDER_LISTINGS[0].bedsLabel}
-            bathsLabel={PLACEHOLDER_LISTINGS[0].bathsLabel}
-            sizeLabel={PLACEHOLDER_LISTINGS[0].sizeLabel}
-            priceLabel={PLACEHOLDER_LISTINGS[0].priceLabel}
+            title={PLACEHOLDER_LISTING.title}
+            address={PLACEHOLDER_LISTING.address}
+            bedsLabel={PLACEHOLDER_LISTING.bedsLabel}
+            bathsLabel={PLACEHOLDER_LISTING.bathsLabel}
+            sizeLabel={PLACEHOLDER_LISTING.sizeLabel}
+            priceLabel={PLACEHOLDER_LISTING.priceLabel}
           />
         </View>
       ))}

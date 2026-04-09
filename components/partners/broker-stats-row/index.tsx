@@ -3,15 +3,7 @@ import { ScrollView, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 
-export type BrokerStat = {
-  value: string;
-  label: string;
-};
-
-type BrokerStatsRowProps = {
-  stats: BrokerStat[];
-  className?: string;
-};
+import type { BrokerStatsRowProps } from './types';
 
 export const BrokerStatsRow: React.FC<BrokerStatsRowProps> = ({ stats, className }) => (
   <ScrollView
@@ -34,3 +26,5 @@ export const BrokerStatsRow: React.FC<BrokerStatsRowProps> = ({ stats, className
     ))}
   </ScrollView>
 );
+
+export type { BrokerStat, BrokerStatsRowProps } from './types';

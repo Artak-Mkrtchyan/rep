@@ -16,11 +16,20 @@ import {
   useSearchIndividualBrokersInfinite,
 } from '@/hooks/api/use-applications';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import type { BrokerCompany, IndividualBroker } from '@/types/applications';
 import { router } from 'expo-router';
 
 const SEARCH_DEBOUNCE_MS = 500;
 const PAGE_SIZE = 12;
 const ON_END_REACHED_THRESHOLD = 0.35;
+
+const FLAT_LIST_CONTENT_STYLE = { paddingBottom: 31, gap: 16 };
+
+type BrokerType = 'individual' | 'company';
+
+function navigateToBrokerDetails(id: string, type: BrokerType) {
+  router.push({ pathname: '/partners/broker/[id]', params: { id, type } });
+}
 
 export default function BrokersListScreen() {
   const { t } = useTranslation();
@@ -30,22 +39,22 @@ export default function BrokersListScreen() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
-    const id = setTimeout(() => setDebouncedSearch(searchInput.trim()), SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(id);
+    const timer = setTimeout(() => setDebouncedSearch(searchInput.trim()), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
   }, [searchInput]);
 
-  const isIndividualBroker = selectedIndex === 0;
+  const isIndividualTab = selectedIndex === 0;
 
   const individualQuery = useSearchIndividualBrokersInfinite(
     debouncedSearch,
     PAGE_SIZE,
-    isIndividualBroker
+    isIndividualTab
   );
 
   const companiesQuery = useSearchBrokerCompaniesInfinite(
     debouncedSearch,
     PAGE_SIZE,
-    !isIndividualBroker
+    !isIndividualTab
   );
 
   const individualList = useMemo(
@@ -58,37 +67,31 @@ export default function BrokersListScreen() {
     [companiesQuery.data]
   );
 
-  const handleLoadMoreIndividuals = useCallback(() => {
-    if (individualQuery.hasNextPage && !individualQuery.isFetchingNextPage) {
-      void individualQuery.fetchNextPage();
+  const activeQuery = isIndividualTab ? individualQuery : companiesQuery;
+
+  const handleLoadMore = useCallback(() => {
+    if (activeQuery.hasNextPage && !activeQuery.isFetchingNextPage) {
+      void activeQuery.fetchNextPage();
     }
-  }, [individualQuery]);
+  }, [activeQuery]);
 
-  const handleLoadMoreCompanies = useCallback(() => {
-    if (companiesQuery.hasNextPage && !companiesQuery.isFetchingNextPage) {
-      void companiesQuery.fetchNextPage();
-    }
-  }, [companiesQuery]);
+  const segments = useMemo(
+    () => [t('partners.individual_broker'), t('partners.broker_company')],
+    [t]
+  );
 
-  const BROKER_SEGMENTS = [t('partners.individual_broker'), t('partners.broker_company')];
+  const renderFooter = useCallback(
+    () =>
+      activeQuery.isFetchingNextPage ? (
+        <View className="py-4">
+          <ActivityIndicator accessibilityLabel="Loading more" />
+        </View>
+      ) : null,
+    [activeQuery.isFetchingNextPage]
+  );
 
-  const renderIndividualFooter = () =>
-    individualQuery.isFetchingNextPage ? (
-      <View className="py-4">
-        <ActivityIndicator accessibilityLabel="Loading more" />
-      </View>
-    ) : null;
-
-  const renderCompaniesFooter = () =>
-    companiesQuery.isFetchingNextPage ? (
-      <View className="py-4">
-        <ActivityIndicator accessibilityLabel="Loading more" />
-      </View>
-    ) : null;
-
-  const renderEmptyList = () => {
-    const query = isIndividualBroker ? individualQuery : companiesQuery;
-    if (query.isLoading) {
+  const renderEmptyList = useCallback(() => {
+    if (activeQuery.isLoading) {
       return (
         <View className="flex-1 items-center justify-center pt-20">
           <ActivityIndicator size="large" />
@@ -102,7 +105,27 @@ export default function BrokersListScreen() {
         </ThemedText>
       </View>
     );
-  };
+  }, [activeQuery.isLoading, t]);
+
+  const renderIndividualItem = useCallback(
+    ({ item }: { item: IndividualBroker }) => (
+      <BrokerCard
+        {...mapIndividualBrokerToCardProps(item)}
+        onPress={() => navigateToBrokerDetails(item.id, 'individual')}
+      />
+    ),
+    []
+  );
+
+  const renderCompanyItem = useCallback(
+    ({ item }: { item: BrokerCompany }) => (
+      <BrokerCard
+        {...mapBrokerCompanyToCardProps(item)}
+        onPress={() => navigateToBrokerDetails(item.id, 'company')}
+      />
+    ),
+    []
+  );
 
   return (
     <ThemedView className="flex-1">
@@ -114,74 +137,50 @@ export default function BrokersListScreen() {
         />
 
         <SegmentedControl
-          segments={BROKER_SEGMENTS}
+          segments={segments}
           selectedIndex={selectedIndex}
           onSelect={setSelectedIndex}
           accessibilityLabel={t('partners.individual_broker')}
         />
       </View>
 
-      {isIndividualBroker ? (
+      {isIndividualTab ? (
         <FlatList
           className="flex-1 px-4 py-4"
           style={horizontalStyle}
-          contentContainerStyle={{ paddingBottom: 31, gap: 16 }}
+          contentContainerStyle={FLAT_LIST_CONTENT_STYLE}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          onEndReached={handleLoadMoreIndividuals}
+          onEndReached={handleLoadMore}
           onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
           data={individualList}
-          keyExtractor={(item) => item.id}
-          ListFooterComponent={renderIndividualFooter}
+          keyExtractor={extractId}
+          ListFooterComponent={renderFooter}
           ListEmptyComponent={renderEmptyList}
           refreshing={individualQuery.isRefetching}
           onRefresh={() => individualQuery.refetch()}
-          renderItem={({ item }) => {
-            const props = mapIndividualBrokerToCardProps(item);
-            return (
-              <BrokerCard
-                {...props}
-                onPress={() =>
-                  router.push({
-                    pathname: '/partners/broker/[id]',
-                    params: { id: item.id, type: 'individual' },
-                  })
-                }
-              />
-            );
-          }}
+          renderItem={renderIndividualItem}
         />
       ) : (
         <FlatList
           className="flex-1 px-4 py-4"
           style={horizontalStyle}
-          contentContainerStyle={{ paddingBottom: 31, gap: 16 }}
+          contentContainerStyle={FLAT_LIST_CONTENT_STYLE}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
-          onEndReached={handleLoadMoreCompanies}
+          onEndReached={handleLoadMore}
           onEndReachedThreshold={ON_END_REACHED_THRESHOLD}
           data={companiesList}
-          keyExtractor={(item) => item.id}
-          ListFooterComponent={renderCompaniesFooter}
+          keyExtractor={extractId}
+          ListFooterComponent={renderFooter}
           ListEmptyComponent={renderEmptyList}
           refreshing={companiesQuery.isRefetching}
           onRefresh={() => companiesQuery.refetch()}
-          renderItem={({ item }) => {
-            const props = mapBrokerCompanyToCardProps(item);
-            return (
-              <BrokerCard
-                {...props}
-                onPress={() =>
-                  router.push({
-                    pathname: '/partners/broker/[id]',
-                    params: { id: item.id, type: 'company' },
-                  })
-                }
-              />
-            );
-          }}
+          renderItem={renderCompanyItem}
         />
       )}
     </ThemedView>
   );
 }
+
+const extractId = (item: { id: string }) => item.id;

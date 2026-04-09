@@ -36,7 +36,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
   const resolvedLabel = label ?? t('announcement.steps.list');
   return (
     <View
-      className={`rounded-[12px] px-[16px] py-[16px] ${containerClassName ?? ''}`}
+      className={`rounded-[12px] p-[16px] ${containerClassName ?? ''}`}
       style={{ backgroundColor: STEP_COLORS.containerBg }}>
       <View className="flex-row items-center">
         {Array.from({ length: totalSteps }, (_, i) => {
@@ -49,7 +49,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
           return (
             <React.Fragment key={stepIndex}>
               <View
-                className="h-6 w-6 items-center justify-center rounded-full"
+                className="h-5 w-5 items-center justify-center rounded-full"
                 style={{
                   backgroundColor: isCompleted
                     ? STEP_COLORS.completedBg
@@ -63,7 +63,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                   <Ionicons name="checkmark" size={14} color={STEP_COLORS.completedFg} />
                 ) : (
                   <ThemedText
-                    className="text-[12px] font-semibold"
+                    className="text-[14px] font-semibold"
                     style={{ color: STEP_COLORS.incompleteFg }}>
                     {stepIndex}
                   </ThemedText>
@@ -84,7 +84,7 @@ export const StepProgress: React.FC<StepProgressProps> = ({
           );
         })}
       </View>
-      <View className="mt-1 flex-row">
+      <View className="mt-1.5 flex-row">
         <ThemedText className="text-[12px] font-medium text-foreground" numberOfLines={1}>
           {resolvedLabel}
         </ThemedText>

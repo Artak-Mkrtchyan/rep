@@ -93,7 +93,7 @@ export default function RentDetailsScreen() {
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.rent_details_title')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="mb-4 text-[14px] text-muted-foreground">
                   {t('announcement.rent.rent_details_subtitle')}
                 </ThemedText>
 
@@ -115,7 +115,6 @@ export default function RentDetailsScreen() {
                         {MONTHLY_RENT_SUFFIX}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
                     keyboardType="decimal-pad"
                     accessibilityLabel="Monthly rent"
                     accessibilityHint="Enter monthly rent amount in dollars"
@@ -138,7 +137,6 @@ export default function RentDetailsScreen() {
                         {SQUARE_METERS_SUFFIX}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
                     keyboardType="decimal-pad"
                     accessibilityLabel="Security deposit"
                     accessibilityHint="Optional. Enter security deposit amount in dollars"

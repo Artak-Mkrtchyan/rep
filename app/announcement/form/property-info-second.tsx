@@ -81,7 +81,7 @@ export default function PropertyInfoSecondScreen() {
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.describe_property')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="mb-4 text-[14px] text-muted-foreground">
                   {t('announcement.rent.describe_property_helper')}
                 </ThemedText>
 

@@ -97,15 +97,15 @@ export default function CharacteristicsScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="pt-[24px]" style={horizontalStyle}>
+              <View className="pt-[16px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.characteristics_title')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="mb-4 text-[14px] text-muted-foreground">
                   {t('announcement.rent.characteristics_subtitle')}
                 </ThemedText>
 
-                <View className="gap-6">
+                <View className="gap-4">
                   <Select
                     label={t('announcement.rent.number_of_floors')}
                     placeholder=""
@@ -124,7 +124,7 @@ export default function CharacteristicsScreen() {
                     containerClassName="mb-1"
                   />
 
-                  <View className="rounded-[12px] bg-muted p-4">
+                  <View className="mb-[8px] rounded-[12px] bg-muted p-4">
                     <ChipGroup
                       label={t('announcement.rent.buildingType')}
                       options={getBuildingTypeOptions(t)}
@@ -133,11 +133,12 @@ export default function CharacteristicsScreen() {
                     />
                   </View>
 
-                  <View className="gap-1">
+                  <View className="mb-[16px] gap-4">
                     <CheckboxRow
                       label={t('announcement.rent.hvac')}
                       checked={values.amenities?.hvac ?? false}
                       onToggle={() => setFieldValue('amenities.hvac', !values.amenities?.hvac)}
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.balcony')}
@@ -145,6 +146,7 @@ export default function CharacteristicsScreen() {
                       onToggle={() =>
                         setFieldValue('amenities.balcony', !values.amenities?.balcony)
                       }
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.off_street_parking')}
@@ -155,6 +157,7 @@ export default function CharacteristicsScreen() {
                           !values.amenities?.offStreetParking
                         )
                       }
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.attached_garage')}
@@ -162,16 +165,18 @@ export default function CharacteristicsScreen() {
                       onToggle={() =>
                         setFieldValue('amenities.attachedGarage', !values.amenities?.attachedGarage)
                       }
+                      containerClassName="py-[0px]"
                     />
                   </View>
 
-                  <View className="gap-1">
+                  <View className="mb-[16px] gap-4">
                     <CheckboxRow
                       label={t('announcement.rent.detached_garage')}
                       checked={values.amenities?.detachedGarage ?? false}
                       onToggle={() =>
                         setFieldValue('amenities.detachedGarage', !values.amenities?.detachedGarage)
                       }
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.washer_and_laundry')}
@@ -179,6 +184,7 @@ export default function CharacteristicsScreen() {
                       onToggle={() =>
                         setFieldValue('amenities.washerLaundry', !values.amenities?.washerLaundry)
                       }
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.elevator')}
@@ -186,6 +192,7 @@ export default function CharacteristicsScreen() {
                       onToggle={() =>
                         setFieldValue('amenities.elevator', !values.amenities?.elevator)
                       }
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.disabled_access')}
@@ -193,10 +200,11 @@ export default function CharacteristicsScreen() {
                       onToggle={() =>
                         setFieldValue('amenities.disabledAccess', !values.amenities?.disabledAccess)
                       }
+                      containerClassName="py-[0px]"
                     />
                   </View>
 
-                  <View className="gap-1">
+                  <View className="mb-[8px] gap-4">
                     <CheckboxRow
                       label={t('announcement.rent.ev_charging_station')}
                       checked={values.amenities?.evChargingStation ?? false}
@@ -206,6 +214,7 @@ export default function CharacteristicsScreen() {
                           !values.amenities?.evChargingStation
                         )
                       }
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.bicycle_storage')}
@@ -213,10 +222,11 @@ export default function CharacteristicsScreen() {
                       onToggle={() =>
                         setFieldValue('amenities.bicycleStorage', !values.amenities?.bicycleStorage)
                       }
+                      containerClassName="py-[0px]"
                     />
                   </View>
 
-                  <View className="rounded-[12px] bg-muted p-4">
+                  <View className="mb-[8px] rounded-[12px] bg-muted p-4">
                     <ChipGroup
                       label={t('announcement.rent.condition')}
                       options={getConditionOptions(t)}
@@ -234,7 +244,7 @@ export default function CharacteristicsScreen() {
                     containerClassName="mb-1"
                   />
 
-                  <View className="rounded-[12px] bg-muted p-4">
+                  <View className="my-[8px] rounded-[12px] bg-muted p-4">
                     <ChipGroup
                       label={t('announcement.rent.ownership_type')}
                       options={getOwnershipTypeOptions(t)}
@@ -243,24 +253,27 @@ export default function CharacteristicsScreen() {
                     />
                   </View>
 
-                  <View className="gap-1">
-                    <ThemedText className="mb-2 text-[16px] font-semibold text-foreground">
+                  <View className="gap-4">
+                    <ThemedText className="text-[16px] font-semibold text-foreground">
                       {t('announcement.rent.pets_allowed')}
                     </ThemedText>
                     <CheckboxRow
                       label={t('announcement.rent.pet_cat')}
                       checked={values.pets?.cat ?? false}
                       onToggle={() => setFieldValue('pets.cat', !values.pets?.cat)}
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.pet_small_dogs')}
                       checked={values.pets?.smallDogs ?? false}
                       onToggle={() => setFieldValue('pets.smallDogs', !values.pets?.smallDogs)}
+                      containerClassName="py-[0px]"
                     />
                     <CheckboxRow
                       label={t('announcement.rent.pet_large_dogs')}
                       checked={values.pets?.largeDogs ?? false}
                       onToggle={() => setFieldValue('pets.largeDogs', !values.pets?.largeDogs)}
+                      containerClassName="py-[0px]"
                     />
                   </View>
                 </View>

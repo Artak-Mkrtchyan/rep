@@ -90,7 +90,7 @@ export default function SaleDetailsScreen() {
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.sale_details_title')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="mb-4 text-[14px] text-muted-foreground">
                   {t('announcement.rent.sale_details_subtitle')}
                 </ThemedText>
 
@@ -107,7 +107,6 @@ export default function SaleDetailsScreen() {
                         {CURRENCY_PREFIX}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
                     keyboardType="decimal-pad"
                     accessibilityLabel="Sale price"
                     accessibilityHint="Enter sale price amount in dollars"

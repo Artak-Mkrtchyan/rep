@@ -54,7 +54,7 @@ export default function MediaScreen() {
           <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
             {t('announcement.rent.add_photos_title')}
           </ThemedText>
-          <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+          <ThemedText className="mb-4 text-[14px] text-muted-foreground">
             {t('announcement.rent.add_photos_subtitle')}
           </ThemedText>
 

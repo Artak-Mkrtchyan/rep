@@ -1,6 +1,6 @@
 import React from 'react';
-import { Keyboard, Modal, Platform, Pressable, Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Keyboard, Modal, Platform, Pressable, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { InputError } from '@/components/ui/input/error';
@@ -108,7 +108,7 @@ export function Select<T extends string = string>({
           style={{ transform: [{ rotate: open ? '0deg' : '180deg' }] }}>
           <Path
             d="M11 6L6 1L1 6"
-            stroke="#111111"
+            stroke={value && value !== 'undefined' ? '#111111' : '#C6C6C6'}
             strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"

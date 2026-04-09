@@ -104,7 +104,7 @@ export default function PropertyInfoFirstScreen() {
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.property_info_first_title')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="mb-4 text-[14px] text-muted-foreground">
                   {t('announcement.rent.property_info_first_subtitle')}
                 </ThemedText>
 
@@ -120,7 +120,6 @@ export default function PropertyInfoFirstScreen() {
                         {t('announcement.rent.square_meters_unit')}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
                     keyboardType="numeric"
                     accessibilityLabel="Square footage"
                     accessibilityHint="Enter property area in square meters"
@@ -133,7 +132,6 @@ export default function PropertyInfoFirstScreen() {
                     value={`${values.property?.attributes?.bedroomCount}`}
                     onChange={(v) => setFieldValue('property.attributes.bedroomCount', Number(v))}
                     options={BEDROOMS_OPTIONS}
-                    containerClassName="mb-1"
                   />
 
                   <Select
@@ -142,7 +140,6 @@ export default function PropertyInfoFirstScreen() {
                     value={`${values.property?.attributes?.bathroomCount}`}
                     onChange={(v) => setFieldValue('property.attributes.bathroomCount', Number(v))}
                     options={BATHROOMS_OPTIONS}
-                    containerClassName="mb-1"
                   />
                 </View>
               </View>

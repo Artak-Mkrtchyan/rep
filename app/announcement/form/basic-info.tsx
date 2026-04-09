@@ -126,18 +126,17 @@ export default function BasicInfoScreen() {
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
               <View className="pt-[24px]" style={horizontalStyle}>
-                <ThemedText className="mb-6 text-[20px] font-bold text-foreground">
-                  {t('announcement.rent.basic_info')}
-                </ThemedText>
-
                 <View className="gap-4">
+                  <ThemedText className="text-[20px] font-bold text-foreground">
+                    {t('announcement.rent.basic_info')}
+                  </ThemedText>
+
                   <Select
                     label={t('announcement.rent.listing_type')}
                     placeholder={t('announcement.rent.for_rent_placeholder')}
                     value={values.listingType}
                     onChange={(v) => setFieldValue('listingType', v)}
                     options={getListingTypeOptions(t)}
-                    containerClassName="mb-1"
                     error={
                       touched.listingType && errors.listingType ? errors.listingType : undefined
                     }
@@ -153,7 +152,6 @@ export default function BasicInfoScreen() {
                       setFieldValue('infrastructureObjects', geo.infrastructureObjects);
                     }}
                     error={touched.geo && errors.geo ? t('validation.address_required') : undefined}
-                    containerClassName="mb-1"
                     lang={currentLanguage}
                   />
 
@@ -163,7 +161,6 @@ export default function BasicInfoScreen() {
                     value={values.propertyType}
                     onChange={(v) => setFieldValue('propertyType', v)}
                     options={getPropertyTypeOptions(t)}
-                    containerClassName="mb-1"
                     error={
                       touched.propertyType && errors.propertyType ? errors.propertyType : undefined
                     }
@@ -175,26 +172,26 @@ export default function BasicInfoScreen() {
                     value={values.processType}
                     onChange={(v) => setFieldValue('processType', v)}
                     options={getProcessOptions(t)}
-                    containerClassName="mb-1"
                     error={
                       touched.processType && errors.processType ? errors.processType : undefined
                     }
                   />
 
-                  <View className="mt-1">
-                    <CheckboxRow
-                      label={t('announcement.rent.need_photographer')}
-                      checked={values.needPhotographer ?? false}
-                      onToggle={() => setFieldValue('needPhotographer', !values.needPhotographer)}
-                    />
-                    <CheckboxRow
-                      label={t('announcement.rent.need_assessment_expert')}
-                      checked={values.needAssessmentExpert ?? false}
-                      onToggle={() =>
-                        setFieldValue('needAssessmentExpert', !values.needAssessmentExpert)
-                      }
-                    />
-                  </View>
+                  <CheckboxRow
+                    label={t('announcement.rent.need_photographer')}
+                    checked={values.needPhotographer ?? false}
+                    onToggle={() => setFieldValue('needPhotographer', !values.needPhotographer)}
+                    containerClassName="py-[0px]"
+                  />
+
+                  <CheckboxRow
+                    label={t('announcement.rent.need_assessment_expert')}
+                    checked={values.needAssessmentExpert ?? false}
+                    containerClassName="py-[0px]"
+                    onToggle={() =>
+                      setFieldValue('needAssessmentExpert', !values.needAssessmentExpert)
+                    }
+                  />
                 </View>
               </View>
             </ScrollView>

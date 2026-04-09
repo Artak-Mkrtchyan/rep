@@ -80,7 +80,7 @@ export default function AnnouncementTitleScreen() {
                 <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
                   {t('announcement.rent.title_heading')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="mb-4 text-[14px] text-muted-foreground">
                   {t('announcement.rent.title_helper')}
                 </ThemedText>
 

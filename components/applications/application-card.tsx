@@ -5,7 +5,7 @@ import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import type { AnnouncementPublicationListResponse } from '@/lib/api/applications';
-import { cn } from '@/lib/utils';
+import { cn, formatNumericString } from '@/lib/utils';
 import { initialsFrom } from '@/lib/utils/initials';
 
 import type { ApplicationCardProps } from './application-card.types';
@@ -48,11 +48,11 @@ const mapStatusCodeToTone = (code?: string): StatusTone => {
 const formatPriceLabel = (item: Partial<AnnouncementPublicationListResponse>): string => {
   const rent = item.rentDetails?.monthlyRent;
   if (rent != null && !Number.isNaN(rent) && rent > 0) {
-    return `$ ${rent.toLocaleString('en-US')} / mo`;
+    return `$ ${formatNumericString(rent.toString())} / mo`;
   }
   const sale = item.saleDetails?.price;
   if (sale != null && !Number.isNaN(sale) && sale > 0) {
-    return `$ ${sale.toLocaleString('en-US')}`;
+    return `$ ${formatNumericString(sale.toString())}`;
   }
   return '';
 };

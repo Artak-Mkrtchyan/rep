@@ -17,6 +17,7 @@ import {
 } from '@/constants/announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { Language } from '@/lib/i18n/i18n';
+import { formatNumericString } from '@/lib/utils';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
 
@@ -103,6 +104,8 @@ export default function FinalScreen() {
       ? `${formData.saleDetails.price} $`
       : '';
 
+  const securityDeposit = formData.rentDetails?.securityDeposit?.toString();
+
   const characteristicHelpers = {
     conditionLabel,
     buildingTypeLabel,
@@ -153,7 +156,7 @@ export default function FinalScreen() {
             title={formData.title || ''}
             id={metaData?.response?.publicId}
             typeLabel={typeLabel}
-            price={price}
+            price={formatNumericString(price)}
             location={{
               country: formData.geo.country[currentLanguage],
               city: formData.geo.locality[currentLanguage],
@@ -206,7 +209,7 @@ export default function FinalScreen() {
                 </View>
               ))}
             </View>
-            {formData.rentDetails?.securityDeposit ? (
+            {securityDeposit ? (
               <View className="mt-4 h-[56px] flex-row items-center justify-center gap-[12px] rounded-[12px] bg-muted">
                 <ThemedText className="text-[16px] font-semibold text-neutral-950">
                   {t('announcement.rent.final.security_deposit')}
@@ -221,7 +224,7 @@ export default function FinalScreen() {
                     contentFit="contain"
                   />
                   <ThemedText className="text-[20px] font-semibold text-main-500">
-                    {formData.rentDetails?.securityDeposit} $
+                    {formatNumericString(securityDeposit)} $
                   </ThemedText>
                 </View>
               </View>

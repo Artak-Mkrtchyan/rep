@@ -1,6 +1,6 @@
 import React from 'react';
-import { Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { Platform, Pressable, Text, TextInput, View } from 'react-native';
 
 import { useThemeValue } from '@/hooks/use-theme';
 import { cn } from '@/lib/utils';
@@ -83,10 +83,11 @@ export const Input = React.forwardRef(function Input(
   const filterNumeric = React.useCallback(
     (text: string): string => {
       if (!numericOnly) return text;
-      const filtered = text.replace(new RegExp(`[^${allowDecimal ? '0-9.' : '0-9'}]`, 'g'), '');
+      const filtered = text.replace(new RegExp(`[^${allowDecimal ? '0-9.,' : '0-9'}]`, 'g'), '');
       if (!allowDecimal) return filtered;
-      const parts = filtered.split('.');
-      if (parts.length <= 2) return filtered;
+      const filteredWithDot = filtered.replace(/,/g, '.');
+      const parts = filteredWithDot.split('.');
+      if (parts.length <= 2) return filteredWithDot;
       return `${parts[0]}.${parts.slice(1).join('')}`;
     },
     [numericOnly, allowDecimal]

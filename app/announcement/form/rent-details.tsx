@@ -27,6 +27,7 @@ const RentDetailsSchema = Yup.object().shape({
     .nullable()
     .shape({
       monthlyRent: Yup.number().required('Required').typeError('Must be a number'),
+      securityDeposit: Yup.number().optional().nullable().typeError('Must be a number'),
     }),
 });
 
@@ -45,8 +46,8 @@ export default function RentDetailsScreen() {
     if (rentDetails) {
       updateFormData({
         rentDetails: {
-          monthlyRent: rentDetails.monthlyRent,
-          securityDeposit: rentDetails.securityDeposit || 0,
+          monthlyRent: Number(rentDetails.monthlyRent) || 0,
+          securityDeposit: Number(rentDetails.securityDeposit) || 0,
         },
       });
     }
@@ -101,9 +102,10 @@ export default function RentDetailsScreen() {
                   <Input
                     label={t('announcement.rent.monthly_rent')}
                     numericOnly
+                    allowDecimal
                     placeholder=""
                     value={`${values.rentDetails?.monthlyRent ?? ''}`}
-                    onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', Number(v))}
+                    onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', v)}
                     error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
@@ -124,8 +126,9 @@ export default function RentDetailsScreen() {
                     label={t('announcement.rent.security_deposit')}
                     placeholder=""
                     numericOnly
+                    allowDecimal
                     value={`${values.rentDetails?.securityDeposit ?? ''}`}
-                    onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', Number(v))}
+                    onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', v)}
                     error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">

@@ -52,8 +52,9 @@ export default function PropertyInfoFirstScreen() {
     if (property && formData.propertyType) {
       updateFormData({
         property: {
-          areaM2: property.areaM2 || 0,
+          areaM2: Number(property.areaM2) || 0,
           attributes: {
+            ...formData.property?.attributes,
             ...property.attributes,
             type: formData.propertyType,
           },
@@ -112,15 +113,16 @@ export default function PropertyInfoFirstScreen() {
                   <Input
                     label={t('announcement.rent.square_footage')}
                     numericOnly
+                    allowDecimal
                     placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
                     value={`${values.property?.areaM2 || ''}`}
-                    onChangeText={(v) => setFieldValue('property.areaM2', Number(v))}
+                    onChangeText={(v) => setFieldValue('property.areaM2', v)}
                     right={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {t('announcement.rent.square_meters_unit')}
                       </ThemedText>
                     }
-                    keyboardType="numeric"
+                    keyboardType="decimal-pad"
                     accessibilityLabel="Square footage"
                     accessibilityHint="Enter property area in square meters"
                     error={touched.property && errors.property ? 'Required' : undefined}

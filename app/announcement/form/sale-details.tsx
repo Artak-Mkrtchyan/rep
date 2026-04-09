@@ -43,7 +43,7 @@ export default function SaleDetailsScreen() {
     if (saleDetails) {
       updateFormData({
         saleDetails: {
-          price: saleDetails.price,
+          price: Number(saleDetails.price) || 0,
         },
       });
     }
@@ -100,7 +100,7 @@ export default function SaleDetailsScreen() {
                     numericOnly
                     placeholder=""
                     value={`${values.saleDetails?.price ?? ''}`}
-                    onChangeText={(v) => setFieldValue('saleDetails.price', Number(v))}
+                    onChangeText={(v) => setFieldValue('saleDetails.price', v)}
                     error={touched.saleDetails && errors.saleDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">

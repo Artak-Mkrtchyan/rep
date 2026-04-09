@@ -20,6 +20,7 @@ import type { BrokerCompany, IndividualBroker } from '@/types/applications';
 import { router } from 'expo-router';
 
 const SEARCH_DEBOUNCE_MS = 500;
+const MIN_SEARCH_LENGTH = 3;
 const PAGE_SIZE = 12;
 const ON_END_REACHED_THRESHOLD = 0.35;
 
@@ -39,7 +40,11 @@ export default function BrokersListScreen() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchInput.trim()), SEARCH_DEBOUNCE_MS);
+    const trimmed = searchInput.trim();
+    const timer = setTimeout(
+      () => setDebouncedSearch(trimmed.length >= MIN_SEARCH_LENGTH ? trimmed : ''),
+      SEARCH_DEBOUNCE_MS
+    );
     return () => clearTimeout(timer);
   }, [searchInput]);
 

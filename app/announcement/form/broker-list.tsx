@@ -19,6 +19,7 @@ import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router } from 'expo-router';
 
 const SEARCH_DEBOUNCE_MS = 500;
+const MIN_SEARCH_LENGTH = 3;
 const PAGE_SIZE = 12;
 const ON_END_REACHED_THRESHOLD = 0.35;
 
@@ -34,8 +35,12 @@ export default function BrokerListScreen() {
 
   const { mutate: assignBroker } = useAssignBroker();
   useEffect(() => {
-    const id = setTimeout(() => setDebouncedSearch(searchInput.trim()), SEARCH_DEBOUNCE_MS);
-    return () => clearTimeout(id);
+    const trimmed = searchInput.trim();
+    const timer = setTimeout(
+      () => setDebouncedSearch(trimmed.length >= MIN_SEARCH_LENGTH ? trimmed : ''),
+      SEARCH_DEBOUNCE_MS
+    );
+    return () => clearTimeout(timer);
   }, [searchInput]);
 
   const isIndividualBroker = selectedIndex === 0;

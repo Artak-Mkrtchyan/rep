@@ -18,7 +18,7 @@ export const APPLICATIONS_QUERY_KEY = 'applications';
 
 const brokerListSorts = [
   {
-    sort: 'CREATED_AT' as const,
+    sort: 'UPDATED_AT' as const,
     direction: 'DESC' as const,
   },
 ];

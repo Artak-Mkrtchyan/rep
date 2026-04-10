@@ -8,8 +8,12 @@ import { ThemedText } from '@/components/themed-text';
 const STEP_COLORS = {
   completedBg: '#087443',
   completedFg: '#FFFFFF',
+  currentBg: '#FFFFFF',
+  currentFg: '#087443',
+  currentBorder: '#087443',
   incompleteBg: '#FFFFFF',
   incompleteFg: '#111111',
+  incompleteBorder: '#FFFFFF',
   connectorDone: '#087443',
   connectorLine: '#FFFFFF',
   containerBg: '#F1F1F1',
@@ -32,28 +36,34 @@ export const StepProgress: React.FC<StepProgressProps> = ({
   const resolvedLabel = label ?? t('announcement.steps.list');
   return (
     <View
-      className={`rounded-[12px] px-[16px] py-[16px] ${containerClassName ?? ''}`}
+      className={`rounded-[12px] p-[16px] ${containerClassName ?? ''}`}
       style={{ backgroundColor: STEP_COLORS.containerBg }}>
       <View className="flex-row items-center">
         {Array.from({ length: totalSteps }, (_, i) => {
           const stepIndex = i + 1;
-          const isCompleted = stepIndex <= completedStep;
+          const isCompleted = stepIndex < completedStep;
+          const isCurrent = stepIndex === completedStep;
+          const isUpcoming = stepIndex > completedStep;
           const isLast = i === totalSteps - 1;
 
           return (
             <React.Fragment key={stepIndex}>
               <View
-                className="h-6 w-6 items-center justify-center rounded-full"
+                className="h-5 w-5 items-center justify-center rounded-full"
                 style={{
-                  backgroundColor: isCompleted ? STEP_COLORS.completedBg : STEP_COLORS.incompleteBg,
-                  borderWidth: isCompleted ? 0 : 1,
-                  borderColor: STEP_COLORS.connectorLine,
+                  backgroundColor: isCompleted
+                    ? STEP_COLORS.completedBg
+                    : isCurrent
+                      ? STEP_COLORS.currentBg
+                      : STEP_COLORS.incompleteBg,
+                  borderWidth: isCurrent || isUpcoming ? 1.5 : 0,
+                  borderColor: isCurrent ? STEP_COLORS.currentBorder : STEP_COLORS.incompleteBorder,
                 }}>
                 {isCompleted ? (
                   <Ionicons name="checkmark" size={14} color={STEP_COLORS.completedFg} />
                 ) : (
                   <ThemedText
-                    className="text-[12px] font-semibold"
+                    className="text-[14px] font-medium text-foreground"
                     style={{ color: STEP_COLORS.incompleteFg }}>
                     {stepIndex}
                   </ThemedText>
@@ -63,9 +73,10 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                 <View
                   className="mx-0.5 h-[4px] min-w-[8px] flex-1 rounded-[33px]"
                   style={{
-                    backgroundColor: isCompleted
-                      ? STEP_COLORS.completedBg
-                      : STEP_COLORS.incompleteBg,
+                    backgroundColor:
+                      stepIndex < completedStep
+                        ? STEP_COLORS.completedBg
+                        : STEP_COLORS.incompleteBg,
                   }}
                 />
               )}
@@ -73,8 +84,8 @@ export const StepProgress: React.FC<StepProgressProps> = ({
           );
         })}
       </View>
-      <View className="mt-1 flex-row">
-        <ThemedText className="text-[12px] font-medium text-foreground" numberOfLines={1}>
+      <View className="mt-1.5 flex-row">
+        <ThemedText className="text-[12px] font-semibold text-neutral-900" numberOfLines={1}>
           {resolvedLabel}
         </ThemedText>
       </View>

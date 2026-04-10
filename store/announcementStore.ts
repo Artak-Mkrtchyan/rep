@@ -44,7 +44,6 @@ const initialFormData: RentForApartmentsForm = {
   propertyType: '',
   processType: '',
   stepNumber: 1,
-  brokerAssignmentNeeded: false,
 };
 
 export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormStore>()(

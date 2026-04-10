@@ -51,10 +51,10 @@ export default function MediaScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
         <View className="pt-[24px]" style={horizontalStyle}>
-          <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
+          <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
             {t('announcement.rent.add_photos_title')}
           </ThemedText>
-          <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+          <ThemedText className="font-regular mb-4 text-[12px] text-muted-foreground">
             {t('announcement.rent.add_photos_subtitle')}
           </ThemedText>
 

@@ -43,7 +43,7 @@ export default function SaleDetailsScreen() {
     if (saleDetails) {
       updateFormData({
         saleDetails: {
-          price: saleDetails.price,
+          price: Number(saleDetails.price) || 0,
         },
       });
     }
@@ -86,11 +86,11 @@ export default function SaleDetailsScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="pt-6" style={horizontalStyle}>
-                <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
+              <View className="pt-[24px]" style={horizontalStyle}>
+                <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.sale_details_title')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="font-regular mb-4 text-[12px] text-muted-foreground">
                   {t('announcement.rent.sale_details_subtitle')}
                 </ThemedText>
 
@@ -100,14 +100,13 @@ export default function SaleDetailsScreen() {
                     numericOnly
                     placeholder=""
                     value={`${values.saleDetails?.price ?? ''}`}
-                    onChangeText={(v) => setFieldValue('saleDetails.price', Number(v))}
+                    onChangeText={(v) => setFieldValue('saleDetails.price', v)}
                     error={touched.saleDetails && errors.saleDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
                     keyboardType="decimal-pad"
                     accessibilityLabel="Sale price"
                     accessibilityHint="Enter sale price amount in dollars"

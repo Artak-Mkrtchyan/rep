@@ -58,7 +58,7 @@ export const Header: React.FC<Props> = ({
   return (
     <View
       className={cn('bg-white', headerClassName)}
-      style={[{ paddingTop: insets.top, paddingBottom: 12 }, horizontalStyle]}>
+      style={[{ paddingTop: insets.top }, horizontalStyle]}>
       <View className="flex-row items-center">
         <View className="flex-1 items-center justify-center">
           <Pressable
@@ -69,7 +69,7 @@ export const Header: React.FC<Props> = ({
             <Ionicons name="chevron-back" size={24} color="#111111" />
           </Pressable>
           <ThemedText
-            className="text-[17px] font-semibold leading-[22px] text-foreground"
+            className="text-[20px] font-semibold leading-[22px] text-foreground"
             numberOfLines={1}>
             {headerTitle}
           </ThemedText>

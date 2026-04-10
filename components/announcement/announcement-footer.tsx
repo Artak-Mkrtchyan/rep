@@ -33,7 +33,7 @@ export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
 
   return (
     <View
-      className="rounded-t-[12px] bg-white px-[16px] pt-[24px]"
+      className="gap-3 rounded-t-[12px] bg-white px-[16px] pt-[24px]"
       style={{
         paddingBottom,
         borderTopWidth: 1,
@@ -41,13 +41,13 @@ export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
         ...FOOTER_SHADOW,
       }}>
       <Button onPress={onNextPress} accessibilityLabel="Next" disabled={firstButtonDisabled}>
-        {firstButtonLabel}
+        <ThemedText className="text-[16px] font-medium text-white">{firstButtonLabel}</ThemedText>
       </Button>
       <Button
         variant="secondary"
         onPress={onSaveAndExitPress}
         accessibilityLabel="Save and exit"
-        style={{ backgroundColor: '#F1F1F1', borderWidth: 0, marginTop: 12 }}>
+        style={{ backgroundColor: '#F1F1F1', borderWidth: 0 }}>
         <ThemedText className="text-[16px] font-medium text-primary">
           {secondButtonLabel}
         </ThemedText>

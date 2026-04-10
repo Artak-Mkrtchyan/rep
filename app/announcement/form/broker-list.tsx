@@ -145,7 +145,7 @@ export default function BrokerListScreen() {
         <FlatList
           className="flex-1 px-4 py-4"
           style={horizontalStyle}
-          contentContainerStyle={{ paddingBottom: 31, gap: 16 }}
+          contentContainerStyle={{ paddingBottom: 31, gap: 6 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           onEndReached={handleLoadMoreIndividuals}
@@ -174,7 +174,7 @@ export default function BrokerListScreen() {
         <FlatList
           className="flex-1 px-4 py-4"
           style={horizontalStyle}
-          contentContainerStyle={{ paddingBottom: 31, gap: 16 }}
+          contentContainerStyle={{ paddingBottom: 31, gap: 6 }}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           onEndReached={handleLoadMoreCompanies}

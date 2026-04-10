@@ -27,6 +27,7 @@ const RentDetailsSchema = Yup.object().shape({
     .nullable()
     .shape({
       monthlyRent: Yup.number().required('Required').typeError('Must be a number'),
+      securityDeposit: Yup.number().optional().nullable().typeError('Must be a number'),
     }),
 });
 
@@ -45,8 +46,8 @@ export default function RentDetailsScreen() {
     if (rentDetails) {
       updateFormData({
         rentDetails: {
-          monthlyRent: rentDetails.monthlyRent,
-          securityDeposit: rentDetails.securityDeposit || 0,
+          monthlyRent: Number(rentDetails.monthlyRent) || 0,
+          securityDeposit: Number(rentDetails.securityDeposit) || 0,
         },
       });
     }
@@ -89,11 +90,11 @@ export default function RentDetailsScreen() {
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="pt-6" style={horizontalStyle}>
-                <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
+              <View className="pt-[24px]" style={horizontalStyle}>
+                <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.rent_details_title')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="font-regular mb-4 text-[12px] text-muted-foreground">
                   {t('announcement.rent.rent_details_subtitle')}
                 </ThemedText>
 
@@ -101,9 +102,10 @@ export default function RentDetailsScreen() {
                   <Input
                     label={t('announcement.rent.monthly_rent')}
                     numericOnly
+                    allowDecimal
                     placeholder=""
                     value={`${values.rentDetails?.monthlyRent ?? ''}`}
-                    onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', Number(v))}
+                    onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', v)}
                     error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
@@ -115,7 +117,6 @@ export default function RentDetailsScreen() {
                         {MONTHLY_RENT_SUFFIX}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
                     keyboardType="decimal-pad"
                     accessibilityLabel="Monthly rent"
                     accessibilityHint="Enter monthly rent amount in dollars"
@@ -125,8 +126,9 @@ export default function RentDetailsScreen() {
                     label={t('announcement.rent.security_deposit')}
                     placeholder=""
                     numericOnly
+                    allowDecimal
                     value={`${values.rentDetails?.securityDeposit ?? ''}`}
-                    onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', Number(v))}
+                    onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', v)}
                     error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
@@ -138,7 +140,6 @@ export default function RentDetailsScreen() {
                         {SQUARE_METERS_SUFFIX}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
                     keyboardType="decimal-pad"
                     accessibilityLabel="Security deposit"
                     accessibilityHint="Optional. Enter security deposit amount in dollars"

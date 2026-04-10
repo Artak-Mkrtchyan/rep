@@ -1,3 +1,4 @@
+import { formatNumericString } from '@/lib/utils';
 import { Announcement, PropertyType } from '@/types/api';
 import type { ImageSource } from 'expo-image';
 
@@ -30,10 +31,10 @@ export function getSizeLabel(item: Announcement): string {
 
 export function getPriceLabel(item: Announcement): string {
   if (item.rentDetails) {
-    return `$ ${item.rentDetails.monthlyRent.toLocaleString()} / mo`;
+    return `$ ${formatNumericString(item.rentDetails.monthlyRent.toString())} / mo`;
   }
   if (item.saleDetails) {
-    return `$ ${item.saleDetails.price.toLocaleString()}`;
+    return `$ ${formatNumericString(item.saleDetails.price.toString())}`;
   }
   return '';
 }

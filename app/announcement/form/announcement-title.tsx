@@ -77,10 +77,10 @@ export default function AnnouncementTitleScreen() {
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
               <View className="pt-[24px]" style={horizontalStyle}>
-                <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
+                <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.title_heading')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="font-regular mb-4 text-[12px] text-muted-foreground">
                   {t('announcement.rent.title_helper')}
                 </ThemedText>
 
@@ -95,7 +95,7 @@ export default function AnnouncementTitleScreen() {
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
-                    className="min-h-[120px] w-full rounded-[12px] border border-default bg-card px-3 py-3 text-[16px] text-foreground"
+                    className="font-regular min-h-[86px] w-full rounded-[12px] border border-default bg-card px-3 py-3 text-[14px] text-foreground"
                     style={{ paddingTop: 12 }}
                     accessibilityLabel={t('announcement.rent.title_heading')}
                     accessibilityHint={t('announcement.rent.title_hint')}

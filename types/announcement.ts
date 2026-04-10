@@ -43,7 +43,7 @@ export type RentForApartmentsFormStep1 = {
   geo: GeoDetailsDto;
   propertyType: Property | '';
   processType: ProcessType | '';
-  brokerAssignmentNeeded: boolean;
+  brokerAssignmentNeeded?: boolean;
 
   infrastructureObjects?: {
     distanceInMeters: number;

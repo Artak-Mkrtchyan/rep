@@ -52,8 +52,9 @@ export default function PropertyInfoFirstScreen() {
     if (property && formData.propertyType) {
       updateFormData({
         property: {
-          areaM2: property.areaM2 || 0,
+          areaM2: Number(property.areaM2) || 0,
           attributes: {
+            ...formData.property?.attributes,
             ...property.attributes,
             type: formData.propertyType,
           },
@@ -100,11 +101,11 @@ export default function PropertyInfoFirstScreen() {
               contentContainerStyle={{ paddingBottom: scrollPaddingBottom }}
               showsVerticalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
-              <View className="pt-6" style={horizontalStyle}>
-                <ThemedText className="mb-2 text-[20px] font-bold text-foreground">
+              <View className="pt-[24px]" style={horizontalStyle}>
+                <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.property_info_first_title')}
                 </ThemedText>
-                <ThemedText className="mb-6 text-[14px] text-muted-foreground">
+                <ThemedText className="font-regular mb-4 text-[12px] text-muted-foreground">
                   {t('announcement.rent.property_info_first_subtitle')}
                 </ThemedText>
 
@@ -112,16 +113,16 @@ export default function PropertyInfoFirstScreen() {
                   <Input
                     label={t('announcement.rent.square_footage')}
                     numericOnly
+                    allowDecimal
                     placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
                     value={`${values.property?.areaM2 || ''}`}
-                    onChangeText={(v) => setFieldValue('property.areaM2', Number(v))}
+                    onChangeText={(v) => setFieldValue('property.areaM2', v)}
                     right={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {t('announcement.rent.square_meters_unit')}
                       </ThemedText>
                     }
-                    containerClassName="mb-1"
-                    keyboardType="numeric"
+                    keyboardType="decimal-pad"
                     accessibilityLabel="Square footage"
                     accessibilityHint="Enter property area in square meters"
                     error={touched.property && errors.property ? 'Required' : undefined}
@@ -133,7 +134,6 @@ export default function PropertyInfoFirstScreen() {
                     value={`${values.property?.attributes?.bedroomCount}`}
                     onChange={(v) => setFieldValue('property.attributes.bedroomCount', Number(v))}
                     options={BEDROOMS_OPTIONS}
-                    containerClassName="mb-1"
                   />
 
                   <Select
@@ -142,7 +142,6 @@ export default function PropertyInfoFirstScreen() {
                     value={`${values.property?.attributes?.bathroomCount}`}
                     onChange={(v) => setFieldValue('property.attributes.bathroomCount', Number(v))}
                     options={BATHROOMS_OPTIONS}
-                    containerClassName="mb-1"
                   />
                 </View>
               </View>

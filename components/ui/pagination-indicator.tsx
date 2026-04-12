@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 
@@ -12,6 +12,10 @@ type PaginationIndicatorProps = {
   maxDots?: number;
   /** Bottom offset for overlay positioning. Defaults to 16. */
   bottom?: number;
+  /** Merged into the root container (e.g. override inline marginTop). */
+  style?: StyleProp<ViewStyle>;
+  /** Top margin when variant is inline (default 16). */
+  inlineMarginTop?: number;
 };
 
 export const PaginationIndicator: React.FC<PaginationIndicatorProps> = ({
@@ -20,6 +24,8 @@ export const PaginationIndicator: React.FC<PaginationIndicatorProps> = ({
   variant = 'overlay',
   maxDots = 9,
   bottom,
+  style,
+  inlineMarginTop,
 }) => {
   if (count <= 1) return null;
 
@@ -27,10 +33,17 @@ export const PaginationIndicator: React.FC<PaginationIndicatorProps> = ({
   const isOverlay = variant === 'overlay';
 
   const bottomOverride = isOverlay && bottom != null ? { bottom } : undefined;
+  const inlineTop = !isOverlay ? { marginTop: inlineMarginTop ?? 16 } : undefined;
 
   if (showDots) {
     return (
-      <View style={[styles.dotsContainer, isOverlay ? styles.overlayDots : styles.inlineDots, bottomOverride]}>
+      <View
+        style={[
+          styles.dotsContainer,
+          isOverlay ? styles.overlayDots : [styles.inlineDots, inlineTop],
+          bottomOverride,
+          style,
+        ]}>
         {Array.from({ length: count }, (_, i) => (
           <View
             key={i}
@@ -51,7 +64,13 @@ export const PaginationIndicator: React.FC<PaginationIndicatorProps> = ({
   }
 
   return (
-    <View style={[styles.counter, isOverlay ? styles.overlayCounter : styles.inlineCounter, bottomOverride]}>
+    <View
+      style={[
+        styles.counter,
+        isOverlay ? styles.overlayCounter : [styles.inlineCounter, inlineTop],
+        bottomOverride,
+        style,
+      ]}>
       <ThemedText style={styles.counterText}>
         {activeIndex + 1}/{count}
       </ThemedText>
@@ -75,7 +94,7 @@ const styles = StyleSheet.create({
   },
   inlineDots: {
     justifyContent: 'center',
-    marginTop: 16,
+    alignSelf: 'center',
   },
   dotBase: {
     borderRadius: 3,
@@ -113,7 +132,6 @@ const styles = StyleSheet.create({
   },
   inlineCounter: {
     alignSelf: 'center',
-    marginTop: 16,
     backgroundColor: '#E2E2E2',
   },
   counterText: {

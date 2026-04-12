@@ -161,7 +161,7 @@ export default function ComparisonsScreen() {
           animationType="fade"
           onRequestClose={() => setTooManyVisible(false)}>
           <View style={styles.overlay}>
-            <BlurView intensity={70} tint="dark" style={StyleSheet.absoluteFill} />
+            <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill} />
             <View style={styles.overlayDim} pointerEvents="none" />
             <View style={styles.popup}>
               <View style={styles.popupTextBlock}>

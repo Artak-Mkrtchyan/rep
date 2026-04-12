@@ -11,11 +11,9 @@ import {
 import { ConstructionCompanyCard } from '@/components/home/construction-company-card';
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
+import { useHomeMetrics } from '@/hooks/use-home-metrics';
 import { MOCK_CONSTRUCTION_COMPANIES } from '@/lib/mocks/home-mock-data';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
-
-const CARD_GAP = 8;
-const COMPANY_CARD_MIN_WIDTH = 220;
 
 const styles = StyleSheet.create({
   section: {
@@ -46,13 +44,16 @@ export const ConstructionCompaniesSection: React.FC<ConstructionCompaniesSection
   onSeeMorePress,
 }) => {
   const { t } = useTranslation();
+  const metrics = useHomeMetrics();
   const [activeIndex, setActiveIndex] = useState(0);
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetX = event.nativeEvent.contentOffset.x;
-    const stride = COMPANY_CARD_MIN_WIDTH + CARD_GAP;
-    const index = Math.round(offsetX / stride);
-    setActiveIndex(Math.min(Math.max(index, 0), MOCK_CONSTRUCTION_COMPANIES.length - 1));
-  }, []);
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const offsetX = event.nativeEvent.contentOffset.x;
+      const index = Math.round(offsetX / metrics.companyStride);
+      setActiveIndex(Math.min(Math.max(index, 0), MOCK_CONSTRUCTION_COMPANIES.length - 1));
+    },
+    [metrics.companyStride]
+  );
 
   return (
     <View style={styles.section}>
@@ -69,15 +70,18 @@ export const ConstructionCompaniesSection: React.FC<ConstructionCompaniesSection
           horizontal
           style={styles.stripScroll}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.stripScrollContent, { paddingLeft: 16, paddingRight: 16 }]}
+          contentContainerStyle={[
+            styles.stripScrollContent,
+            { paddingLeft: metrics.horizontalPad, paddingRight: metrics.horizontalPad },
+          ]}
           onScroll={handleScroll}
           scrollEventThrottle={16}>
           {MOCK_CONSTRUCTION_COMPANIES.map((company, index) => (
             <View
               key={company.id}
               style={{
-                minWidth: COMPANY_CARD_MIN_WIDTH,
-                marginRight: index < MOCK_CONSTRUCTION_COMPANIES.length - 1 ? CARD_GAP : 0,
+                width: metrics.companyCardWidth,
+                marginRight: index < MOCK_CONSTRUCTION_COMPANIES.length - 1 ? metrics.gap : 0,
               }}>
               <ConstructionCompanyCard
                 name={company.name}

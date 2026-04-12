@@ -1,6 +1,6 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -17,16 +17,14 @@ import { SectionHeaderRow } from '@/components/home/section-header-row';
 import { ThemedView } from '@/components/themed-view';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
 import { useFeaturedAnnouncements } from '@/hooks/api/use-announcements';
-import { MOCK_FEATURED_LISTINGS } from '@/lib/mocks/home-mock-data';
+import { useHomeMetrics } from '@/hooks/use-home-metrics';
+import { MOCK_FEATURED_LISTINGS, isMockHomeListingId } from '@/lib/mocks/home-mock-data';
 import { announcementsService } from '@/lib/api/announcements';
 import {
   announcementToFeaturedVm,
   mockListingToFeaturedVm,
   type FeaturedListingViewModel,
 } from '@/lib/utils/home-featured-helpers';
-
-const CARD_GAP = 8;
-const CARD_STRIDE = HOME_DESIGN.featuredCardWidth + CARD_GAP;
 
 const featuredLayout = StyleSheet.create({
   root: {
@@ -45,6 +43,7 @@ type FeaturedPropertiesProps = {
 export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMorePress }) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const metrics = useHomeMetrics();
   const { announcements, isLoading, error, refetch } = useFeaturedAnnouncements(5);
 
   const [mockFavourite, setMockFavourite] = useState<Record<string, boolean>>({});
@@ -111,7 +110,6 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
   );
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const scrollViewRef = useRef<ScrollView>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -124,10 +122,10 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offsetX = event.nativeEvent.contentOffset.x;
-      const index = Math.round(offsetX / CARD_STRIDE);
+      const index = Math.round(offsetX / metrics.featuredCardStride);
       setActiveIndex(Math.min(Math.max(index, 0), listings.length - 1));
     },
-    [listings.length]
+    [listings.length, metrics.featuredCardStride]
   );
 
   if (isLoading) {
@@ -152,9 +150,8 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
         />
 
         <ScrollView
-          ref={scrollViewRef}
           className="overflow-visible"
-          contentContainerStyle={{ gap: CARD_GAP, paddingRight: 16 }}
+          contentContainerStyle={{ gap: metrics.gap, paddingRight: metrics.horizontalPad }}
           showsHorizontalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
@@ -162,6 +159,8 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
           {listings.map((item) => (
             <FeaturedPropertyFigmaCard
               key={item.id}
+              cardWidth={metrics.featuredCardWidth}
+              imageHeight={metrics.featuredImageHeight}
               title={item.title}
               address={item.address}
               attributes={item.attributes}
@@ -171,7 +170,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
               isFavourite={item.isFavourite}
               isForComparison={item.isForComparison}
               onPress={
-                item.id.startsWith('mock-')
+                isMockHomeListingId(item.id)
                   ? undefined
                   : () => router.push(`/announcement/${item.id}` as any)
               }

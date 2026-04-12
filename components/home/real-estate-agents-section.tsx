@@ -11,11 +11,9 @@ import {
 import { AgentCard } from '@/components/home/agent-card';
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
+import { useHomeMetrics } from '@/hooks/use-home-metrics';
 import { MOCK_AGENTS } from '@/lib/mocks/home-mock-data';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
-
-const CARD_GAP = 8;
-const AGENT_CARD_MIN_WIDTH = 280;
 
 const styles = StyleSheet.create({
   section: {
@@ -46,13 +44,16 @@ export const RealEstateAgentsSection: React.FC<RealEstateAgentsSectionProps> = (
   onSeeMorePress,
 }) => {
   const { t } = useTranslation();
+  const metrics = useHomeMetrics();
   const [activeIndex, setActiveIndex] = useState(0);
-  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetX = event.nativeEvent.contentOffset.x;
-    const stride = AGENT_CARD_MIN_WIDTH + CARD_GAP;
-    const index = Math.round(offsetX / stride);
-    setActiveIndex(Math.min(Math.max(index, 0), MOCK_AGENTS.length - 1));
-  }, []);
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const offsetX = event.nativeEvent.contentOffset.x;
+      const index = Math.round(offsetX / metrics.agentStride);
+      setActiveIndex(Math.min(Math.max(index, 0), MOCK_AGENTS.length - 1));
+    },
+    [metrics.agentStride]
+  );
 
   return (
     <View style={styles.section}>
@@ -69,15 +70,18 @@ export const RealEstateAgentsSection: React.FC<RealEstateAgentsSectionProps> = (
           horizontal
           style={styles.stripScroll}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={[styles.stripScrollContent, { paddingLeft: 16, paddingRight: 16 }]}
+          contentContainerStyle={[
+            styles.stripScrollContent,
+            { paddingLeft: metrics.horizontalPad, paddingRight: metrics.horizontalPad },
+          ]}
           onScroll={handleScroll}
           scrollEventThrottle={16}>
           {MOCK_AGENTS.map((agent, index) => (
             <View
               key={agent.id}
               style={{
-                minWidth: AGENT_CARD_MIN_WIDTH,
-                marginRight: index < MOCK_AGENTS.length - 1 ? CARD_GAP : 0,
+                width: metrics.agentCardWidth,
+                marginRight: index < MOCK_AGENTS.length - 1 ? metrics.gap : 0,
               }}>
               <AgentCard
                 name={agent.name}

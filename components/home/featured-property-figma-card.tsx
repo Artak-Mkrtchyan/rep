@@ -20,6 +20,9 @@ export type FeaturedPropertyFigmaCardProps = {
   imageSources: ImageSource[];
   isFavourite: boolean;
   isForComparison: boolean;
+  /** From `useHomeMetrics`; defaults match Figma reference */
+  cardWidth?: number;
+  imageHeight?: number;
   onPress?: () => void;
   onFavouritePress?: () => void;
   onComparisonPress?: () => void;
@@ -37,6 +40,8 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
   onPress,
   onFavouritePress,
   onComparisonPress,
+  cardWidth = HOME_DESIGN.featuredCardWidth,
+  imageHeight = HOME_DESIGN.featuredImageHeight,
 }) => {
   const [imageIndex, setImageIndex] = useState(0);
   const count = Math.max(imageSources.length, 1);
@@ -55,9 +60,9 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
   return (
     <Container
       {...(onPress ? { onPress } : {})}
-      style={styles.card}
+      style={[styles.card, { width: cardWidth }]}
       accessibilityRole={onPress ? 'button' : undefined}>
-      <View style={styles.imageWrap}>
+      <View style={[styles.imageWrap, { height: imageHeight }]}>
         <Image source={currentSource} style={styles.image} contentFit="cover" />
         <View style={styles.imageDim} pointerEvents="none" />
 
@@ -79,8 +84,8 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
                 <ComparisonIcon
                   width={18}
                   height={18}
-                  stroke={isForComparison ? '#5EBC39' : '#FFFFFF'}
-                  fill={isForComparison ? '#5EBC39' : '#FFFFFF'}
+                  stroke={isForComparison ? HOME_DESIGN.green500 : HOME_DESIGN.white}
+                  fill={isForComparison ? HOME_DESIGN.green500 : HOME_DESIGN.white}
                 />
               </Pressable>
               <Pressable
@@ -91,8 +96,8 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
                 <HeartIcon
                   width={18}
                   height={18}
-                  stroke={isFavourite ? '#5EBC39' : '#FFFFFF'}
-                  fill={isFavourite ? '#5EBC39' : 'none'}
+                  stroke={isFavourite ? HOME_DESIGN.green500 : HOME_DESIGN.white}
+                  fill={isFavourite ? HOME_DESIGN.green500 : 'none'}
                 />
               </Pressable>
             </View>

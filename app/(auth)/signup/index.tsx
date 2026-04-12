@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
 import { getAccountTypeOptions, AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
+import { useGoogleOAuth } from '@/hooks/use-google-oauth';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 
 import type { AccountRole } from '@/types/auth';
@@ -25,6 +26,7 @@ const SignUpSchema = Yup.object().shape({
 export default function SignUpFirstScreen() {
   const { t } = useTranslation();
   const { data, updateData, resetData } = useSignUpContext();
+  const { startGoogleAuth } = useGoogleOAuth();
   const { goToNext } = useSignUpFlow();
 
   const handleContinue = (values: { role: AccountRole }) => {
@@ -37,7 +39,7 @@ export default function SignUpFirstScreen() {
   };
 
   const handleGoogleAuth = () => {
-    Alert.alert(t('login.google_sign_in_title'), t('login.google_sign_in_coming_soon'));
+    startGoogleAuth();
   };
 
   const handleAppleAuth = () => {

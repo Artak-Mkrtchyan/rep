@@ -1,5 +1,12 @@
 import type { CardAttribute } from '@/lib/utils/announcement-helpers';
 
+/** Prefix for home mock listing ids — no real `/announcement/:id` route */
+export const MOCK_HOME_LISTING_PREFIX = 'mock-' as const;
+
+export function isMockHomeListingId(id: string): boolean {
+  return id.startsWith(MOCK_HOME_LISTING_PREFIX);
+}
+
 export type MockAgent = {
   id: string;
   name: string;

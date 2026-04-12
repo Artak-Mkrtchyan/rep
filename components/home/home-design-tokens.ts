@@ -46,5 +46,20 @@ export const HOME_DESIGN = {
     affordabilityBlockGap: 28,
     affordabilityPaddingH: 16,
     affordabilityPaddingV: 24,
+    /** Space between horizontal carousel cards */
+    carouselCardGap: 8,
+  },
+  /**
+   * Bounds / ratios for {@link useHomeMetrics} (rotation, split view, small/large phones).
+   */
+  responsive: {
+    featuredCardWidthMin: 200,
+    featuredCardWidthMax: 340,
+    agentCardWidthRatio: 0.78,
+    agentCardWidthMin: 250,
+    agentCardWidthMax: 400,
+    companyCardWidthRatio: 0.62,
+    companyCardWidthMin: 200,
+    companyCardWidthMax: 360,
   },
 } as const;

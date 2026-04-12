@@ -4,7 +4,6 @@ import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 
 export const featuredPropertyFigmaCardStyles = StyleSheet.create({
   card: {
-    width: HOME_DESIGN.featuredCardWidth,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: HOME_DESIGN.neutral50,
@@ -15,7 +14,6 @@ export const featuredPropertyFigmaCardStyles = StyleSheet.create({
     ...HOME_DESIGN.cardShadow,
   },
   imageWrap: {
-    height: HOME_DESIGN.featuredImageHeight,
     borderRadius: 16,
     overflow: 'hidden',
     width: '100%',

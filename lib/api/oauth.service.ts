@@ -22,7 +22,7 @@ export const oauthService = {
     const params = new URLSearchParams({
       provider,
       scope,
-      deviceType: DeviceType.MOBILE,
+      deviceType: DeviceType.DESKTOP,
     });
 
     return `${baseUrl}/auth/oauth2/authorization-code-flow/start?${params.toString()}`;

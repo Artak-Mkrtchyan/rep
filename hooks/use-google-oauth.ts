@@ -25,26 +25,19 @@ export const useGoogleOAuth = (options: UseGoogleOAuthOptions = {}) => {
       // Build the backend start URL — browser handles all redirects:
       // backend → Google → backend callback → auth/complete page
       const startUrl = oauthService.getOAuthStartUrl(OAuthProvider.GOOGLE, scope);
-      console.log('[GoogleOAuth] Opening browser with start URL:', startUrl);
 
       // The auth/complete web page will detect mobile context and redirect
       // to rep://auth/callback with tokens. openAuthSessionAsync catches this.
       const returnUrl = Linking.createURL('auth/callback');
-      console.log('[GoogleOAuth] Return URL (deep link):', returnUrl);
 
-      const result = await WebBrowser.openAuthSessionAsync(startUrl, returnUrl, {
-        preferEphemeralSession: true,
-      });
-      console.log('[GoogleOAuth] Browser result:', result.type);
+      const result = await WebBrowser.openAuthSessionAsync(startUrl, returnUrl);
 
       if (result.type !== 'success' || !('url' in result)) {
-        console.log('[GoogleOAuth] Flow cancelled or dismissed');
         return;
       }
 
       // Parse the deep link URL for tokens
       const url = result.url;
-      console.log('[GoogleOAuth] Returned URL:', url);
 
       const parsed = Linking.parse(url);
       const accessToken = parsed.queryParams?.accessToken as string | undefined;
@@ -52,13 +45,11 @@ export const useGoogleOAuth = (options: UseGoogleOAuthOptions = {}) => {
 
       if (accessToken && refreshToken) {
         await setTokens({ accessToken, refreshToken });
-        console.log('[GoogleOAuth] Login complete!');
       } else {
         throw new Error('No tokens received from OAuth callback');
       }
     } catch (e) {
       const errorMsg = e instanceof Error ? e.message : 'An error occurred during Google sign-in';
-      console.error('[GoogleOAuth] Error:', errorMsg);
       setError(errorMsg);
       Alert.alert('Google Sign-In Error', errorMsg);
     } finally {

@@ -113,7 +113,6 @@ export default function LoginFormScreen() {
   };
 
   const handleGoogleSignIn = () => {
-    console.log('handleGoogleSignIn');
     startGoogleAuth();
   };
 

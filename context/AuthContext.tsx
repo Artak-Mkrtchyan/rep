@@ -32,6 +32,7 @@ type AuthContextValue = {
   setTokens: (tokens: AuthTokens) => Promise<void>;
   logout: () => Promise<void>;
   getAuthHeader: () => Record<string, string>;
+  refreshUser: () => Promise<void>;
 };
 
 const ACCESS_TOKEN_KEY = 'auth.accessToken';
@@ -190,8 +191,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setTokens,
       logout,
       getAuthHeader,
+      refreshUser: fetchUserInfo,
     }),
-    [accessToken, refreshToken, userInfo, isRestoring, setTokens, logout, getAuthHeader]
+    [accessToken, refreshToken, userInfo, isRestoring, setTokens, logout, getAuthHeader, fetchUserInfo]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

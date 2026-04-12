@@ -28,6 +28,13 @@ export interface UpdateUserRequest {
   dateOfBirth?: string;
 }
 
+export interface UsualUserUpdateRequest {
+  avatarId?: string;
+  dateOfBirth?: string;
+  fullName?: string;
+  phone?: string;
+}
+
 export const profileService = {
   getIndividualBroker: async (id: string): Promise<IndividualBrokerProfile> => {
     const response = await httpClient.get<IndividualBrokerProfile>(
@@ -47,5 +54,9 @@ export const profileService = {
 
   updateUser: async (id: string, data: UpdateUserRequest): Promise<void> => {
     await httpClient.patch<void>(`/v1/users/${id}`, data, { requiresAuth: true });
+  },
+
+  updateUsualUser: async (id: string, data: UsualUserUpdateRequest): Promise<void> => {
+    await httpClient.put<void>(`/v1/users/usual/${id}`, data, { requiresAuth: true });
   },
 };

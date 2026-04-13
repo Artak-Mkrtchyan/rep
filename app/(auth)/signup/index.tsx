@@ -107,7 +107,7 @@ export default function SignUpFirstScreen() {
             </Button>
 
             <SignInFooter
-              onGooglePress={handleGoogleAuth}
+              onGooglePress={values.role === 'individual' ? handleGoogleAuth : undefined}
               onApplePress={handleAppleAuth}
               onSignInPress={handleGoToLogin}
               showSignInLink

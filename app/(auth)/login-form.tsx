@@ -219,7 +219,7 @@ export default function LoginFormScreen() {
 
             <View className="w-full">
               <SignInFooter
-                onGooglePress={handleGoogleSignIn}
+                onGooglePress={role === 'individual' ? handleGoogleSignIn : undefined}
                 onApplePress={handleAppleSignIn}
                 onSignInPress={() => router.push('/(auth)/signup')}
                 showSignInLink

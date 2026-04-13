@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Modal, Platform, Pressable, Text, View } from 'react-native';
+import { Keyboard, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { InputError } from '@/components/ui/input/error';
@@ -26,6 +26,7 @@ type SelectProps<T extends string = string> = {
 const OPTION_HEIGHT = 40;
 const DROPDOWN_PADDING = 16;
 const DROPDOWN_GAP = 4;
+const MAX_VISIBLE_OPTIONS = 5;
 
 export function Select<T extends string = string>({
   label,
@@ -55,7 +56,8 @@ export function Select<T extends string = string>({
     };
   }, []);
 
-  const dropdownHeight = options.length * OPTION_HEIGHT + DROPDOWN_PADDING;
+  const dropdownHeight =
+    Math.min(options.length, MAX_VISIBLE_OPTIONS) * OPTION_HEIGHT + DROPDOWN_PADDING;
 
   const handleToggle = () => {
     if (disabled) return;
@@ -136,25 +138,30 @@ export function Select<T extends string = string>({
               elevation: 4,
             }}
             className="rounded-[12px] border border-default bg-card p-2">
-            {options.map((opt) => {
-              const isSelected = opt.value === value;
-              return (
-                <Pressable
-                  key={opt.value}
-                  onPress={() => handleSelect(opt.value)}
-                  accessibilityRole="menuitem"
-                  accessibilityState={{ selected: isSelected }}
-                  className={cn(
-                    'h-10 w-full justify-center rounded-[8px] px-3',
-                    isSelected ? 'bg-primary/10' : 'bg-transparent'
-                  )}>
-                  <Text
-                    className={cn('text-[14px]', isSelected ? 'text-primary' : 'text-foreground')}>
-                    {opt.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
+            <ScrollView
+              style={{ maxHeight: MAX_VISIBLE_OPTIONS * OPTION_HEIGHT }}
+              showsVerticalScrollIndicator
+              nestedScrollEnabled>
+              {options.map((opt) => {
+                const isSelected = opt.value === value;
+                return (
+                  <Pressable
+                    key={opt.value}
+                    onPress={() => handleSelect(opt.value)}
+                    accessibilityRole="menuitem"
+                    accessibilityState={{ selected: isSelected }}
+                    className={cn(
+                      'h-10 w-full justify-center rounded-[8px] px-3',
+                      isSelected ? 'bg-primary/10' : 'bg-transparent'
+                    )}>
+                    <Text
+                      className={cn('text-[14px]', isSelected ? 'text-primary' : 'text-foreground')}>
+                      {opt.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
           </View>
         </Pressable>
       </Modal>

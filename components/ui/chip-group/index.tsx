@@ -55,8 +55,8 @@ export function ChipGroup<T extends string = string>({
               style={({ pressed }) => (pressed && !disabled ? { opacity: 0.9 } : undefined)}>
               <ThemedText
                 className={cn(
-                  'text-[12px]',
-                  selected ? 'font-medium text-white' : 'font-regular text-foreground'
+                  'font-regular text-[12px]',
+                  selected ? 'text-white' : 'text-foreground'
                 )}>
                 {option.label}
               </ThemedText>

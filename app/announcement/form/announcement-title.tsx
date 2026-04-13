@@ -88,6 +88,7 @@ export default function AnnouncementTitleScreen() {
                   <InputLabel>{t('announcement.rent.title_label')}</InputLabel>
                   <TextInput
                     value={values.title}
+                    maxLength={255}
                     onChangeText={handleChange('title')}
                     onBlur={handleBlur('title')}
                     placeholder={t('announcement.rent.title_placeholder')}

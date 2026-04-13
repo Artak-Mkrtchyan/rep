@@ -11,7 +11,11 @@ import { PersonalInfoRow } from '@/components/profile/personal-info-row';
 import { PROFILE_CARD_SHADOW } from '@/components/profile/profile-card-tokens';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/context/AuthContext';
-import { useIndividualBrokerProfile, useUpdateUsualUser } from '@/hooks/api/use-profile';
+import {
+  useIndividualBrokerProfile,
+  useUpdateUsualUser,
+  useUserProfile,
+} from '@/hooks/api/use-profile';
 import { AuthScope } from '@/lib/api/auth';
 import {
   buildPersonalInfoEditSheetProps,
@@ -37,6 +41,9 @@ export default function PersonalInformationScreen() {
   const { data: brokerProfile, isLoading: brokerLoading } = useIndividualBrokerProfile(
     isBroker ? userInfo?.id : undefined
   );
+  const { data: userProfile } = useUserProfile(
+    !isBroker && !isBrokerCompany ? userInfo?.id : undefined
+  );
   const { mutateAsync: updateUser } = useUpdateUsualUser();
   const editingFieldRef = useRef<EditingField>(null);
 
@@ -58,12 +65,9 @@ export default function PersonalInformationScreen() {
           phone: userInfo.phone || '',
         };
         const payload = { ...currentData, [field]: value };
-        console.log('[UpdateProfile] Request:', { id: userInfo.id, payload });
-        const response = await updateUser({ id: userInfo.id, data: payload });
-        console.log('[UpdateProfile] Response:', response);
+        await updateUser({ id: userInfo.id, data: payload });
         setEditingField(null);
-      } catch (err) {
-        console.error('[UpdateProfile] Error:', JSON.stringify(err, null, 2));
+      } catch {
         Alert.alert(
           t('common.error', 'Error'),
           t('profile.update_failed', 'Failed to update profile.')
@@ -85,9 +89,10 @@ export default function PersonalInformationScreen() {
         brokerProfile,
         isBroker,
         isBrokerCompany,
-        onEditField
+        onEditField,
+        userProfile?.dateOfBirth
       ),
-    [t, userInfo, brokerProfile, isBroker, isBrokerCompany, onEditField]
+    [t, userInfo, brokerProfile, isBroker, isBrokerCompany, onEditField, userProfile?.dateOfBirth]
   );
 
   const editSheetProps = useMemo(
@@ -97,9 +102,10 @@ export default function PersonalInformationScreen() {
         t,
         userInfo,
         isBroker,
-        brokerProfile?.phoneNumber
+        brokerProfile?.phoneNumber,
+        userProfile?.dateOfBirth
       ),
-    [editingField, t, userInfo, isBroker, brokerProfile?.phoneNumber]
+    [editingField, t, userInfo, isBroker, brokerProfile?.phoneNumber, userProfile?.dateOfBirth]
   );
 
   const showBrokerPersonalLayout = Boolean(isBroker && brokerProfile);

@@ -1,4 +1,14 @@
+import { AuthScope } from './auth';
 import { httpClient } from './http/client';
+
+export interface UserProfile {
+  id: string;
+  email?: string;
+  fullName?: string;
+  phone?: string;
+  dateOfBirth?: string;
+  scope?: AuthScope;
+}
 
 export interface IndividualBrokerProfile {
   id: string;
@@ -36,6 +46,13 @@ export interface UsualUserUpdateRequest {
 }
 
 export const profileService = {
+  getUser: async (id: string): Promise<UserProfile> => {
+    const response = await httpClient.get<UserProfile>(`/v1/users/${id}`, {
+      requiresAuth: true,
+    });
+    return response;
+  },
+
   getIndividualBroker: async (id: string): Promise<IndividualBrokerProfile> => {
     const response = await httpClient.get<IndividualBrokerProfile>(
       `/v1/brokers/individuals/${id}`,

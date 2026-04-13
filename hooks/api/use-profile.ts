@@ -34,13 +34,19 @@ export function useBrokerCompanyProfile(companyId?: string) {
 }
 
 export function useUpdateUsualUser() {
-  const { refreshUser } = useAuth();
+  const { updateUserInfo } = useAuth();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UsualUserUpdateRequest }) =>
       profileService.updateUsualUser(id, data),
-    onSuccess: () => {
-      refreshUser();
+    onSuccess: (_response, variables) => {
+      // Optimistically update local user info — avoids an extra API call
+      // that could fail and wipe the auth state
+      const { fullName, phone } = variables.data;
+      updateUserInfo({
+        ...(fullName !== undefined && { fullName }),
+        ...(phone !== undefined && { phone }),
+      });
     },
   });
 }

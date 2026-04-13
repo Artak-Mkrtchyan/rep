@@ -51,16 +51,26 @@ export default function PersonalInformationScreen() {
       if (!field || !userInfo?.id) return;
 
       try {
-        await updateUser({ id: userInfo.id, data: { [field]: value } });
+        // PUT replaces the full resource — always send all current fields
+        // with the edited one overridden
+        const currentData = {
+          fullName: userInfo.fullName || '',
+          phone: userInfo.phone || '',
+        };
+        const payload = { ...currentData, [field]: value };
+        console.log('[UpdateProfile] Request:', { id: userInfo.id, payload });
+        const response = await updateUser({ id: userInfo.id, data: payload });
+        console.log('[UpdateProfile] Response:', response);
         setEditingField(null);
-      } catch {
+      } catch (err) {
+        console.error('[UpdateProfile] Error:', JSON.stringify(err, null, 2));
         Alert.alert(
           t('common.error', 'Error'),
           t('profile.update_failed', 'Failed to update profile.')
         );
       }
     },
-    [userInfo?.id, updateUser, t]
+    [userInfo, updateUser, t]
   );
 
   const handleUploadedFilesEdit = useCallback(() => {

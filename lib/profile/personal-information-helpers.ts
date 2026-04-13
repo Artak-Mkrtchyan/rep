@@ -16,7 +16,7 @@ export type PersonalInfoEditSheetProps = {
   label: string;
   value: string;
   placeholder?: string;
-  type?: 'text' | 'phone';
+  type?: 'text' | 'phone' | 'date';
   keyboardType?: 'default' | 'phone-pad' | 'numeric';
 };
 
@@ -127,7 +127,8 @@ export function buildPersonalInfoEditSheetProps(
       return {
         label: t('profile.date_of_birth', 'Date of birth'),
         value: '',
-        placeholder: 'DD/MM/YYYY',
+        placeholder: 'DD.MM.YYYY',
+        type: 'date',
         keyboardType: 'numeric',
       };
     default:

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { PhoneInput } from '@/components/ui/phone-input';
 
@@ -12,7 +13,7 @@ type EditFieldSheetProps = {
   label: string;
   value: string;
   placeholder?: string;
-  type?: 'text' | 'phone';
+  type?: 'text' | 'phone' | 'date';
   keyboardType?: 'default' | 'phone-pad' | 'numeric';
   onSave: (value: string) => void;
   onClose: () => void;
@@ -59,6 +60,12 @@ export const EditFieldSheet: React.FC<EditFieldSheetProps> = ({
 
             {type === 'phone' ? (
               <PhoneInput value={editValue} onChangeText={setEditValue} variant="rep" autoFocus />
+            ) : type === 'date' ? (
+              <DatePicker
+                value={editValue}
+                onChange={(date) => setEditValue(typeof date === 'string' ? date : '')}
+                maximumDate={new Date()}
+              />
             ) : (
               <Input
                 value={editValue}

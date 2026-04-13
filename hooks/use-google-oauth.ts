@@ -42,9 +42,12 @@ export const useGoogleOAuth = (options: UseGoogleOAuthOptions = {}) => {
       const parsed = Linking.parse(url);
       const accessToken = parsed.queryParams?.accessToken as string | undefined;
       const refreshToken = parsed.queryParams?.refreshToken as string | undefined;
+      const refreshTokenExpiresAt = parsed.queryParams?.refreshTokenExpiresAt as
+        | string
+        | undefined;
 
       if (accessToken && refreshToken) {
-        await setTokens({ accessToken, refreshToken });
+        await setTokens({ accessToken, refreshToken, refreshTokenExpiresAt });
       } else {
         throw new Error('No tokens received from OAuth callback');
       }

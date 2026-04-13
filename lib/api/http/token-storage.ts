@@ -1,8 +1,11 @@
 import * as SecureStore from 'expo-secure-store';
 
-const ACCESS_TOKEN_KEY = 'auth_token';
-const REFRESH_TOKEN_KEY = 'refresh_token';
-const REFRESH_TOKEN_EXPIRES_KEY = 'refresh_token_expires_at';
+// IMPORTANT: These keys MUST match the ones in AuthContext.tsx so both
+// read/write the same values in SecureStore. Otherwise the http client's
+// auto-refresh would save tokens that AuthContext can't find on reload.
+const ACCESS_TOKEN_KEY = 'auth.accessToken';
+const REFRESH_TOKEN_KEY = 'auth.refreshToken';
+const REFRESH_TOKEN_EXPIRES_KEY = 'auth.refreshTokenExpiresAt';
 
 // In-memory cache for synchronous access
 let cachedAccessToken: string | null = null;
@@ -102,7 +105,14 @@ export const clearAllTokens = (): void => {
 };
 
 // Update cache from external source (e.g., AuthContext)
-export const updateTokenCache = (accessToken: string | null, refreshToken: string | null): void => {
+export const updateTokenCache = (
+  accessToken: string | null,
+  refreshToken: string | null,
+  refreshTokenExpiresAt?: string | null
+): void => {
   cachedAccessToken = accessToken;
   cachedRefreshToken = refreshToken;
+  if (refreshTokenExpiresAt !== undefined) {
+    cachedRefreshTokenExpiresAt = refreshTokenExpiresAt;
+  }
 };

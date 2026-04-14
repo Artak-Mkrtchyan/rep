@@ -11,6 +11,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.rep",
+      "infoPlist": {
+        "CFBundleDisplayName": "Real Estate Platform"
+      },
       "associatedDomains": [
         "applinks:rep-dev.utspdev.com",
         "applinks:rep-test.utspdev.com",
@@ -48,10 +51,7 @@
               "pathPrefix": "/app/open"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         },
         {
           "action": "VIEW",
@@ -73,15 +73,10 @@
               "pathPrefix": "/app/open"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["android.permission.RECORD_AUDIO"],
       "package": "com.anonymous.rep"
     },
     "web": {

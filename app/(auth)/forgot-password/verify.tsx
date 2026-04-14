@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { OtpInput } from '@/components/auth/otp-input';
+import { OtpInput, type OtpInputHandle } from '@/components/auth/otp-input';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
@@ -23,14 +23,16 @@ import { useForgotPasswordContext } from '@/context/ForgotPasswordContext';
 import { useOtpResend } from '@/hooks/use-otp-resend';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { authService } from '@/lib/api/auth';
-import { ERROR_MESSAGES, isApiError, showErrorAlert } from '@/lib/error-handler';
+import { ERROR_MESSAGES, getApiErrorMessage, isApiError, showErrorAlert } from '@/lib/error-handler';
 import { OTP_EXPIRATION_TIMEOUT } from '@/lib/auth-validation';
 
 export default function ForgotPasswordVerifyScreen() {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const { data } = useForgotPasswordContext();
   const otpRef = useRef('');
+  const otpInputRef = useRef<OtpInputHandle>(null);
   const failedOtpAttemptsRef = useRef(0);
 
   const insets = useSafeAreaInsets();
@@ -40,6 +42,8 @@ export default function ForgotPasswordVerifyScreen() {
     if (!data.email) return;
     await authService.sendPasswordOtp(data.email);
     failedOtpAttemptsRef.current = 0;
+    setError('');
+    otpInputRef.current?.reset();
     Alert.alert(
       t('forgot_password.verify.code_sent_title'),
       t('forgot_password.verify.code_sent_message')
@@ -64,31 +68,40 @@ export default function ForgotPasswordVerifyScreen() {
       if (!code || code.length !== 6 || isLoading) return;
 
       setIsLoading(true);
+      setError('');
       try {
         await authService.confirmPasswordOtp(code);
         router.push(AUTH_ROUTES.FORGOT_PASSWORD_RESET);
-      } catch (error) {
-        if (isApiError(error) && (error.statusCode === 400 || error.statusCode === 422)) {
-          failedOtpAttemptsRef.current += 1;
+      } catch (err) {
+        if (isApiError(err)) {
+          const message = err.message?.toLowerCase() || '';
+          if (err.statusCode === 400 || err.statusCode === 422) {
+            failedOtpAttemptsRef.current += 1;
+          }
+          const useExpiredMessage =
+            message.includes('expired') ||
+            message.includes('maximum') ||
+            message.includes('too many') ||
+            message.includes('exceeded') ||
+            message.includes('locked') ||
+            failedOtpAttemptsRef.current >= 4;
+          const expiredMsg = t('signup.verify.code_expired');
+          const invalidMsg = ERROR_MESSAGES.INVALID_CODE;
+
+          const sc = err.statusCode;
+          if (sc === 0) {
+            setError(ERROR_MESSAGES.NETWORK);
+          } else if (sc === 500) {
+            setError(ERROR_MESSAGES.SERVER);
+          } else if (sc === 400 || sc === 422) {
+            setError(useExpiredMessage ? expiredMsg : invalidMsg);
+          } else {
+            setError(getApiErrorMessage(err, useExpiredMessage ? expiredMsg : invalidMsg));
+          }
+        } else {
+          setError(ERROR_MESSAGES.UNEXPECTED);
         }
-        const msg = isApiError(error) ? (error.message?.toLowerCase() ?? '') : '';
-        const useExpiredMessage =
-          msg.includes('expired') ||
-          msg.includes('maximum') ||
-          msg.includes('too many') ||
-          msg.includes('exceeded') ||
-          msg.includes('locked') ||
-          failedOtpAttemptsRef.current >= 4;
-        const expiredMsg = t('signup.verify.code_expired');
-        const invalidMsg = ERROR_MESSAGES.INVALID_CODE;
-        showErrorAlert(error, {
-          fallback: useExpiredMessage ? expiredMsg : invalidMsg,
-          statusMessages: {
-            0: ERROR_MESSAGES.NETWORK,
-            400: useExpiredMessage ? expiredMsg : invalidMsg,
-            500: ERROR_MESSAGES.SERVER,
-          },
-        });
+        otpInputRef.current?.reset();
       } finally {
         setIsLoading(false);
       }
@@ -165,10 +178,13 @@ export default function ForgotPasswordVerifyScreen() {
                   ) : null}
 
                   <OtpInput
+                    ref={otpInputRef}
+                    error={error}
                     disabled={isLoading}
                     hideResend
                     onChange={(code) => {
                       otpRef.current = code;
+                      setError('');
                     }}
                     onComplete={handleOtpComplete}
                     countdownSecondsLeft={secondsLeft}

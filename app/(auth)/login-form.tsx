@@ -19,6 +19,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useLogin } from '@/hooks/api/use-auth';
+import { useGoogleOAuth } from '@/hooks/use-google-oauth';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { AuthScope } from '@/lib/api/auth';
@@ -29,7 +30,7 @@ const ROLE_TO_SCOPE: Record<string, AuthScope> = {
   individual: AuthScope.USUAL,
   company: AuthScope.CONSTRUCTION,
   broker: AuthScope.BROKER,
-  broker_company: AuthScope.BROKER_COMPANY,
+  broker_company: AuthScope.BROKER,
 };
 
 export default function LoginFormScreen() {
@@ -43,6 +44,7 @@ export default function LoginFormScreen() {
   const [formError, setFormError] = React.useState<string | null>(null);
 
   const { login, isLoading, reset: resetLoginError } = useLogin();
+  const { startGoogleAuth, isLoading: isGoogleLoading } = useGoogleOAuth({ scope });
   const { tokens: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const { horizontalStyle } = useScreenEdgePadding();
@@ -59,7 +61,7 @@ export default function LoginFormScreen() {
     };
   }, []);
 
-  const canContinue = email.length > 0 && password.length > 0 && !isLoading;
+  const canContinue = email.length > 0 && password.length > 0 && !isLoading && !isGoogleLoading;
 
   const handleEmailChange = (text: string) => {
     setEmail(text);
@@ -111,7 +113,7 @@ export default function LoginFormScreen() {
   };
 
   const handleGoogleSignIn = () => {
-    // TODO: Implement Google sign in
+    startGoogleAuth();
   };
 
   const handleAppleSignIn = () => {
@@ -145,88 +147,90 @@ export default function LoginFormScreen() {
         showsVerticalScrollIndicator={false}
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         contentInsetAdjustmentBehavior="automatic">
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-            <View className="w-full items-center">
-              <Image
-                style={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION}
-                source={require('@/assets/images/login-illustration.svg')}
-                contentFit="contain"
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View className="w-full items-center">
+            <Image
+              style={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION}
+              source={require('@/assets/images/login-illustration.svg')}
+              contentFit="contain"
+            />
+
+            <ThemedText type="title" className="mt-6 text-center">
+              {t('login.title')}
+            </ThemedText>
+
+            <View className="mt-8 w-full">
+              <Input
+                label={t('auth.email')}
+                value={email}
+                onChangeText={handleEmailChange}
+                placeholder=""
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="email"
+                placeholderTextColor={theme.placeholder}
+                error={emailError || undefined}
+                invalid={credentialError}
+                editable={!isLoading}
               />
-
-              <ThemedText type="title" className="mt-6 text-center">
-                {t('login.title')}
-              </ThemedText>
-
-              <View className="mt-8 w-full">
-                <Input
-                  label={t('auth.email')}
-                  value={email}
-                  onChangeText={handleEmailChange}
-                  placeholder=""
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  autoComplete="email"
-                  placeholderTextColor={theme.placeholder}
-                  error={emailError || undefined}
-                  invalid={credentialError}
-                  editable={!isLoading}
-                />
-              </View>
-
-              <View className="mt-6 w-full">
-                <Input
-                  label={t('auth.password')}
-                  value={password}
-                  onChangeText={handlePasswordChange}
-                  placeholder=""
-                  secureTextEntry
-                  showPasswordToggle
-                  autoComplete="password"
-                  textContentType="password"
-                  placeholderTextColor={theme.placeholder}
-                  error={passwordFieldError}
-                  editable={!isLoading}
-                  afterField={
-                    <View className="mt-1 w-full items-end">
-                      <Pressable onPress={handleForgotPassword} disabled={isLoading} hitSlop={8}>
-                        <ThemedText className="text-[16px] leading-[20px] text-primary">
-                          {t('login.forgot_password')}
-                        </ThemedText>
-                      </Pressable>
-                    </View>
-                  }
-                />
-              </View>
-
-              <Pressable
-                disabled={!canContinue}
-                onPress={handleLogin}
-                className={`mt-6 h-[50px] w-full items-center justify-center rounded-[12px] ${
-                  canContinue ? 'bg-primary' : 'bg-input'
-                }`}
-                style={({ pressed }) => (pressed && canContinue ? { opacity: 0.9 } : undefined)}>
-                {isLoading ? (
-                  <ActivityIndicator color="#ffffff" />
-                ) : (
-                  <ThemedText className="text-[16px] font-medium text-white">
-                    {t('common.continue')}
-                  </ThemedText>
-                )}
-              </Pressable>
-
-              <View className="w-full">
-                <SignInFooter
-                  onGooglePress={handleGoogleSignIn}
-                  onApplePress={handleAppleSignIn}
-                  onSignInPress={() => router.push('/(auth)/signup')}
-                  showSignInLink
-                  signInLabel={t('auth.dont_have_account')}
-                  signInActionLabel={t('auth.sign_up')}
-                />
-              </View>
             </View>
-          </TouchableWithoutFeedback>
+
+            <View className="mt-6 w-full">
+              <Input
+                label={t('auth.password')}
+                value={password}
+                onChangeText={handlePasswordChange}
+                placeholder=""
+                secureTextEntry
+                showPasswordToggle
+                autoComplete="password"
+                textContentType="password"
+                placeholderTextColor={theme.placeholder}
+                error={passwordFieldError}
+                editable={!isLoading}
+                afterField={
+                  <View className="mt-1 w-full items-end">
+                    <Pressable onPress={handleForgotPassword} disabled={isLoading} hitSlop={8}>
+                      <ThemedText
+                        className="text-[16px] font-normal leading-[24px]"
+                        style={{ color: theme.link }}>
+                        {t('login.forgot_password')}
+                      </ThemedText>
+                    </Pressable>
+                  </View>
+                }
+              />
+            </View>
+
+            <Pressable
+              disabled={!canContinue}
+              onPress={handleLogin}
+              className={`mt-6 h-[50px] w-full items-center justify-center rounded-[12px] ${
+                canContinue ? 'bg-primary' : 'bg-input'
+              }`}
+              style={({ pressed }) => (pressed && canContinue ? { opacity: 0.9 } : undefined)}>
+              {isLoading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <ThemedText className="text-[16px] font-medium text-white">
+                  {t('common.continue')}
+                </ThemedText>
+              )}
+            </Pressable>
+
+            <View className="w-full">
+              <SignInFooter
+                onGooglePress={role === 'individual' ? handleGoogleSignIn : undefined}
+                onApplePress={handleAppleSignIn}
+                onSignInPress={() => router.push('/(auth)/signup')}
+                showSignInLink
+                signInLabel={t('auth.dont_have_account')}
+                signInActionLabel={t('auth.sign_up')}
+              />
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
       </ScrollView>
     </ThemedView>
   );

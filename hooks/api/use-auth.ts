@@ -27,6 +27,7 @@ export function useLogin(): UseLoginResult {
           await setTokens({
             accessToken: response.accessToken,
             refreshToken: response.refreshToken,
+            refreshTokenExpiresAt: response.refreshTokenExpiresAt,
           });
         }
       } catch (err) {

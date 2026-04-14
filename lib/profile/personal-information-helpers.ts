@@ -16,9 +16,19 @@ export type PersonalInfoEditSheetProps = {
   label: string;
   value: string;
   placeholder?: string;
-  type?: 'text' | 'phone';
+  type?: 'text' | 'phone' | 'date';
   keyboardType?: 'default' | 'phone-pad' | 'numeric';
 };
+
+/** Formats e.g. "2007-04-13" → "13.04.2007" */
+export function formatDateDisplay(date: string | undefined): string {
+  if (!date) return '';
+  const [year, month, day] = date.slice(0, 10).split('-');
+  if (year && month && day) {
+    return `${day}.${month}.${year}`;
+  }
+  return date;
+}
 
 /** Formats e.g. "+998901211323" → "+998 (90)121 13 23" */
 export function formatPhoneDisplay(phone: string): string {
@@ -38,6 +48,7 @@ export function buildPersonalInformationRows(
   isBroker: boolean,
   isBrokerCompany: boolean,
   onEditField: (field: PersonalInfoEditableField) => void,
+  dateOfBirth?: string,
 ): PersonalInfoRowSpec[] {
   const base: PersonalInfoRowSpec[] = [
     {
@@ -92,7 +103,7 @@ export function buildPersonalInformationRows(
       {
         key: 'dob',
         label: t('profile.date_of_birth', 'Date of birth'),
-        value: '',
+        value: formatDateDisplay(dateOfBirth),
         onPress: () => onEditField('dateOfBirth'),
       },
     ];
@@ -107,6 +118,7 @@ export function buildPersonalInfoEditSheetProps(
   userInfo: UserInfo | null,
   isBroker: boolean,
   brokerPhone: string | undefined,
+  dateOfBirth?: string,
 ): PersonalInfoEditSheetProps | null {
   switch (editingField) {
     case 'fullName':
@@ -126,8 +138,9 @@ export function buildPersonalInfoEditSheetProps(
     case 'dateOfBirth':
       return {
         label: t('profile.date_of_birth', 'Date of birth'),
-        value: '',
-        placeholder: 'DD/MM/YYYY',
+        value: dateOfBirth?.slice(0, 10) || '',
+        placeholder: 'DD.MM.YYYY',
+        type: 'date',
         keyboardType: 'numeric',
       };
     default:

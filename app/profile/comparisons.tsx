@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, FlatList, Modal, Pressable, View } from 'react-native';
+import { ActivityIndicator, FlatList, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ComparisonCard } from '@/components/announcement/comparison-card';
@@ -160,6 +161,7 @@ export default function ComparisonsScreen() {
           animationType="fade"
           onRequestClose={() => setTooManyVisible(false)}>
           <View style={styles.overlay}>
+            <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill} />
             <View style={styles.overlayDim} pointerEvents="none" />
             <View style={styles.popup}>
               <View style={styles.popupTextBlock}>
@@ -177,7 +179,7 @@ export default function ComparisonsScreen() {
                   contentFit="contain"
                   accessibilityIgnoresInvertColors
                 />
-                <Pressable onPress={() => setTooManyVisible(false)} style={styles.closeButton}>
+                <Pressable onPress={() => { setSelectedIds(new Set()); setTooManyVisible(false); }} style={styles.closeButton}>
                   <ThemedText className="text-[16px] font-semibold text-white">
                     {t('comparisons.close')}
                   </ThemedText>

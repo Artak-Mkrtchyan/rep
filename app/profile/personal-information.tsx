@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { BrokerUploadedFilesCard } from '@/components/profile/broker-uploaded-files-card';
@@ -11,7 +11,11 @@ import { PersonalInfoRow } from '@/components/profile/personal-info-row';
 import { PROFILE_CARD_SHADOW } from '@/components/profile/profile-card-tokens';
 import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/context/AuthContext';
-import { useIndividualBrokerProfile } from '@/hooks/api/use-profile';
+import {
+  useIndividualBrokerProfile,
+  useUpdateUsualUser,
+  useUserProfile,
+} from '@/hooks/api/use-profile';
 import { AuthScope } from '@/lib/api/auth';
 import {
   buildPersonalInfoEditSheetProps,
@@ -35,16 +39,43 @@ export default function PersonalInformationScreen() {
   const isBrokerCompany = userInfo?.scope === AuthScope.BROKER_COMPANY;
 
   const { data: brokerProfile, isLoading: brokerLoading } = useIndividualBrokerProfile(
-    isBroker ? userInfo?.id : undefined,
+    isBroker ? userInfo?.id : undefined
   );
+  const { data: userProfile } = useUserProfile(
+    !isBroker && !isBrokerCompany ? userInfo?.id : undefined
+  );
+  const { mutateAsync: updateUser } = useUpdateUsualUser();
+  const editingFieldRef = useRef<EditingField>(null);
 
   const onEditField = useCallback((field: PersonalInfoEditableField) => {
+    editingFieldRef.current = field;
     setEditingField(field);
   }, []);
 
-  const handleSave = useCallback((_value: string) => {
-    setEditingField(null);
-  }, []);
+  const handleSave = useCallback(
+    async (value: string) => {
+      const field = editingFieldRef.current;
+      if (!field || !userInfo?.id) return;
+
+      try {
+        // PUT replaces the full resource — always send all current fields
+        // with the edited one overridden
+        const currentData = {
+          fullName: userInfo.fullName || '',
+          phone: userInfo.phone || '',
+        };
+        const payload = { ...currentData, [field]: value };
+        await updateUser({ id: userInfo.id, data: payload });
+        setEditingField(null);
+      } catch {
+        Alert.alert(
+          t('common.error', 'Error'),
+          t('profile.update_failed', 'Failed to update profile.')
+        );
+      }
+    },
+    [userInfo, updateUser, t]
+  );
 
   const handleUploadedFilesEdit = useCallback(() => {
     // Wire when upload / document API is available
@@ -59,8 +90,9 @@ export default function PersonalInformationScreen() {
         isBroker,
         isBrokerCompany,
         onEditField,
+        userProfile?.dateOfBirth
       ),
-    [t, userInfo, brokerProfile, isBroker, isBrokerCompany, onEditField],
+    [t, userInfo, brokerProfile, isBroker, isBrokerCompany, onEditField, userProfile?.dateOfBirth]
   );
 
   const editSheetProps = useMemo(
@@ -71,8 +103,9 @@ export default function PersonalInformationScreen() {
         userInfo,
         isBroker,
         brokerProfile?.phoneNumber,
+        userProfile?.dateOfBirth
       ),
-    [editingField, t, userInfo, isBroker, brokerProfile?.phoneNumber],
+    [editingField, t, userInfo, isBroker, brokerProfile?.phoneNumber, userProfile?.dateOfBirth]
   );
 
   const showBrokerPersonalLayout = Boolean(isBroker && brokerProfile);

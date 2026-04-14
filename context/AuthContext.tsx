@@ -10,6 +10,7 @@ import React from 'react';
 type AuthTokens = {
   accessToken: string;
   refreshToken: string;
+  refreshTokenExpiresAt?: string;
 };
 
 export type UserInfo = {
@@ -32,16 +33,20 @@ type AuthContextValue = {
   setTokens: (tokens: AuthTokens) => Promise<void>;
   logout: () => Promise<void>;
   getAuthHeader: () => Record<string, string>;
+  refreshUser: () => Promise<void>;
+  updateUserInfo: (partial: Partial<UserInfo>) => void;
 };
 
 const ACCESS_TOKEN_KEY = 'auth.accessToken';
 const REFRESH_TOKEN_KEY = 'auth.refreshToken';
+const REFRESH_TOKEN_EXPIRES_AT_KEY = 'auth.refreshTokenExpiresAt';
 
 const AuthContext = React.createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = React.useState<string | null>(null);
   const [refreshToken, setRefreshToken] = React.useState<string | null>(null);
+  const [refreshTokenExpiresAt, setRefreshTokenExpiresAt] = React.useState<string | null>(null);
   const [userInfo, setUserInfo] = React.useState<UserInfo | null>(null);
   const [isRestoring, setIsRestoring] = React.useState(true);
 
@@ -64,8 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Sync tokens with HTTP client cache whenever they change
   React.useEffect(() => {
-    updateTokenCache(accessToken, refreshToken);
-  }, [accessToken, refreshToken]);
+    updateTokenCache(accessToken, refreshToken, refreshTokenExpiresAt);
+  }, [accessToken, refreshToken, refreshTokenExpiresAt]);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -75,66 +80,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Initialize HTTP client token storage
         await initializeTokenStorage();
 
-        // Step 1: Restore tokens from secure storage
-        const [, storedRefresh] = await Promise.all([
+        // Restore tokens from secure storage
+        const [storedAccess, storedRefresh, storedExpiresAt] = await Promise.all([
           SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
           SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
+          SecureStore.getItemAsync(REFRESH_TOKEN_EXPIRES_AT_KEY),
         ]);
 
         if (!isMounted) return;
 
-        // Step 2: If we have a refresh token, validate it by refreshing
-        if (storedRefresh) {
+        // If we have stored tokens, trust them and let the http client
+        // refresh lazily on 401 if needed. Don't proactively refresh —
+        // the backend rejects refresh calls with a linked session.
+        if (storedAccess && storedRefresh) {
+          setAccessToken(storedAccess);
+          setRefreshToken(storedRefresh);
+          setRefreshTokenExpiresAt(storedExpiresAt);
+
+          // Fetch user info — if the access token is expired, the http
+          // client will auto-refresh and retry, then clearAllTokens on
+          // unrecoverable failure.
           try {
-            const response = await authService.refreshToken(storedRefresh);
-
-            if (!isMounted) return;
-
-            // Refresh succeeded - update tokens
-            if (response.accessToken && response.refreshToken) {
-              setAccessToken(response.accessToken);
-              setRefreshToken(response.refreshToken);
-              await Promise.all([
-                SecureStore.setItemAsync(ACCESS_TOKEN_KEY, response.accessToken),
-                SecureStore.setItemAsync(REFRESH_TOKEN_KEY, response.refreshToken),
-              ]);
-
-              // Fetch user info from API (like web does)
-              await fetchUserInfo();
-            } else {
-              // Invalid response - clear tokens
-              await clearStoredTokens();
-            }
+            await fetchUserInfo();
           } catch {
-            // Refresh failed - token is invalid, clear everything
-            if (!isMounted) return;
-            await clearStoredTokens();
+            // Non-critical
           }
         } else {
-          // No refresh token stored - user is not authenticated
+          // No tokens stored - user is not authenticated
           setAccessToken(null);
           setRefreshToken(null);
+          setRefreshTokenExpiresAt(null);
         }
       } catch {
         // Restore errors - user will be unauthenticated
         if (isMounted) {
           setAccessToken(null);
           setRefreshToken(null);
+          setRefreshTokenExpiresAt(null);
         }
       } finally {
         if (isMounted) setIsRestoring(false);
       }
-    };
-
-    const clearStoredTokens = async () => {
-      setAccessToken(null);
-      setRefreshToken(null);
-      setUserInfo(null);
-      clearHttpClientTokens();
-      await Promise.all([
-        SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
-        SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
-      ]);
     };
 
     restoreAndValidateSession();
@@ -148,9 +134,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (tokens: AuthTokens) => {
       setAccessToken(tokens.accessToken);
       setRefreshToken(tokens.refreshToken);
+      setRefreshTokenExpiresAt(tokens.refreshTokenExpiresAt || null);
       await Promise.all([
         SecureStore.setItemAsync(ACCESS_TOKEN_KEY, tokens.accessToken),
         SecureStore.setItemAsync(REFRESH_TOKEN_KEY, tokens.refreshToken),
+        tokens.refreshTokenExpiresAt
+          ? SecureStore.setItemAsync(REFRESH_TOKEN_EXPIRES_AT_KEY, tokens.refreshTokenExpiresAt)
+          : SecureStore.deleteItemAsync(REFRESH_TOKEN_EXPIRES_AT_KEY),
       ]);
 
       // Fetch user info after login (like web does)
@@ -162,12 +152,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = React.useCallback(async () => {
     setAccessToken(null);
     setRefreshToken(null);
+    setRefreshTokenExpiresAt(null);
     setUserInfo(null);
     clearHttpClientTokens();
     await Promise.all([
       SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
       SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+      SecureStore.deleteItemAsync(REFRESH_TOKEN_EXPIRES_AT_KEY),
     ]);
+  }, []);
+
+  const updateUserInfo = React.useCallback((partial: Partial<UserInfo>) => {
+    setUserInfo((prev) => (prev ? { ...prev, ...partial } : prev));
   }, []);
 
   const getAuthHeader = React.useCallback(() => {
@@ -190,8 +186,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setTokens,
       logout,
       getAuthHeader,
+      refreshUser: fetchUserInfo,
+      updateUserInfo,
     }),
-    [accessToken, refreshToken, userInfo, isRestoring, setTokens, logout, getAuthHeader]
+    [accessToken, refreshToken, userInfo, isRestoring, setTokens, logout, getAuthHeader, fetchUserInfo, updateUserInfo]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

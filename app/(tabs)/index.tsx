@@ -2,8 +2,11 @@ import { Href, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ScrollView } from 'react-native';
 
+import { AffordabilityCalculatorSection } from '@/components/home/affordability-calculator-section';
+import { ConstructionCompaniesSection } from '@/components/home/construction-companies-section';
 import { FeaturedProperties } from '@/components/home/featured-properties';
 import { HeroSection } from '@/components/home/hero-section';
+import { RealEstateAgentsSection } from '@/components/home/real-estate-agents-section';
 import { SearchModal } from '@/components/search/search-modal';
 import { ThemedView } from '@/components/themed-view';
 import type { SearchFilters } from '@/types/search';
@@ -39,7 +42,10 @@ export default function HomeScreen() {
     <ThemedView className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
         <HeroSection onMenuPress={handleMenuPress} onSearchPress={handleSearchPress} />
-        <FeaturedProperties />
+        <FeaturedProperties onSeeMorePress={handleSearchPress} />
+        <AffordabilityCalculatorSection onSubmit={handleSearchPress} />
+        <RealEstateAgentsSection onSeeMorePress={handleSearchPress} />
+        <ConstructionCompaniesSection onSeeMorePress={handleSearchPress} />
       </ScrollView>
 
       <SearchModal

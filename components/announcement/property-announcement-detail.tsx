@@ -45,6 +45,7 @@ export type PropertyAnnouncementDetailProps = {
   onSharePress?: () => void;
   id?: string;
   typeLabel?: string;
+  listingType?: 'FOR_RENT' | 'FOR_SALE';
   title: string;
   price: string;
   placedBy?: { name: string; avatarUri?: string };
@@ -75,6 +76,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
   onSharePress,
   id = '',
   typeLabel,
+  listingType,
   title,
   price,
   placedBy,
@@ -164,7 +166,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
 
           {typeLabel ? (
             <View className="flex-row items-center gap-1.5">
-              <View className="h-[16px] w-[16px] rounded-full bg-destructive" />
+              <View className={`h-[16px] w-[16px] rounded-full ${listingType === 'FOR_RENT' ? 'bg-main-500' : 'bg-destructive'}`} />
               <ThemedText className="text-[14px] text-foreground">{typeLabel}</ThemedText>
             </View>
           ) : null}

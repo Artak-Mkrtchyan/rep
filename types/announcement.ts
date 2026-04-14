@@ -92,6 +92,7 @@ export type Attributes = {
     numberOfFloors?: number;
     yearBuilt?: number;
   };
+  buildingType?: 'OFFICE' | 'RETAIL' | 'BUSINESS_CENTER' | 'INDUSTRIAL' | 'RESIDENTIAL_BUILDING';
   amenities?: {
     hvac?: boolean;
     balcony?: boolean;
@@ -104,6 +105,50 @@ export type Attributes = {
     evChargingStation?: boolean;
     bicycleStorage?: boolean;
   };
+  terrace?: boolean;
+  gardenYard?: boolean;
+  parking?: boolean;
+  disabledAccess?: boolean;
+  evChargingStation?: boolean;
+  electricityAvailable?: boolean;
+  infrastructure?: {
+    electricityAvailable?: boolean;
+    waterSupply?: boolean;
+    gas?: boolean;
+    sewage?: boolean;
+    internetAvailable?: boolean;
+  };
+  roadAccess?: {
+    roadAccess?: boolean;
+    roadType?: 'ASPHALT' | 'GRAVEL' | 'DIRT_ROAD';
+  };
+  remoteAutomaticDoor?: boolean;
+  motorcycleBicycleAllowed?: boolean;
+  securityAccess?: {
+    access247?: boolean;
+    gatedEntry?: boolean;
+    remoteControlAccess?: boolean;
+    securityGuard?: boolean;
+    securityCctv?: boolean;
+  };
+  ceilingHeightM?: number;
+  vehicleRestrictions?: {
+    maxVehicleHeightCm?: number;
+    maxVehicleLengthCm?: number;
+  };
+  facilities?: {
+    coolingHvac?: boolean;
+    elevator?: boolean;
+    heating?: boolean;
+    ventilationSystem?: boolean;
+    fireSafetySystem?: boolean;
+    sprinklers?: boolean;
+    receptionConcierge?: boolean;
+    internetConnectivity?: boolean;
+    serverRoom?: boolean;
+    kitchenette?: boolean;
+    restroomsCount?: number;
+  };
   ownershipAndCondition?: {
     condition?: 'EXCELLENT' | 'RENOVATED' | 'NEEDS_RENOVATION' | 'UNDER_CONSTRUCTION';
     ownershipType?: 'FULL' | 'SHARED' | 'JOINT';
@@ -113,6 +158,31 @@ export type Attributes = {
     largeDogs?: boolean;
     smallDogs?: boolean;
   };
+  usableAreaM2?: number;
+  landAreaM2?: number;
+  houseAreaM2?: number;
+  garageType?: 'ENCLOSED' | 'OPEN_AIR' | 'UNDERGROUND' | 'COVERED_CARPORT';
+  spaceSize?:
+    | 'SINGLE'
+    | 'DOUBLE'
+    | 'TRIPLE'
+    | 'MULTIPLE'
+    | 'MOTORCYCLE'
+    | 'SMALL_CAR'
+    | 'STANDARD_CAR'
+    | 'SUV'
+    | 'VAN';
+  landType?: 'RESIDENTIAL' | 'AGRICULTURAL' | 'INDUSTRIAL' | 'COMMERCIAL' | 'MIXED_USE';
+  permittedUse?:
+    | 'CONSTRUCTION'
+    | 'FARMING'
+    | 'STORAGE'
+    | 'PARKING'
+    | 'EVENTS'
+    | 'GARDENING'
+    | 'OTHER';
+
+  parkingType?: 'OUTDOOR' | 'INDOOR' | 'UNDERGROUND' | 'COVERED';
 };
 
 export type CharacteristicConfig = {

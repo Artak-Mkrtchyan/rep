@@ -1,5 +1,6 @@
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
-import { MetaData, RentForApartmentsForm } from '@/types/announcement';
+import { MetaData, Property, RentForApartmentsForm } from '@/types/announcement';
+import * as Yup from 'yup';
 import { AnnouncementPublicationResponse } from './api/applications';
 
 export type AnnouncementRoutePath =
@@ -81,4 +82,140 @@ export const getParsedAnnouncementData = (
   } catch (error) {
     throw error;
   }
+};
+
+export const getPropertyTypeInfo = (type: Property | '') => ({
+  isApartment: type === 'APARTMENT',
+  isCommercialSpace: type === 'COMMERCIAL_SPACE',
+  isGarage: type === 'GARAGE',
+  isHouse: type === 'HOUSE',
+  isLand: type === 'LAND',
+  isParkingSpace: type === 'PARKING_SPACE',
+});
+
+const PropertyInfoApartmentsSchema = Yup.object().shape({
+  property: Yup.object().shape({
+    areaM2: Yup.number().required('Required').typeError('Must be a number'),
+    attributes: Yup.object().shape({
+      bedroomCount: Yup.number().required('Required').typeError('Must be a number'),
+      bathroomCount: Yup.number().required('Required').typeError('Must be a number'),
+    }),
+  }),
+});
+
+const PropertyInfoCommercialSpacesSchema = Yup.object().shape({
+  property: Yup.object().shape({
+    areaM2: Yup.number().required('Required').typeError('Must be a number'),
+    attributes: Yup.object().shape({
+      usableAreaM2: Yup.number().required('Required').typeError('Must be a number'),
+      buildingType: Yup.string().required('Required'),
+    }),
+  }),
+});
+
+const PropertyInfoGaragesSchema = Yup.object().shape({
+  property: Yup.object().shape({
+    areaM2: Yup.number().required('Required').typeError('Must be a number'),
+    attributes: Yup.object().shape({
+      spaceSize: Yup.string().required('Required'),
+      garageType: Yup.string().required('Required'),
+    }),
+  }),
+});
+
+const PropertyInfoHousesSchema = Yup.object().shape({
+  property: Yup.object().shape({
+    areaM2: Yup.number().required('Required').typeError('Must be a number'),
+    attributes: Yup.object().shape({
+      bedroomCount: Yup.number().required('Required').typeError('Must be a number'),
+      bathroomCount: Yup.number().required('Required').typeError('Must be a number'),
+      landAreaM2: Yup.number().required('Required').typeError('Must be a number'),
+      houseAreaM2: Yup.number().required('Required').typeError('Must be a number'),
+    }),
+  }),
+});
+
+const PropertyInfoLandSchema = Yup.object().shape({
+  property: Yup.object().shape({
+    areaM2: Yup.number().required('Required').typeError('Must be a number'),
+    attributes: Yup.object().shape({
+      landType: Yup.string().required('Required'),
+      landAreaM2: Yup.number().required('Required').typeError('Must be a number'),
+      permittedUse: Yup.string().required('Required'),
+    }),
+  }),
+});
+
+const PropertyInfoParkingSpacesSchema = Yup.object().shape({
+  property: Yup.object().shape({
+    areaM2: Yup.number().required('Required').typeError('Must be a number'),
+    attributes: Yup.object().shape({
+      spaceSize: Yup.string().required('Required'),
+      parkingType: Yup.string().required('Required'),
+    }),
+  }),
+});
+
+const CharacteristicsSchema = Yup.object().shape({
+  building: Yup.object().shape({
+    buildingType: Yup.string().required('Required'),
+    yearBuilt: Yup.number().required('Required').typeError('Must be a number'),
+  }),
+  ownershipAndCondition: Yup.object().shape({
+    condition: Yup.string().required('Required'),
+    ownershipType: Yup.string().required('Required'),
+  }),
+});
+
+const CommercialSpaceCharacteristicsSchema = Yup.object().shape({
+  building: Yup.object().shape({
+    buildingType: Yup.string().required('Required'),
+  }),
+  facilities: Yup.object().shape({
+    restroomsCount: Yup.number().required('Required').typeError('Must be a number'),
+  }),
+});
+
+const LandCharacteristicsSchema = Yup.object().shape({
+  roadAccess: Yup.object().shape({
+    roadType: Yup.string().required('Required'),
+  }),
+});
+
+export const getSchemaForPropertyType = (type: Property | '') => {
+  if (type === 'APARTMENT') {
+    return PropertyInfoApartmentsSchema;
+  }
+  if (type === 'COMMERCIAL_SPACE') {
+    return PropertyInfoCommercialSpacesSchema;
+  }
+  if (type === 'GARAGE') {
+    return PropertyInfoGaragesSchema;
+  }
+  if (type === 'HOUSE') {
+    return PropertyInfoHousesSchema;
+  }
+  if (type === 'LAND') {
+    return PropertyInfoLandSchema;
+  }
+  if (type === 'PARKING_SPACE') {
+    return PropertyInfoParkingSpacesSchema;
+  }
+  return undefined;
+};
+
+export const getCharacteristicsSchemaForPropertyType = (type: Property | '') => {
+  if (type === 'APARTMENT' || type === 'HOUSE') {
+    return CharacteristicsSchema;
+  }
+
+  if (type === 'COMMERCIAL_SPACE') {
+    return CommercialSpaceCharacteristicsSchema;
+  }
+
+  if (type === 'LAND') {
+    return LandCharacteristicsSchema;
+  }
+
+  return undefined;
 };

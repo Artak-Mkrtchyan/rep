@@ -44,10 +44,9 @@ export default function PropertyInfoSecondScreen() {
     } else {
       try {
         await sendFormData();
+        router.back();
       } catch {
         Alert.alert(t('common.error'), t('error.failed_to_send_form'));
-      } finally {
-        router.back();
       }
     }
   };

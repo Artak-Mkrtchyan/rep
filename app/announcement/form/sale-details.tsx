@@ -53,10 +53,9 @@ export default function SaleDetailsScreen() {
     } else {
       try {
         await sendFormData();
-      } catch {
-        Alert.alert('Error', 'Failed to send form data');
-      } finally {
         router.back();
+      } catch {
+        Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       }
     }
   };
@@ -107,7 +106,7 @@ export default function SaleDetailsScreen() {
                         {CURRENCY_PREFIX}
                       </ThemedText>
                     }
-                    keyboardType="decimal-pad"
+                    keyboardType="number-pad"
                     accessibilityLabel="Sale price"
                     accessibilityHint="Enter sale price amount in dollars"
                   />

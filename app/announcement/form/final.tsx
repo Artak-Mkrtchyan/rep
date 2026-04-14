@@ -35,23 +35,20 @@ export default function FinalScreen() {
   const handlePublish = async () => {
     try {
       await sendFormData();
-
       await publishFormData();
       resetForm();
+      router.back();
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_publish'));
-    } finally {
-      router.back();
     }
   };
 
   const handleSaveAndExit = async () => {
     try {
       await sendFormData();
+      router.back();
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
-    } finally {
-      router.back();
     }
   };
 
@@ -80,11 +77,11 @@ export default function FinalScreen() {
 
   const ownershipRaw = formData.property?.attributes?.ownershipAndCondition?.ownershipType;
   const ownershipLabel =
-    ownershipRaw === 'FULL'
+    ownershipRaw === 'full' || ownershipRaw === 'FULL'
       ? t('ownership_type_options.full')
-      : ownershipRaw === 'SHARED'
+      : ownershipRaw === 'shared' || ownershipRaw === 'SHARED'
         ? t('ownership_type_options.shared')
-        : ownershipRaw === 'JOINT'
+        : ownershipRaw === 'joint' || ownershipRaw === 'JOINT'
           ? t('ownership_type_options.joint')
           : '—';
 
@@ -156,6 +153,7 @@ export default function FinalScreen() {
             title={formData.title || ''}
             id={metaData?.response?.publicId}
             typeLabel={typeLabel}
+            listingType={formData.listingType as 'FOR_RENT' | 'FOR_SALE'}
             price={formatNumericString(price)}
             location={{
               country: formData.geo.country[currentLanguage],

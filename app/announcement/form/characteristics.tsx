@@ -45,10 +45,16 @@ export default function CharacteristicsScreen() {
 
   const saveCharacteristics = async (values: CharacteristicsFormValues) => {
     if (formData.property) {
+      const ceilingHeightM = Number(values.ceilingHeightM) || undefined;
+
       updateFormData({
         property: {
           ...formData.property,
-          attributes: values,
+          attributes: {
+            ...formData.property.attributes,
+            ...values,
+            ceilingHeightM,
+          },
         },
       });
     }
@@ -103,14 +109,16 @@ export default function CharacteristicsScreen() {
                 <View className="gap-4">
                   <Conditional condition={isGarage || isParkingSpace}>
                     <Input
-                      label={'Max vehicle height'}
+                      label={t('property_details.max_vehicle_height')}
                       numericOnly
                       value={`${values.vehicleRestrictions?.maxVehicleHeightCm || ''}`}
                       onChangeText={(v) =>
-                        setFieldValue('vehicleRestrictions.maxVehicleHeightCm', v)
+                        setFieldValue('vehicleRestrictions.maxVehicleHeightCm', Number(v))
                       }
                       right={
-                        <ThemedText className="text-[16px] text-muted-foreground">cm</ThemedText>
+                        <ThemedText className="text-[16px] text-muted-foreground">
+                          {t('common.unit_cm')}
+                        </ThemedText>
                       }
                       keyboardType="number-pad"
                       error={
@@ -123,19 +131,21 @@ export default function CharacteristicsScreen() {
 
                   <Conditional condition={isGarage || isParkingSpace}>
                     <Input
-                      label={t('Max vehicle length')}
+                      label={t('property_details.max_vehicle_length')}
                       numericOnly
                       value={`${values.vehicleRestrictions?.maxVehicleLengthCm || ''}`}
                       onChangeText={(v) =>
-                        setFieldValue('vehicleRestrictions.maxVehicleLengthCm', v)
+                        setFieldValue('vehicleRestrictions.maxVehicleLengthCm', Number(v))
                       }
                       right={
-                        <ThemedText className="text-[16px] text-muted-foreground">cm</ThemedText>
+                        <ThemedText className="text-[16px] text-muted-foreground">
+                          {t('common.unit_cm')}
+                        </ThemedText>
                       }
                       keyboardType="decimal-pad"
                       error={
                         touched.vehicleRestrictions && errors.vehicleRestrictions
-                          ? 'Required'
+                          ? t('validation.required')
                           : undefined
                       }
                     />
@@ -143,18 +153,20 @@ export default function CharacteristicsScreen() {
 
                   <Conditional condition={isGarage}>
                     <Input
-                      label={t('Ceiling height (m)')}
+                      label={t('property_details.ceiling_height')}
                       numericOnly
                       allowDecimal
                       value={`${values.ceilingHeightM || ''}`}
                       onChangeText={(v) => setFieldValue('ceilingHeightM', v)}
                       right={
-                        <ThemedText className="text-[16px] text-muted-foreground">m</ThemedText>
+                        <ThemedText className="text-[16px] text-muted-foreground">
+                          {t('common.unit_m')}
+                        </ThemedText>
                       }
                       keyboardType="number-pad"
                       error={
                         touched.vehicleRestrictions && errors.vehicleRestrictions
-                          ? 'Required'
+                          ? t('validation.required')
                           : undefined
                       }
                     />
@@ -205,7 +217,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isLand}>
                       <CheckboxRow
-                        label={'Electricity available'}
+                        label={t('property_details.electricity')}
                         checked={values.infrastructure?.electricityAvailable ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -219,7 +231,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isParkingSpace}>
                       <CheckboxRow
-                        label={'Electricity available'}
+                        label={t('property_details.electricity')}
                         checked={values.electricityAvailable ?? false}
                         onToggle={() =>
                           setFieldValue('electricityAvailable', !values.electricityAvailable)
@@ -230,7 +242,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isLand}>
                       <CheckboxRow
-                        label={'Water supply'}
+                        label={t('property_details.water')}
                         checked={values.infrastructure?.waterSupply ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -244,7 +256,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isLand}>
                       <CheckboxRow
-                        label={'Gas'}
+                        label={t('property_details.gas')}
                         checked={values.infrastructure?.gas ?? false}
                         onToggle={() =>
                           setFieldValue('infrastructure.gas', !values.infrastructure?.gas)
@@ -255,7 +267,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isLand}>
                       <CheckboxRow
-                        label={'Sewage'}
+                        label={t('property_details.sewage')}
                         checked={values.infrastructure?.sewage ?? false}
                         onToggle={() =>
                           setFieldValue('infrastructure.sewage', !values.infrastructure?.sewage)
@@ -266,7 +278,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isLand}>
                       <CheckboxRow
-                        label={'Internet available'}
+                        label={t('property_details.internet')}
                         checked={values.infrastructure?.internetAvailable ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -280,7 +292,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isLand}>
                       <CheckboxRow
-                        label={'Road access'}
+                        label={t('property_details.road_access')}
                         checked={values.roadAccess?.roadAccess ?? false}
                         onToggle={() =>
                           setFieldValue('roadAccess.roadAccess', !values.roadAccess?.roadAccess)
@@ -422,7 +434,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isGarage || isParkingSpace}>
                       <CheckboxRow
-                        label={t('24/7 access')}
+                        label={t('property_details.access_24_7')}
                         checked={values.securityAccess?.access247 ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -436,7 +448,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isGarage || isParkingSpace}>
                       <CheckboxRow
-                        label={t('Gated entry')}
+                        label={t('property_details.gated_entry')}
                         checked={values.securityAccess?.gatedEntry ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -450,7 +462,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isGarage || isParkingSpace}>
                       <CheckboxRow
-                        label={t('Remote control access')}
+                        label={t('property_details.remote_access')}
                         checked={values.securityAccess?.remoteControlAccess ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -464,7 +476,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isGarage || isParkingSpace}>
                       <CheckboxRow
-                        label={t('Security guard')}
+                        label={t('property_details.security_guard')}
                         checked={values.securityAccess?.securityGuard ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -478,7 +490,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isGarage || isParkingSpace}>
                       <CheckboxRow
-                        label={t('Security / CCTV)')}
+                        label={t('property_details.security_cctv')}
                         checked={values.securityAccess?.securityCctv ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -492,7 +504,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isGarage}>
                       <CheckboxRow
-                        label={t('Remote automatic door')}
+                        label={t('property_details.automatic_door')}
                         checked={values.remoteAutomaticDoor ?? false}
                         onToggle={() =>
                           setFieldValue('remoteAutomaticDoor', !values.remoteAutomaticDoor)
@@ -503,7 +515,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isGarage}>
                       <CheckboxRow
-                        label={t('Motorcycle / Bicycle allowed')}
+                        label={t('property_details.motorcycle_bicycle')}
                         checked={values.motorcycleBicycleAllowed ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -517,7 +529,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Heating')}
+                        label={t('property_details.heating')}
                         checked={values.facilities?.heating ?? false}
                         onToggle={() =>
                           setFieldValue('facilities.heating', !values.facilities?.heating)
@@ -528,7 +540,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Ventilation system')}
+                        label={t('property_details.ventilation')}
                         checked={values.facilities?.ventilationSystem ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -542,7 +554,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Fire safety system')}
+                        label={t('property_details.fire_safety')}
                         checked={values.facilities?.fireSafetySystem ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -556,7 +568,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Sprinklers')}
+                        label={t('property_details.sprinklers')}
                         checked={values.facilities?.sprinklers ?? false}
                         onToggle={() =>
                           setFieldValue('facilities.sprinklers', !values.facilities?.sprinklers)
@@ -567,7 +579,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Reception/Concierge')}
+                        label={t('property_details.reception')}
                         checked={values.facilities?.receptionConcierge ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -581,7 +593,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Internet connectivity')}
+                        label={t('property_details.internet')}
                         checked={values.facilities?.internetConnectivity ?? false}
                         onToggle={() =>
                           setFieldValue(
@@ -595,7 +607,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Server room')}
+                        label={t('property_details.server_room')}
                         checked={values.facilities?.serverRoom ?? false}
                         onToggle={() =>
                           setFieldValue('facilities.serverRoom', !values.facilities?.serverRoom)
@@ -606,7 +618,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <CheckboxRow
-                        label={t('Kitchenette')}
+                        label={t('property_details.kitchenette')}
                         checked={values.facilities?.kitchenette ?? false}
                         onToggle={() =>
                           setFieldValue('facilities.kitchenette', !values.facilities?.kitchenette)
@@ -617,7 +629,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isHouse}>
                       <CheckboxRow
-                        label={t('Terrace')}
+                        label={t('property_details.terrace')}
                         checked={values.terrace ?? false}
                         onToggle={() => setFieldValue('terrace', !values.terrace)}
                         containerClassName="py-[0px]"
@@ -626,7 +638,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isHouse}>
                       <CheckboxRow
-                        label={t('Garden/Yard')}
+                        label={t('property_details.garden')}
                         checked={values.gardenYard ?? false}
                         onToggle={() => setFieldValue('gardenYard', !values.gardenYard)}
                         containerClassName="py-[0px]"
@@ -636,11 +648,11 @@ export default function CharacteristicsScreen() {
                     <Conditional condition={isLand}>
                       <View className="mb-[8px] rounded-[12px] bg-muted p-4">
                         <ChipGroup
-                          label={'Road type'}
+                          label={t('property_details.road_type')}
                           options={[
-                            { label: 'Asphalt', value: 'ASPHALT' },
-                            { label: 'Gravel', value: 'GRAVEL' },
-                            { label: 'Dirt road', value: 'DIRT_ROAD' },
+                            { label: t('road_type_options.asphalt'), value: 'ASPHALT' },
+                            { label: t('road_type_options.gravel'), value: 'GRAVEL' },
+                            { label: t('road_type_options.dirtRoad'), value: 'DIRT_ROAD' },
                           ]}
                           value={values.roadAccess?.roadType || ''}
                           onChange={(v) => setFieldValue('roadAccess.roadType', v)}
@@ -691,7 +703,7 @@ export default function CharacteristicsScreen() {
 
                     <Conditional condition={isCommercialSpace}>
                       <Input
-                        label={t('Restrooms count')}
+                        label={t('property_details.restrooms')}
                         numericOnly
                         value={`${values.facilities?.restroomsCount || ''}`}
                         onChangeText={(v) => setFieldValue('facilities.restroomsCount', Number(v))}

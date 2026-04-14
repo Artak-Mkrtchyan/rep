@@ -17,6 +17,7 @@ import {
   getBuildingTypeOptionsCommercial,
   getGarageTypeOptions,
   getLandTypeOptions,
+  getParkingTypeOptions,
   getPermittedUseOptions,
   getSpaceSizeGarageOptions,
   getSpaceSizeParkingOptions,
@@ -267,6 +268,16 @@ export default function PropertyInfoFirstScreen() {
                       value={`${values.property?.attributes?.permittedUse}`}
                       onChange={(v) => setFieldValue('property.attributes.permittedUse', v)}
                       options={getPermittedUseOptions(t)}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isParkingSpace}>
+                    <Select
+                      label={t('announcement.rent.parking_type')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.parkingType}`}
+                      onChange={(v) => setFieldValue('property.attributes.parkingType', v)}
+                      options={getParkingTypeOptions(t)}
                     />
                   </Conditional>
                 </View>

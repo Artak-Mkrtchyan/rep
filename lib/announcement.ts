@@ -151,6 +151,7 @@ const PropertyInfoParkingSpacesSchema = Yup.object().shape({
     areaM2: Yup.number().required('Required').typeError('Must be a number'),
     attributes: Yup.object().shape({
       spaceSize: Yup.string().required('Required'),
+      parkingType: Yup.string().required('Required'),
     }),
   }),
 });

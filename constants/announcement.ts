@@ -67,6 +67,13 @@ export const getLandTypeOptions = (t: TFunction): SelectOption<string>[] => [
   { label: t('land_type.mixed_use'), value: 'MIXED_USE' },
 ];
 
+export const getParkingTypeOptions = (t: TFunction): SelectOption<string>[] => [
+  { label: t('parking_type.outdoor'), value: 'OUTDOOR' },
+  { label: t('parking_type.indoor'), value: 'INDOOR' },
+  { label: t('parking_type.underground'), value: 'UNDERGROUND' },
+  { label: t('parking_type.covered'), value: 'COVERED' },
+];
+
 export const getPermittedUseOptions = (t: TFunction): SelectOption<string>[] => [
   { label: t('permitted_use.construction'), value: 'CONSTRUCTION' },
   { label: t('permitted_use.farming'), value: 'FARMING' },

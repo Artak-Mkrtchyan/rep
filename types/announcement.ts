@@ -181,6 +181,8 @@ export type Attributes = {
     | 'EVENTS'
     | 'GARDENING'
     | 'OTHER';
+
+  parkingType?: 'OUTDOOR' | 'INDOOR' | 'UNDERGROUND' | 'COVERED';
 };
 
 export type CharacteristicConfig = {

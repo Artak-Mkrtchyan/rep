@@ -32,6 +32,7 @@ export interface FileUploadProps {
   required?: boolean;
   disabled?: boolean;
   containerClassName?: string;
+  maxFileSize?: number;
 }
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
@@ -48,6 +49,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   required,
   disabled = false,
   containerClassName,
+  maxFileSize = MAX_FILE_SIZE,
 }) => {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = React.useState(false);
@@ -66,7 +68,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
 
-        if (asset.size && asset.size > MAX_FILE_SIZE) {
+        if (asset.size && asset.size > maxFileSize) {
           Alert.alert(t('ui.file_too_large_title'), t('ui.file_too_large_message'));
           return;
         }

@@ -92,6 +92,7 @@ export type Attributes = {
     numberOfFloors?: number;
     yearBuilt?: number;
   };
+  buildingType?: 'OFFICE' | 'RETAIL' | 'BUSINESS_CENTER' | 'INDUSTRIAL' | 'RESIDENTIAL_BUILDING';
   amenities?: {
     hvac?: boolean;
     balcony?: boolean;
@@ -113,6 +114,29 @@ export type Attributes = {
     largeDogs?: boolean;
     smallDogs?: boolean;
   };
+  usableAreaM2?: number;
+  landAreaM2?: number;
+  houseAreaM2?: number;
+  garageType?: 'ENCLOSED' | 'OPEN_AIR' | 'UNDERGROUND' | 'COVERED_CARPORT';
+  spaceSize?:
+    | 'SINGLE'
+    | 'DOUBLE'
+    | 'TRIPLE'
+    | 'MULTIPLE'
+    | 'MOTORCYCLE'
+    | 'SMALL_CAR'
+    | 'STANDARD_CAR'
+    | 'SUV'
+    | 'VAN';
+  landType?: 'RESIDENTIAL' | 'AGRICULTURAL' | 'INDUSTRIAL' | 'COMMERCIAL' | 'MIXED_USE';
+  permittedUse?:
+    | 'CONSTRUCTION'
+    | 'FARMING'
+    | 'STORAGE'
+    | 'PARKING'
+    | 'EVENTS'
+    | 'GARDENING'
+    | 'OTHER';
 };
 
 export type CharacteristicConfig = {

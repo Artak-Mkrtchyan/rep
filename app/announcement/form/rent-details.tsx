@@ -102,7 +102,6 @@ export default function RentDetailsScreen() {
                   <Input
                     label={t('announcement.rent.monthly_rent')}
                     numericOnly
-                    allowDecimal
                     placeholder=""
                     value={`${values.rentDetails?.monthlyRent ?? ''}`}
                     onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', v)}
@@ -117,7 +116,7 @@ export default function RentDetailsScreen() {
                         {MONTHLY_RENT_SUFFIX}
                       </ThemedText>
                     }
-                    keyboardType="decimal-pad"
+                    keyboardType="number-pad"
                     accessibilityLabel="Monthly rent"
                     accessibilityHint="Enter monthly rent amount in dollars"
                   />
@@ -126,7 +125,6 @@ export default function RentDetailsScreen() {
                     label={t('announcement.rent.security_deposit')}
                     placeholder=""
                     numericOnly
-                    allowDecimal
                     value={`${values.rentDetails?.securityDeposit ?? ''}`}
                     onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', v)}
                     error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
@@ -140,7 +138,7 @@ export default function RentDetailsScreen() {
                         {SQUARE_METERS_SUFFIX}
                       </ThemedText>
                     }
-                    keyboardType="decimal-pad"
+                    keyboardType="number-pad"
                     accessibilityLabel="Security deposit"
                     accessibilityHint="Optional. Enter security deposit amount in dollars"
                   />

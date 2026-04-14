@@ -154,6 +154,33 @@ const PropertyInfoParkingSpacesSchema = Yup.object().shape({
     }),
   }),
 });
+
+const CharacteristicsSchema = Yup.object().shape({
+  building: Yup.object().shape({
+    buildingType: Yup.string().required('Required'),
+    yearBuilt: Yup.number().required('Required').typeError('Must be a number'),
+  }),
+  ownershipAndCondition: Yup.object().shape({
+    condition: Yup.string().required('Required'),
+    ownershipType: Yup.string().required('Required'),
+  }),
+});
+
+const CommercialSpaceCharacteristicsSchema = Yup.object().shape({
+  building: Yup.object().shape({
+    buildingType: Yup.string().required('Required'),
+  }),
+  facilities: Yup.object().shape({
+    restroomsCount: Yup.number().required('Required').typeError('Must be a number'),
+  }),
+});
+
+const LandCharacteristicsSchema = Yup.object().shape({
+  roadAccess: Yup.object().shape({
+    roadType: Yup.string().required('Required'),
+  }),
+});
+
 export const getSchemaForPropertyType = (type: Property | '') => {
   if (type === 'APARTMENT') {
     return PropertyInfoApartmentsSchema;
@@ -173,5 +200,21 @@ export const getSchemaForPropertyType = (type: Property | '') => {
   if (type === 'PARKING_SPACE') {
     return PropertyInfoParkingSpacesSchema;
   }
+  return undefined;
+};
+
+export const getCharacteristicsSchemaForPropertyType = (type: Property | '') => {
+  if (type === 'APARTMENT' || type === 'HOUSE') {
+    return CharacteristicsSchema;
+  }
+
+  if (type === 'COMMERCIAL_SPACE') {
+    return CommercialSpaceCharacteristicsSchema;
+  }
+
+  if (type === 'LAND') {
+    return LandCharacteristicsSchema;
+  }
+
   return undefined;
 };

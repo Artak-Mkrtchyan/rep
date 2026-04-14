@@ -179,7 +179,7 @@ export default function ComparisonsScreen() {
                   contentFit="contain"
                   accessibilityIgnoresInvertColors
                 />
-                <Pressable onPress={() => setTooManyVisible(false)} style={styles.closeButton}>
+                <Pressable onPress={() => { setSelectedIds(new Set()); setTooManyVisible(false); }} style={styles.closeButton}>
                   <ThemedText className="text-[16px] font-semibold text-white">
                     {t('comparisons.close')}
                   </ThemedText>

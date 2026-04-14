@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, View } from 'react-native';
+import { ActionSheetIOS, Alert, Platform, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { InputError } from '@/components/ui/input/error';
@@ -52,12 +53,51 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = React.useState(false);
 
-  const handleFileUpload = async () => {
-    if (disabled || isUploading) return;
+  const uploadAsset = async (uri: string, mimeType: string, name: string) => {
+    const formData = new FormData();
+    formData.append('file', {
+      uri,
+      type: mimeType || 'application/octet-stream',
+      name: name.toLowerCase() || 'file',
+    } as any);
 
+    const response = await applicationsService.uploadTemporaryAttachment(formData);
+    onChange?.([
+      ...value,
+      { id: response.id, uri, type: mimeType, name: name.toLowerCase() },
+    ]);
+  };
+
+  const pickFromGallery = async () => {
     try {
       setIsUploading(true);
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 1,
+      });
 
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0];
+
+        if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
+          Alert.alert(t('ui.file_too_large_title'), t('ui.file_too_large_message'));
+          return;
+        }
+
+        const fileName = asset.fileName || asset.uri.split('/').pop() || 'photo.jpg';
+        const mimeType = asset.mimeType || 'image/jpeg';
+        await uploadAsset(asset.uri, mimeType, fileName);
+      }
+    } catch (error) {
+      handleUploadError(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const pickFromFiles = async () => {
+    try {
+      setIsUploading(true);
       const result = await DocumentPicker.getDocumentAsync({
         type: allowedFileTypes || ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'],
         copyToCacheDirectory: true,
@@ -71,24 +111,39 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           return;
         }
 
-        let formData = new FormData();
-
-        formData.append('file', {
-          uri: asset.uri,
-          type: asset.mimeType || 'application/octet-stream',
-          name: asset.name.toLowerCase() || 'file',
-        } as any);
-
-        const response = await applicationsService.uploadTemporaryAttachment(formData);
-        onChange?.([
-          ...value,
-          { id: response.id, uri: asset.uri, type: asset.mimeType, name: asset.name.toLowerCase() },
-        ]);
+        await uploadAsset(asset.uri, asset.mimeType || 'application/octet-stream', asset.name);
       }
     } catch (error) {
       handleUploadError(error);
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const handleFileUpload = () => {
+    if (disabled || isUploading) return;
+
+    const galleryLabel = t('ui.choose_gallery');
+    const filesLabel = t('ui.choose_files');
+    const cancelLabel = t('common.cancel');
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: [cancelLabel, galleryLabel, filesLabel],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) pickFromGallery();
+          else if (buttonIndex === 2) pickFromFiles();
+        }
+      );
+    } else {
+      Alert.alert(t('ui.select_file'), undefined, [
+        { text: galleryLabel, onPress: pickFromGallery },
+        { text: filesLabel, onPress: pickFromFiles },
+        { text: cancelLabel, style: 'cancel' },
+      ]);
     }
   };
 

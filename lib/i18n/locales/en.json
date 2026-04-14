@@ -181,7 +181,7 @@
   "signup.application_submitted.description": "Your application has been submitted for review. It is currently pending administrator approval. You will be notified once the review is completed.",
   "signup.application_submitted.ok": "Ok",
 
-  "forgot_password.title": "Forgot password?",
+  "forgot_password.title": "Forgot password",
   "forgot_password.enter_email": "Enter your email",
   "forgot_password.verify.title": "Verify your email address",
   "forgot_password.verify.description": "We will send you an One Time Password via this mail: <emailStyle>{{email}}</emailStyle> email address",

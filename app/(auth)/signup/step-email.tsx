@@ -129,8 +129,8 @@ export default function SignUpEmailStepScreen() {
             </Button>
 
             <SignInFooter
-              onGooglePress={handleGoogleAuth}
-              onApplePress={handleAppleAuth}
+              onGooglePress={data.role === 'individual' ? handleGoogleAuth : undefined}
+              onApplePress={data.role === 'individual' ? handleAppleAuth : undefined}
               onSignInPress={handleGoToLogin}
               showSignInLink
             />

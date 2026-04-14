@@ -76,13 +76,6 @@ export default function BrokerSignUpScreen() {
     router.replace(AUTH_ROUTES.LOGIN);
   };
 
-  const handleGoogleAuth = () => {
-    // TODO: Implement Google authentication
-  };
-
-  const handleAppleAuth = () => {
-    // TODO: Implement Apple authentication
-  };
 
   return (
     <AuthLayout scrollable>
@@ -276,8 +269,6 @@ export default function BrokerSignUpScreen() {
               </Button>
 
               <SignInFooter
-                onGooglePress={handleGoogleAuth}
-                onApplePress={handleAppleAuth}
                 onSignInPress={handleGoToLogin}
                 showSignInLink
               />

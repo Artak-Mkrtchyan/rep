@@ -81,13 +81,6 @@ export default function ConstructionCompanySignUpScreen() {
     router.replace(AUTH_ROUTES.LOGIN);
   };
 
-  const handleGoogleAuth = () => {
-    // TODO: Implement Google authentication
-  };
-
-  const handleAppleAuth = () => {
-    // TODO: Implement Apple authentication
-  };
 
   return (
     <AuthLayout scrollable>
@@ -283,8 +276,6 @@ export default function ConstructionCompanySignUpScreen() {
               </Button>
 
               <SignInFooter
-                onGooglePress={handleGoogleAuth}
-                onApplePress={handleAppleAuth}
                 onSignInPress={handleGoToLogin}
                 showSignInLink
               />

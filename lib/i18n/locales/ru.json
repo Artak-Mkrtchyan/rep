@@ -181,7 +181,7 @@
   "signup.application_submitted.description": "Ваша заявка отправлена на рассмотрение. В данный момент она ожидает одобрения администратора. Вы получите уведомление, когда рассмотрение будет завершено.",
   "signup.application_submitted.ok": "Ок",
 
-  "forgot_password.title": "Забыли пароль?",
+  "forgot_password.title": "Забыли пароль",
   "forgot_password.enter_email": "Введите вашу электронную почту",
   "forgot_password.verify.title": "Подтвердите адрес электронной почты",
   "forgot_password.verify.description": "Мы отправим вам одноразовый пароль на эту почту: <emailStyle>{{email}}</emailStyle>",

@@ -192,7 +192,9 @@ export default function LoginFormScreen() {
                 afterField={
                   <View className="mt-1 w-full items-end">
                     <Pressable onPress={handleForgotPassword} disabled={isLoading} hitSlop={8}>
-                      <ThemedText className="text-[16px] leading-[20px] text-primary">
+                      <ThemedText
+                        className="text-[16px] font-normal leading-[24px]"
+                        style={{ color: theme.link }}>
                         {t('login.forgot_password')}
                       </ThemedText>
                     </Pressable>

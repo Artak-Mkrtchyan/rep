@@ -210,7 +210,13 @@ export const authService = {
   },
 
   resetPassword: async (data: ResetPasswordRequest | ChangePasswordRequest): Promise<void> => {
-    await httpClient.patch<void>('/v1/users/change-password', data, { skipAuth: true });
+    // OTP reset is unauthenticated; logged-in change-password must send the bearer token.
+    const skipAuth = data.usingOtp === true;
+    await httpClient.patch<void>(
+      '/v1/users/change-password',
+      data,
+      skipAuth ? { skipAuth: true } : {}
+    );
   },
 
   getCurrentActor: async (): Promise<CurrentActorResponse> => {

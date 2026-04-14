@@ -181,7 +181,7 @@
   "signup.application_submitted.description": "Arizangiz ko'rib chiqish uchun yuborildi. Hozirda administrator tasdig'i kutilmoqda. Ko'rib chiqish yakunlangandan so'ng sizga xabar beriladi.",
   "signup.application_submitted.ok": "OK",
 
-  "forgot_password.title": "Parolni unutdingizmi?",
+  "forgot_password.title": "Parolni unutdingizmi",
   "forgot_password.enter_email": "Elektron pochtangizni kiriting",
   "forgot_password.verify.title": "Elektron pochtangizni tasdiqlang",
   "forgot_password.verify.description": "Biz sizga bir martalik parolni ushbu manzilga yuboramiz: <emailStyle>{{email}}</emailStyle>",

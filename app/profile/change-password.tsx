@@ -14,8 +14,22 @@ import { useAuth } from '@/context/AuthContext';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
-import { ERROR_MESSAGES, getApiErrorMessage, isApiError, showErrorAlert } from '@/lib/error-handler';
+import { ERROR_MESSAGES, isApiError, showErrorAlert } from '@/lib/error-handler';
 import { doPasswordsMatch, isPasswordValid, validatePassword } from '@/lib/auth-validation';
+
+function isLikelyWrongCurrentPassword(error: unknown): boolean {
+  if (!isApiError(error) || error.statusCode === undefined) return false;
+  const code = error.statusCode;
+  const msg = (error.message ?? '').toLowerCase();
+
+  if (code === 401 || code === 403) return true;
+  if (code === 400) {
+    return /current password|old password|incorrect password|wrong password|invalid password|неверн|не верн|joriy parol/.test(
+      msg
+    );
+  }
+  return false;
+}
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation();
@@ -31,11 +45,18 @@ export default function ChangePasswordScreen() {
 
   const passwordRequirements = validatePassword(newPassword);
   const passwordsMatch = doPasswordsMatch(newPassword, confirmPassword);
-  const canSubmit =
-    currentPassword.length > 0 &&
-    isPasswordValid(passwordRequirements) &&
-    passwordsMatch &&
-    !isLoading;
+  const newPasswordReady = isPasswordValid(passwordRequirements);
+  const confirmPasswordError = (() => {
+    if (confirmPassword.length > 0 && !passwordsMatch) {
+      return t('validation.passwords_do_not_match');
+    }
+    if (newPassword.length > 0 && newPasswordReady && confirmPassword.length === 0) {
+      return t('validation.required');
+    }
+    return undefined;
+  })();
+
+  const canSubmit = currentPassword.length > 0 && newPasswordReady && passwordsMatch && !isLoading;
 
   const handleCurrentPasswordChange = (text: string) => {
     setCurrentPassword(text);
@@ -71,13 +92,14 @@ export default function ChangePasswordScreen() {
       });
 
       Alert.alert(t('common.success'), t('change_password.success_message'), [
-        { text: t('common.ok'), onPress: () => router.back() },
+        {
+          text: t('common.ok'),
+          onPress: () => router.replace('/(tabs)/profile' as any),
+        },
       ]);
     } catch (error) {
-      if (isApiError(error) && (error.statusCode === 400 || error.statusCode === 401)) {
-        setCurrentPasswordError(
-          getApiErrorMessage(error, t('change_password.incorrect_current_password'))
-        );
+      if (isLikelyWrongCurrentPassword(error)) {
+        setCurrentPasswordError(t('change_password.incorrect_current_password'));
       } else {
         showErrorAlert(error, {
           title: t('change_password.failed_title'),
@@ -163,11 +185,7 @@ export default function ChangePasswordScreen() {
                 showPasswordToggle
                 autoComplete="new-password"
                 placeholderTextColor={theme.placeholder}
-                error={
-                  confirmPassword && !passwordsMatch
-                    ? t('validation.passwords_do_not_match')
-                    : undefined
-                }
+                error={confirmPasswordError}
                 editable={!isLoading}
               />
 

@@ -24,9 +24,10 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
   const [totalPages, setTotalPages] = useState(0);
   const mountedRef = useRef(true);
   const hasLoadedRef = useRef(false);
+  const isDirtyRef = useRef(false);
 
   const fetchFavourites = useCallback(async () => {
-    if (!hasLoadedRef.current) {
+    if (!hasLoadedRef.current || isDirtyRef.current) {
       setIsLoading(true);
     }
     setError(null);
@@ -37,6 +38,7 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
         setTotalElements(response.totalElements);
         setTotalPages(response.totalPages);
         hasLoadedRef.current = true;
+        isDirtyRef.current = false;
       }
     } catch (err) {
       if (mountedRef.current) {
@@ -58,6 +60,7 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
           // Update local state to mark as unfavourited instead of refetching,
           // so the item remains visible on the Favourites page until the user
           // refreshes or navigates away.
+          isDirtyRef.current = true;
           setFavourites((prev) =>
             prev.map((item) =>
               item.id === id ? { ...item, favourite: false } : item

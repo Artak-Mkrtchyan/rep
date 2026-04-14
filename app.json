@@ -15,7 +15,8 @@
         "applinks:rep-dev.utspdev.com",
         "applinks:rep-test.utspdev.com",
         "applinks:rep.utspdev.com"
-      ]
+      ],
+      "appleTeamId": "85A3D5474J"
     },
     "android": {
       "softwareKeyboardLayoutMode": "resize",
@@ -51,8 +52,37 @@
             "BROWSABLE",
             "DEFAULT"
           ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "rep-dev.utspdev.com",
+              "pathPrefix": "/app/open"
+            },
+            {
+              "scheme": "https",
+              "host": "rep-test.utspdev.com",
+              "pathPrefix": "/app/open"
+            },
+            {
+              "scheme": "https",
+              "host": "rep.utspdev.com",
+              "pathPrefix": "/app/open"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
-      ]
+      ],
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.rep"
     },
     "web": {
       "output": "static",
@@ -72,7 +102,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"

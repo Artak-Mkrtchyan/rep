@@ -103,10 +103,10 @@ export default function FavouriteScreen() {
                   attributes={getCardAttributes(item)}
                   priceLabel={getPriceLabel(item)}
                   isArrowUpRight={false}
-                  isFavourite
+                  isFavourite={item.favourite}
                   isForComparison={item.forComparison}
                   onPress={() => handleCardPress(item.id)}
-                  onFavouritePress={() => toggle(item.id, true)}
+                  onFavouritePress={() => toggle(item.id, item.favourite)}
                   onComparisonPress={() => toggleComparison(item.id, item.forComparison)}
                 />
               ))}

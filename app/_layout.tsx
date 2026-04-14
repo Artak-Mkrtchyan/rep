@@ -3,11 +3,13 @@ import '../global.css';
 import i18n from '../lib/i18n/i18n';
 
 import { Slot, useRouter, useSegments } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Appearance } from 'react-native';
+import { Appearance, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { InitialLoadingScreen } from '@/components/initial-loading-screen';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { loadSavedLanguage } from '@/hooks/use-language';
@@ -18,6 +20,10 @@ import { PortalHost } from '@rn-primitives/portal';
 Appearance.setColorScheme('light');
 
 export default function RootLayout() {
+  React.useEffect(() => {
+    void SplashScreen.preventAutoHideAsync();
+  }, []);
+
   React.useEffect(() => {
     loadSavedLanguage().then((lang) => {
       if (lang) i18n.changeLanguage(lang);
@@ -58,8 +64,17 @@ function RootNavigator() {
     }
   }, [user, isLoading, segments, router]);
 
+  React.useEffect(() => {
+    if (isLoading) return;
+    void SplashScreen.hideAsync();
+  }, [isLoading]);
+
   if (isLoading) {
-    return null;
+    return (
+      <View style={{ flex: 1 }}>
+        <InitialLoadingScreen />
+      </View>
+    );
   }
 
   return <Slot />;

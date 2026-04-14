@@ -55,10 +55,18 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
       try {
         if (isFavourite) {
           await announcementsService.removeFromFavourites(id);
+          // Update local state to mark as unfavourited instead of refetching,
+          // so the item remains visible on the Favourites page until the user
+          // refreshes or navigates away.
+          setFavourites((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, favourite: false } : item
+            )
+          );
         } else {
           await announcementsService.addToFavourites(id);
+          await fetchFavourites();
         }
-        await fetchFavourites();
       } catch (err) {
         console.error('Failed to toggle favourite:', err);
         throw err;

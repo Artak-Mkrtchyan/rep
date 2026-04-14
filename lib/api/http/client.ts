@@ -184,7 +184,28 @@ class HttpClient {
         }
       } else {
         try {
-          errorMessage = (await response.text()) || errorMessage;
+          const text = await response.text();
+          // Some services return JSON with a non-JSON content-type; try parsing it
+          if (text && (text.startsWith('{') || text.startsWith('['))) {
+            try {
+              const errorData = JSON.parse(text);
+              const rawMessage = errorData.message || errorData.errorMessage || errorData.error;
+              if (Array.isArray(rawMessage)) {
+                errorMessage = rawMessage[0] || errorMessage;
+              } else if (rawMessage) {
+                errorMessage = rawMessage;
+              }
+              errors = errorData.errors;
+              if (!errors && errorData.validationErrors?.length) {
+                errorMessage = errorData.validationErrors[0].errorMessage;
+                validationErrors = errorData.validationErrors;
+              }
+            } catch {
+              errorMessage = text || errorMessage;
+            }
+          } else {
+            errorMessage = text || errorMessage;
+          }
         } catch {
           // If text parsing fails, use default error message
         }

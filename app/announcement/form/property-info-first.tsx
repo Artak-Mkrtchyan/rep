@@ -4,16 +4,27 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { Conditional } from '@/components/conditional';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
-import { BATHROOMS_OPTIONS, BEDROOMS_OPTIONS } from '@/constants/announcement';
+import {
+  BATHROOMS_OPTIONS,
+  BEDROOMS_OPTIONS,
+  getBuildingTypeOptionsCommercial,
+  getGarageTypeOptions,
+  getLandTypeOptions,
+  getParkingTypeOptions,
+  getPermittedUseOptions,
+  getSpaceSizeGarageOptions,
+  getSpaceSizeParkingOptions,
+} from '@/constants/announcement';
 import { useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { getPropertyTypeInfo, getSchemaForPropertyType } from '@/lib/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep3 } from '@/types/announcement';
 
@@ -21,16 +32,6 @@ const SQUARE_FOOTAGE_PLACEHOLDER = '1200';
 const FOOTER_APPROX_HEIGHT = 152;
 
 type PropertyInfoFormValues = RentForApartmentsFormStep3;
-
-const PropertyInfoSchema = Yup.object().shape({
-  property: Yup.object().shape({
-    areaM2: Yup.number().required('Required').typeError('Must be a number'),
-    attributes: Yup.object().shape({
-      bedroomCount: Yup.number().required('Required').typeError('Must be a number'),
-      bathroomCount: Yup.number().required('Required').typeError('Must be a number'),
-    }),
-  }),
-});
 
 export default function PropertyInfoFirstScreen() {
   const { t } = useTranslation();
@@ -41,6 +42,9 @@ export default function PropertyInfoFirstScreen() {
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
 
+  const { isGarage, isApartment, isHouse, isCommercialSpace, isLand, isParkingSpace } =
+    getPropertyTypeInfo(formData.propertyType);
+
   const footerPaddingBottom = insets.bottom > 0 ? insets.bottom : 24;
   const scrollPaddingBottom = FOOTER_APPROX_HEIGHT + footerPaddingBottom + 24;
 
@@ -50,12 +54,20 @@ export default function PropertyInfoFirstScreen() {
 
   const savePropertyInfo = async ({ property }: PropertyInfoFormValues) => {
     if (property && formData.propertyType) {
+      const areaM2 = Number(property.areaM2) || 0;
+      const usableAreaM2 = Number(property.attributes?.usableAreaM2) || undefined;
+      const landAreaM2 = Number(property.attributes?.landAreaM2) || undefined;
+      const houseAreaM2 = Number(property.attributes?.houseAreaM2) || undefined;
+
       updateFormData({
         property: {
-          areaM2: Number(property.areaM2) || 0,
+          areaM2,
           attributes: {
             ...formData.property?.attributes,
             ...property.attributes,
+            usableAreaM2,
+            landAreaM2,
+            houseAreaM2,
             type: formData.propertyType,
           },
           propertyType: formData.propertyType,
@@ -90,7 +102,7 @@ export default function PropertyInfoFirstScreen() {
     <ThemedView className="flex-1">
       <Formik<PropertyInfoFormValues>
         initialValues={initialValues}
-        validationSchema={PropertyInfoSchema}
+        validationSchema={getSchemaForPropertyType(formData.propertyType)}
         validateOnMount={true}
         enableReinitialize
         onSubmit={savePropertyInfo}>
@@ -128,21 +140,146 @@ export default function PropertyInfoFirstScreen() {
                     error={touched.property && errors.property ? 'Required' : undefined}
                   />
 
-                  <Select
-                    label={t('announcement.rent.total_bedrooms')}
-                    placeholder={t('common.select')}
-                    value={`${values.property?.attributes?.bedroomCount}`}
-                    onChange={(v) => setFieldValue('property.attributes.bedroomCount', Number(v))}
-                    options={BEDROOMS_OPTIONS}
-                  />
+                  <Conditional condition={isCommercialSpace}>
+                    <Input
+                      label={t('announcement.rent.usable_area')}
+                      numericOnly
+                      placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
+                      value={`${values.property?.attributes?.usableAreaM2 || ''}`}
+                      onChangeText={(v) => setFieldValue('property.attributes.usableAreaM2', v)}
+                      right={
+                        <ThemedText className="text-[16px] text-muted-foreground">
+                          {t('announcement.rent.square_meters_unit')}
+                        </ThemedText>
+                      }
+                      keyboardType="number-pad"
+                      accessibilityLabel="Usable area"
+                      accessibilityHint="Enter usable area in square meters"
+                      error={touched.property && errors.property ? 'Required' : undefined}
+                    />
+                  </Conditional>
 
-                  <Select
-                    label={t('announcement.rent.total_bathrooms')}
-                    placeholder={t('common.select')}
-                    value={`${values.property?.attributes?.bathroomCount}`}
-                    onChange={(v) => setFieldValue('property.attributes.bathroomCount', Number(v))}
-                    options={BATHROOMS_OPTIONS}
-                  />
+                  <Conditional condition={isApartment || isHouse}>
+                    <Select
+                      label={t('announcement.rent.total_bedrooms')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.bedroomCount}`}
+                      onChange={(v) => setFieldValue('property.attributes.bedroomCount', Number(v))}
+                      options={BEDROOMS_OPTIONS}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isApartment || isHouse}>
+                    <Select
+                      label={t('announcement.rent.total_bathrooms')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.bathroomCount}`}
+                      onChange={(v) =>
+                        setFieldValue('property.attributes.bathroomCount', Number(v))
+                      }
+                      options={BATHROOMS_OPTIONS}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isCommercialSpace}>
+                    <Select
+                      label={t('announcement.rent.building_type')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.buildingType}`}
+                      onChange={(v) => setFieldValue('property.attributes.buildingType', v)}
+                      options={getBuildingTypeOptionsCommercial(t)}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isHouse || isLand}>
+                    <Input
+                      label={t('announcement.rent.land_area')}
+                      numericOnly
+                      placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
+                      value={`${values.property?.attributes?.landAreaM2 || ''}`}
+                      onChangeText={(v) => setFieldValue('property.attributes.landAreaM2', v)}
+                      right={
+                        <ThemedText className="text-[16px] text-muted-foreground">
+                          {t('announcement.rent.square_meters_unit')}
+                        </ThemedText>
+                      }
+                      keyboardType="number-pad"
+                      accessibilityLabel="Land area"
+                      accessibilityHint="Enter land area in square meters"
+                      error={touched.property && errors.property ? 'Required' : undefined}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isHouse}>
+                    <Input
+                      label={t('announcement.rent.house_area')}
+                      numericOnly
+                      placeholder={SQUARE_FOOTAGE_PLACEHOLDER}
+                      value={`${values.property?.attributes?.houseAreaM2 || ''}`}
+                      onChangeText={(v) => setFieldValue('property.attributes.houseAreaM2', v)}
+                      right={
+                        <ThemedText className="text-[16px] text-muted-foreground">
+                          {t('announcement.rent.square_meters_unit')}
+                        </ThemedText>
+                      }
+                      keyboardType="number-pad"
+                      accessibilityLabel="House area"
+                      accessibilityHint="Enter house area in square meters"
+                      error={touched.property && errors.property ? 'Required' : undefined}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isGarage}>
+                    <Select
+                      label={t('announcement.rent.garage_type')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.garageType}`}
+                      onChange={(v) => setFieldValue('property.attributes.garageType', v)}
+                      options={getGarageTypeOptions(t)}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isGarage || isParkingSpace}>
+                    <Select
+                      label={t('announcement.rent.space_size')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.spaceSize}`}
+                      onChange={(v) => setFieldValue('property.attributes.spaceSize', v)}
+                      options={
+                        isGarage ? getSpaceSizeGarageOptions(t) : getSpaceSizeParkingOptions(t)
+                      }
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isLand}>
+                    <Select
+                      label={t('announcement.rent.land_type')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.landType}`}
+                      onChange={(v) => setFieldValue('property.attributes.landType', v)}
+                      options={getLandTypeOptions(t)}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isLand}>
+                    <Select
+                      label={t('announcement.rent.permitted_use')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.permittedUse}`}
+                      onChange={(v) => setFieldValue('property.attributes.permittedUse', v)}
+                      options={getPermittedUseOptions(t)}
+                    />
+                  </Conditional>
+
+                  <Conditional condition={isParkingSpace}>
+                    <Select
+                      label={t('announcement.rent.parking_type')}
+                      placeholder={t('common.select')}
+                      value={`${values.property?.attributes?.parkingType}`}
+                      onChange={(v) => setFieldValue('property.attributes.parkingType', v)}
+                      options={getParkingTypeOptions(t)}
+                    />
+                  </Conditional>
                 </View>
               </View>
             </ScrollView>

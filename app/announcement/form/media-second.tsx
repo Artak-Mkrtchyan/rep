@@ -76,6 +76,7 @@ export default function MediaScreen() {
 
       <AnnouncementFooter
         firstButtonLabel={t('common.next')}
+        firstButtonDisabled={!documentFiles?.length}
         secondButtonLabel={t('common.save_and_exit')}
         onNextPress={nextStep}
         onSaveAndExitPress={handleSaveAndExit}

@@ -29,6 +29,60 @@ export const BATHROOMS_OPTIONS: SelectOption<string>[] = [
   { label: '10', value: '10' },
 ];
 
+export const getBuildingTypeOptionsCommercial = (t: TFunction): SelectOption<string>[] => [
+  { label: t('building_options.office'), value: 'OFFICE' },
+  { label: t('building_options.retail'), value: 'RETAIL' },
+  { label: t('building_options.business_center'), value: 'BUSINESS_CENTER' },
+  { label: t('building_options.industrial'), value: 'INDUSTRIAL' },
+  { label: t('building_options.residential_building'), value: 'RESIDENTIAL_BUILDING' },
+];
+
+export const getGarageTypeOptions = (t: TFunction): SelectOption<string>[] => [
+  { label: t('garage_type.enclosed'), value: 'ENCLOSED' },
+  { label: t('garage_type.open_air'), value: 'OPEN_AIR' },
+  { label: t('garage_type.underground'), value: 'UNDERGROUND' },
+  { label: t('garage_type.covered_carport'), value: 'COVERED_CARPORT' },
+];
+
+export const getSpaceSizeParkingOptions = (t: TFunction): SelectOption<string>[] => [
+  { label: t('space_size_parking.motorcycle'), value: 'MOTORCYCLE' },
+  { label: t('space_size_parking.small_car'), value: 'SMALL_CAR' },
+  { label: t('space_size_parking.standard_car'), value: 'STANDARD_CAR' },
+  { label: t('space_size_parking.suv'), value: 'SUV' },
+  { label: t('space_size_parking.van'), value: 'VAN' },
+];
+
+export const getSpaceSizeGarageOptions = (t: TFunction): SelectOption<string>[] => [
+  { label: t('space_size_garage.single'), value: 'SINGLE' },
+  { label: t('space_size_garage.double'), value: 'DOUBLE' },
+  { label: t('space_size_garage.triple'), value: 'TRIPLE' },
+  { label: t('space_size_garage.multiple'), value: 'MULTIPLE' },
+];
+
+export const getLandTypeOptions = (t: TFunction): SelectOption<string>[] => [
+  { label: t('land_type.residential'), value: 'RESIDENTIAL' },
+  { label: t('land_type.agricultural'), value: 'AGRICULTURAL' },
+  { label: t('land_type.industrial'), value: 'INDUSTRIAL' },
+  { label: t('land_type.commercial'), value: 'COMMERCIAL' },
+  { label: t('land_type.mixed_use'), value: 'MIXED_USE' },
+];
+
+export const getParkingTypeOptions = (t: TFunction): SelectOption<string>[] => [
+  { label: t('parking_type.outdoor'), value: 'OUTDOOR' },
+  { label: t('parking_type.indoor'), value: 'INDOOR' },
+  { label: t('parking_type.underground'), value: 'UNDERGROUND' },
+  { label: t('parking_type.covered'), value: 'COVERED' },
+];
+
+export const getPermittedUseOptions = (t: TFunction): SelectOption<string>[] => [
+  { label: t('permitted_use.construction'), value: 'CONSTRUCTION' },
+  { label: t('permitted_use.farming'), value: 'FARMING' },
+  { label: t('permitted_use.storage'), value: 'STORAGE' },
+  { label: t('permitted_use.parking'), value: 'PARKING' },
+  { label: t('permitted_use.events'), value: 'EVENTS' },
+  { label: t('permitted_use.gardening'), value: 'GARDENING' },
+  { label: t('permitted_use.other'), value: 'OTHER' },
+];
 export const BEDROOMS_OPTIONS: SelectOption<string>[] = [
   { label: '1', value: '1' },
   { label: '2', value: '2' },

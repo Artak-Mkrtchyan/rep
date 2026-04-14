@@ -107,7 +107,7 @@ export default function SaleDetailsScreen() {
                         {CURRENCY_PREFIX}
                       </ThemedText>
                     }
-                    keyboardType="decimal-pad"
+                    keyboardType="number-pad"
                     accessibilityLabel="Sale price"
                     accessibilityHint="Enter sale price amount in dollars"
                   />

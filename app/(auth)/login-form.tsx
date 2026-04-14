@@ -19,10 +19,10 @@ import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
 import { IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useLogin } from '@/hooks/api/use-auth';
+import { useGoogleOAuth } from '@/hooks/use-google-oauth';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { AuthScope } from '@/lib/api/auth';
-import { useGoogleOAuth } from '@/hooks/use-google-oauth';
 import { validateEmail } from '@/lib/auth-validation';
 import type { AccountRole } from '@/types/auth';
 
@@ -30,7 +30,7 @@ const ROLE_TO_SCOPE: Record<string, AuthScope> = {
   individual: AuthScope.USUAL,
   company: AuthScope.CONSTRUCTION,
   broker: AuthScope.BROKER,
-  broker_company: AuthScope.BROKER_COMPANY,
+  broker_company: AuthScope.BROKER,
 };
 
 export default function LoginFormScreen() {

@@ -8,7 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { InputError } from '@/components/ui/input/error';
 import { InputLabel } from '@/components/ui/input/label';
 import { applicationsService } from '@/lib/api/applications';
-import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
+import { ERROR_MESSAGES, isApiError, showErrorAlert } from '@/lib/error-handler';
 import { Image } from 'expo-image';
 
 type Attachment = {
@@ -93,6 +93,13 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleUploadError = (error: unknown) => {
+    if (isApiError(error) && error.validationErrors?.length) {
+      const code = error.validationErrors[0].errorCode;
+      if (code === 'validation.forbidden-image-content') {
+        Alert.alert(t('ui.upload_failed'), t('error.forbidden_image_content'));
+        return;
+      }
+    }
     showErrorAlert(error, { title: t('ui.upload_failed'), fallback: ERROR_MESSAGES.UPLOAD_FAILED });
   };
 

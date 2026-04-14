@@ -101,6 +101,7 @@
   "error.network": "Network error: Unable to reach the server. Please check your internet connection and try again.",
   "error.server": "Server error occurred. Please try again later.",
   "error.upload_failed": "Failed to upload file. Please try again.",
+  "error.forbidden_image_content": "This image cannot be uploaded. Please select a different file.",
   "error.upload_unexpected": "An unexpected error occurred while uploading the file.",
   "error.resend_code_failed": "Failed to resend code. Please try again.",
   "error.submit_failed": "Failed to submit. Please try again.",

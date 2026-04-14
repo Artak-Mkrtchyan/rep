@@ -101,6 +101,7 @@
   "error.network": "Tarmoq xatosi: Serverga ulanib bo'lmadi. Iltimos, internet aloqangizni tekshiring va qayta urinib ko'ring.",
   "error.server": "Server xatosi yuz berdi. Iltimos, keyinroq qayta urinib ko'ring.",
   "error.upload_failed": "Faylni yuklash muvaffaqiyatsiz bo'ldi. Iltimos, qayta urinib ko'ring.",
+  "error.forbidden_image_content": "Bu rasmni yuklab bo'lmaydi. Iltimos, boshqa fayl tanlang.",
   "error.upload_unexpected": "Faylni yuklashda kutilmagan xatolik yuz berdi.",
   "error.resend_code_failed": "Kodni qayta yuborib bo'lmadi. Iltimos, qayta urinib ko'ring.",
   "error.submit_failed": "Yuborib bo'lmadi. Iltimos, qayta urinib ko'ring.",

@@ -41,6 +41,8 @@
   "ui.upload_your_photo": "Upload your photo",
   "ui.upload_your_file": "Upload your file",
   "ui.select_file": "Upload",
+  "ui.choose_gallery": "Gallery",
+  "ui.choose_files": "Files",
   "ui.remove_file": "Remove file",
   "ui.add_file": "Add file",
   "ui.phone_placeholder": "(90)121 13 23",

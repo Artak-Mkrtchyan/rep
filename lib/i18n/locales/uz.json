@@ -41,6 +41,8 @@
   "ui.upload_your_photo": "Rasmingizni yuklang",
   "ui.upload_your_file": "Faylni yuklang",
   "ui.select_file": "Fayl tanlash",
+  "ui.choose_gallery": "Galereya",
+  "ui.choose_files": "Fayllar",
   "ui.remove_file": "Faylni o'chirish",
   "ui.add_file": "Fayl qo'shish",
   "ui.phone_placeholder": "(90)121 13 23",

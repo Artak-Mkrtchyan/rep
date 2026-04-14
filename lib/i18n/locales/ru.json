@@ -41,6 +41,8 @@
   "ui.upload_your_photo": "Загрузите ваше фото",
   "ui.upload_your_file": "Загрузите ваш файл",
   "ui.select_file": "Выбрать файл",
+  "ui.choose_gallery": "Галерея",
+  "ui.choose_files": "Файлы",
   "ui.remove_file": "Удалить файл",
   "ui.add_file": "Добавить файл",
   "ui.phone_placeholder": "(90)121 13 23",

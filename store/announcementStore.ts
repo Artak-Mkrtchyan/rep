@@ -72,11 +72,24 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
       try {
         const { formData, metaData } = get();
 
+        // Strip null/undefined optional fields that the API may reject
+        const payload = { ...formData } as Record<string, unknown>;
+        if (!payload.rentDetails) delete payload.rentDetails;
+        if (!payload.saleDetails) delete payload.saleDetails;
+        if (!payload.documentIds) delete payload.documentIds;
+        if (!payload.mediaFileIds) delete payload.mediaFileIds;
+        if (!payload.infrastructureObjects) delete payload.infrastructureObjects;
+
         if (metaData?.response?.id) {
-          await applicationsService.updateAnnouncementPublication(metaData.response.id, formData);
+          await applicationsService.updateAnnouncementPublication(
+            metaData.response.id,
+            payload as RentForApartmentsForm
+          );
           return { id: metaData.response.id };
         } else {
-          const response = await applicationsService.announcementPublication(formData);
+          const response = await applicationsService.announcementPublication(
+            payload as RentForApartmentsForm
+          );
           set(() => ({
             metaData: {
               ...metaData,

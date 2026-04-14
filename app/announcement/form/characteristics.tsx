@@ -69,7 +69,6 @@ export default function CharacteristicsScreen() {
       }
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
-      router.back();
     }
   };
 

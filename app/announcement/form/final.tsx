@@ -35,23 +35,20 @@ export default function FinalScreen() {
   const handlePublish = async () => {
     try {
       await sendFormData();
-
       await publishFormData();
       resetForm();
+      router.back();
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_publish'));
-    } finally {
-      router.back();
     }
   };
 
   const handleSaveAndExit = async () => {
     try {
       await sendFormData();
+      router.back();
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
-    } finally {
-      router.back();
     }
   };
 

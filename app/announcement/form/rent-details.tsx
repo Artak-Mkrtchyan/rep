@@ -57,10 +57,9 @@ export default function RentDetailsScreen() {
     } else {
       try {
         await sendFormData();
-      } catch {
-        Alert.alert('Error', 'Failed to send form data');
-      } finally {
         router.back();
+      } catch {
+        Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       }
     }
   };

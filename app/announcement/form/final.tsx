@@ -167,8 +167,6 @@ export default function FinalScreen() {
             placedBy={{
               name: metaData?.response?.applicantEmail || '',
             }}
-            postedDate={''}
-            updatedDate=""
             onViewMap={handleViewOnMap}
           />
 

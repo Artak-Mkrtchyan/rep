@@ -266,14 +266,18 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                     key={`${item.type}-${index}`}
                     icon={
                       <View className="h-[28px] w-[28px] items-center justify-center rounded-full bg-muted">
-                        <Image
-                          source={meta.icon}
-                          style={{
-                            width: 20,
-                            height: 20,
-                          }}
-                          contentFit="contain"
-                        />
+                        {meta.icon ? (
+                          <Image
+                            source={meta.icon}
+                            style={{
+                              width: 20,
+                              height: 20,
+                            }}
+                            contentFit="contain"
+                          />
+                        ) : (
+                          <Ionicons name="information-circle-outline" size={20} color="black" />
+                        )}
                       </View>
                     }
                     name={

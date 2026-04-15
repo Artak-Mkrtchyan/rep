@@ -228,7 +228,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
   {
     iconKey: 'buildingType',
     label: t('announcement.rent.building_type'),
-    getValue: (_, h) => h.buildingTypeLabel,
+    getValue: (_, h) => h.buildingTypeLabel || '—',
   },
   {
     iconKey: 'yearBuilt',
@@ -241,7 +241,28 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
   {
     iconKey: 'ownershipType',
     label: t('announcement.rent.ownership_type'),
-    getValue: (_, h) => h.ownershipLabel,
+    getValue: (_, h) => h.ownershipLabel || '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.building_type_commercial'),
+    getValue: (fd) =>
+      fd.property?.attributes?.buildingType ? String(fd.property.attributes.buildingType) : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.hvac'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.hvac),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.balcony'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.balcony),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.elevator'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.elevator),
   },
   {
     iconKey: 'offStreetParking',
@@ -272,6 +293,265 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
     iconKey: 'bicycleStorage',
     label: t('announcement.rent.bicycle_storage'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.amenities_ev_charging_station'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.evChargingStation),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.terrace'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.terrace),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.garden_yard'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.gardenYard),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.parking'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.parking),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.attribute_disabled_access'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.disabledAccess),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.attribute_ev_charging_station'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.evChargingStation),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.electricity_available'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.electricityAvailable),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.infrastructure_electricity_available'),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.infrastructure?.electricityAvailable),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.water_supply'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.waterSupply),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.gas'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.gas),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.sewage'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.sewage),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.internet_available'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.internetAvailable),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.road_access'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.roadAccess?.roadAccess),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.road_type'),
+    getValue: (fd) =>
+      fd.property?.attributes?.roadAccess?.roadType
+        ? String(fd.property.attributes.roadAccess.roadType)
+        : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.remote_automatic_door'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.remoteAutomaticDoor),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.motorcycle_bicycle_allowed'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.motorcycleBicycleAllowed),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.security_access_24_7'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.access247),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.security_gated_entry'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.gatedEntry),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.security_remote_control_access'),
+    getValue: (fd, h) =>
+      h.formatYesNo(fd.property?.attributes?.securityAccess?.remoteControlAccess),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.security_guard'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.securityGuard),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.security_cctv'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.securityCctv),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.ceiling_height'),
+    getValue: (fd) =>
+      fd.property?.attributes?.ceilingHeightM != null
+        ? String(fd.property.attributes.ceilingHeightM)
+        : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.max_vehicle_height'),
+    getValue: (fd) =>
+      fd.property?.attributes?.vehicleRestrictions?.maxVehicleHeightCm != null
+        ? String(fd.property.attributes.vehicleRestrictions.maxVehicleHeightCm)
+        : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.max_vehicle_length'),
+    getValue: (fd) =>
+      fd.property?.attributes?.vehicleRestrictions?.maxVehicleLengthCm != null
+        ? String(fd.property.attributes.vehicleRestrictions.maxVehicleLengthCm)
+        : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_cooling_hvac'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.coolingHvac),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_elevator'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.elevator),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_heating'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.heating),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_ventilation_system'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.ventilationSystem),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_fire_safety_system'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.fireSafetySystem),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_sprinklers'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.sprinklers),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_reception_concierge'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.receptionConcierge),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_internet_connectivity'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.internetConnectivity),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_server_room'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.serverRoom),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_kitchenette'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.kitchenette),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.facilities_restrooms_count'),
+    getValue: (fd) =>
+      fd.property?.attributes?.facilities?.restroomsCount != null
+        ? String(fd.property.attributes.facilities.restroomsCount)
+        : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.pet_cat'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.cat),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.pet_large_dogs'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.largeDogs),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.pet_small_dogs'),
+    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.smallDogs),
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.usable_area'),
+    getValue: (fd) =>
+      fd.property?.attributes?.usableAreaM2 != null
+        ? String(fd.property.attributes.usableAreaM2)
+        : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.land_area'),
+    getValue: (fd) =>
+      fd.property?.attributes?.landAreaM2 != null ? String(fd.property.attributes.landAreaM2) : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.house_area'),
+    getValue: (fd) =>
+      fd.property?.attributes?.houseAreaM2 != null
+        ? String(fd.property.attributes.houseAreaM2)
+        : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.garage_type'),
+    getValue: (fd) =>
+      fd.property?.attributes?.garageType ? String(fd.property.attributes.garageType) : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.space_size'),
+    getValue: (fd) =>
+      fd.property?.attributes?.spaceSize ? String(fd.property.attributes.spaceSize) : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.land_type'),
+    getValue: (fd) =>
+      fd.property?.attributes?.landType ? String(fd.property.attributes.landType) : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.permitted_use'),
+    getValue: (fd) =>
+      fd.property?.attributes?.permittedUse ? String(fd.property.attributes.permittedUse) : '—',
+  },
+  {
+    iconKey: 'undefined',
+    label: t('announcement.rent.parking_type'),
+    getValue: (fd) =>
+      fd.property?.attributes?.parkingType ? String(fd.property.attributes.parkingType) : '—',
   },
 ];
 

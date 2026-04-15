@@ -20,6 +20,7 @@ import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { Language } from '@/lib/i18n/i18n';
 import { formatNumericString } from '@/lib/utils';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 
 export default function FinalScreen() {
@@ -88,7 +89,13 @@ export default function FinalScreen() {
           ? t('ownership_type_options.joint')
           : '—';
 
-  const formatYesNo = (v: boolean | undefined) => (v ? t('common.yes') : t('common.no'));
+  const formatYesNo = (v: boolean | undefined) => {
+    if (v === undefined) {
+      return '—';
+    }
+
+    return v ? t('common.yes') : t('common.no');
+  };
 
   const typeLabel =
     formData.listingType === 'FOR_RENT'
@@ -112,6 +119,13 @@ export default function FinalScreen() {
     ownershipLabel,
     formatYesNo,
   };
+
+  const visibleCharacteristics = getObjectCharacteristics(t)
+    .map((config) => ({
+      config,
+      value: config.getValue(formData, characteristicHelpers),
+    }))
+    .filter(({ value }) => value !== '—');
 
   return (
     <ThemedView className="flex-1">
@@ -186,22 +200,26 @@ export default function FinalScreen() {
             title={t('announcement.rent.final.object_characteristics')}
             className="mb-4 gap-[24px]">
             <View className="flex-row flex-wrap gap-y-4">
-              {getObjectCharacteristics(t).map((config) => (
-                <View key={config.iconKey} className="w-1/2 pr-2">
+              {visibleCharacteristics.map(({ config, value }) => (
+                <View key={`${config.iconKey}-${config.label}`} className="w-1/2 pr-2">
                   <PlacedByItem
                     icon={
                       <View className="h-[32px] w-[32px] items-center justify-center rounded-full bg-muted">
-                        <Image
-                          source={CHARACTERISTIC_ICONS[config.iconKey]}
-                          style={{
-                            width: 20,
-                            height: 20,
-                          }}
-                          contentFit="contain"
-                        />
+                        {CHARACTERISTIC_ICONS[config.iconKey] ? (
+                          <Image
+                            source={CHARACTERISTIC_ICONS[config.iconKey]}
+                            style={{
+                              width: 20,
+                              height: 20,
+                            }}
+                            contentFit="contain"
+                          />
+                        ) : (
+                          <Ionicons name="information-circle-outline" size={20} color="black" />
+                        )}
                       </View>
                     }
-                    name={config.getValue(formData, characteristicHelpers)}
+                    name={value}
                     label={config.label}
                     nameClassName="text-foreground"
                   />

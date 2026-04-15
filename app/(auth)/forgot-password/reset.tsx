@@ -4,7 +4,6 @@ import { router } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -25,7 +24,7 @@ import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useTheme } from '@/hooks/use-theme';
 import { authService } from '@/lib/api/auth';
 import { isPasswordValid, validatePassword } from '@/lib/auth-validation';
-import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
+import { ERROR_MESSAGES, isApiError, showErrorAlert } from '@/lib/error-handler';
 
 export default function ForgotPasswordResetScreen() {
   const { t } = useTranslation();
@@ -33,6 +32,7 @@ export default function ForgotPasswordResetScreen() {
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
 
   const { data, resetData } = useForgotPasswordContext();
   const { tokens: theme } = useTheme();
@@ -71,25 +71,58 @@ export default function ForgotPasswordResetScreen() {
       });
 
       resetData();
-      Alert.alert(t('common.success'), t('forgot_password.reset.success_message'), [
-        {
-          text: t('common.ok'),
-          onPress: () => router.replace(AUTH_ROUTES.LOGIN),
-        },
-      ]);
+      setIsSuccess(true);
     } catch (error) {
-      showErrorAlert(error, {
-        title: t('forgot_password.reset.failed_title'),
-        fallback: ERROR_MESSAGES.RESET_PASSWORD_FAILED,
-      });
+      if (isApiError(error) && error.statusCode === 400) {
+        setPasswordError(t('forgot_password.reset.cannot_use_current_password'));
+      } else {
+        showErrorAlert(error, {
+          title: t('forgot_password.reset.failed_title'),
+          fallback: ERROR_MESSAGES.RESET_PASSWORD_FAILED,
+        });
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleGoToLogin = () => {
+    router.replace(AUTH_ROUTES.LOGIN);
+  };
+
   const handleBack = () => {
     router.back();
   };
+
+  if (isSuccess) {
+    return (
+      <ThemedView className="flex-1" style={[{ paddingTop: insets.top }, horizontalStyle]}>
+        <View className="flex-1 items-center justify-center gap-6">
+          <Image
+            style={{
+              width: IMAGE_DIMENSIONS.FORGOT_PASSWORD.width,
+              height: IMAGE_DIMENSIONS.FORGOT_PASSWORD.height,
+            }}
+            source={require('@/assets/images/icon-signup-success.svg')}
+            contentFit="contain"
+          />
+          <ThemedText type="title" className="text-center font-semibold">
+            {t('forgot_password.success.title')}
+          </ThemedText>
+          <ThemedText className="text-center text-[14px] text-muted-foreground">
+            {t('forgot_password.success.description')}
+          </ThemedText>
+          <View className="mt-4 w-full">
+            <Button
+              onPress={handleGoToLogin}
+              accessibilityLabel={t('forgot_password.success.go_home')}>
+              {t('forgot_password.success.go_home')}
+            </Button>
+          </View>
+        </View>
+      </ThemedView>
+    );
+  }
 
   return (
     <KeyboardAvoidingView

@@ -206,8 +206,12 @@
   "forgot_password.reset.confirm_password": "Parolni tasdiqlang",
   "forgot_password.reset.confirm_new_password": "Yangi parolni tasdiqlang",
   "forgot_password.reset.success_message": "Parolingiz muvaffaqiyatli tiklandi.",
+  "forgot_password.reset.cannot_use_current_password": "Joriy parolingizdan foydalana olmaysiz",
   "forgot_password.reset.failed_title": "Tiklash muvaffaqiyatsiz",
   "forgot_password.reset.resetting": "Tiklanmoqda...",
+  "forgot_password.success.title": "Muvaffaqiyatli!",
+  "forgot_password.success.description": "Parolingiz muvaffaqiyatli tiklandi. Xavfsizligingiz uchun biz sizni boshqa barcha qurilmalardan chiqardik.\nIltimos, yangi parolingiz bilan tizimga kiring",
+  "forgot_password.success.go_home": "Bosh ekranga o'tish",
 
   "change_password.title": "Parolni o'zgartirish",
   "change_password.current_password": "Joriy parol",

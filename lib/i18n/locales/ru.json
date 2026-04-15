@@ -206,8 +206,12 @@
   "forgot_password.reset.confirm_password": "Подтвердите пароль",
   "forgot_password.reset.confirm_new_password": "Подтвердите новый пароль",
   "forgot_password.reset.success_message": "Ваш пароль успешно сброшен.",
+  "forgot_password.reset.cannot_use_current_password": "Вы не можете использовать текущий пароль",
   "forgot_password.reset.failed_title": "Ошибка сброса",
   "forgot_password.reset.resetting": "Сброс...",
+  "forgot_password.success.title": "Успешно!",
+  "forgot_password.success.description": "Ваш пароль успешно сброшен. В целях безопасности мы вышли из всех других устройств.\nПожалуйста, войдите с новым паролем",
+  "forgot_password.success.go_home": "На главный экран",
 
   "change_password.title": "Изменение пароля",
   "change_password.current_password": "Текущий пароль",

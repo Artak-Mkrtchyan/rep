@@ -206,8 +206,12 @@
   "forgot_password.reset.confirm_password": "Confirm Password",
   "forgot_password.reset.confirm_new_password": "Confirm new password",
   "forgot_password.reset.success_message": "Your password has been reset successfully.",
+  "forgot_password.reset.cannot_use_current_password": "You cannot use your current password",
   "forgot_password.reset.failed_title": "Reset Failed",
   "forgot_password.reset.resetting": "Resetting...",
+  "forgot_password.success.title": "Successfully!",
+  "forgot_password.success.description": "Your password has been successfully reset. For your security, we have signed you out of all other devices.\nPlease Sign in with your new password",
+  "forgot_password.success.go_home": "Get to home screen",
 
   "change_password.title": "Change Password",
   "change_password.current_password": "Current Password",

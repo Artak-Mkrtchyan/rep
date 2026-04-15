@@ -27,10 +27,21 @@ export function useHandleNextPress() {
   };
 }
 
+const EDITABLE_STATUSES = ['DRAFT', 'RETURNED_TO_APPLICANT'];
+
 export function useHandleBackPress() {
   const setCurrentStep = useAnnouncementForRentFormStore((s) => s.setCurrentStep);
+  const statusCode = useAnnouncementForRentFormStore(
+    (s) => s.metaData?.response?.status?.code
+  );
 
   return (step: number, routeName: string) => {
+    // Read-only applications (non-editable) should exit straight to the list.
+    if (statusCode && !EDITABLE_STATUSES.includes(statusCode)) {
+      router.back();
+      return;
+    }
+
     if (
       routeName === ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.name ||
       routeName === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.name ||

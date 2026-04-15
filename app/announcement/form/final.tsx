@@ -32,6 +32,9 @@ export default function FinalScreen() {
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
+  const statusCode = metaData?.response?.status?.code;
+  const isReadOnly = !!statusCode && statusCode !== 'DRAFT' && statusCode !== 'RETURNED_TO_APPLICANT';
+
   const handlePublish = async () => {
     try {
       await sendFormData();
@@ -96,7 +99,7 @@ export default function FinalScreen() {
     metaData?.tempMediaFiles?.map((file) => ({ uri: file.uri })) || [];
 
   const price = formData.rentDetails?.monthlyRent
-    ? `${formData.rentDetails.monthlyRent} / month`
+    ? `${formData.rentDetails.monthlyRent} $ / month`
     : formData.saleDetails?.price
       ? `${formData.saleDetails.price} $`
       : '';
@@ -262,12 +265,14 @@ export default function FinalScreen() {
         </View>
       </ScrollView>
 
-      <AnnouncementFooter
-        firstButtonLabel={t('common.publish')}
-        secondButtonLabel={t('common.save_and_exit')}
-        onNextPress={handlePublish}
-        onSaveAndExitPress={handleSaveAndExit}
-      />
+      {!isReadOnly && (
+        <AnnouncementFooter
+          firstButtonLabel={t('common.publish')}
+          secondButtonLabel={t('common.save_and_exit')}
+          onNextPress={handlePublish}
+          onSaveAndExitPress={handleSaveAndExit}
+        />
+      )}
     </ThemedView>
   );
 }

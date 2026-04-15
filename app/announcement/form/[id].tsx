@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, View } from 'react-native';
 
+const EDITABLE_STATUSES = ['DRAFT', 'RETURNED_TO_APPLICANT'];
+
 export default function AnnouncementFormScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -19,7 +21,19 @@ export default function AnnouncementFormScreen() {
           router.replace(ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path);
         } else if (id) {
           await getApplicationById(id);
-          router.replace(ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path);
+          const store = useAnnouncementForRentFormStore.getState();
+          const statusCode = store.metaData?.response?.status?.code;
+          const isEditable = !statusCode || EDITABLE_STATUSES.includes(statusCode);
+          if (!isEditable) {
+            // Force stepNumber to the final step so useStepRedirect doesn't
+            // bounce back to an earlier form screen.
+            store.setCurrentStep(ANNOUNCEMENT_ROUTES.RENT_FINAL.completedStep);
+          }
+          router.replace(
+            isEditable
+              ? ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path
+              : ANNOUNCEMENT_ROUTES.RENT_FINAL.path
+          );
         } else {
           router.back();
         }

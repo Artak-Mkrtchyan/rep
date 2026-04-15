@@ -69,44 +69,55 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
       }),
 
     sendFormData: async () => {
-      try {
-        const { formData, metaData } = get();
+      const { formData, metaData } = get();
 
-        // Strip null/undefined optional fields that the API may reject
-        const payload = { ...formData } as Record<string, unknown>;
-        if (!payload.rentDetails) delete payload.rentDetails;
-        if (!payload.saleDetails) delete payload.saleDetails;
-        if (!payload.documentIds) delete payload.documentIds;
-        if (!payload.mediaFileIds) delete payload.mediaFileIds;
-        if (!payload.infrastructureObjects) delete payload.infrastructureObjects;
+      // Strip fields that the API's PUT endpoint doesn't accept.
+      // Web's mapApplicationToApiRequest only sends this subset.
+      const payload: Record<string, unknown> = {
+        stepNumber: formData.stepNumber,
+        listingType: formData.listingType,
+        geo: formData.geo,
+        propertyType: formData.propertyType,
+        brokerAssignmentNeeded: formData.brokerAssignmentNeeded,
+        title: formData.title,
+        description: formData.description,
+        property: formData.property,
+        rentDetails: formData.rentDetails,
+        saleDetails: formData.saleDetails,
+        mediaFileIds: formData.mediaFileIds,
+        documentIds: formData.documentIds,
+        infrastructureObjects: formData.infrastructureObjects,
+      };
 
-        if (metaData?.response?.id) {
-          await applicationsService.updateAnnouncementPublication(
-            metaData.response.id,
-            payload as RentForApartmentsForm
-          );
-          return { id: metaData.response.id };
-        } else {
-          const response = await applicationsService.announcementPublication(
-            payload as RentForApartmentsForm
-          );
-          set(() => ({
-            metaData: {
-              ...metaData,
-              response: {
-                id: response.id,
-                status: response.status,
-                createdAt: response.createdAt,
-                createdBy: response.createdBy,
-                applicantEmail: response.applicantEmail,
-                publicId: response.publicId,
-              },
+      // Strip undefined/null optional fields
+      Object.keys(payload).forEach((k) => {
+        if (payload[k] === undefined || payload[k] === null) delete payload[k];
+      });
+
+      if (metaData?.response?.id) {
+        await applicationsService.updateAnnouncementPublication(
+          metaData.response.id,
+          payload as RentForApartmentsForm
+        );
+        return { id: metaData.response.id };
+      } else {
+        const response = await applicationsService.announcementPublication(
+          payload as RentForApartmentsForm
+        );
+        set(() => ({
+          metaData: {
+            ...metaData,
+            response: {
+              id: response.id,
+              status: response.status,
+              createdAt: response.createdAt,
+              createdBy: response.createdBy,
+              applicantEmail: response.applicantEmail,
+              publicId: response.publicId,
             },
-          }));
-          return { id: response.id };
-        }
-      } catch (error) {
-        throw error;
+          },
+        }));
+        return { id: response.id };
       }
     },
 

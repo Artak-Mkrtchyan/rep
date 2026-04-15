@@ -10,15 +10,14 @@ import { PropertyAnnouncementDetail } from '@/components/announcement/property-a
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
-import {
-  CHARACTERISTIC_ICONS,
-  getObjectCharacteristics,
-  getPetItemsConfig,
-} from '@/constants/announcement';
+import { CHARACTERISTIC_ICONS, getPetItemsConfig } from '@/constants/announcement';
+import { useAuth } from '@/context/AuthContext';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { getObjectCharacteristics } from '@/lib/announcement';
 import { Language } from '@/lib/i18n/i18n';
 import { formatNumericString } from '@/lib/utils';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 
 export default function FinalScreen() {
@@ -33,7 +32,9 @@ export default function FinalScreen() {
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const statusCode = metaData?.response?.status?.code;
-  const isReadOnly = !!statusCode && statusCode !== 'DRAFT' && statusCode !== 'RETURNED_TO_APPLICANT';
+  const isReadOnly =
+    !!statusCode && statusCode !== 'DRAFT' && statusCode !== 'RETURNED_TO_APPLICANT';
+  const name = useAuth().userInfo?.fullName || '';
 
   const handlePublish = async () => {
     try {
@@ -75,25 +76,31 @@ export default function FinalScreen() {
 
   const buildingTypeRaw = formData.property?.attributes?.building?.buildingType;
   const buildingTypeLabel = buildingTypeRaw
-    ? buildingTypeRaw.charAt(0).toUpperCase() + buildingTypeRaw.slice(1)
+    ? t(`building_options.${buildingTypeRaw.toLowerCase()}`)
     : '—';
 
   const ownershipRaw = formData.property?.attributes?.ownershipAndCondition?.ownershipType;
   const ownershipLabel =
-    ownershipRaw === 'full' || ownershipRaw === 'FULL'
+    ownershipRaw === 'FULL'
       ? t('ownership_type_options.full')
-      : ownershipRaw === 'shared' || ownershipRaw === 'SHARED'
+      : ownershipRaw === 'SHARED'
         ? t('ownership_type_options.shared')
-        : ownershipRaw === 'joint' || ownershipRaw === 'JOINT'
+        : ownershipRaw === 'JOINT'
           ? t('ownership_type_options.joint')
           : '—';
 
-  const formatYesNo = (v: boolean | undefined) => (v ? t('common.yes') : t('common.no'));
+  const formatYesNo = (v: boolean | undefined) => {
+    if (v === undefined) {
+      return '—';
+    }
+
+    return v ? t('common.yes') : t('common.no');
+  };
 
   const typeLabel =
     formData.listingType === 'FOR_RENT'
-      ? t('announcement.rent.final.apartment_for_rent')
-      : t('announcement.rent.final.apartment_for_sale');
+      ? t('announcement.rent.final.for_rent')
+      : t('announcement.rent.final.for_sale');
 
   const imageSources: { uri: string }[] =
     metaData?.tempMediaFiles?.map((file) => ({ uri: file.uri })) || [];
@@ -112,6 +119,13 @@ export default function FinalScreen() {
     ownershipLabel,
     formatYesNo,
   };
+
+  const visibleCharacteristics = getObjectCharacteristics(t)
+    .map((config) => ({
+      config,
+      value: config.getValue(formData, characteristicHelpers),
+    }))
+    .filter(({ value }) => value !== '—');
 
   return (
     <ThemedView className="flex-1">
@@ -166,10 +180,8 @@ export default function FinalScreen() {
             }}
             distances={formData.infrastructureObjects}
             placedBy={{
-              name: metaData?.response?.applicantEmail || '',
+              name,
             }}
-            postedDate={''}
-            updatedDate=""
             onViewMap={handleViewOnMap}
           />
 
@@ -188,22 +200,26 @@ export default function FinalScreen() {
             title={t('announcement.rent.final.object_characteristics')}
             className="mb-4 gap-[24px]">
             <View className="flex-row flex-wrap gap-y-4">
-              {getObjectCharacteristics(t).map((config) => (
-                <View key={config.iconKey} className="w-1/2 pr-2">
+              {visibleCharacteristics.map(({ config, value }) => (
+                <View key={`${config.iconKey}-${config.label}`} className="w-1/2 pr-2">
                   <PlacedByItem
                     icon={
                       <View className="h-[32px] w-[32px] items-center justify-center rounded-full bg-muted">
-                        <Image
-                          source={CHARACTERISTIC_ICONS[config.iconKey]}
-                          style={{
-                            width: 20,
-                            height: 20,
-                          }}
-                          contentFit="contain"
-                        />
+                        {CHARACTERISTIC_ICONS[config.iconKey] ? (
+                          <Image
+                            source={CHARACTERISTIC_ICONS[config.iconKey]}
+                            style={{
+                              width: 20,
+                              height: 20,
+                            }}
+                            contentFit="contain"
+                          />
+                        ) : (
+                          <Ionicons name="information-circle-outline" size={20} color="black" />
+                        )}
                       </View>
                     }
-                    name={config.getValue(formData, characteristicHelpers)}
+                    name={value}
                     label={config.label}
                     nameClassName="text-foreground"
                   />

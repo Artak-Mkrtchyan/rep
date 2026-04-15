@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import type { SelectOption } from '@/components/ui/select';
-import { CharacteristicConfig, RentForApartmentsForm } from '@/types/announcement';
+import { RentForApartmentsForm } from '@/types/announcement';
 
 export const getListingTypeOptions = (t: TFunction): SelectOption<string>[] => [
   { label: t('announcement.listing_type.for_rent'), value: 'FOR_RENT' },
@@ -185,93 +185,6 @@ export const getPetItemsConfig = (
     icon: require('@/assets/images/announcement-icons/large-dog-icon.svg'),
     label: t('announcement.rent.pet_large_dogs'),
     getAllowed: (f) => !!f.property?.attributes?.pets?.largeDogs,
-  },
-];
-
-export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] => [
-  {
-    iconKey: 'floors',
-    label: t('announcement.rent.floors'),
-    getValue: (fd) => {
-      const b = fd.property?.attributes?.building;
-      return b?.floorNo != null && b?.numberOfFloors != null
-        ? `${b.floorNo} of ${b.numberOfFloors}`
-        : '—';
-    },
-  },
-  {
-    iconKey: 'area',
-    label: t('announcement.rent.area'),
-    getValue: (fd) => (fd.property?.areaM2 != null ? String(fd.property.areaM2) : '—'),
-  },
-  {
-    iconKey: 'bedroom',
-    label: t('announcement.rent.bedroom'),
-    getValue: (fd) =>
-      fd.property?.attributes?.bedroomCount != null
-        ? String(fd.property.attributes.bedroomCount)
-        : '—',
-  },
-  {
-    iconKey: 'bathroom',
-    label: t('announcement.rent.bathroom'),
-    getValue: (fd) =>
-      fd.property?.attributes?.bathroomCount != null
-        ? String(fd.property.attributes.bathroomCount)
-        : '—',
-  },
-  {
-    iconKey: 'condition',
-    label: t('announcement.rent.condition'),
-    getValue: (_, h) => h.conditionLabel,
-  },
-  {
-    iconKey: 'buildingType',
-    label: t('announcement.rent.building_type'),
-    getValue: (_, h) => h.buildingTypeLabel,
-  },
-  {
-    iconKey: 'yearBuilt',
-    label: t('announcement.rent.year_built'),
-    getValue: (fd) =>
-      fd.property?.attributes?.building?.yearBuilt != null
-        ? String(fd.property.attributes.building.yearBuilt)
-        : '—',
-  },
-  {
-    iconKey: 'ownershipType',
-    label: t('announcement.rent.ownership_type'),
-    getValue: (_, h) => h.ownershipLabel,
-  },
-  {
-    iconKey: 'offStreetParking',
-    label: t('announcement.rent.off_street_parking'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.offStreetParking),
-  },
-  {
-    iconKey: 'attachedGarage',
-    label: t('announcement.rent.attached_garage'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.attachedGarage),
-  },
-  {
-    iconKey: 'detachedGarage',
-    label: t('announcement.rent.detached_garage'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.detachedGarage),
-  },
-  {
-    iconKey: 'washerAndLaundry',
-    label: t('announcement.rent.washer_and_laundry'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.washerLaundry),
-  },
-  {
-    iconKey: 'disabledAccess',
-    label: t('announcement.rent.disabled_access'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.disabledAccess),
-  },
-  {
-    iconKey: 'bicycleStorage',
-    label: t('announcement.rent.bicycle_storage'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
   },
 ];
 

@@ -33,7 +33,7 @@ export default function CharacteristicsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useHandleNextPress();
-  const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
+
   let isNext = true;
 
   const initialValues: CharacteristicsFormValues = formData.property?.attributes || {
@@ -60,8 +60,6 @@ export default function CharacteristicsScreen() {
     }
 
     try {
-      await sendFormData();
-
       if (isNext) {
         nextStep();
       } else {

@@ -15,6 +15,7 @@ import {
   getObjectCharacteristics,
   getPetItemsConfig,
 } from '@/constants/announcement';
+import { useAuth } from '@/context/AuthContext';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { Language } from '@/lib/i18n/i18n';
 import { formatNumericString } from '@/lib/utils';
@@ -31,6 +32,8 @@ export default function FinalScreen() {
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
+
+  const name = useAuth().userInfo?.fullName || '';
 
   const handlePublish = async () => {
     try {
@@ -77,11 +80,11 @@ export default function FinalScreen() {
 
   const ownershipRaw = formData.property?.attributes?.ownershipAndCondition?.ownershipType;
   const ownershipLabel =
-    ownershipRaw === 'full' || ownershipRaw === 'FULL'
+    ownershipRaw === 'FULL'
       ? t('ownership_type_options.full')
-      : ownershipRaw === 'shared' || ownershipRaw === 'SHARED'
+      : ownershipRaw === 'SHARED'
         ? t('ownership_type_options.shared')
-        : ownershipRaw === 'joint' || ownershipRaw === 'JOINT'
+        : ownershipRaw === 'JOINT'
           ? t('ownership_type_options.joint')
           : '—';
 
@@ -89,8 +92,8 @@ export default function FinalScreen() {
 
   const typeLabel =
     formData.listingType === 'FOR_RENT'
-      ? t('announcement.rent.final.apartment_for_rent')
-      : t('announcement.rent.final.apartment_for_sale');
+      ? t('announcement.rent.final.for_rent')
+      : t('announcement.rent.final.for_sale');
 
   const imageSources: { uri: string }[] =
     metaData?.tempMediaFiles?.map((file) => ({ uri: file.uri })) || [];
@@ -163,7 +166,7 @@ export default function FinalScreen() {
             }}
             distances={formData.infrastructureObjects}
             placedBy={{
-              name: metaData?.response?.applicantEmail || '',
+              name,
             }}
             onViewMap={handleViewOnMap}
           />

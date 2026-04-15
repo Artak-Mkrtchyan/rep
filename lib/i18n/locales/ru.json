@@ -431,8 +431,8 @@
   "announcement.rent.final.object_characteristics": "Характеристики объекта",
   "announcement.rent.final.security_deposit": "Залоговый депозит",
   "announcement.rent.final.pets_allowed": "Домашние животные разрешены",
-  "announcement.rent.final.apartment_for_rent": "Квартира в аренду",
-  "announcement.rent.final.apartment_for_sale": "Квартира на продажу",
+  "announcement.rent.final.for_rent": "В аренду",
+  "announcement.rent.final.for_sale": "На продажу",
   "announcement.rent.final.property_images": "Фотографии недвижимости",
 
   "announcement.rent.broker_list.heading": "Основная информация",

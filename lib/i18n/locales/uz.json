@@ -431,8 +431,8 @@
   "announcement.rent.final.object_characteristics": "Obyekt xususiyatlari",
   "announcement.rent.final.security_deposit": "Garov puli",
   "announcement.rent.final.pets_allowed": "Uy hayvonlari ruxsat etiladi",
-  "announcement.rent.final.apartment_for_rent": "Ijaraga kvartira",
-  "announcement.rent.final.apartment_for_sale": "Sotuvga kvartira",
+  "announcement.rent.final.for_rent": "Ijaraga",
+  "announcement.rent.final.for_sale": "Sotuvga",
   "announcement.rent.final.property_images": "Mulk rasmlari",
 
   "announcement.rent.broker_list.heading": "Asosiy ma'lumotlar",

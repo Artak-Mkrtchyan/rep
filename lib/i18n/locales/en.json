@@ -431,8 +431,8 @@
   "announcement.rent.final.object_characteristics": "Object characteristics",
   "announcement.rent.final.security_deposit": "Security deposit",
   "announcement.rent.final.pets_allowed": "Pets allowed",
-  "announcement.rent.final.apartment_for_rent": "Apartment for rent",
-  "announcement.rent.final.apartment_for_sale": "Apartment for sale",
+  "announcement.rent.final.for_rent": "For rent",
+  "announcement.rent.final.for_sale": "For sale",
   "announcement.rent.final.property_images": "Property images",
 
   "announcement.rent.broker_list.heading": "Basic info",

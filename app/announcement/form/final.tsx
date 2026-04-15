@@ -10,13 +10,10 @@ import { PropertyAnnouncementDetail } from '@/components/announcement/property-a
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
-import {
-  CHARACTERISTIC_ICONS,
-  getObjectCharacteristics,
-  getPetItemsConfig,
-} from '@/constants/announcement';
+import { CHARACTERISTIC_ICONS, getPetItemsConfig } from '@/constants/announcement';
 import { useAuth } from '@/context/AuthContext';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { getObjectCharacteristics } from '@/lib/announcement';
 import { Language } from '@/lib/i18n/i18n';
 import { formatNumericString } from '@/lib/utils';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -76,7 +73,7 @@ export default function FinalScreen() {
 
   const buildingTypeRaw = formData.property?.attributes?.building?.buildingType;
   const buildingTypeLabel = buildingTypeRaw
-    ? buildingTypeRaw.charAt(0).toUpperCase() + buildingTypeRaw.slice(1)
+    ? t(`building_options.${buildingTypeRaw.toLowerCase()}`)
     : '—';
 
   const ownershipRaw = formData.property?.attributes?.ownershipAndCondition?.ownershipType;

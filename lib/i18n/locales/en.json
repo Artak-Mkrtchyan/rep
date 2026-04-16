@@ -716,6 +716,8 @@
   "applications.status_draft": "Draft",
   "applications.status_rejected": "Rejected",
   "applications.status_returned": "Returned application",
+  "applications.status_submitted": "Submitted",
+  "applications.status_completed": "Completed",
   "applications.empty": "You Don't Have Any applications",
   "applications.announcement_application": "Announcement application",
   "applications.role_broker": "Broker",

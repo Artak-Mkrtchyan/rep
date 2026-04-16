@@ -38,6 +38,18 @@ export interface FileUploadProps {
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 
+function safeUploadFileName(uri: string, name?: string): string {
+  const base =
+    name?.trim() ||
+    uri
+      .split('/')
+      .pop()
+      ?.split('?')[0]
+      ?.trim() ||
+    'file';
+  return base.toLowerCase();
+}
+
 export const FileUpload: React.FC<FileUploadProps> = ({
   label,
   description,
@@ -55,18 +67,19 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = React.useState(false);
 
-  const uploadAsset = async (uri: string, mimeType: string, name: string) => {
+  const uploadAsset = async (uri: string, mimeType: string, name?: string) => {
+    const fileName = safeUploadFileName(uri, name);
     const formData = new FormData();
     formData.append('file', {
       uri,
       type: mimeType || 'application/octet-stream',
-      name: name.toLowerCase() || 'file',
+      name: fileName || 'file',
     } as any);
 
     const response = await applicationsService.uploadTemporaryAttachment(formData);
     onChange?.([
       ...value,
-      { id: response.id, uri, type: mimeType, name: name.toLowerCase() },
+      { id: response.id, uri, type: mimeType, name: fileName },
     ]);
   };
 

@@ -716,6 +716,8 @@
   "applications.status_draft": "Qoralama",
   "applications.status_rejected": "Rad etilgan",
   "applications.status_returned": "Qaytarilgan ariza",
+  "applications.status_submitted": "Topshirilgan",
+  "applications.status_completed": "Tugallangan",
   "applications.empty": "Sizda hali arizalar yo‘q",
   "applications.announcement_application": "E’lon arizasi",
   "applications.role_broker": "Broker",

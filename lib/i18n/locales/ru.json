@@ -716,6 +716,8 @@
   "applications.status_draft": "Черновик",
   "applications.status_rejected": "Отклонено",
   "applications.status_returned": "Возвращённая заявка",
+  "applications.status_submitted": "Подано",
+  "applications.status_completed": "Завершено",
   "applications.empty": "У вас пока нет заявок",
   "applications.announcement_application": "Заявка на объявление",
   "applications.role_broker": "Брокер",

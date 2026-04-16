@@ -17,9 +17,11 @@ import { router } from 'expo-router';
 
 const STATUS_SEGMENTS: { value: string; label: ApplicationStatusType | 'ALL' }[] = [
   { value: 'applications.status_all', label: 'ALL' },
-  { value: 'applications.status_approved', label: 'APPROVED' },
-  { value: 'applications.status_under_review', label: 'UNDER_REVIEW' },
   { value: 'applications.status_draft', label: 'DRAFT' },
+  { value: 'applications.status_submitted', label: 'SUBMITTED' },
+  { value: 'applications.status_under_review', label: 'UNDER_REVIEW' },
+  { value: 'applications.status_approved', label: 'APPROVED' },
+  { value: 'applications.status_completed', label: 'COMPLETED' },
   { value: 'applications.status_rejected', label: 'REJECTED' },
   { value: 'applications.status_returned', label: 'RETURNED_TO_APPLICANT' },
 ] as const;

@@ -1,7 +1,9 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Pressable, View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AuthLayout } from '@/components/auth/auth-layout';
@@ -12,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES } from '@/constants/auth';
 import { useTheme } from '@/hooks/use-theme';
+import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { FULL_NAME_MAX_LENGTH, validatePassword, yupSchemas } from '@/lib/auth-validation';
 
 import { PhoneInput } from '@/components/ui/phone-input';
@@ -32,6 +35,7 @@ export default function CreatePasswordScreen() {
   const { t } = useTranslation();
   const { tokens: theme } = useTheme();
   const { data, resetData } = useSignUpContext();
+  const { goToPrevious } = useSignUpFlow();
 
   const handleContinue = async (values: PasswordForm, { setSubmitting, setFieldError }: any) => {
     try {
@@ -97,7 +101,17 @@ export default function CreatePasswordScreen() {
 
           return (
             <>
-              <ThemedText type="title" className="mt-10 text-center">
+              <View className="mt-8 w-full">
+                <Pressable
+                  onPress={goToPrevious}
+                  accessibilityRole="button"
+                  accessibilityLabel={t('common.go_back')}
+                  className="h-10 w-10 items-center justify-center rounded-full">
+                  <Ionicons name="chevron-back" size={24} color="black" />
+                </Pressable>
+              </View>
+
+              <ThemedText type="title" className="text-center">
                 {t('signup.title')}
               </ThemedText>
 

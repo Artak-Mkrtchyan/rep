@@ -222,7 +222,7 @@ export default function LoginFormScreen() {
             <View className="w-full">
               <SignInFooter
                 onGooglePress={role === 'individual' ? handleGoogleSignIn : undefined}
-                onApplePress={handleAppleSignIn}
+                onApplePress={role === 'individual' ? handleAppleSignIn : undefined}
                 onSignInPress={() => router.push('/(auth)/signup')}
                 showSignInLink
                 signInLabel={t('auth.dont_have_account')}

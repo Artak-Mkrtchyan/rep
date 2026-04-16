@@ -2,7 +2,9 @@ import 'react-native-reanimated';
 import '../global.css';
 import i18n from '../lib/i18n/i18n';
 
+import { Ionicons } from '@expo/vector-icons';
 import { Slot, useRouter, useSegments } from 'expo-router';
+import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -20,6 +22,10 @@ import { PortalHost } from '@rn-primitives/portal';
 Appearance.setColorScheme('light');
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    ...Ionicons.font,
+  });
+
   React.useEffect(() => {
     void SplashScreen.preventAutoHideAsync();
   }, []);
@@ -29,6 +35,10 @@ export default function RootLayout() {
       if (lang) i18n.changeLanguage(lang);
     });
   }, []);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <QueryProvider>

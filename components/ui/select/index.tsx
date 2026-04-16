@@ -155,7 +155,10 @@ export function Select<T extends string = string>({
                       isSelected ? 'bg-primary/10' : 'bg-transparent'
                     )}>
                     <Text
-                      className={cn('text-[14px]', isSelected ? 'text-primary' : 'text-foreground')}>
+                      className={cn(
+                        'text-[14px]',
+                        isSelected ? 'text-primary' : 'text-foreground'
+                      )}>
                       {opt.label}
                     </Text>
                   </Pressable>

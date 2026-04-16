@@ -3,7 +3,14 @@ import type { TFunction } from 'i18next';
 import type { UserInfo } from '@/context/AuthContext';
 import type { IndividualBrokerProfile } from '@/lib/api/profile';
 
-export type PersonalInfoEditableField = 'fullName' | 'phone' | 'dateOfBirth';
+export type PersonalInfoEditableField =
+  | 'fullName'
+  | 'phone'
+  | 'dateOfBirth'
+  | 'certifiedBy'
+  | 'certifiedOn'
+  | 'yearsOfActivity'
+  | 'bio';
 
 export type PersonalInfoRowSpec = {
   key: string;
@@ -16,8 +23,10 @@ export type PersonalInfoEditSheetProps = {
   label: string;
   value: string;
   placeholder?: string;
-  type?: 'text' | 'phone' | 'date';
+  type?: 'text' | 'phone' | 'date' | 'textarea';
   keyboardType?: 'default' | 'phone-pad' | 'numeric';
+  maxLength?: number;
+  numberOfLines?: number;
 };
 
 /** Formats e.g. "2007-04-13" → "13.04.2007" */
@@ -71,6 +80,7 @@ export function buildPersonalInformationRows(
         key: 'certifiedBy',
         label: t('profile.certified_by', 'Certified by'),
         value: brokerProfile.certifiedBy || '',
+        onPress: () => onEditField('certifiedBy'),
       },
       {
         key: 'phone',
@@ -81,12 +91,14 @@ export function buildPersonalInformationRows(
       {
         key: 'certifiedOn',
         label: t('profile.certified_on', 'Certified on'),
-        value: brokerProfile.certifiedOn || '',
+        value: formatDateDisplay(brokerProfile.certifiedOn),
+        onPress: () => onEditField('certifiedOn'),
       },
       {
         key: 'years',
         label: t('profile.years_of_activity', 'Years of activity'),
         value: brokerProfile.yearsOfActivity?.toString() || '',
+        onPress: () => onEditField('yearsOfActivity'),
       },
     ];
   }
@@ -117,7 +129,7 @@ export function buildPersonalInfoEditSheetProps(
   t: TFunction,
   userInfo: UserInfo | null,
   isBroker: boolean,
-  brokerPhone: string | undefined,
+  brokerProfile: IndividualBrokerProfile | undefined,
   dateOfBirth?: string,
 ): PersonalInfoEditSheetProps | null {
   switch (editingField) {
@@ -131,7 +143,7 @@ export function buildPersonalInfoEditSheetProps(
     case 'phone':
       return {
         label: t('profile.phone_number', 'Phone number'),
-        value: (isBroker && brokerPhone) || userInfo?.phone || '',
+        value: (isBroker && brokerProfile?.phoneNumber) || userInfo?.phone || '',
         type: 'phone',
         keyboardType: 'phone-pad',
       };
@@ -142,6 +154,40 @@ export function buildPersonalInfoEditSheetProps(
         placeholder: 'DD.MM.YYYY',
         type: 'date',
         keyboardType: 'numeric',
+      };
+    case 'certifiedBy':
+      return {
+        label: t('profile.certified_by', 'Certified by'),
+        value: brokerProfile?.certifiedBy || '',
+        placeholder: t('profile.certified_by', 'Certified by'),
+        keyboardType: 'default',
+        maxLength: 100,
+      };
+    case 'certifiedOn':
+      return {
+        label: t('profile.certified_on', 'Certified on'),
+        value: brokerProfile?.certifiedOn?.slice(0, 10) || '',
+        placeholder: 'DD.MM.YYYY',
+        type: 'date',
+        keyboardType: 'numeric',
+      };
+    case 'yearsOfActivity':
+      return {
+        label: t('profile.years_of_activity', 'Years of activity'),
+        value: brokerProfile?.yearsOfActivity?.toString() || '',
+        placeholder: t('profile.years_of_activity', 'Years of activity'),
+        keyboardType: 'numeric',
+        maxLength: 3,
+      };
+    case 'bio':
+      return {
+        label: t('profile.about_us', 'About us'),
+        value: brokerProfile?.bio || '',
+        placeholder: t('profile.about_placeholder', 'Tell about yourself'),
+        type: 'textarea',
+        keyboardType: 'default',
+        maxLength: 500,
+        numberOfLines: 4,
       };
     default:
       return null;

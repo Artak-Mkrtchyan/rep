@@ -19,6 +19,19 @@ export interface IndividualBrokerProfile {
   certifiedOn: string;
   certifiedBy?: string;
   yearsOfActivity: number;
+  bio?: string;
+}
+
+export interface UpdateIndividualBrokerRequest {
+  avatarId?: string;
+  bio?: string;
+  certifiedBy?: string;
+  certifiedOn?: string;
+  fullName?: string;
+  locale?: string;
+  phoneNumber?: string;
+  publicAttachmentIds?: string[];
+  yearsOfActivity?: number;
 }
 
 export interface BrokerCompanyProfile {
@@ -75,5 +88,17 @@ export const profileService = {
 
   updateUsualUser: async (id: string, data: UsualUserUpdateRequest): Promise<void> => {
     await httpClient.put<void>(`/v1/users/usual/${id}`, data, { requiresAuth: true });
+  },
+
+  updateIndividualBroker: async (
+    id: string,
+    data: UpdateIndividualBrokerRequest
+  ): Promise<IndividualBrokerProfile> => {
+    const response = await httpClient.put<IndividualBrokerProfile>(
+      `/v1/brokers/individuals/${id}`,
+      data,
+      { requiresAuth: true }
+    );
+    return response;
   },
 };

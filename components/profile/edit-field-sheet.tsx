@@ -1,7 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -13,8 +21,10 @@ type EditFieldSheetProps = {
   label: string;
   value: string;
   placeholder?: string;
-  type?: 'text' | 'phone' | 'date';
+  type?: 'text' | 'phone' | 'date' | 'textarea';
   keyboardType?: 'default' | 'phone-pad' | 'numeric';
+  maxLength?: number;
+  numberOfLines?: number;
   onSave: (value: string) => void;
   onClose: () => void;
 };
@@ -26,6 +36,8 @@ export const EditFieldSheet: React.FC<EditFieldSheetProps> = ({
   placeholder,
   type = 'text',
   keyboardType = 'default',
+  maxLength,
+  numberOfLines,
   onSave,
   onClose,
 }) => {
@@ -66,12 +78,25 @@ export const EditFieldSheet: React.FC<EditFieldSheetProps> = ({
                 onChange={(date) => setEditValue(typeof date === 'string' ? date : '')}
                 maximumDate={new Date()}
               />
+            ) : type === 'textarea' ? (
+              <TextInput
+                value={editValue}
+                onChangeText={setEditValue}
+                placeholder={placeholder}
+                multiline
+                numberOfLines={numberOfLines || 4}
+                maxLength={maxLength}
+                textAlignVertical="top"
+                autoFocus
+                style={styles.textarea}
+              />
             ) : (
               <Input
                 value={editValue}
                 onChangeText={setEditValue}
                 placeholder={placeholder}
                 keyboardType={keyboardType}
+                maxLength={maxLength}
                 autoFocus
                 rightIcon={
                   editValue ? (
@@ -93,7 +118,7 @@ export const EditFieldSheet: React.FC<EditFieldSheetProps> = ({
               </Pressable>
               <Pressable onPress={handleSave} style={styles.saveButton}>
                 <ThemedText className="text-[16px] font-semibold text-white">
-                  {t('common.save', 'Save')}
+                  {t('common.done', 'Done')}
                 </ThemedText>
               </Pressable>
             </View>
@@ -166,5 +191,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 12,
     backgroundColor: '#0E9457',
+  },
+  textarea: {
+    minHeight: 100,
+    borderWidth: 1,
+    borderColor: '#E2E2E2',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    color: '#111111',
   },
 });

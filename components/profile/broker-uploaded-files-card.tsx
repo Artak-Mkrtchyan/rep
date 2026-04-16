@@ -26,12 +26,16 @@ export type BrokerUploadedFilesCardProps = {
   files: BrokerUploadedFileRow[];
   onEditPress?: () => void;
   onDownloadPress?: (file: BrokerUploadedFileRow) => void;
+  onDeletePress?: (file: BrokerUploadedFileRow) => void;
+  onUploadPress?: () => void;
 };
 
 export const BrokerUploadedFilesCard: React.FC<BrokerUploadedFilesCardProps> = ({
   files,
   onEditPress,
   onDownloadPress,
+  onDeletePress,
+  onUploadPress,
 }) => {
   const { t } = useTranslation();
 
@@ -76,19 +80,48 @@ export const BrokerUploadedFilesCard: React.FC<BrokerUploadedFilesCardProps> = (
               <ThemedText style={styles.fileName} numberOfLines={1}>
                 {file.name}
               </ThemedText>
-              {onDownloadPress ? (
-                <Pressable
-                  onPress={() => onDownloadPress(file)}
-                  hitSlop={8}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('common.download', 'Download')}>
-                  <Ionicons name="download-outline" size={20} color={NEUTRAL_950} />
-                </Pressable>
-              ) : null}
+              <View style={styles.fileActions}>
+                {onDownloadPress ? (
+                  <Pressable
+                    onPress={() => onDownloadPress(file)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('common.download', 'Download')}>
+                    <Ionicons name="download-outline" size={20} color={NEUTRAL_950} />
+                  </Pressable>
+                ) : null}
+                {onDeletePress ? (
+                  <Pressable
+                    onPress={() => onDeletePress(file)}
+                    hitSlop={8}
+                    accessibilityRole="button"
+                    accessibilityLabel={t('ui.remove_file', 'Remove file')}>
+                    <Ionicons name="trash-outline" size={20} color="#E53935" />
+                  </Pressable>
+                ) : null}
+              </View>
             </View>
           ))
         )}
       </View>
+
+      {onUploadPress ? (
+        <View style={styles.uploadSection}>
+          <Ionicons name="image-outline" size={32} color={NEUTRAL_500} />
+          <ThemedText style={styles.uploadLabel}>
+            {t('ui.upload_your_photo', 'Upload your photo')}
+          </ThemedText>
+          <Pressable
+            onPress={onUploadPress}
+            style={styles.uploadButton}
+            accessibilityRole="button">
+            <ThemedText style={styles.uploadButtonText}>
+              {t('ui.select_file', 'Upload')}
+            </ThemedText>
+            <Ionicons name="cloud-upload-outline" size={16} color="#FFFFFF" />
+          </Pressable>
+        </View>
+      ) : null}
     </View>
   );
 };
@@ -158,5 +191,37 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 22,
     color: MAIN_500,
+  },
+  fileActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  uploadSection: {
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F1F1F1',
+    paddingTop: 16,
+    alignItems: 'center',
+    gap: 8,
+  },
+  uploadLabel: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: NEUTRAL_500,
+  },
+  uploadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: MAIN_500,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  uploadButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
 });

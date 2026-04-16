@@ -8,6 +8,7 @@ import {
   type BrokerCompanyProfile,
   type UserProfile,
   type UsualUserUpdateRequest,
+  type UpdateIndividualBrokerRequest,
 } from '@/lib/api/profile';
 
 export const PROFILE_QUERY_KEY = 'profile';
@@ -60,6 +61,28 @@ export function useUpdateUsualUser() {
       // Invalidate the user profile query so DOB (and any other field
       // not tracked in AuthContext) is refetched
       queryClient.invalidateQueries({ queryKey: [PROFILE_QUERY_KEY, 'user', variables.id] });
+    },
+  });
+}
+
+export function useUpdateIndividualBroker() {
+  const { updateUserInfo } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateIndividualBrokerRequest }) =>
+      profileService.updateIndividualBroker(id, data),
+    onSuccess: (response, variables) => {
+      const { fullName, phoneNumber } = variables.data;
+      updateUserInfo({
+        ...(fullName !== undefined && { fullName }),
+        ...(phoneNumber !== undefined && { phone: phoneNumber }),
+      });
+
+      queryClient.setQueryData(
+        [PROFILE_QUERY_KEY, 'individual-broker', variables.id],
+        response
+      );
     },
   });
 }

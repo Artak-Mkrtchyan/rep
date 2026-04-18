@@ -14,12 +14,16 @@ type HeroSectionProps = {
   onMenuPress: () => void;
   onSearchPress: () => void;
   onNotificationsPress?: () => void;
+  isAuthenticated?: boolean;
+  onLoginPress?: () => void;
 };
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onMenuPress,
   onSearchPress,
   onNotificationsPress,
+  isAuthenticated = true,
+  onLoginPress,
 }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -41,14 +45,26 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               accessibilityRole="button">
               <Ionicons name="menu" size={24} color={HOME_DESIGN.white} />
             </Pressable>
-            <Pressable
-              onPress={onNotificationsPress}
-              disabled={!onNotificationsPress}
-              className="h-10 w-10 items-center justify-center"
-              accessibilityLabel={t('home.notifications')}
-              accessibilityRole="button">
-              <Ionicons name="notifications-outline" size={24} color={HOME_DESIGN.white} />
-            </Pressable>
+            {isAuthenticated ? (
+              <Pressable
+                onPress={onNotificationsPress}
+                disabled={!onNotificationsPress}
+                className="h-10 w-10 items-center justify-center"
+                accessibilityLabel={t('home.notifications')}
+                accessibilityRole="button">
+                <Ionicons name="notifications-outline" size={24} color={HOME_DESIGN.white} />
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={onLoginPress}
+                className="items-center justify-center px-2 py-2"
+                accessibilityLabel={t('home.login')}
+                accessibilityRole="button">
+                <ThemedText className="text-[14px] font-medium text-white">
+                  {t('home.login')}
+                </ThemedText>
+              </Pressable>
+            )}
           </View>
 
           <ThemedText className="mt-6 text-center text-[32px] font-bold leading-tight text-white">

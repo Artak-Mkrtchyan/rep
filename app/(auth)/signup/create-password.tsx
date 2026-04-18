@@ -101,7 +101,7 @@ export default function CreatePasswordScreen() {
 
           return (
             <>
-              <View className="mt-8 w-full">
+              <View className="mt-12 w-full">
                 <Pressable
                   onPress={goToPrevious}
                   accessibilityRole="button"

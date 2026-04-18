@@ -36,7 +36,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
               flexGrow: 1,
               justifyContent: centered ? 'center' : undefined,
               paddingBottom: 24,
-              paddingTop: centered ? 0 : 32,
+              paddingTop: centered || scrollable ? 0 : 32,
             }}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled">

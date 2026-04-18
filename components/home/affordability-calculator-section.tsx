@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useState, type ReactNode } from 'react';
+import React, { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, TextInput, View } from 'react-native';
 
@@ -15,20 +15,11 @@ type AffordabilityCalculatorSectionProps = {
   onSubmit?: () => void;
 };
 
-export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSectionProps> = ({
-  onSubmit,
-}) => {
+export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSectionProps> = () => {
   const { t } = useTranslation();
-  const [annualIncome, setAnnualIncome] = useState('');
-  const [downPayment, setDownPayment] = useState('');
-  const [monthlyDebt, setMonthlyDebt] = useState('');
-
-  const handleCta = useCallback(() => {
-    onSubmit?.();
-  }, [onSubmit]);
 
   return (
-    <View style={styles.section}>
+    <View style={[styles.section, { opacity: 0.6 }]} pointerEvents="none">
       <View>
         <ThemedText className="text-[20px] font-bold leading-6 text-foreground">
           {t('home.affordability_calculator_title')}
@@ -57,7 +48,7 @@ export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSec
 
         <View className="mt-4 gap-3">
           <LabeledField label={t('home.field_location')}>
-            <Pressable style={styles.inputRow} accessibilityRole="button">
+            <Pressable style={styles.inputRow} disabled>
               <ThemedText className="text-[16px]" style={{ color: HOME_DESIGN.neutral300 }}>
                 {t('home.select_sale')}
               </ThemedText>
@@ -66,7 +57,7 @@ export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSec
           </LabeledField>
 
           <LabeledField label={t('home.field_credit_score')}>
-            <Pressable style={styles.inputRow} accessibilityRole="button">
+            <Pressable style={styles.inputRow} disabled>
               <ThemedText className="flex-1 text-[16px] text-foreground" />
               <Ionicons name="chevron-down" size={20} color={HOME_DESIGN.neutral950} />
             </Pressable>
@@ -86,8 +77,7 @@ export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSec
                 $
               </ThemedText>
               <TextInput
-                value={annualIncome}
-                onChangeText={setAnnualIncome}
+                editable={false}
                 keyboardType="decimal-pad"
                 placeholderTextColor={HOME_DESIGN.neutral300}
                 className="min-h-[24px] flex-1 text-[16px]"
@@ -106,8 +96,7 @@ export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSec
                 $
               </ThemedText>
               <TextInput
-                value={downPayment}
-                onChangeText={setDownPayment}
+                editable={false}
                 keyboardType="decimal-pad"
                 placeholderTextColor={HOME_DESIGN.neutral300}
                 className="min-h-[24px] flex-1 text-[16px]"
@@ -132,8 +121,7 @@ export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSec
                 $
               </ThemedText>
               <TextInput
-                value={monthlyDebt}
-                onChangeText={setMonthlyDebt}
+                editable={false}
                 keyboardType="decimal-pad"
                 placeholderTextColor={HOME_DESIGN.neutral300}
                 className="min-h-[24px] flex-1 text-[16px]"
@@ -152,8 +140,8 @@ export const AffordabilityCalculatorSection: React.FC<AffordabilityCalculatorSec
         </View>
 
         <Pressable
-          onPress={handleCta}
-          style={styles.cta}
+          disabled
+          style={[styles.cta, { opacity: 0.5 }]}
           accessibilityRole="button"
           accessibilityLabel={t('home.cta_lets_get_started')}>
           <ThemedText className="text-[16px] font-medium text-white">

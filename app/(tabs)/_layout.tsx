@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, router } from 'expo-router';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { HapticTab } from '@/components/haptic-tab';
+import { useAuth } from '@/context/AuthContext';
 import { THEME } from '@/lib/theme';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -14,6 +15,18 @@ const TabBarIcon = ({ name, color }: { name: IconName; color: string }) => {
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+
+  const requireAuth = useCallback(
+    (e: { preventDefault: () => void }) => {
+      if (!user) {
+        e.preventDefault();
+        router.push('/(auth)');
+      }
+    },
+    [user]
+  );
+
   return (
     <Tabs
       screenOptions={{
@@ -54,6 +67,7 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'heart' : 'heart-outline'} color={color} />
           ),
         }}
+        listeners={{ tabPress: requireAuth }}
       />
       <Tabs.Screen
         name="announcement"
@@ -66,7 +80,11 @@ export default function TabLayout() {
         listeners={{
           tabPress: (e) => {
             e.preventDefault();
-            router.push('/announcement/form/new');
+            if (!user) {
+              router.push('/(auth)');
+            } else {
+              router.push('/announcement/form/new');
+            }
           },
         }}
       />
@@ -78,6 +96,7 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />
           ),
         }}
+        listeners={{ tabPress: requireAuth }}
       />
     </Tabs>
   );

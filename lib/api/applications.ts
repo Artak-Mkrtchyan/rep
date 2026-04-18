@@ -361,7 +361,7 @@ export const applicationsService = {
     const response = await httpClient.post<ApiResponse<SearchResponse<BrokerCompany>>>(
       `/v1/brokers/companies/search`,
       data,
-      { requiresAuth: true }
+      { requiresAuth: false }
     );
     return response.data || (response as unknown as SearchResponse<BrokerCompany>);
   },
@@ -376,7 +376,7 @@ export const applicationsService = {
     const response = await httpClient.post<ApiResponse<SearchResponse<IndividualBroker>>>(
       `/v1/brokers/individuals/search`,
       data,
-      { requiresAuth: true }
+      { requiresAuth: false }
     );
     return response.data || (response as unknown as SearchResponse<IndividualBroker>);
   },

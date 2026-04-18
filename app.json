@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Real Estate Platform",
+    "name": "Test Real Estate",
     "slug": "rep",
     "version": "1.0.1",
     "orientation": "portrait",
@@ -12,7 +12,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.rep",
       "infoPlist": {
-        "CFBundleDisplayName": "Real Estate Platform"
+        "CFBundleDisplayName": "Test Real Estate"
       },
       "associatedDomains": [
         "applinks:rep-dev.utspdev.com",

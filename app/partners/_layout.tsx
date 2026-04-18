@@ -24,6 +24,19 @@ export default function PartnersLayout() {
       />
 
       <Stack.Screen
+        name="construction-companies"
+        options={{
+          headerShown: true,
+          header: () => (
+            <Header
+              headerTitle={t('partners.construction_companies')}
+              isStepProgressVisible={false}
+            />
+          ),
+        }}
+      />
+
+      <Stack.Screen
         name="broker/[id]"
         options={{
           headerShown: true,

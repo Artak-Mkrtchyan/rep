@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
@@ -149,6 +150,16 @@ export default function LoginFormScreen() {
         contentInsetAdjustmentBehavior="automatic">
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View className="w-full items-center">
+            <View className="mb-2 w-full">
+              <Pressable
+                onPress={() => router.back()}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.go_back')}
+                className="h-10 w-10 items-center justify-center rounded-full">
+                <Ionicons name="chevron-back" size={24} color="black" />
+              </Pressable>
+            </View>
+
             <Image
               style={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION}
               source={require('@/assets/images/login-illustration.svg')}

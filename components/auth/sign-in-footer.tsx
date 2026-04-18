@@ -31,7 +31,7 @@ export const SignInFooter: React.FC<SignInFooterProps> = ({
 
   return (
     <>
-      <FormDivider className="mb-4 mt-6" />
+      <FormDivider className="mb-2 mt-3" />
 
       {showSocial ? (
         <SocialAuthButtons onGooglePress={onGooglePress} onApplePress={onApplePress} />

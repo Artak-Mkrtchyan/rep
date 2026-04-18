@@ -63,13 +63,20 @@ function RootNavigator() {
   React.useEffect(() => {
     if (isLoading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const currentSegment = segments[0] as string | undefined;
+    const inAuthGroup = currentSegment === '(auth)';
+
+    // Protected segments that require authentication
+    const PROTECTED_SEGMENTS = ['announcement', 'menu', 'profile'];
+    const inProtectedGroup = currentSegment
+      ? PROTECTED_SEGMENTS.includes(currentSegment)
+      : false;
 
     if (user && inAuthGroup) {
       // User is signed in but on auth screen, redirect to home
       router.replace('/(tabs)');
-    } else if (!user && !inAuthGroup) {
-      // User is not signed in but on protected screen, redirect to login
+    } else if (!user && inProtectedGroup) {
+      // User is not signed in but on a protected screen, redirect to auth
       router.replace('/(auth)');
     }
   }, [user, isLoading, segments, router]);

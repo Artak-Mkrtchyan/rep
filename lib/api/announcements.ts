@@ -20,7 +20,7 @@ export const announcementsService = {
     const response = await httpClient.post<ApiResponse<ItemsListApiResponse<Announcement>>>(
       '/v1/announcements/search',
       request,
-      { requiresAuth: true }
+      { requiresAuth: false }
     );
     return response.data || (response as unknown as ItemsListApiResponse<Announcement>);
   },

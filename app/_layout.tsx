@@ -3,7 +3,7 @@ import '../global.css';
 import i18n from '../lib/i18n/i18n';
 
 import { Ionicons } from '@expo/vector-icons';
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -94,5 +94,11 @@ function RootNavigator() {
     );
   }
 
-  return <Slot />;
+  return (
+    <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="login-required" />
+    </Stack>
+  );
 }

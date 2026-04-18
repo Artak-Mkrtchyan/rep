@@ -67,6 +67,14 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'heart' : 'heart-outline'} color={color} />
           ),
         }}
+        listeners={{
+          tabPress: (e) => {
+            if (!user) {
+              e.preventDefault();
+              router.push('/login-required/favourite');
+            }
+          },
+        }}
       />
       <Tabs.Screen
         name="announcement"
@@ -75,6 +83,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            if (!user) {
+              e.preventDefault();
+              router.push('/login-required/announcement');
+            }
+          },
         }}
       />
       <Tabs.Screen

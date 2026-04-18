@@ -60,6 +60,10 @@
   "auth.apple": "Apple",
   "auth.continue_with_google": "Continue with Google",
   "auth.continue_with_apple": "Continue with Apple",
+  "auth.login_required": "Log in required",
+  "auth.login_required_button": "Log in",
+  "auth.login_required_favourites": "Log in to access favourite items.",
+  "auth.login_required_announcement": "Log in to add your announcement.",
 
   "auth.password_req.uppercase": "uppercase",
   "auth.password_req.lowercase": "lowercase",

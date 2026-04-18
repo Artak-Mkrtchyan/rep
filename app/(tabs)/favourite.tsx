@@ -5,8 +5,10 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnnouncementSmallCard } from '@/components/announcement/announcement-small-card';
+import { LoginRequiredScreen } from '@/components/auth/login-required-screen';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/context/AuthContext';
 import { useFavourites } from '@/hooks/api/use-favourites';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { announcementsService } from '@/lib/api/announcements';
@@ -22,6 +24,7 @@ import { Image } from 'expo-image';
 export default function FavouriteScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { user } = useAuth();
   const { favourites, isLoading, error, refetch, toggle } = useFavourites();
   const [seeding, setSeeding] = useState(false);
   const { horizontalStyle } = useScreenEdgePadding();
@@ -56,6 +59,16 @@ export default function FavouriteScreen() {
       setSeeding(false);
     }
   };
+
+  if (!user) {
+    return (
+      <LoginRequiredScreen
+        title={t('favourite.title')}
+        subtitle={t('auth.login_required_favourites')}
+        illustration={require('@/assets/images/login-required-favourites.svg')}
+      />
+    );
+  }
 
   if (isLoading) {
     return (

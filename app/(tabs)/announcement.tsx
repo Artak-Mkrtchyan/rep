@@ -5,16 +5,30 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LoginRequiredScreen } from '@/components/auth/login-required-screen';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/context/AuthContext';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 
 export default function AnnouncementScreen() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const { horizontalStyle } = useScreenEdgePadding();
+
   const handleAddPress = () => {
     router.push('/announcement/form/new');
   };
+
+  if (!user) {
+    return (
+      <LoginRequiredScreen
+        title={t('announcement.add')}
+        subtitle={t('auth.login_required_announcement')}
+        illustration={require('@/assets/images/login-required-announcement.svg')}
+      />
+    );
+  }
 
   return (
     <ThemedView className="flex-1">

@@ -60,6 +60,10 @@
   "auth.apple": "Apple",
   "auth.continue_with_google": "Продолжить с Google",
   "auth.continue_with_apple": "Продолжить с Apple",
+  "auth.login_required": "Требуется вход",
+  "auth.login_required_button": "Войти",
+  "auth.login_required_favourites": "Войдите, чтобы просматривать избранное.",
+  "auth.login_required_announcement": "Войдите, чтобы добавить объявление.",
 
   "auth.password_req.uppercase": "заглавная буква",
   "auth.password_req.lowercase": "строчная буква",

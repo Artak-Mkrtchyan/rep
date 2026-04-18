@@ -1,8 +1,10 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
@@ -21,6 +23,8 @@ const LoginRoleSchema = Yup.object().shape({
 
 export default function LoginRoleScreen() {
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const canGoBack = router.canGoBack();
 
   const handleContinue = (values: { role: AccountRole }) => {
     router.push({
@@ -31,6 +35,17 @@ export default function LoginRoleScreen() {
 
   return (
     <AuthLayout centered>
+      {canGoBack && (
+        <Pressable
+          onPress={() => router.back()}
+          className="absolute left-0 h-10 items-center justify-center"
+          style={{ top: insets.top + 12, zIndex: 10 }}
+          hitSlop={12}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.go_back')}>
+          <Ionicons name="chevron-back" size={24} color="#111111" />
+        </Pressable>
+      )}
       <Formik
         initialValues={{ role: '' as AccountRole }}
         validationSchema={LoginRoleSchema}

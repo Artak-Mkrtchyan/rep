@@ -60,6 +60,10 @@
   "auth.apple": "Apple",
   "auth.continue_with_google": "Google orqali davom etish",
   "auth.continue_with_apple": "Apple orqali davom etish",
+  "auth.login_required": "Kirish talab qilinadi",
+  "auth.login_required_button": "Kirish",
+  "auth.login_required_favourites": "Sevimlilarni ko'rish uchun tizimga kiring.",
+  "auth.login_required_announcement": "E'lon qo'shish uchun tizimga kiring.",
 
   "auth.password_req.uppercase": "katta harf",
   "auth.password_req.lowercase": "kichik harf",

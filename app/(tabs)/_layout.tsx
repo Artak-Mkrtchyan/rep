@@ -67,7 +67,6 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'heart' : 'heart-outline'} color={color} />
           ),
         }}
-        listeners={{ tabPress: requireAuth }}
       />
       <Tabs.Screen
         name="announcement"
@@ -76,16 +75,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'add-circle' : 'add-circle-outline'} color={color} />
           ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-            if (!user) {
-              router.push('/(auth)');
-            } else {
-              router.push('/announcement/form/new');
-            }
-          },
         }}
       />
       <Tabs.Screen

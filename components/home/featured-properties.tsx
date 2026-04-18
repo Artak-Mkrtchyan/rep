@@ -16,6 +16,7 @@ import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
 import { ThemedView } from '@/components/themed-view';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
+import { useAuth } from '@/context/AuthContext';
 import { useFeaturedAnnouncements } from '@/hooks/api/use-announcements';
 import { useHomeMetrics } from '@/hooks/use-home-metrics';
 import { MOCK_FEATURED_LISTINGS, isMockHomeListingId } from '@/lib/mocks/home-mock-data';
@@ -43,6 +44,7 @@ type FeaturedPropertiesProps = {
 export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMorePress }) => {
   const { t } = useTranslation();
   const router = useRouter();
+  const { user } = useAuth();
   const metrics = useHomeMetrics();
   const { announcements, isLoading, error, refetch } = useFeaturedAnnouncements(5);
 
@@ -71,6 +73,10 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
 
   const toggleFavourite = useCallback(
     async (id: string, isFavourite: boolean) => {
+      if (!user) {
+        router.push('/(auth)' as any);
+        return;
+      }
       if (useMockData) {
         setMockFavourite((prev) => ({ ...prev, [id]: !isFavourite }));
         return;
@@ -86,11 +92,15 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
         console.error('Failed to toggle favourite:', err);
       }
     },
-    [refetch, useMockData]
+    [refetch, useMockData, user, router]
   );
 
   const toggleComparison = useCallback(
     async (id: string, isForComparison: boolean) => {
+      if (!user) {
+        router.push('/(auth)' as any);
+        return;
+      }
       if (useMockData) {
         setMockComparison((prev) => ({ ...prev, [id]: !isForComparison }));
         return;
@@ -106,7 +116,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
         console.error('Failed to toggle comparison:', err);
       }
     },
-    [refetch, useMockData]
+    [refetch, useMockData, user, router]
   );
 
   const [activeIndex, setActiveIndex] = useState(0);

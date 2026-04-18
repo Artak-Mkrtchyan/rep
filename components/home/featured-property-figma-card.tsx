@@ -1,7 +1,7 @@
 import { Image, type ImageSource } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Animated, Pressable, View } from 'react-native';
 
 import { ComparisonIcon } from '@/components/icons/comparison-icon';
 import { HeartIcon } from '@/components/icons/heart-icon';
@@ -20,7 +20,6 @@ export type FeaturedPropertyFigmaCardProps = {
   imageSources: ImageSource[];
   isFavourite: boolean;
   isForComparison: boolean;
-  /** From `useHomeMetrics`; defaults match Figma reference */
   cardWidth?: number;
   imageHeight?: number;
   onPress?: () => void;
@@ -44,8 +43,18 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
   imageHeight = HOME_DESIGN.featuredImageHeight,
 }) => {
   const [imageIndex, setImageIndex] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
   const count = Math.max(imageSources.length, 1);
   const currentSource = imageSources[imageIndex] ?? imageSources[0];
+
+  useEffect(() => {
+    fadeAnim.setValue(0);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [imageIndex, fadeAnim]);
 
   const goPrev = useCallback(() => {
     setImageIndex((i) => (i - 1 + count) % count);
@@ -63,7 +72,9 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
       style={[styles.card, { width: cardWidth }]}
       accessibilityRole={onPress ? 'button' : undefined}>
       <View style={[styles.imageWrap, { height: imageHeight }]}>
-        <Image source={currentSource} style={styles.image} contentFit="cover" />
+        <Animated.View style={[styles.image, { opacity: fadeAnim }]}>
+          <Image source={currentSource} style={styles.image} contentFit="cover" />
+        </Animated.View>
         <View style={styles.imageDim} pointerEvents="none" />
 
         <View className="absolute inset-0 px-2 pt-4" pointerEvents="box-none">

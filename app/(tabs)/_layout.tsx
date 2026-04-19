@@ -86,9 +86,15 @@ export default function TabLayout() {
         }}
         listeners={{
           tabPress: (e) => {
+            // The Announcement tab is an "action" tab — it never shows its own
+            // screen. Signed-in users jump straight to the create-listing flow;
+            // guests get the login-required page. Prevent default so the
+            // current tab stays focused when they return.
+            e.preventDefault();
             if (!user) {
-              e.preventDefault();
               router.push('/login-required/announcement');
+            } else {
+              router.push('/announcement/form/new');
             }
           },
         }}

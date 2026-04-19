@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import { TFunction } from 'i18next';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 
@@ -17,11 +18,16 @@ import * as Yup from 'yup';
 
 type DescriptionFormValues = { description: RentForApartmentsFormStep3['description'] };
 
-const DescriptionSchema = Yup.object().shape({
-  description: Yup.string().required('Required'),
-});
+const makeDescriptionSchema = (t: TFunction) =>
+  Yup.object().shape({
+    description: Yup.string()
+      .required(t('add_application.validation.description_required'))
+      .max(4000, t('add_application.validation.description_max_length')),
+  });
+
 export default function PropertyInfoSecondScreen() {
   const { t } = useTranslation();
+  const validationSchema = useMemo(() => makeDescriptionSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
@@ -65,7 +71,7 @@ export default function PropertyInfoSecondScreen() {
     <ThemedView className="flex-1">
       <Formik<DescriptionFormValues>
         initialValues={initialValues}
-        validationSchema={DescriptionSchema}
+        validationSchema={validationSchema}
         enableReinitialize
         validateOnMount={true}
         onSubmit={saveTitle}>

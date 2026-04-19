@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import { TFunction } from 'i18next';
+import React, { useMemo } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -19,17 +20,21 @@ const CURRENCY_PREFIX = '$';
 type SaleDetailsFormValues = RentForApartmentsFormStep4;
 
 /** When saleDetails is present, price is required. */
-const SaleDetailsSchema = Yup.object().shape({
-  saleDetails: Yup.object()
-    .optional()
-    .nullable()
-    .shape({
-      price: Yup.number().required('Required').typeError('Must be a number'),
-    }),
-});
+const makeSaleDetailsSchema = (t: TFunction) =>
+  Yup.object().shape({
+    saleDetails: Yup.object()
+      .optional()
+      .nullable()
+      .shape({
+        price: Yup.number()
+          .required(t('add_application.validation.price_required'))
+          .typeError(t('add_application.validation.must_be_number')),
+      }),
+  });
 
 export default function SaleDetailsScreen() {
   const { t } = useTranslation();
+  const validationSchema = useMemo(() => makeSaleDetailsSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
@@ -74,7 +79,7 @@ export default function SaleDetailsScreen() {
     <ThemedView className="flex-1">
       <Formik<SaleDetailsFormValues>
         initialValues={initialValues}
-        validationSchema={SaleDetailsSchema}
+        validationSchema={validationSchema}
         validateOnMount={true}
         enableReinitialize
         onSubmit={saveSaleDetails}>
@@ -100,7 +105,11 @@ export default function SaleDetailsScreen() {
                     placeholder=""
                     value={`${values.saleDetails?.price ?? ''}`}
                     onChangeText={(v) => setFieldValue('saleDetails.price', v)}
-                    error={touched.saleDetails && errors.saleDetails ? 'Required' : undefined}
+                    error={
+                      touched.saleDetails && errors.saleDetails
+                        ? t('add_application.validation.price_required')
+                        : undefined
+                    }
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}

@@ -1,7 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { MapAnnouncementPinCard } from '@/components/search/map/map-announcement-pin-card';
 import { SaveSearchButton } from '@/components/search/map/save-search-button';
@@ -26,15 +25,6 @@ const DEFAULT_FILTERS: SearchFilters = {
   priceMin: '',
   priceMax: '',
   sortOption: 'NEWEST_FIRST',
-};
-
-const GESTURE_OVERLAY_STYLE = {
-  position: 'absolute' as const,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  top: 0,
-  pointerEvents: 'box-none' as const,
 };
 
 export default function SearchResultsScreen() {
@@ -244,31 +234,29 @@ export default function SearchResultsScreen() {
         onComparisonPress={handleComparisonPress}
       />
 
-      <GestureHandlerRootView style={GESTURE_OVERLAY_STYLE}>
-        {showMapButton ? (
-          <SaveSearchButton onPress={handleShowOnMap} sheetTop={sheetTop} variant="showOnMap" />
-        ) : null}
-        <SearchResultsSheet
-          expandedTop={headerHeight || undefined}
-          onSheetPositionChange={setSheetTop}
-          onFullyExpandedChange={handleSheetFullyExpandedChange}>
-          <SearchResultsGrid
-            announcements={announcements}
-            totalElements={totalElements}
-            isLoading={isLoading}
-            isLoadingMore={isLoadingMore}
-            error={error}
-            hasMore={hasMore}
-            onRetry={() => search(currentFilters)}
-            onLoadMore={loadMore}
-            onCardPress={handleCardPress}
-            onComparisonPress={handleComparisonPress}
-            sortOption={currentFilters.sortOption}
-            sortLabel={sortLabel}
-            onSortPress={() => setIsSortModalVisible(true)}
-          />
-        </SearchResultsSheet>
-      </GestureHandlerRootView>
+      {showMapButton ? (
+        <SaveSearchButton onPress={handleShowOnMap} sheetTop={sheetTop} variant="showOnMap" />
+      ) : null}
+      <SearchResultsSheet
+        expandedTop={headerHeight || undefined}
+        onSheetPositionChange={setSheetTop}
+        onFullyExpandedChange={handleSheetFullyExpandedChange}>
+        <SearchResultsGrid
+          announcements={announcements}
+          totalElements={totalElements}
+          isLoading={isLoading}
+          isLoadingMore={isLoadingMore}
+          error={error}
+          hasMore={hasMore}
+          onRetry={() => search(currentFilters)}
+          onLoadMore={loadMore}
+          onCardPress={handleCardPress}
+          onComparisonPress={handleComparisonPress}
+          sortOption={currentFilters.sortOption}
+          sortLabel={sortLabel}
+          onSortPress={() => setIsSortModalVisible(true)}
+        />
+      </SearchResultsSheet>
 
       <SearchModal
         visible={isModalVisible}

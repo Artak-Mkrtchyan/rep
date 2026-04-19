@@ -1,41 +1,26 @@
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { Redirect } from 'expo-router';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { useAuth } from '@/context/AuthContext';
 
+/**
+ * The Announcement tab doubles as an "Add announcement" action button:
+ * authenticated users go to the create-listing flow; guests are sent to the
+ * login-required page. The tab bar's `tabPress` listener normally short-
+ * circuits before this screen renders, but we also redirect here for deep
+ * links and edge cases where `preventDefault` can't run (e.g. programmatic
+ * navigation to `/(tabs)/announcement`).
+ */
 export default function AnnouncementScreen() {
-  const { t } = useTranslation();
-  const { horizontalStyle } = useScreenEdgePadding();
+  const { user, isRestoring } = useAuth();
 
-  const handleAddPress = () => {
-    router.push('/announcement/form/new');
-  };
+  if (isRestoring) {
+    return null;
+  }
 
-  return (
-    <ThemedView className="flex-1">
-      <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-center" style={horizontalStyle}>
-          <Pressable
-            onPress={handleAddPress}
-            style={({ pressed }) => (pressed ? { opacity: 0.8 } : undefined)}
-            accessibilityRole="button"
-            accessibilityLabel={t('announcement.create')}>
-            <Ionicons name="add-circle-outline" size={64} color="#ABABAB" />
-          </Pressable>
-          <ThemedText type="title" className="mt-4 text-center">
-            {t('announcement.title')}
-          </ThemedText>
-          <ThemedText className="mt-2 text-center text-muted-foreground">
-            {t('announcement.subtitle')}
-          </ThemedText>
-        </View>
-      </SafeAreaView>
-    </ThemedView>
+  return user ? (
+    <Redirect href="/announcement/form/new" />
+  ) : (
+    <Redirect href="/login-required/announcement" />
   );
 }

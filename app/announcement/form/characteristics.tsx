@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 
@@ -33,6 +33,10 @@ export default function CharacteristicsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useHandleNextPress();
+  const validationSchema = useMemo(
+    () => getCharacteristicsSchemaForPropertyType(formData.propertyType, t),
+    [formData.propertyType, t]
+  );
 
   let isNext = true;
 
@@ -86,7 +90,7 @@ export default function CharacteristicsScreen() {
         initialValues={initialValues}
         validateOnMount={true}
         enableReinitialize
-        validationSchema={getCharacteristicsSchemaForPropertyType(formData.propertyType)}
+        validationSchema={validationSchema}
         onSubmit={saveCharacteristics}>
         {({ handleSubmit, setFieldValue, values, isValid, errors, touched }) => (
           <>

@@ -42,7 +42,8 @@ export default function FinalScreen() {
       await publishFormData();
       resetForm();
       router.back();
-    } catch {
+    } catch (error) {
+      console.error('Error publishing announcement:', error);
       Alert.alert(t('common.error'), t('error.failed_to_publish'));
     }
   };
@@ -51,7 +52,8 @@ export default function FinalScreen() {
     try {
       await sendFormData();
       router.back();
-    } catch {
+    } catch (error) {
+      console.error('Error saving and exiting announcement:', error);
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
     }
   };

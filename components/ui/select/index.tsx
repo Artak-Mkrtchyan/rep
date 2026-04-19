@@ -123,7 +123,13 @@ export function Select<T extends string = string>({
       </Pressable>
       {error ? <InputError>{error}</InputError> : null}
 
-      <Modal transparent visible={open} onRequestClose={handleClose} animationType="none">
+      <Modal
+        transparent
+        visible={open}
+        onRequestClose={handleClose}
+        animationType="none"
+        statusBarTranslucent
+        navigationBarTranslucent>
         <Pressable style={{ flex: 1 }} onPress={handleClose} accessible={false}>
           <View
             style={{

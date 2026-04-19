@@ -1,12 +1,14 @@
 import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import { TFunction } from 'i18next';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { InputError } from '@/components/ui/input/error';
 import { InputLabel } from '@/components/ui/input/label';
 import { useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
@@ -15,12 +17,16 @@ import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { RentForApartmentsFormStep2 } from '@/types/announcement';
 import * as Yup from 'yup';
 
-const AnnouncementTitleSchema = Yup.object().shape({
-  title: Yup.string().required('Required'),
-});
+const makeAnnouncementTitleSchema = (t: TFunction) =>
+  Yup.object().shape({
+    title: Yup.string()
+      .required(t('add_application.validation.title_required'))
+      .max(255, t('add_application.validation.title_max_length')),
+  });
 
 export default function AnnouncementTitleScreen() {
   const { t } = useTranslation();
+  const validationSchema = useMemo(() => makeAnnouncementTitleSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
@@ -65,10 +71,10 @@ export default function AnnouncementTitleScreen() {
       <Formik<RentForApartmentsFormStep2>
         initialValues={initialValues}
         enableReinitialize
-        validationSchema={AnnouncementTitleSchema}
+        validationSchema={validationSchema}
         validateOnMount={true}
         onSubmit={saveTitle}>
-        {({ handleChange, handleBlur, handleSubmit, values, isValid }) => (
+        {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
@@ -95,11 +101,14 @@ export default function AnnouncementTitleScreen() {
                     multiline
                     numberOfLines={4}
                     textAlignVertical="top"
-                    className="font-regular min-h-[86px] w-full rounded-[12px] border border-default bg-card px-3 py-3 text-[14px] text-foreground"
+                    className={`font-regular min-h-[86px] w-full rounded-[12px] border bg-card px-3 py-3 text-[14px] text-foreground ${touched.title && errors.title ? 'border-destructive' : 'border-default'}`}
                     style={{ paddingTop: 12 }}
                     accessibilityLabel={t('announcement.rent.title_heading')}
                     accessibilityHint={t('announcement.rent.title_hint')}
                   />
+                  {touched.title && errors.title ? (
+                    <InputError>{errors.title}</InputError>
+                  ) : null}
                 </View>
               </View>
             </ScrollView>

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Input } from '@/components/ui/input';
@@ -113,20 +113,16 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       />
       {showSuggestions && (
         <View className="absolute left-0 right-0 top-full z-20 mt-1 max-h-[200px] rounded-[12px] border border-default bg-card shadow-sm">
-          <FlatList
-            data={suggestions}
-            keyExtractor={(item, index) => `${item}-${index}`}
-            keyboardShouldPersistTaps="handled"
-            renderItem={({ item }) => (
-              <Pressable
-                onPress={() => handleSelectSuggestion(item)}
-                className="border-b border-default px-4 py-3">
-                <ThemedText className="text-[14px] text-foreground" numberOfLines={1}>
-                  {item}
-                </ThemedText>
-              </Pressable>
-            )}
-          />
+          {suggestions.map((item, index) => (
+            <Pressable
+              key={`${item}-${index}`}
+              onPress={() => handleSelectSuggestion(item)}
+              className="border-b border-default px-4 py-3">
+              <ThemedText className="text-[14px] text-foreground" numberOfLines={1}>
+                {item}
+              </ThemedText>
+            </Pressable>
+          ))}
         </View>
       )}
     </View>

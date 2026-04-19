@@ -63,7 +63,9 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
       {...(onPress ? { onPress } : {})}
       className={cn('w-full rounded-[16px] bg-card px-[12px] py-[8px]', className)}
       style={styles.container}>
-      <View className="mb-2 h-[97px] w-full overflow-hidden rounded-[8px] bg-muted">
+      <View
+        className="mb-2 w-full overflow-hidden rounded-[8px] bg-muted"
+        style={styles.heroContainer}>
         <Image source={imageSource} style={styles.heroImage} contentFit="cover" />
         <View className="absolute right-[8px] top-[8px]  flex-row items-center gap-[8px]">
           <Pressable

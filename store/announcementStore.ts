@@ -98,43 +98,16 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         if (payload[k] === undefined || payload[k] === null) delete payload[k];
       });
 
-      console.log(
-        '[announcementStore.sendFormData] payload:',
-        JSON.stringify(payload, null, 2)
-      );
-
       if (metaData?.response?.id) {
-        console.log(
-          '[announcementStore.sendFormData] updating id:',
-          metaData.response.id
+        await applicationsService.updateAnnouncementPublication(
+          metaData.response.id,
+          payload as RentForApartmentsForm
         );
-        try {
-          await applicationsService.updateAnnouncementPublication(
-            metaData.response.id,
-            payload as RentForApartmentsForm
-          );
-        } catch (error) {
-          console.error(
-            '[announcementStore.sendFormData] PUT failed:',
-            JSON.stringify(error, Object.getOwnPropertyNames(error as object), 2)
-          );
-          throw error;
-        }
         return { id: metaData.response.id };
       } else {
-        console.log('[announcementStore.sendFormData] creating new application');
-        let response;
-        try {
-          response = await applicationsService.announcementPublication(
-            payload as RentForApartmentsForm
-          );
-        } catch (error) {
-          console.error(
-            '[announcementStore.sendFormData] POST failed:',
-            JSON.stringify(error, Object.getOwnPropertyNames(error as object), 2)
-          );
-          throw error;
-        }
+        const response = await applicationsService.announcementPublication(
+          payload as RentForApartmentsForm
+        );
         set(() => ({
           metaData: {
             ...metaData,
@@ -170,24 +143,9 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
     publishFormData: async () => {
       const { metaData } = get();
       if (!metaData?.response?.id) {
-        const error = new Error('Save the form first before publishing');
-        console.error('[announcementStore.publishFormData] missing application id');
-        throw error;
+        throw new Error('Save the form first before publishing');
       }
-      console.log(
-        '[announcementStore.publishFormData] submitting id:',
-        metaData.response.id
-      );
-      try {
-        await applicationsService.publishApplication(metaData.response.id);
-        console.log('[announcementStore.publishFormData] success');
-      } catch (error) {
-        console.error(
-          '[announcementStore.publishFormData] PATCH failed:',
-          JSON.stringify(error, Object.getOwnPropertyNames(error as object), 2)
-        );
-        throw error;
-      }
+      await applicationsService.publishApplication(metaData.response.id);
     },
 
     updateFormData: (data) =>

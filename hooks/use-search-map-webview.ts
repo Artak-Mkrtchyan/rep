@@ -13,6 +13,8 @@ export type UseSearchMapWebViewOptions = {
   fitBoundsToMarkers?: boolean;
   /** Embed posts `{ type: 'markerClick', id: publicId }` from the map */
   onMarkerPress?: (publicId: string) => void;
+  /** Initial center for the embed URL so the map starts at the right location */
+  initialCenter?: [number, number];
 };
 
 function buildMarkers(announcements: Announcement[]) {
@@ -27,7 +29,7 @@ function buildMarkers(announcements: Announcement[]) {
 }
 
 function boundsFromMarkerCoordinates(
-  coords: [number, number][],
+  coords: [number, number][]
 ): [[number, number], [number, number]] | null {
   if (coords.length === 0) return null;
   let minLng = Infinity;
@@ -55,22 +57,23 @@ function boundsFromMarkerCoordinates(
   ];
 }
 
-function buildEmbedUrl(locale: string): string {
-  return `${getWebBaseUrl()}/${locale}/embed/map?ll=${DEFAULT_CENTER[0]},${DEFAULT_CENTER[1]}&zoom=${DEFAULT_ZOOM}`;
-}
-
 export function useSearchMapWebView(
   announcements: Announcement[],
-  options?: UseSearchMapWebViewOptions,
+  options?: UseSearchMapWebViewOptions
 ) {
   const { i18n } = useTranslation();
   const fitBoundsToMarkers = options?.fitBoundsToMarkers ?? false;
   const onMarkerPress = options?.onMarkerPress;
+  const optionsCenter = options?.initialCenter;
   const webViewRef = useRef<WebView>(null);
   const hasCenteredRef = useRef(false);
   const announcementsSignatureRef = useRef<string>('');
+  const mapReadyRef = useRef(false);
+  const pendingMessagesRef = useRef<Record<string, unknown>[]>([]);
 
-  const embedUrl = buildEmbedUrl(i18n.language || 'ru');
+  const locale = i18n.language || 'ru';
+  const center = optionsCenter ?? DEFAULT_CENTER;
+  const embedUrl = `${getWebBaseUrl()}/${locale}/embed/map?ll=${center[0]},${center[1]}&zoom=${DEFAULT_ZOOM}`;
 
   const sendMessage = useCallback((msg: Record<string, unknown>) => {
     webViewRef.current?.injectJavaScript(`
@@ -80,6 +83,25 @@ export function useSearchMapWebView(
       true;
     `);
   }, []);
+
+  const sendOrQueue = useCallback(
+    (msg: Record<string, unknown>) => {
+      if (mapReadyRef.current) {
+        sendMessage(msg);
+      } else {
+        pendingMessagesRef.current.push(msg);
+      }
+    },
+    [sendMessage]
+  );
+
+  const flushPendingMessages = useCallback(() => {
+    const pending = pendingMessagesRef.current;
+    pendingMessagesRef.current = [];
+    for (const msg of pending) {
+      sendMessage(msg);
+    }
+  }, [sendMessage]);
 
   const zoomIn = useCallback(() => {
     sendMessage({ type: 'zoom', direction: 'in' });
@@ -91,31 +113,50 @@ export function useSearchMapWebView(
 
   const handleMessage = useCallback(
     (event: WebViewMessageEvent) => {
-      if (!onMarkerPress) return;
       try {
-        const data = JSON.parse(event.nativeEvent.data) as { type?: string; id?: string };
+        const data = JSON.parse(event.nativeEvent.data) as {
+          type?: string;
+          id?: string;
+        };
+
+        if (data.type === 'mapReady') {
+          mapReadyRef.current = true;
+          flushPendingMessages();
+          return;
+        }
+
         if (data.type === 'markerClick' && data.id != null && data.id !== '') {
-          onMarkerPress(data.id);
+          onMarkerPress?.(data.id);
         }
       } catch {
         /* ignore non-JSON messages from the map */
       }
     },
-    [onMarkerPress],
+    [onMarkerPress, flushPendingMessages]
   );
 
   const resetCenter = useCallback(() => {
     hasCenteredRef.current = false;
     announcementsSignatureRef.current = '';
+    pendingMessagesRef.current = [];
   }, []);
 
+  const setCenter = useCallback(
+    (lng: number, lat: number, zoom = DEFAULT_ZOOM) => {
+      hasCenteredRef.current = true;
+      sendOrQueue({ type: 'setCenter', center: [lng, lat], zoom });
+    },
+    [sendOrQueue]
+  );
+
+  // When announcements change, send markers and center/fit the map
   useEffect(() => {
     if (!webViewRef.current) return;
 
     const markers = buildMarkers(announcements);
     const signature = announcements.map((a) => a.id).join(',');
 
-    sendMessage({ type: 'setMarkers', markers });
+    sendOrQueue({ type: 'setMarkers', markers });
 
     if (markers.length === 0) {
       if (fitBoundsToMarkers) {
@@ -129,17 +170,18 @@ export function useSearchMapWebView(
       announcementsSignatureRef.current = signature;
       const bounds = boundsFromMarkerCoordinates(markers.map((m) => m.coordinates));
       if (bounds) {
-        sendMessage({ type: 'setBounds', bounds });
+        sendOrQueue({ type: 'setBounds', bounds });
       }
       return;
     }
 
+    // Center on first marker when hasCenteredRef is false (initial load or after resetCenter)
     if (!hasCenteredRef.current) {
       hasCenteredRef.current = true;
       const [lng, lat] = markers[0].coordinates;
-      sendMessage({ type: 'setCenter', center: [lng, lat], zoom: DEFAULT_ZOOM });
+      sendOrQueue({ type: 'setCenter', center: [lng, lat], zoom: DEFAULT_ZOOM });
     }
-  }, [announcements, sendMessage, fitBoundsToMarkers]);
+  }, [announcements, sendOrQueue, fitBoundsToMarkers]);
 
   return {
     webViewRef,
@@ -148,5 +190,6 @@ export function useSearchMapWebView(
     zoomOut,
     handleMessage,
     resetCenter,
+    setCenter,
   };
 }

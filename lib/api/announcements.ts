@@ -131,6 +131,14 @@ export const announcementsService = {
     return response.data || (response as unknown as Announcement);
   },
 
+  getAddressSuggestions: async (address: string, limit = 10): Promise<string[]> => {
+    const response = await httpClient.get<ApiResponse<string[]>>(
+      `/v1/announcements/addresses/suggestions?address=${encodeURIComponent(address)}&limit=${limit}`,
+      { requiresAuth: false }
+    );
+    return response.data || (response as unknown as string[]);
+  },
+
   reopenAnnouncement: async (id: string): Promise<Announcement> => {
     const response = await httpClient.patch<ApiResponse<Announcement>>(
       `/v1/announcements/${id}/reopen`,

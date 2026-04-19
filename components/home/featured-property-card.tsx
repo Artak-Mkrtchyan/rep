@@ -9,9 +9,9 @@ import { ThemedText } from '@/components/themed-text';
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import type { CardAttribute } from '@/lib/utils/announcement-helpers';
 
-import { featuredPropertyFigmaCardStyles as styles } from './featured-property-figma-card.styles';
+import { featuredPropertyCardStyles as styles } from './featured-property-card.styles';
 
-export type FeaturedPropertyFigmaCardProps = {
+export type FeaturedPropertyCardProps = {
   title: string;
   address: string;
   attributes: CardAttribute[];
@@ -29,7 +29,7 @@ export type FeaturedPropertyFigmaCardProps = {
 
 const SLIDE_DURATION_MS = 280;
 
-export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps> = ({
+export const FeaturedPropertyCard: React.FC<FeaturedPropertyCardProps> = ({
   title,
   address,
   attributes,

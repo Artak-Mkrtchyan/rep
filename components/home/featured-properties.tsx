@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { FeaturedPropertyFigmaCard } from '@/components/home/featured-property-figma-card';
+import { FeaturedPropertyCard } from '@/components/home/featured-property-card';
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
 import { ThemedView } from '@/components/themed-view';
@@ -167,7 +167,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
           scrollEventThrottle={16}
           horizontal>
           {listings.map((item) => (
-            <FeaturedPropertyFigmaCard
+            <FeaturedPropertyCard
               key={item.id}
               cardWidth={metrics.featuredCardWidth}
               imageHeight={metrics.featuredImageHeight}

@@ -66,7 +66,7 @@ export default function SearchMapFullscreenScreen() {
 
   const { webViewRef, embedUrl, zoomIn, zoomOut, handleMessage, resetCenter } =
     useSearchMapWebView(announcements, {
-      fitBoundsToMarkers: !initialCenter,
+      fitBoundsToMarkers: false,
       onMarkerPress: handleMapMarkerPress,
       initialCenter: initialCenter ?? undefined,
     });

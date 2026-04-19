@@ -1,7 +1,7 @@
 import { Image, type ImageSource } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, View } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import { Animated, Easing, LayoutChangeEvent, Pressable, View } from 'react-native';
 
 import { ComparisonIcon } from '@/components/icons/comparison-icon';
 import { HeartIcon } from '@/components/icons/heart-icon';
@@ -27,6 +27,8 @@ export type FeaturedPropertyFigmaCardProps = {
   onComparisonPress?: () => void;
 };
 
+const SLIDE_DURATION_MS = 280;
+
 export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps> = ({
   title,
   address,
@@ -43,26 +45,42 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
   imageHeight = HOME_DESIGN.featuredImageHeight,
 }) => {
   const [imageIndex, setImageIndex] = useState(0);
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const count = Math.max(imageSources.length, 1);
-  const currentSource = imageSources[imageIndex] ?? imageSources[0];
+  const [trackWidth, setTrackWidth] = useState(0);
+  const translateX = useRef(new Animated.Value(0)).current;
+  const isAnimatingRef = useRef(false);
 
-  useEffect(() => {
-    fadeAnim.setValue(0);
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 250,
-      useNativeDriver: true,
-    }).start();
-  }, [imageIndex, fadeAnim]);
+  const count = Math.max(imageSources.length, 1);
+
+  const handleImageWrapLayout = useCallback((e: LayoutChangeEvent) => {
+    const w = e.nativeEvent.layout.width;
+    setTrackWidth(w);
+    translateX.setValue(-imageIndex * w);
+  }, [imageIndex, translateX]);
+
+  const slideTo = useCallback(
+    (nextIndex: number) => {
+      if (trackWidth === 0 || isAnimatingRef.current) return;
+      isAnimatingRef.current = true;
+      setImageIndex(nextIndex);
+      Animated.timing(translateX, {
+        toValue: -nextIndex * trackWidth,
+        duration: SLIDE_DURATION_MS,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }).start(() => {
+        isAnimatingRef.current = false;
+      });
+    },
+    [trackWidth, translateX]
+  );
 
   const goPrev = useCallback(() => {
-    setImageIndex((i) => (i - 1 + count) % count);
-  }, [count]);
+    slideTo((imageIndex - 1 + count) % count);
+  }, [slideTo, imageIndex, count]);
 
   const goNext = useCallback(() => {
-    setImageIndex((i) => (i + 1) % count);
-  }, [count]);
+    slideTo((imageIndex + 1) % count);
+  }, [slideTo, imageIndex, count]);
 
   const Container = onPress ? Pressable : View;
 
@@ -71,10 +89,28 @@ export const FeaturedPropertyFigmaCard: React.FC<FeaturedPropertyFigmaCardProps>
       {...(onPress ? { onPress } : {})}
       style={[styles.card, { width: cardWidth }]}
       accessibilityRole={onPress ? 'button' : undefined}>
-      <View style={[styles.imageWrap, { height: imageHeight }]}>
-        <Animated.View style={[styles.image, { opacity: fadeAnim }]}>
-          <Image source={currentSource} style={styles.image} contentFit="cover" />
-        </Animated.View>
+      <View
+        style={[styles.imageWrap, { height: imageHeight }]}
+        onLayout={handleImageWrapLayout}>
+        {trackWidth > 0 ? (
+          <Animated.View
+            style={{
+              flexDirection: 'row',
+              width: trackWidth * count,
+              height: imageHeight,
+              transform: [{ translateX }],
+            }}>
+            {imageSources.map((source, i) => (
+              <Image
+                key={i}
+                source={source}
+                style={{ width: trackWidth, height: imageHeight }}
+                contentFit="cover"
+              />
+            ))}
+          </Animated.View>
+        ) : null}
+
         <View style={styles.imageDim} pointerEvents="none" />
 
         <View className="absolute inset-0 px-2 pt-4" pointerEvents="box-none">

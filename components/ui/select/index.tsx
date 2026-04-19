@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Keyboard, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { InputError } from '@/components/ui/input/error';
@@ -27,6 +27,7 @@ const OPTION_HEIGHT = 40;
 const DROPDOWN_PADDING = 16;
 const DROPDOWN_GAP = 4;
 const MAX_VISIBLE_OPTIONS = 5;
+const TRIGGER_HEIGHT = 48;
 
 export function Select<T extends string = string>({
   label,
@@ -40,35 +41,14 @@ export function Select<T extends string = string>({
 }: SelectProps<T>) {
   const { t } = useTranslation();
   const [open, setOpen] = React.useState(false);
-  const [triggerLayout, setTriggerLayout] = React.useState({ x: 0, y: 0, width: 0, height: 0 });
-  const [keyboardVisible, setKeyboardVisible] = React.useState(false);
-  const triggerRef = React.useRef<View>(null);
   const selected = options.find((o) => o.value === value);
-
-  React.useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-    const showSub = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
-    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
 
   const dropdownHeight =
     Math.min(options.length, MAX_VISIBLE_OPTIONS) * OPTION_HEIGHT + DROPDOWN_PADDING;
 
   const handleToggle = () => {
     if (disabled) return;
-    if (open) {
-      setOpen(false);
-      return;
-    }
-    triggerRef.current?.measureInWindow((x, y, width, height) => {
-      setTriggerLayout({ x, y, width, height });
-      setOpen(true);
-    });
+    setOpen((prev) => !prev);
   };
 
   const handleClose = () => setOpen(false);
@@ -78,102 +58,113 @@ export function Select<T extends string = string>({
     setOpen(false);
   };
 
-  const dropdownTop = keyboardVisible
-    ? triggerLayout.y - dropdownHeight - DROPDOWN_GAP
-    : triggerLayout.y + triggerLayout.height + DROPDOWN_GAP;
+  const { width: screenW, height: screenH } = Dimensions.get('window');
 
   return (
-    <View className={cn('w-full gap-1', containerClassName)}>
+    <View
+      className={cn('w-full gap-1', containerClassName)}
+      style={open ? { zIndex: 1000, elevation: 1000 } : undefined}>
       {label ? <InputLabel>{label}</InputLabel> : null}
 
-      <Pressable
-        ref={triggerRef}
-        onPress={handleToggle}
-        accessibilityRole="button"
-        accessibilityLabel={label ?? placeholder}
-        accessibilityState={{ disabled, expanded: open }}
-        className={cn(
-          'h-12 flex-row items-center justify-between rounded-[12px] border px-3',
-          'bg-card',
-          disabled && 'opacity-50',
-          error && 'border-destructive',
-          !error && (open ? 'border-primary' : 'border-default')
-        )}>
-        <Text
+      <View style={{ position: 'relative' }}>
+        <Pressable
+          onPress={handleToggle}
+          accessibilityRole="button"
+          accessibilityLabel={label ?? placeholder}
+          accessibilityState={{ disabled, expanded: open }}
           className={cn(
-            'font-regular text-[16px]',
-            selected ? 'text-foreground' : 'text-muted-foreground'
+            'h-12 flex-row items-center justify-between rounded-[12px] border px-3',
+            'bg-card',
+            disabled && 'opacity-50',
+            error && 'border-destructive',
+            !error && (open ? 'border-primary' : 'border-default')
           )}>
-          {selected ? selected.label : (placeholder ?? t('common.select_placeholder'))}
-        </Text>
-        <Svg
-          width={12}
-          height={7}
-          viewBox="0 0 12 7"
-          fill="none"
-          style={{ transform: [{ rotate: open ? '0deg' : '180deg' }] }}>
-          <Path
-            d="M11 6L6 1L1 6"
-            stroke={value && value !== 'undefined' ? '#111111' : '#C6C6C6'}
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-      </Pressable>
-      {error ? <InputError>{error}</InputError> : null}
-
-      <Modal
-        transparent
-        visible={open}
-        onRequestClose={handleClose}
-        animationType="none"
-        statusBarTranslucent
-        navigationBarTranslucent>
-        <Pressable style={{ flex: 1 }} onPress={handleClose} accessible={false}>
-          <View
-            style={{
-              position: 'absolute',
-              top: dropdownTop,
-              left: triggerLayout.x,
-              width: triggerLayout.width,
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 4,
-            }}
-            className="rounded-[12px] border border-default bg-card p-2">
-            <ScrollView
-              style={{ maxHeight: MAX_VISIBLE_OPTIONS * OPTION_HEIGHT }}
-              showsVerticalScrollIndicator
-              nestedScrollEnabled>
-              {options.map((opt) => {
-                const isSelected = opt.value === value;
-                return (
-                  <Pressable
-                    key={opt.value}
-                    onPress={() => handleSelect(opt.value)}
-                    accessibilityRole="menuitem"
-                    accessibilityState={{ selected: isSelected }}
-                    className={cn(
-                      'h-10 w-full justify-center rounded-[8px] px-3',
-                      isSelected ? 'bg-primary/10' : 'bg-transparent'
-                    )}>
-                    <Text
-                      className={cn(
-                        'text-[14px]',
-                        isSelected ? 'text-primary' : 'text-foreground'
-                      )}>
-                      {opt.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
+          <Text
+            className={cn(
+              'font-regular text-[16px]',
+              selected ? 'text-foreground' : 'text-muted-foreground'
+            )}>
+            {selected ? selected.label : (placeholder ?? t('common.select_placeholder'))}
+          </Text>
+          <Svg
+            width={12}
+            height={7}
+            viewBox="0 0 12 7"
+            fill="none"
+            style={{ transform: [{ rotate: open ? '0deg' : '180deg' }] }}>
+            <Path
+              d="M11 6L6 1L1 6"
+              stroke={value && value !== 'undefined' ? '#111111' : '#C6C6C6'}
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </Svg>
         </Pressable>
-      </Modal>
+
+        {open ? (
+          <>
+            <Pressable
+              onPress={handleClose}
+              accessible={false}
+              style={{
+                position: 'absolute',
+                top: -screenH,
+                left: -screenW,
+                width: screenW * 3,
+                height: screenH * 3,
+                zIndex: 999,
+              }}
+            />
+
+            <View
+              style={{
+                position: 'absolute',
+                top: TRIGGER_HEIGHT + DROPDOWN_GAP,
+                left: 0,
+                right: 0,
+                height: dropdownHeight,
+                zIndex: 1001,
+                elevation: 8,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+              }}
+              className="rounded-[12px] border border-default bg-card p-2">
+              <ScrollView
+                style={{ maxHeight: MAX_VISIBLE_OPTIONS * OPTION_HEIGHT }}
+                showsVerticalScrollIndicator
+                nestedScrollEnabled
+                keyboardShouldPersistTaps="handled">
+                {options.map((opt) => {
+                  const isSelected = opt.value === value;
+                  return (
+                    <Pressable
+                      key={opt.value}
+                      onPress={() => handleSelect(opt.value)}
+                      accessibilityRole="menuitem"
+                      accessibilityState={{ selected: isSelected }}
+                      className={cn(
+                        'h-10 w-full justify-center rounded-[8px] px-3',
+                        isSelected ? 'bg-primary/10' : 'bg-transparent'
+                      )}>
+                      <Text
+                        className={cn(
+                          'text-[14px]',
+                          isSelected ? 'text-primary' : 'text-foreground'
+                        )}>
+                        {opt.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
+            </View>
+          </>
+        ) : null}
+      </View>
+      {error ? <InputError>{error}</InputError> : null}
     </View>
   );
 }

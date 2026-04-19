@@ -63,8 +63,15 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                   <Ionicons name="checkmark" size={14} color={STEP_COLORS.completedFg} />
                 ) : (
                   <ThemedText
-                    className="text-[14px] font-medium text-foreground"
-                    style={{ color: STEP_COLORS.incompleteFg }}>
+                    className="font-medium text-foreground"
+                    style={{
+                      color: STEP_COLORS.incompleteFg,
+                      fontSize: 12,
+                      lineHeight: 14,
+                      includeFontPadding: false,
+                      textAlignVertical: 'center',
+                      textAlign: 'center',
+                    }}>
                     {stepIndex}
                   </ThemedText>
                 )}

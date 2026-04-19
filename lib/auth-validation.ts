@@ -14,8 +14,8 @@ export const FULL_NAME_MIN_LENGTH = 2;
 export const FULL_NAME_MAX_LENGTH = 255;
 export const FULL_NAME_REGEX = /^[a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'\u2018\u2019\-\s]+$/;
 export const EMAIL_REGEX =
-  /^(?=^.{1,64}@)(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
-export const EMAIL_LOCAL_MAX_LENGTH = 64;
+  /^(?=^.{1,255}@)(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
+export const EMAIL_LOCAL_MAX_LENGTH = 255;
 export const PHONE_REGEX = /^\+998\d{9}$/;
 export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 

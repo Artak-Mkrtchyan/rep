@@ -81,7 +81,6 @@ export default function ConstructionCompanySignUpScreen() {
     router.replace(AUTH_ROUTES.LOGIN);
   };
 
-
   return (
     <AuthLayout scrollable>
       <Formik
@@ -199,6 +198,7 @@ export default function ConstructionCompanySignUpScreen() {
                     : undefined
                 }
                 placeholder=""
+                maxLength={255}
               />
 
               <PhoneInput
@@ -275,10 +275,7 @@ export default function ConstructionCompanySignUpScreen() {
                 {isSubmitting ? t('common.submitting') : t('common.continue')}
               </Button>
 
-              <SignInFooter
-                onSignInPress={handleGoToLogin}
-                showSignInLink
-              />
+              <SignInFooter onSignInPress={handleGoToLogin} showSignInLink />
             </View>
           </View>
         )}

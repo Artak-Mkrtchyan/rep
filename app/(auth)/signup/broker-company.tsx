@@ -32,7 +32,9 @@ const BrokerCompanySchema = Yup.object().shape({
       .max(255, () => i18n.t('validation.max_length_255')),
     certifiedOn: yupSchemas.certifiedOn,
     email: yupSchemas.email,
-    name: Yup.string().required(() => i18n.t('validation.required')),
+    name: Yup.string()
+      .required(() => i18n.t('validation.required'))
+      .max(255, () => i18n.t('validation.max_length_255')),
     phoneNumber: yupSchemas.phone,
     yearsOfActivity: Yup.number().required('Required'),
   }),
@@ -193,6 +195,7 @@ export default function BrokerSignUpScreen() {
                     : undefined
                 }
                 placeholder=""
+                maxLength={255}
               />
 
               <PhoneInput

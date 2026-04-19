@@ -837,5 +837,7 @@
   "partners.price_range": "Narx oralig'i",
   "partners.average_price": "O'rtacha narx",
   "partners.no_results": "Brokerlar topilmadi",
-  "partners.see_all": "Hammasini ko'rish"
+  "partners.see_all": "Hammasini ko'rish",
+  "partners.years_of_activity": "{{count}} yillik faoliyat",
+  "partners.certified_on": "Sertifikatlangan {{date}}"
 }

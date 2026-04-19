@@ -26,30 +26,35 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
   const hasLoadedRef = useRef(false);
   const isDirtyRef = useRef(false);
 
-  const fetchFavourites = useCallback(async () => {
-    if (!hasLoadedRef.current || isDirtyRef.current) {
-      setIsLoading(true);
-    }
-    setError(null);
-    try {
-      const response = await announcementsService.getFavourites(page, pageSize);
-      if (mountedRef.current) {
-        setFavourites(response.content);
-        setTotalElements(response.totalElements);
-        setTotalPages(response.totalPages);
-        hasLoadedRef.current = true;
-        isDirtyRef.current = false;
+  const fetchFavourites = useCallback(
+    async ({ silent = false }: { silent?: boolean } = {}) => {
+      const shouldShowLoading =
+        !silent && (!hasLoadedRef.current || isDirtyRef.current);
+      if (shouldShowLoading) {
+        setIsLoading(true);
       }
-    } catch (err) {
-      if (mountedRef.current) {
-        setError(err instanceof Error ? err.message : 'Failed to load favourites');
+      setError(null);
+      try {
+        const response = await announcementsService.getFavourites(page, pageSize);
+        if (mountedRef.current) {
+          setFavourites(response.content);
+          setTotalElements(response.totalElements);
+          setTotalPages(response.totalPages);
+          hasLoadedRef.current = true;
+          isDirtyRef.current = false;
+        }
+      } catch (err) {
+        if (mountedRef.current) {
+          setError(err instanceof Error ? err.message : 'Failed to load favourites');
+        }
+      } finally {
+        if (mountedRef.current && shouldShowLoading) {
+          setIsLoading(false);
+        }
       }
-    } finally {
-      if (mountedRef.current) {
-        setIsLoading(false);
-      }
-    }
-  }, [page, pageSize]);
+    },
+    [page, pageSize]
+  );
 
   const toggle = useCallback(
     async (id: string, isFavourite: boolean) => {
@@ -68,7 +73,12 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
           );
         } else {
           await announcementsService.addToFavourites(id);
-          await fetchFavourites();
+          isDirtyRef.current = true;
+          setFavourites((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, favourite: true } : item
+            )
+          );
         }
       } catch (err) {
         console.error('Failed to toggle favourite:', err);
@@ -77,8 +87,10 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
         setIsToggling(false);
       }
     },
-    [fetchFavourites]
+    []
   );
+
+  const refetch = useCallback(() => fetchFavourites(), [fetchFavourites]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -90,7 +102,7 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
 
   useFocusEffect(
     useCallback(() => {
-      fetchFavourites();
+      fetchFavourites({ silent: true });
     }, [fetchFavourites])
   );
 
@@ -101,7 +113,7 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
     error,
     totalElements,
     totalPages,
-    refetch: fetchFavourites,
+    refetch,
     toggle,
   };
 }

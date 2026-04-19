@@ -837,5 +837,7 @@
   "partners.price_range": "Price range",
   "partners.average_price": "Average price",
   "partners.no_results": "No brokers found",
-  "partners.see_all": "See all"
+  "partners.see_all": "See all",
+  "partners.years_of_activity": "{{count}} years of activity",
+  "partners.certified_on": "Certified {{date}}"
 }

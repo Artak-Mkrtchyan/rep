@@ -29,6 +29,9 @@ export default function MenuScreen() {
       if (sectionTitle === 'Partners' && item === 'Brokers') {
         router.push('/partners/brokers');
       }
+      if (sectionTitle === 'Partners' && item === 'Construction companies') {
+        router.push('/partners/construction-companies');
+      }
     },
     [router]
   );

@@ -837,5 +837,7 @@
   "partners.price_range": "Диапазон цен",
   "partners.average_price": "Средняя цена",
   "partners.no_results": "Брокеры не найдены",
-  "partners.see_all": "Смотреть все"
+  "partners.see_all": "Смотреть все",
+  "partners.years_of_activity": "{{count}} лет деятельности",
+  "partners.certified_on": "Сертифицирован {{date}}"
 }

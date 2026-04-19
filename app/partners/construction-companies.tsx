@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, View } from 'react-native';
 
-import { BrokerCard } from '@/components/announcement/broker-card';
-import { mapBrokerCompanyToCardProps } from '@/components/partners/broker-utils';
+import { ConstructionCompanyCard } from '@/components/partners/construction-company-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { SearchInput } from '@/components/ui/search-input';
@@ -74,7 +73,14 @@ export default function ConstructionCompaniesListScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: BrokerCompany }) => (
-      <BrokerCard {...mapBrokerCompanyToCardProps(item)} />
+      <ConstructionCompanyCard
+        name={item.name}
+        email={item.email}
+        phoneNumber={item.phoneNumber}
+        certifiedOn={item.certifiedOn}
+        yearsOfActivity={item.yearsOfActivity}
+        avatarInfo={item.avatarInfo}
+      />
     ),
     []
   );

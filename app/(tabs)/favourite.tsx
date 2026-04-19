@@ -8,6 +8,7 @@ import { AnnouncementSmallCard } from '@/components/announcement/announcement-sm
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useFavourites } from '@/hooks/api/use-favourites';
+import { useResponsiveGrid } from '@/hooks/use-responsive-grid';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { announcementsService } from '@/lib/api/announcements';
 import { seedAll } from '@/lib/dev/create-announcements';
@@ -25,6 +26,7 @@ export default function FavouriteScreen() {
   const { favourites, isLoading, error, refetch, toggle } = useFavourites();
   const [seeding, setSeeding] = useState(false);
   const { horizontalStyle } = useScreenEdgePadding();
+  const { cardWidth, gap, onLayout } = useResponsiveGrid();
 
   const handleCardPress = useCallback(
     (id: string) => router.push(`/announcement/${id}` as any),
@@ -92,23 +94,26 @@ export default function FavouriteScreen() {
               {t('favourite.title')}
             </ThemedText>
 
-            <View className="mt-8 flex-row flex-wrap gap-x-[8px] gap-y-[12px]">
+            <View
+              onLayout={onLayout}
+              className="mt-8 flex-row flex-wrap gap-y-[12px]"
+              style={{ columnGap: gap }}>
               {favourites.map((item) => (
-                <AnnouncementSmallCard
-                  key={item.id}
-                  className="w-[175px]"
-                  imageSource={getImageSource(item)}
-                  title={item.title}
-                  address={getAddress(item)}
-                  attributes={getCardAttributes(item)}
-                  priceLabel={getPriceLabel(item)}
-                  isArrowUpRight={false}
-                  isFavourite={item.favourite}
-                  isForComparison={item.forComparison}
-                  onPress={() => handleCardPress(item.id)}
-                  onFavouritePress={() => toggle(item.id, item.favourite)}
-                  onComparisonPress={() => toggleComparison(item.id, item.forComparison)}
-                />
+                <View key={item.id} style={{ width: cardWidth }}>
+                  <AnnouncementSmallCard
+                    imageSource={getImageSource(item)}
+                    title={item.title}
+                    address={getAddress(item)}
+                    attributes={getCardAttributes(item)}
+                    priceLabel={getPriceLabel(item)}
+                    isArrowUpRight={false}
+                    isFavourite={item.favourite}
+                    isForComparison={item.forComparison}
+                    onPress={() => handleCardPress(item.id)}
+                    onFavouritePress={() => toggle(item.id, item.favourite)}
+                    onComparisonPress={() => toggleComparison(item.id, item.forComparison)}
+                  />
+                </View>
               ))}
             </View>
 

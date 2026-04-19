@@ -5,6 +5,7 @@ import { ImageBackground, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
+import { ReIcon } from '@/components/icons/re-icon';
 import { ThemedText } from '@/components/themed-text';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 
@@ -81,7 +82,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               style={{ color: HOME_DESIGN.neutral200 }}>
               {t('home.search_placeholder')}
             </ThemedText>
-            <Ionicons name="options-outline" size={24} color={HOME_DESIGN.neutral950} />
+            <ReIcon name="settings" size={20} color="#a1a1a1" />
           </Pressable>
         </View>
       </ImageBackground>

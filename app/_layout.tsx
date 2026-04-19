@@ -24,6 +24,7 @@ Appearance.setColorScheme('light');
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     ...Ionicons.font,
+    're-icons': require('@/assets/fonts/re-icons.ttf'),
   });
 
   React.useEffect(() => {

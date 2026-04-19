@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { type LayoutChangeEvent, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ReIcon } from '@/components/icons/re-icon';
+
 import { ThemedText } from '@/components/themed-text';
 import { styles } from '@/app/search/results.styles';
 
@@ -71,7 +73,7 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
           accessibilityLabel={t('search.title')}
           className="h-[46px] w-[46px] items-center justify-center rounded-full bg-white"
           style={styles.headerButton}>
-          <Ionicons name="options-outline" size={20} color="#111111" />
+          <ReIcon name="settings" size={20} color="#a1a1a1" />
         </Pressable>
       </View>
     </SafeAreaView>

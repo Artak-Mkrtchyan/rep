@@ -30,7 +30,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   const insets = useSafeAreaInsets();
   const [address, setAddress] = useState(initialFilters?.address ?? '');
   const [listingType, setListingType] = useState<ListingType | null>(
-    initialFilters?.listingType ?? null
+    initialFilters?.listingType ?? 'BUY'
   );
   const [propertyTypes, setPropertyTypes] = useState<PropertyTypeValue[]>(
     initialFilters?.propertyTypes ?? []
@@ -41,10 +41,13 @@ export const SearchModal: React.FC<SearchModalProps> = ({
   useEffect(() => {
     if (visible && initialFilters) {
       setAddress(initialFilters.address ?? '');
-      setListingType(initialFilters.listingType);
+      setListingType(initialFilters.listingType ?? 'BUY');
       setPropertyTypes(initialFilters.propertyTypes);
       setPriceMin(initialFilters.priceMin);
       setPriceMax(initialFilters.priceMax);
+    }
+    if (!visible) {
+      setAddress('');
     }
   }, [visible, initialFilters]);
 

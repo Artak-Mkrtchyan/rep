@@ -1,6 +1,12 @@
 import { ApiResponse } from './auth.types';
 import { httpClient } from './http/client';
-import { Announcement, ItemsListApiResponse, PriceChangeHistory, SearchRequest } from '@/types/api';
+import {
+  Announcement,
+  AnnouncementFullInfoDto,
+  ItemsListApiResponse,
+  PriceChangeHistory,
+  SearchRequest,
+} from '@/types/api';
 import type {
   AnnouncementListItem,
   AnnouncementStatisticsByStatusResponse,
@@ -9,7 +15,7 @@ import type {
 export const announcementsService = {
   getAnnouncementById: async (id: string): Promise<Announcement> => {
     const response = await httpClient.get<ApiResponse<Announcement>>(`/v1/announcements/${id}`, {
-      requiresAuth: true,
+      requiresAuth: false,
     });
     return response.data || (response as unknown as Announcement);
   },
@@ -129,6 +135,14 @@ export const announcementsService = {
       { requiresAuth: true }
     );
     return response.data || (response as unknown as Announcement);
+  },
+
+  getAnnouncementFullInfo: async (id: string): Promise<AnnouncementFullInfoDto> => {
+    const response = await httpClient.get<ApiResponse<AnnouncementFullInfoDto>>(
+      `/v1/announcements/${id}/full-info`,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as AnnouncementFullInfoDto);
   },
 
   getAddressSuggestions: async (address: string, limit = 10): Promise<string[]> => {

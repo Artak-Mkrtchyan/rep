@@ -68,7 +68,7 @@ function RootNavigator() {
     const inAuthGroup = currentSegment === '(auth)';
 
     // Protected segments that require authentication
-    const PROTECTED_SEGMENTS = ['announcement', 'menu', 'profile'];
+    const PROTECTED_SEGMENTS = ['menu', 'profile'];
     const inProtectedGroup = currentSegment
       ? PROTECTED_SEGMENTS.includes(currentSegment)
       : false;

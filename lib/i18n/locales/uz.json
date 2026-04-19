@@ -583,6 +583,11 @@
   "announcement.detail.page": "Sahifa",
   "announcement.detail.of_page": "dan",
   "announcement.detail.download_failed": "Faylni yuklab bo'lmadi",
+  "announcement.contact.title": "Aloqa ma'lumotlari",
+  "announcement.contact.subtitle": "Aloqa ma'lumotlarini ko'ring va ushbu mulk bo'yicha bog'laning.",
+  "announcement.contact.broker": "Broker",
+  "announcement.contact.individual_user": "Jismoniy shaxs",
+  "announcement.contact.not_available": "Aloqa ma'lumotlari mavjud emas",
 
   "profile.my_announcements": "E'lonlar",
 

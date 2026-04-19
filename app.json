@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.rep",
       "infoPlist": {
-        "CFBundleDisplayName": "Test Real Estate"
+        "CFBundleDisplayName": "Test Real Estate",
+        "LSApplicationQueriesSchemes": ["tel", "mailto"]
       },
       "associatedDomains": [
         "applinks:rep-dev.utspdev.com",

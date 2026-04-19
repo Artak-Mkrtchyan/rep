@@ -583,6 +583,11 @@
   "announcement.detail.page": "Страница",
   "announcement.detail.of_page": "из",
   "announcement.detail.download_failed": "Не удалось скачать файл",
+  "announcement.contact.title": "Контактная информация",
+  "announcement.contact.subtitle": "Просмотрите контактные данные и свяжитесь по этому объекту.",
+  "announcement.contact.broker": "Брокер",
+  "announcement.contact.individual_user": "Частное лицо",
+  "announcement.contact.not_available": "Контактная информация недоступна",
 
   "profile.my_announcements": "Объявления",
 

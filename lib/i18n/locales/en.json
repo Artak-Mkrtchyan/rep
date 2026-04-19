@@ -583,6 +583,11 @@
   "announcement.detail.page": "Page",
   "announcement.detail.of_page": "of page",
   "announcement.detail.download_failed": "Failed to download file",
+  "announcement.contact.title": "Contact information",
+  "announcement.contact.subtitle": "View the contact details and get in touch about this property.",
+  "announcement.contact.broker": "Broker",
+  "announcement.contact.individual_user": "Individual user",
+  "announcement.contact.not_available": "Contact information is not available",
 
   "profile.my_announcements": "Announcements",
 

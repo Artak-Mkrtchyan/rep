@@ -13,6 +13,7 @@ export interface UseFavouritesResult {
   totalPages: number;
   refetch: () => Promise<void>;
   toggle: (id: string, isFavourite: boolean) => Promise<void>;
+  toggleComparison: (id: string, isForComparison: boolean) => Promise<void>;
 }
 
 export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
@@ -90,6 +91,28 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
     []
   );
 
+  const toggleComparison = useCallback(
+    async (id: string, isForComparison: boolean) => {
+      try {
+        if (isForComparison) {
+          await announcementsService.removeFromComparison(id);
+        } else {
+          await announcementsService.addToComparison(id);
+        }
+        isDirtyRef.current = true;
+        setFavourites((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, forComparison: !isForComparison } : item
+          )
+        );
+      } catch (err) {
+        console.error('Failed to toggle comparison:', err);
+        throw err;
+      }
+    },
+    []
+  );
+
   const refetch = useCallback(() => fetchFavourites(), [fetchFavourites]);
 
   useEffect(() => {
@@ -115,5 +138,6 @@ export function useFavourites(page = 0, pageSize = 20): UseFavouritesResult {
     totalPages,
     refetch,
     toggle,
+    toggleComparison,
   };
 }

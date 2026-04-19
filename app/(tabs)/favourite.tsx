@@ -10,7 +10,6 @@ import { ThemedView } from '@/components/themed-view';
 import { useFavourites } from '@/hooks/api/use-favourites';
 import { useResponsiveGrid } from '@/hooks/use-responsive-grid';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
-import { announcementsService } from '@/lib/api/announcements';
 import { seedAll } from '@/lib/dev/create-announcements';
 import {
   getAddress,
@@ -23,7 +22,7 @@ import { Image } from 'expo-image';
 export default function FavouriteScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { favourites, isLoading, error, refetch, toggle } = useFavourites();
+  const { favourites, isLoading, error, refetch, toggle, toggleComparison } = useFavourites();
   const [seeding, setSeeding] = useState(false);
   const { horizontalStyle } = useScreenEdgePadding();
   const { cardWidth, gap, onLayout } = useResponsiveGrid();
@@ -31,22 +30,6 @@ export default function FavouriteScreen() {
   const handleCardPress = useCallback(
     (id: string) => router.push(`/announcement/${id}` as any),
     [router]
-  );
-
-  const toggleComparison = useCallback(
-    async (id: string, isForComparison: boolean) => {
-      try {
-        if (isForComparison) {
-          await announcementsService.removeFromComparison(id);
-        } else {
-          await announcementsService.addToComparison(id);
-        }
-        await refetch();
-      } catch (err) {
-        console.error('Failed to toggle comparison:', err);
-      }
-    },
-    [refetch]
   );
 
   const handleSeed = async () => {

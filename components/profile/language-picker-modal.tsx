@@ -32,7 +32,13 @@ export const LanguagePickerModal: React.FC<LanguagePickerModalProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Modal transparent visible={visible} onRequestClose={onClose} animationType="fade">
+    <Modal
+      transparent
+      visible={visible}
+      onRequestClose={onClose}
+      animationType="fade"
+      statusBarTranslucent
+      navigationBarTranslucent>
       <Pressable style={{ flex: 1 }} onPress={onClose} accessible={false}>
         <View className="flex-1 justify-end bg-black/40">
           <Pressable onPress={(e) => e.stopPropagation()}>

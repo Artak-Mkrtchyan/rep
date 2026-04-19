@@ -1,7 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { announcementsService } from '@/lib/api/announcements';
 import { Announcement } from '@/types/api';
+
+const FETCH_PAGE_SIZE = 50;
+const DISPLAY_COUNT = 9;
+
+function getRandomSample<T>(array: T[], sampleSize: number): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = shuffled[i] as T;
+    shuffled[i] = shuffled[j] as T;
+    shuffled[j] = temp;
+  }
+  return shuffled.slice(0, sampleSize);
+}
 
 export interface UseFeaturedAnnouncementsResult {
   announcements: Announcement[];
@@ -10,25 +24,26 @@ export interface UseFeaturedAnnouncementsResult {
   refetch: () => Promise<void>;
 }
 
-export function useFeaturedAnnouncements(pageSize = 5): UseFeaturedAnnouncementsResult {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+export function useFeaturedAnnouncements(): UseFeaturedAnnouncementsResult {
+  const [allAnnouncements, setAllAnnouncements] = useState<Announcement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const mountedRef = useRef(true);
   const hasLoadedRef = useRef(false);
 
-  const fetch = useCallback(async () => {
+  const fetchAnnouncements = useCallback(async () => {
     if (!hasLoadedRef.current) {
       setIsLoading(true);
     }
     setError(null);
     try {
       const response = await announcementsService.searchAnnouncements({
-        pagination: { pageNumber: 0, pageSize },
+        filter: { statuses: ['ACTIVE'] },
+        pagination: { pageNumber: 0, pageSize: FETCH_PAGE_SIZE },
         sorts: [{ sort: 'CREATED_AT', direction: 'DESC' }],
       });
       if (mountedRef.current) {
-        setAnnouncements(response.content);
+        setAllAnnouncements(response.content);
         hasLoadedRef.current = true;
       }
     } catch (err) {
@@ -40,15 +55,20 @@ export function useFeaturedAnnouncements(pageSize = 5): UseFeaturedAnnouncements
         setIsLoading(false);
       }
     }
-  }, [pageSize]);
+  }, []);
 
   useEffect(() => {
     mountedRef.current = true;
-    fetch();
+    fetchAnnouncements();
     return () => {
       mountedRef.current = false;
     };
-  }, [fetch]);
+  }, [fetchAnnouncements]);
 
-  return { announcements, isLoading, error, refetch: fetch };
+  const announcements = useMemo(
+    () => getRandomSample(allAnnouncements, DISPLAY_COUNT),
+    [allAnnouncements]
+  );
+
+  return { announcements, isLoading, error, refetch: fetchAnnouncements };
 }

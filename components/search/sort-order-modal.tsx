@@ -44,8 +44,12 @@ export const SortOrderModal: React.FC<SortOrderModalProps> = ({
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
-      onRequestClose={onClose}>
-      <View className="flex-1 bg-background" style={{ paddingBottom: insets.bottom }}>
+      onRequestClose={onClose}
+      statusBarTranslucent
+      navigationBarTranslucent>
+      <View
+        className="flex-1 bg-background"
+        style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
         <View className="flex-row items-center justify-between px-4 py-3">
           <Pressable
             onPress={onClose}

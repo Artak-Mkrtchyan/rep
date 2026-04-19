@@ -63,7 +63,7 @@ export function Select<T extends string = string>({
   return (
     <View
       className={cn('w-full gap-1', containerClassName)}
-      style={open ? { zIndex: 1000, elevation: 1000 } : undefined}>
+      style={open ? { zIndex: 2000, elevation: 2000 } : undefined}>
       {label ? <InputLabel>{label}</InputLabel> : null}
 
       <View style={{ position: 'relative' }}>

@@ -205,7 +205,7 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
   return (
     <View
       className={cn('w-full gap-1', containerClassName)}
-      style={{ zIndex: showDropdown ? 100 : 0 }}>
+      style={{ zIndex: 1000, elevation: 1000 }}>
       {label ? <InputLabel>{label}</InputLabel> : null}
 
       {/**
@@ -255,9 +255,9 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
               top: '100%',
               left: 0,
               right: 0,
-              zIndex: 100,
+              zIndex: 1001,
               marginTop: 4,
-              elevation: 5,
+              elevation: 8,
               shadowColor: '#000',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.15,

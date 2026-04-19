@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
+import { Href, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,11 +19,9 @@ import { PaginationIndicator } from '@/components/ui/pagination-indicator';
 import { useAuth } from '@/context/AuthContext';
 import { useFeaturedAnnouncements } from '@/hooks/api/use-announcements';
 import { useHomeMetrics } from '@/hooks/use-home-metrics';
-import { MOCK_FEATURED_LISTINGS, isMockHomeListingId } from '@/lib/mocks/home-mock-data';
 import { announcementsService } from '@/lib/api/announcements';
 import {
   announcementToFeaturedVm,
-  mockListingToFeaturedVm,
   type FeaturedListingViewModel,
 } from '@/lib/utils/home-featured-helpers';
 
@@ -37,48 +35,41 @@ const featuredLayout = StyleSheet.create({
   },
 });
 
-type FeaturedPropertiesProps = {
-  onSeeMorePress?: () => void;
-};
+type FeaturedPropertiesProps = Record<string, never>;
 
-export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMorePress }) => {
+export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { user } = useAuth();
   const metrics = useHomeMetrics();
-  const { announcements, isLoading, error, refetch } = useFeaturedAnnouncements(5);
+  const { announcements, isLoading, refetch } = useFeaturedAnnouncements();
 
-  const [mockFavourite, setMockFavourite] = useState<Record<string, boolean>>({});
-  const [mockComparison, setMockComparison] = useState<Record<string, boolean>>({});
+  const listings: FeaturedListingViewModel[] = useMemo(
+    () => announcements.map(announcementToFeaturedVm),
+    [announcements]
+  );
 
-  const useMockData = !isLoading && (error != null || announcements.length === 0);
-
-  const baseListings: FeaturedListingViewModel[] = useMemo(() => {
-    if (!useMockData) {
-      return announcements.map(announcementToFeaturedVm);
-    }
-    return MOCK_FEATURED_LISTINGS.map(mockListingToFeaturedVm);
-  }, [announcements, useMockData]);
-
-  const listings: FeaturedListingViewModel[] = useMemo(() => {
-    if (!useMockData) {
-      return baseListings;
-    }
-    return baseListings.map((vm) => ({
-      ...vm,
-      isFavourite: mockFavourite[vm.id] ?? vm.isFavourite,
-      isForComparison: mockComparison[vm.id] ?? vm.isForComparison,
-    }));
-  }, [baseListings, mockComparison, mockFavourite, useMockData]);
+  const handleSeeMore = useCallback(() => {
+    router.push({
+      pathname: '/search/results' as Href,
+      params: {
+        filters: JSON.stringify({
+          query: '',
+          address: '',
+          listingType: null,
+          propertyTypes: [],
+          priceMin: '',
+          priceMax: '',
+          sortOption: 'NEWEST_FIRST',
+        }),
+      },
+    });
+  }, [router]);
 
   const toggleFavourite = useCallback(
     async (id: string, isFavourite: boolean) => {
       if (!user) {
         router.push('/(auth)' as any);
-        return;
-      }
-      if (useMockData) {
-        setMockFavourite((prev) => ({ ...prev, [id]: !isFavourite }));
         return;
       }
       try {
@@ -88,21 +79,17 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
           await announcementsService.addToFavourites(id);
         }
         await refetch();
-      } catch (err) {
-        console.error('Failed to toggle favourite:', err);
+      } catch {
+        // silently fail
       }
     },
-    [refetch, useMockData, user, router]
+    [refetch, user, router]
   );
 
   const toggleComparison = useCallback(
     async (id: string, isForComparison: boolean) => {
       if (!user) {
         router.push('/(auth)' as any);
-        return;
-      }
-      if (useMockData) {
-        setMockComparison((prev) => ({ ...prev, [id]: !isForComparison }));
         return;
       }
       try {
@@ -112,21 +99,19 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
           await announcementsService.addToComparison(id);
         }
         await refetch();
-      } catch (err) {
-        console.error('Failed to toggle comparison:', err);
+      } catch {
+        // silently fail
       }
     },
-    [refetch, useMockData, user, router]
+    [refetch, user, router]
   );
 
   const [activeIndex, setActiveIndex] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
-      if (!useMockData) {
-        refetch();
-      }
-    }, [refetch, useMockData])
+      refetch();
+    }, [refetch])
   );
 
   const handleScroll = useCallback(
@@ -156,7 +141,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
         <SectionHeaderRow
           title={t('home.featured_property')}
           actionLabel={t('home.see_more')}
-          onActionPress={onSeeMorePress}
+          onActionPress={handleSeeMore}
         />
 
         <ScrollView
@@ -179,11 +164,7 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = ({ onSeeMor
               imageSources={item.imageSources}
               isFavourite={item.isFavourite}
               isForComparison={item.isForComparison}
-              onPress={
-                isMockHomeListingId(item.id)
-                  ? undefined
-                  : () => router.push(`/announcement/${item.id}` as any)
-              }
+              onPress={() => router.push(`/announcement/${item.id}` as any)}
               onFavouritePress={() => toggleFavourite(item.id, item.isFavourite)}
               onComparisonPress={() => toggleComparison(item.id, item.isForComparison)}
             />

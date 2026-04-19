@@ -86,7 +86,7 @@ export default function HomeScreen() {
           isAuthenticated={isAuthenticated}
           onLoginPress={handleLoginPress}
         />
-        <FeaturedProperties onSeeMorePress={handleSearchPress} />
+        <FeaturedProperties />
         <AffordabilityCalculatorSection />
         <RealEstateAgentsSection
           onSeeMorePress={handleBrokersNavigate}

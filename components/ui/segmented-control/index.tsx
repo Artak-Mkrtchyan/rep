@@ -46,7 +46,8 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
             className={cn(
               'text-center text-[13px] leading-[18px]',
               isSelected ? 'font-semibold text-white' : 'font-normal text-foreground'
-            )}>
+            )}
+            style={{ includeFontPadding: false, textAlignVertical: 'center' }}>
             {label}
           </ThemedText>
         </Pressable>

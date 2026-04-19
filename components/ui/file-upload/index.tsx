@@ -39,14 +39,7 @@ export interface FileUploadProps {
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
 
 function safeUploadFileName(uri: string, name?: string): string {
-  const base =
-    name?.trim() ||
-    uri
-      .split('/')
-      .pop()
-      ?.split('?')[0]
-      ?.trim() ||
-    'file';
+  const base = name?.trim() || uri.split('/').pop()?.split('?')[0]?.trim() || 'file';
   return base.toLowerCase();
 }
 
@@ -77,10 +70,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
     } as any);
 
     const response = await applicationsService.uploadTemporaryAttachment(formData);
-    onChange?.([
-      ...value,
-      { id: response.id, uri, type: mimeType, name: fileName },
-    ]);
+    onChange?.([...value, { id: response.id, uri, type: mimeType, name: fileName }]);
   };
 
   const pickFromGallery = async () => {

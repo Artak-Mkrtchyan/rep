@@ -82,7 +82,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+      statusBarTranslucent
+      navigationBarTranslucent>
       <View
         className="flex-1 bg-background"
         style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>

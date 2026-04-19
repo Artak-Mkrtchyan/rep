@@ -27,17 +27,23 @@ const MAX_COMPARE_COUNT = 3;
 export default function ComparisonsScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { announcements, isLoading, error, refetch, removeFromComparison, toggleFavourite } =
-    useComparisons();
+  const {
+    announcements,
+    isLoading,
+    error,
+    refetchSilent,
+    removeFromComparison,
+    toggleFavourite,
+  } = useComparisons();
   const { horizontalStyle } = useScreenEdgePadding();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [tooManyVisible, setTooManyVisible] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
-      refetch();
+      refetchSilent();
       setSelectedIds(new Set());
-    }, [refetch])
+    }, [refetchSilent])
   );
 
   const toggleSelection = useCallback((id: string) => {
@@ -159,7 +165,9 @@ export default function ComparisonsScreen() {
           visible={tooManyVisible}
           transparent
           animationType="fade"
-          onRequestClose={() => setTooManyVisible(false)}>
+          onRequestClose={() => setTooManyVisible(false)}
+          statusBarTranslucent
+          navigationBarTranslucent>
           <View style={styles.overlay}>
             <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill} />
             <View style={styles.overlayDim} pointerEvents="none" />

@@ -12,6 +12,8 @@ import { ChipGroup } from '@/components/ui/chip-group';
 import { Select } from '@/components/ui/select';
 import {
   FLOORS_OPTIONS,
+  HOUSE_FLOORS_OPTIONS,
+  RESTROOMS_OPTIONS,
   getBuildingTypeOptions,
   getConditionOptions,
   getOwnershipTypeOptions,
@@ -179,7 +181,7 @@ export default function CharacteristicsScreen() {
                       placeholder=""
                       value={`${values.building?.numberOfFloors || ''}`}
                       onChange={(v) => setFieldValue('building.numberOfFloors', Number(v))}
-                      options={FLOORS_OPTIONS}
+                      options={isHouse ? HOUSE_FLOORS_OPTIONS : FLOORS_OPTIONS}
                       containerClassName="mb-1"
                     />
                   </Conditional>
@@ -703,12 +705,13 @@ export default function CharacteristicsScreen() {
                     </Conditional>
 
                     <Conditional condition={isCommercialSpace}>
-                      <Input
+                      <Select
                         label={t('property_details.restrooms')}
-                        numericOnly
+                        placeholder=""
                         value={`${values.facilities?.restroomsCount || ''}`}
-                        onChangeText={(v) => setFieldValue('facilities.restroomsCount', Number(v))}
-                        keyboardType="number-pad"
+                        onChange={(v) => setFieldValue('facilities.restroomsCount', Number(v))}
+                        options={RESTROOMS_OPTIONS}
+                        containerClassName="mb-1"
                       />
                     </Conditional>
                   </View>

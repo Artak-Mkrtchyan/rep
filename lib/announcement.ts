@@ -222,11 +222,25 @@ const makeCommercialSpaceCharacteristicsSchema = (t: TFunction) =>
   Yup.object().shape({
     building: Yup.object().shape({
       buildingType: Yup.string().required(t('add_application.validation.building_required')),
+      numberOfFloors: Yup.number()
+        .required(t('add_application.validation.number_of_floors_required'))
+        .typeError(t('add_application.validation.must_be_number')),
     }),
     facilities: Yup.object().shape({
       restroomsCount: Yup.number()
         .required(t('add_application.validation.restrooms_count_required'))
         .typeError(t('add_application.validation.must_be_number')),
+    }),
+  });
+
+const makeGarageCharacteristicsSchema = (t: TFunction) =>
+  Yup.object().shape({
+    property: Yup.object().shape({
+      attributes: Yup.object().shape({
+        ceilingHeightM: Yup.number()
+          .required(t('add_application.validation.ceiling_height_required'))
+          .typeError(t('add_application.validation.must_be_number')),
+      }),
     }),
   });
 
@@ -266,6 +280,10 @@ export const getCharacteristicsSchemaForPropertyType = (type: Property | '', t: 
 
   if (type === 'COMMERCIAL_SPACE') {
     return makeCommercialSpaceCharacteristicsSchema(t);
+  }
+
+  if (type === 'GARAGE') {
+    return makeGarageCharacteristicsSchema(t);
   }
 
   if (type === 'LAND') {

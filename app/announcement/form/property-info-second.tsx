@@ -18,16 +18,27 @@ import * as Yup from 'yup';
 
 type DescriptionFormValues = { description: RentForApartmentsFormStep3['description'] };
 
-const makeDescriptionSchema = (t: TFunction) =>
+const PROPERTY_TYPES_WITH_OPTIONAL_DESCRIPTION = ['GARAGE', 'COMMERCIAL_SPACE'] as const;
+
+const makeDescriptionSchema = (t: TFunction, isDescriptionRequired: boolean) =>
   Yup.object().shape({
-    description: Yup.string()
-      .required(t('add_application.validation.description_required'))
-      .max(4000, t('add_application.validation.description_max_length')),
+    description: isDescriptionRequired
+      ? Yup.string()
+          .required(t('add_application.validation.description_required'))
+          .max(4000, t('add_application.validation.description_max_length'))
+      : Yup.string().max(4000, t('add_application.validation.description_max_length')),
   });
 
 export default function PropertyInfoSecondScreen() {
   const { t } = useTranslation();
-  const validationSchema = useMemo(() => makeDescriptionSchema(t), [t]);
+  const propertyType = useAnnouncementForRentFormStore((s) => s.formData.propertyType);
+  const isDescriptionRequired = !PROPERTY_TYPES_WITH_OPTIONAL_DESCRIPTION.includes(
+    propertyType as (typeof PROPERTY_TYPES_WITH_OPTIONAL_DESCRIPTION)[number]
+  );
+  const validationSchema = useMemo(
+    () => makeDescriptionSchema(t, isDescriptionRequired),
+    [t, isDescriptionRequired]
+  );
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
@@ -91,7 +102,9 @@ export default function PropertyInfoSecondScreen() {
                 </ThemedText>
 
                 <View className="gap-1">
-                  <InputLabel>{t('announcement.rent.property_description')}</InputLabel>
+                  <InputLabel required={isDescriptionRequired}>
+                    {t('announcement.rent.property_description')}
+                  </InputLabel>
                   <TextInput
                     value={values.description}
                     onChangeText={handleChange('description')}

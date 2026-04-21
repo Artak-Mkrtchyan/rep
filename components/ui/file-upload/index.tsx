@@ -36,7 +36,8 @@ export interface FileUploadProps {
   maxFileSize?: number;
 }
 
-const MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_PDF_SIZE = 20 * 1024 * 1024; // 20MB
 
 function safeUploadFileName(uri: string, name?: string): string {
   const base = name?.trim() || uri.split('/').pop()?.split('?')[0]?.trim() || 'file';
@@ -55,7 +56,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   required,
   disabled = false,
   containerClassName,
-  maxFileSize = MAX_FILE_SIZE,
+  maxFileSize,
 }) => {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = React.useState(false);
@@ -84,7 +85,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
 
-        if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
+        const imageLimit = maxFileSize ?? MAX_IMAGE_SIZE;
+        if (asset.fileSize && asset.fileSize > imageLimit) {
           Alert.alert(t('ui.file_too_large_title'), t('ui.file_too_large_message'));
           return;
         }
@@ -111,7 +113,9 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       if (!result.canceled && result.assets[0]) {
         const asset = result.assets[0];
 
-        if (asset.size && asset.size > maxFileSize) {
+        const isPdf = asset.mimeType === 'application/pdf';
+        const sizeLimit = maxFileSize ?? (isPdf ? MAX_PDF_SIZE : MAX_IMAGE_SIZE);
+        if (asset.size && asset.size > sizeLimit) {
           Alert.alert(t('ui.file_too_large_title'), t('ui.file_too_large_message'));
           return;
         }

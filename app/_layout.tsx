@@ -70,18 +70,13 @@ function RootNavigator() {
     const currentSegment = segments[0] as string | undefined;
     const inAuthGroup = currentSegment === '(auth)';
 
-    // Protected segments that require authentication
-    const PROTECTED_SEGMENTS = ['menu', 'profile'];
-    const inProtectedGroup = currentSegment
-      ? PROTECTED_SEGMENTS.includes(currentSegment)
-      : false;
-
+    // Only force-navigate signed-in users away from the auth stack. Guests
+    // are never pushed to (auth) automatically — the Home tab is the
+    // landing screen, and individual protected actions (profile, add
+    // announcement, favourites toggle, etc.) handle auth prompts
+    // themselves via login-required screens.
     if (user && inAuthGroup) {
-      // User is signed in but on auth screen, redirect to home
       router.replace('/(tabs)');
-    } else if (!user && inProtectedGroup) {
-      // User is not signed in but on a protected screen, redirect to auth
-      router.replace('/(auth)');
     }
   }, [user, isLoading, segments, router]);
 
@@ -99,7 +94,10 @@ function RootNavigator() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false, gestureEnabled: true }}>
+    <Stack
+      initialRouteName="(tabs)"
+      screenOptions={{ headerShown: false, gestureEnabled: true }}>
+      <Stack.Screen name="index" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="login-required" />

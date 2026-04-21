@@ -19,17 +19,15 @@ const CURRENCY_PREFIX = '$';
 
 type SaleDetailsFormValues = RentForApartmentsFormStep4;
 
-/** When saleDetails is present, price is required. */
 const makeSaleDetailsSchema = (t: TFunction) =>
   Yup.object().shape({
     saleDetails: Yup.object()
-      .optional()
-      .nullable()
       .shape({
         price: Yup.number()
           .required(t('add_application.validation.price_required'))
           .typeError(t('add_application.validation.must_be_number')),
-      }),
+      })
+      .required(t('add_application.validation.price_required')),
   });
 
 export default function SaleDetailsScreen() {
@@ -42,14 +40,14 @@ export default function SaleDetailsScreen() {
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
-  const initialValues: SaleDetailsFormValues = { saleDetails: formData.saleDetails };
+  const initialValues: SaleDetailsFormValues = {
+    saleDetails: formData.saleDetails ?? { price: undefined as unknown as number },
+  };
 
   const saveSaleDetails = async ({ saleDetails }: SaleDetailsFormValues) => {
-    if (saleDetails) {
+    if (saleDetails?.price != null) {
       updateFormData({
-        saleDetails: {
-          price: Number(saleDetails.price) || 0,
-        },
+        saleDetails: { price: Number(saleDetails.price) },
       });
     }
 
@@ -104,10 +102,12 @@ export default function SaleDetailsScreen() {
                     numericOnly
                     placeholder=""
                     value={`${values.saleDetails?.price ?? ''}`}
-                    onChangeText={(v) => setFieldValue('saleDetails.price', v)}
+                    onChangeText={(v) =>
+                      setFieldValue('saleDetails.price', v === '' ? undefined : Number(v))
+                    }
                     error={
-                      touched.saleDetails && errors.saleDetails
-                        ? t('add_application.validation.price_required')
+                      touched.saleDetails && (errors.saleDetails as { price?: string })?.price
+                        ? (errors.saleDetails as { price?: string }).price
                         : undefined
                     }
                     left={

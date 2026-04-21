@@ -35,7 +35,7 @@
   "ui.close_date_picker": "Закрыть выбор даты",
   "ui.invalid_date": "Введите корректную дату",
   "ui.file_too_large_title": "Файл слишком большой",
-  "ui.file_too_large_message": "Пожалуйста, выберите файл размером менее 15МБ.",
+  "ui.file_too_large_message": "Пожалуйста, выберите файл размером менее {{size}}МБ.",
   "ui.upload_failed": "Загрузка не удалась",
   "ui.uploading": "Загрузка...",
   "ui.upload_your_photo": "Нажмите для загрузки или перетащите",

@@ -35,7 +35,7 @@
   "ui.close_date_picker": "Sana tanlashni yopish",
   "ui.invalid_date": "To‘g‘ri sanani kiriting",
   "ui.file_too_large_title": "Fayl juda katta",
-  "ui.file_too_large_message": "Iltimos, 15MB dan kichik fayl tanlang.",
+  "ui.file_too_large_message": "Iltimos, {{size}}MB dan kichik fayl tanlang.",
   "ui.upload_failed": "Yuklash muvaffaqiyatsiz",
   "ui.uploading": "Yuklanmoqda...",
   "ui.upload_your_photo": "Yuklash uchun bosing yoki sudrab tashlang",

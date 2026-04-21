@@ -87,7 +87,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
         const imageLimit = maxFileSize ?? MAX_IMAGE_SIZE;
         if (asset.fileSize && asset.fileSize > imageLimit) {
-          Alert.alert(t('ui.file_too_large_title'), t('ui.file_too_large_message'));
+          Alert.alert(
+            t('ui.file_too_large_title'),
+            t('ui.file_too_large_message', { size: Math.round(imageLimit / 1024 / 1024) })
+          );
           return;
         }
 
@@ -116,7 +119,10 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         const isPdf = asset.mimeType === 'application/pdf';
         const sizeLimit = maxFileSize ?? (isPdf ? MAX_PDF_SIZE : MAX_IMAGE_SIZE);
         if (asset.size && asset.size > sizeLimit) {
-          Alert.alert(t('ui.file_too_large_title'), t('ui.file_too_large_message'));
+          Alert.alert(
+            t('ui.file_too_large_title'),
+            t('ui.file_too_large_message', { size: Math.round(sizeLimit / 1024 / 1024) })
+          );
           return;
         }
 

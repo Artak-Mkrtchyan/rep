@@ -35,7 +35,7 @@
   "ui.close_date_picker": "Close date picker",
   "ui.invalid_date": "Enter a valid date",
   "ui.file_too_large_title": "File Too Large",
-  "ui.file_too_large_message": "Please select a file smaller than 15MB.",
+  "ui.file_too_large_message": "Please select a file smaller than {{size}}MB.",
   "ui.upload_failed": "Upload Failed",
   "ui.uploading": "Uploading...",
   "ui.upload_your_photo": "Click to upload or drag",

@@ -7,7 +7,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 interface AnnouncementForRentFormStore {
   formData: RentForApartmentsForm;
   metaData?: MetaData;
-  nextStep: () => void;
+  nextStep: () => number;
   setBrokerId: (id: string) => void;
   sendFormData: () => Promise<{ id: string }>;
   publishFormData: () => Promise<void>;
@@ -61,12 +61,16 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         metaData: { ...state?.metaData, brokerId: id },
       })),
 
-    nextStep: () =>
+    nextStep: () => {
+      let newStep = 0;
       set((state) => {
+        newStep = state.formData.stepNumber + 1;
         return {
-          formData: { ...state.formData, stepNumber: ++state.formData.stepNumber },
+          formData: { ...state.formData, stepNumber: newStep },
         };
-      }),
+      });
+      return newStep;
+    },
 
     sendFormData: async () => {
       const { formData, metaData } = get();

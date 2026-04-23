@@ -162,11 +162,15 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
           </View>
         </View>
         <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1">
-          <ThemedText className="text-[14px] font-semibold  text-foreground">ID: {id}</ThemedText>
+          {id ? (
+            <ThemedText className="text-[14px] font-semibold text-foreground">ID: {id}</ThemedText>
+          ) : null}
 
           {typeLabel ? (
             <View className="flex-row items-center gap-1.5">
-              <View className={`h-[16px] w-[16px] rounded-full ${listingType === 'FOR_RENT' ? 'bg-main-500' : 'bg-destructive'}`} />
+              <View
+                className={`h-[16px] w-[16px] rounded-full ${listingType === 'FOR_RENT' ? 'bg-main-500' : 'bg-destructive'}`}
+              />
               <ThemedText className="text-[14px] text-foreground">{typeLabel}</ThemedText>
             </View>
           ) : null}

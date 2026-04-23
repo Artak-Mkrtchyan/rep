@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 
@@ -9,7 +9,7 @@ const STEP_COLORS = {
   completedBg: '#087443',
   completedFg: '#FFFFFF',
   currentBg: '#FFFFFF',
-  currentFg: '#087443',
+  currentFg: '#111111',
   currentBorder: '#087443',
   incompleteBg: '#FFFFFF',
   incompleteFg: '#111111',
@@ -17,6 +17,8 @@ const STEP_COLORS = {
   connectorDone: '#087443',
   connectorLine: '#FFFFFF',
   containerBg: '#F1F1F1',
+  labelMain: '#1B1B1B',
+  labelSub: '#474747',
 } as const;
 
 export type StepProgressProps = {
@@ -24,6 +26,17 @@ export type StepProgressProps = {
   completedStep: number;
   label?: string;
   containerClassName?: string;
+};
+
+// Split "Property info (1/2)" / "Property info(1/2)" / "Media (1/2)" into
+// the main label and the parenthesised sub-step suffix so they can be
+// styled independently (semibold dark + regular dimmer).
+const splitStepLabel = (label: string): { main: string; suffix: string | null } => {
+  const match = label.match(/^(.*?)(\s*\([^()]*\))\s*$/);
+  if (!match) {
+    return { main: label, suffix: null };
+  }
+  return { main: match[1].trim(), suffix: match[2].trim() };
 };
 
 export const StepProgress: React.FC<StepProgressProps> = ({
@@ -34,16 +47,17 @@ export const StepProgress: React.FC<StepProgressProps> = ({
 }) => {
   const { t } = useTranslation();
   const resolvedLabel = label ?? t('announcement.steps.list');
+  const { main, suffix } = splitStepLabel(resolvedLabel);
+
   return (
     <View
-      className={`rounded-[12px] p-[16px] ${containerClassName ?? ''}`}
+      className={`rounded-[16px] p-[16px] ${containerClassName ?? ''}`}
       style={{ backgroundColor: STEP_COLORS.containerBg }}>
       <View className="flex-row items-center">
         {Array.from({ length: totalSteps }, (_, i) => {
           const stepIndex = i + 1;
           const isCompleted = stepIndex < completedStep;
           const isCurrent = stepIndex === completedStep;
-          const isUpcoming = stepIndex > completedStep;
           const isLast = i === totalSteps - 1;
 
           return (
@@ -56,24 +70,27 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                     : isCurrent
                       ? STEP_COLORS.currentBg
                       : STEP_COLORS.incompleteBg,
-                  borderWidth: isCurrent || isUpcoming ? 1.5 : 0,
-                  borderColor: isCurrent ? STEP_COLORS.currentBorder : STEP_COLORS.incompleteBorder,
+                  borderWidth: isCurrent ? 1.5 : 0,
+                  borderColor: isCurrent ? STEP_COLORS.currentBorder : 'transparent',
                 }}>
                 {isCompleted ? (
-                  <Ionicons name="checkmark" size={14} color={STEP_COLORS.completedFg} />
+                  <Ionicons name="checkmark" size={12} color={STEP_COLORS.completedFg} />
                 ) : (
-                  <ThemedText
-                    className="font-medium text-foreground"
+                  <Text
+                    allowFontScaling={false}
                     style={{
-                      color: STEP_COLORS.incompleteFg,
-                      fontSize: 12,
-                      lineHeight: 14,
+                      width: 20,
+                      height: 20,
+                      color: isCurrent ? STEP_COLORS.currentFg : STEP_COLORS.incompleteFg,
+                      fontSize: isCurrent ? 14 : 12,
+                      lineHeight: 20,
+                      fontWeight: '500',
                       includeFontPadding: false,
                       textAlignVertical: 'center',
                       textAlign: 'center',
                     }}>
                     {stepIndex}
-                  </ThemedText>
+                  </Text>
                 )}
               </View>
               {!isLast && (
@@ -82,8 +99,8 @@ export const StepProgress: React.FC<StepProgressProps> = ({
                   style={{
                     backgroundColor:
                       stepIndex < completedStep
-                        ? STEP_COLORS.completedBg
-                        : STEP_COLORS.incompleteBg,
+                        ? STEP_COLORS.connectorDone
+                        : STEP_COLORS.connectorLine,
                   }}
                 />
               )}
@@ -91,10 +108,30 @@ export const StepProgress: React.FC<StepProgressProps> = ({
           );
         })}
       </View>
-      <View className="mt-1.5 flex-row">
-        <ThemedText className="text-[12px] font-semibold text-neutral-900" numberOfLines={1}>
-          {resolvedLabel}
+
+      <View className="mt-[6px] flex-row items-baseline">
+        <ThemedText
+          numberOfLines={1}
+          style={{
+            color: STEP_COLORS.labelMain,
+            fontSize: 12,
+            fontWeight: '600',
+            includeFontPadding: false,
+          }}>
+          {main}
         </ThemedText>
+        {suffix ? (
+          <ThemedText
+            numberOfLines={1}
+            style={{
+              color: STEP_COLORS.labelSub,
+              fontSize: 12,
+              fontWeight: '400',
+              includeFontPadding: false,
+            }}>
+            {suffix}
+          </ThemedText>
+        ) : null}
       </View>
     </View>
   );

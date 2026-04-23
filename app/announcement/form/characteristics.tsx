@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { Formik } from 'formik';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +24,7 @@ import { Attributes, Property } from '@/types/announcement';
 
 import { Conditional } from '@/components/conditional';
 import { Input } from '@/components/ui/input';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { getCharacteristicsSchemaForPropertyType, getPropertyTypeInfo } from '@/lib/announcement';
 type CharacteristicsFormValues = Attributes;
 
@@ -35,6 +34,9 @@ export default function CharacteristicsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
+  const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
+  const [isSaving, setIsSaving] = React.useState(false);
   const validationSchema = useMemo(
     () => getCharacteristicsSchemaForPropertyType(formData.propertyType, t),
     [formData.propertyType, t]
@@ -66,13 +68,18 @@ export default function CharacteristicsScreen() {
     }
 
     try {
+      // Persist before showing the preview so metaData.response.publicId is available.
+      setIsSaving(true);
+      await sendFormData();
       if (isNext) {
         nextStep();
       } else {
-        router.back();
+        exitFlow();
       }
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -100,7 +107,9 @@ export default function CharacteristicsScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[16px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.characteristics_title')}
@@ -783,7 +792,7 @@ export default function CharacteristicsScreen() {
 
             <AnnouncementFooter
               firstButtonLabel={t('common.next')}
-              firstButtonDisabled={!isValid}
+              firstButtonDisabled={!isValid || isSaving}
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}

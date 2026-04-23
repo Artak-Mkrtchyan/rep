@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
@@ -7,7 +6,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 
@@ -19,6 +18,7 @@ export default function MediaScreen() {
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
 
   const mediaFiles =
     mediaFileIds?.map((id) => {
@@ -36,7 +36,7 @@ export default function MediaScreen() {
   const handleSaveAndExit = async () => {
     try {
       await sendFormData();
-      router.back();
+      exitFlow();
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
     }

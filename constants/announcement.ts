@@ -16,6 +16,7 @@ export const getPropertyTypeOptions = (t: TFunction): SelectOption<string>[] => 
   { label: t('announcement.property_type.land'), value: 'LAND' },
   { label: t('announcement.property_type.parking_space'), value: 'PARKING_SPACE' },
 ];
+
 export const BATHROOMS_OPTIONS: SelectOption<string>[] = Array.from({ length: 11 }, (_, i) => ({
   label: String(i),
   value: String(i),
@@ -85,15 +86,12 @@ export const getProcessOptions = (t: TFunction): SelectOption<string>[] => [
   { label: t('announcement.process_type.as_broker'), value: 'AS_BROKER' },
 ];
 
-export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 50 }, (_, i) => ({
+export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 10 }, (_, i) => ({
   label: String(i + 1),
   value: String(i + 1),
 }));
 
-export const HOUSE_FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 10 }, (_, i) => ({
-  label: String(i + 1),
-  value: String(i + 1),
-}));
+export const HOUSE_FLOORS_OPTIONS = FLOORS_OPTIONS;
 
 export const RESTROOMS_OPTIONS: SelectOption<string>[] = Array.from({ length: 20 }, (_, i) => ({
   label: String(i + 1),

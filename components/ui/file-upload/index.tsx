@@ -192,7 +192,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
       )}
 
       {value.length === 0 ? (
-        /* Empty State - Original Design */
+        /* Empty State */
         <View className="w-full items-center gap-4 rounded-[12px] border border-default bg-muted p-6">
           <View className="h-12 w-12 items-center justify-center rounded-full bg-card">
             {icon || (
@@ -227,8 +227,8 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </Pressable>
         </View>
       ) : (
-        /* Files List - wrap to next line */
-        <View className="mt-2 w-full flex-row flex-wrap gap-3">
+        /* Populated state — same outer frame as empty so layout doesn't jump */
+        <View className="w-full flex-row flex-wrap gap-3">
           {/* Uploaded Files */}
           {value.map((attachment, index) => (
             <View

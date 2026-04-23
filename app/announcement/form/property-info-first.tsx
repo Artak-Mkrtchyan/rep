@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { Formik, FormikErrors, FormikTouched } from 'formik';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +21,7 @@ import {
   getSpaceSizeGarageOptions,
   getSpaceSizeParkingOptions,
 } from '@/constants/announcement';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { getPropertyTypeInfo, getSchemaForPropertyType } from '@/lib/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -66,6 +65,7 @@ export default function PropertyInfoFirstScreen() {
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
   const validationSchema = useMemo(
     () => getSchemaForPropertyType(formData.propertyType, t),
     [formData.propertyType, t]
@@ -109,7 +109,7 @@ export default function PropertyInfoFirstScreen() {
     } else {
       try {
         await sendFormData();
-        router.back();
+        exitFlow();
       } catch {
         Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       }
@@ -140,7 +140,9 @@ export default function PropertyInfoFirstScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: scrollPaddingBottom }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.property_info_first_title')}

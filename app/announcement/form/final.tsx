@@ -1,7 +1,6 @@
-import { router } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Pressable, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
@@ -12,6 +11,7 @@ import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
 import { CHARACTERISTIC_ICONS, getPetItemsConfig } from '@/constants/announcement';
 import { useAuth } from '@/context/AuthContext';
+import { useExitAnnouncementFlow } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { getObjectCharacteristics } from '@/lib/announcement';
 import { Language } from '@/lib/i18n/i18n';
@@ -30,6 +30,7 @@ export default function FinalScreen() {
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
+  const exitFlow = useExitAnnouncementFlow();
 
   const statusCode = metaData?.response?.status?.code;
   const isReadOnly =
@@ -41,7 +42,7 @@ export default function FinalScreen() {
       await sendFormData();
       await publishFormData();
       resetForm();
-      router.back();
+      exitFlow();
     } catch (error) {
       console.error('Error publishing announcement:', error);
       Alert.alert(t('common.error'), t('error.failed_to_publish'));
@@ -51,7 +52,7 @@ export default function FinalScreen() {
   const handleSaveAndExit = async () => {
     try {
       await sendFormData();
-      router.back();
+      exitFlow();
     } catch (error) {
       console.error('Error saving and exiting announcement:', error);
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
@@ -82,14 +83,11 @@ export default function FinalScreen() {
     : '—';
 
   const ownershipRaw = formData.property?.attributes?.ownershipAndCondition?.ownershipType;
+  const ownershipKey = ownershipRaw?.toLowerCase();
   const ownershipLabel =
-    ownershipRaw === 'FULL'
-      ? t('ownership_type_options.full')
-      : ownershipRaw === 'SHARED'
-        ? t('ownership_type_options.shared')
-        : ownershipRaw === 'JOINT'
-          ? t('ownership_type_options.joint')
-          : '—';
+    ownershipKey === 'full' || ownershipKey === 'shared' || ownershipKey === 'joint'
+      ? t(`ownership_type_options.${ownershipKey}`)
+      : '—';
 
   const formatYesNo = (v: boolean | undefined) => {
     if (v === undefined) {
@@ -142,30 +140,6 @@ export default function FinalScreen() {
               accessibilityLabel={t('announcement.rent.final.property_images')}
               className="h-[345px]"
             />
-            <View className="absolute right-[16px] top-[16px]  flex-row items-center gap-[8px]">
-              <Pressable className="h-[44px] w-[44px] items-center justify-center rounded-[31px] bg-[#1111114d]">
-                <Image
-                  source={require('@/assets/images/heart-icon.svg')}
-                  style={{
-                    width: 24,
-                    height: 24,
-                    tintColor: 'white',
-                  }}
-                  contentFit="contain"
-                />
-              </Pressable>
-              <Pressable className="h-[44px] w-[44px] items-center justify-center rounded-[31px] bg-[#1111114d]">
-                <Image
-                  source={require('@/assets/images/menu-icon.svg')}
-                  style={{
-                    width: 24,
-                    height: 24,
-                    tintColor: 'white',
-                  }}
-                  contentFit="contain"
-                />
-              </Pressable>
-            </View>
           </View>
 
           <PropertyAnnouncementDetail

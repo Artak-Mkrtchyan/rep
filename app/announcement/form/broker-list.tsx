@@ -13,7 +13,7 @@ import {
   useSearchBrokerCompaniesInfinite,
   useSearchIndividualBrokersInfinite,
 } from '@/hooks/api/use-applications';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router } from 'expo-router';
@@ -31,6 +31,7 @@ export default function BrokerListScreen() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const { mutate: assignBroker } = useAssignBroker();
@@ -102,7 +103,7 @@ export default function BrokerListScreen() {
     } catch {
       Alert.alert(t('common.error'), t('Assign broker error'));
     } finally {
-      router.back();
+      exitFlow();
     }
   };
 

@@ -16,12 +16,11 @@ import {
   getProcessOptions,
   getPropertyTypeOptions,
 } from '@/constants/announcement';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { Language } from '@/lib/i18n/i18n';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
-import { router } from 'expo-router';
 
 type BasicInfoFormValues = RentForApartmentsFormStep1;
 
@@ -66,6 +65,7 @@ export default function BasicInfoScreen() {
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
   let isNext = true;
 
   const processType =
@@ -99,7 +99,7 @@ export default function BasicInfoScreen() {
     });
 
     if (!isNext) {
-      router.back();
+      exitFlow();
       return;
     }
 
@@ -130,7 +130,9 @@ export default function BasicInfoScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
                 <View className="gap-4">
                   <ThemedText className="text-[16px] font-bold text-foreground">

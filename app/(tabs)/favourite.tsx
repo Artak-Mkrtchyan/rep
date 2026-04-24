@@ -5,8 +5,10 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AnnouncementSmallCard } from '@/components/announcement/announcement-small-card';
+import { LoginRequiredScreen } from '@/components/auth/login-required-screen';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/context/AuthContext';
 import { useFavourites } from '@/hooks/api/use-favourites';
 import { useResponsiveGrid } from '@/hooks/use-responsive-grid';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
@@ -22,6 +24,7 @@ import { Image } from 'expo-image';
 export default function FavouriteScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const { user, isRestoring } = useAuth();
   const { favourites, isLoading, error, refetch, toggle, toggleComparison } = useFavourites();
   const [seeding, setSeeding] = useState(false);
   const { horizontalStyle } = useScreenEdgePadding();
@@ -31,6 +34,19 @@ export default function FavouriteScreen() {
     (id: string) => router.push(`/announcement/${id}` as any),
     [router]
   );
+
+  // Render the login-required screen inline so the bottom tab bar stays
+  // visible for guests (fixes: nav bar hidden when unsigned user taps
+  // Favourites / Add Announcement).
+  if (!isRestoring && !user) {
+    return (
+      <LoginRequiredScreen
+        title={t('favourite.title')}
+        subtitle={t('auth.login_required_favourites')}
+        illustration={require('@/assets/images/login-required-favourites.svg')}
+      />
+    );
+  }
 
   const handleSeed = async () => {
     setSeeding(true);

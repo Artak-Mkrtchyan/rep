@@ -67,14 +67,6 @@ export default function TabLayout() {
             <TabBarIcon name={focused ? 'heart' : 'heart-outline'} color={color} />
           ),
         }}
-        listeners={{
-          tabPress: (e) => {
-            if (!user) {
-              e.preventDefault();
-              router.push('/login-required/favourite');
-            }
-          },
-        }}
       />
       <Tabs.Screen
         name="announcement"
@@ -86,14 +78,12 @@ export default function TabLayout() {
         }}
         listeners={{
           tabPress: (e) => {
-            // The Announcement tab is an "action" tab — it never shows its own
-            // screen. Signed-in users jump straight to the create-listing flow;
-            // guests get the login-required page. Prevent default so the
-            // current tab stays focused when they return.
-            e.preventDefault();
-            if (!user) {
-              router.push('/login-required/announcement');
-            } else {
+            // The Announcement tab is an "action" tab for signed-in users —
+            // they jump straight to the create-listing flow (outside tabs).
+            // Guests fall through to the tab's screen, which renders the
+            // login-required UI so the bottom nav stays visible.
+            if (user) {
+              e.preventDefault();
               router.push('/announcement/form/new');
             }
           },

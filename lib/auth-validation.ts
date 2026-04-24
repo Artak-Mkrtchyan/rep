@@ -4,18 +4,21 @@ import i18n from '@/lib/i18n/i18n';
 import type { PasswordRequirements } from '@/types/auth';
 
 export const PASSWORD_MIN_LENGTH = 8;
-export const ALLOWED_SPECIAL_CHARS = '-_!@#$%^&*().+~{}[]|\\/<>=?,;:\'\"';
-export const ALLOWED_SPECIAL_CHARS_REGEX = /[^A-Za-z0-9\s]/;
-export const PASSWORD_ALLOWED_CHARS_REGEX = /^[^\s]+$/;
+// Spec (Appendix A): only these special characters are allowed / required in passwords.
+export const ALLOWED_SPECIAL_CHARS = '-_!@#$%^&*()';
+export const ALLOWED_SPECIAL_CHARS_REGEX = /[-_!@#$%^&*()]/;
+export const PASSWORD_ALLOWED_CHARS_REGEX = /^[A-Za-z\d\-_!@#$%^&*()]+$/;
 export const OTP_LENGTH = 6;
 export const RESEND_CODE_TIMEOUT = 60;
 export const OTP_EXPIRATION_TIMEOUT = 300; // 5 minutes
 export const FULL_NAME_MIN_LENGTH = 2;
-export const FULL_NAME_MAX_LENGTH = 255;
+// Spec (Appendix A): full name max 80 characters.
+export const FULL_NAME_MAX_LENGTH = 80;
 export const FULL_NAME_REGEX = /^[a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'\u2018\u2019\-\s]+$/;
+// Spec (Appendix A): email local-part max 64 characters.
 export const EMAIL_REGEX =
-  /^(?=^.{1,255}@)(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
-export const EMAIL_LOCAL_MAX_LENGTH = 255;
+  /^(?=^.{1,64}@)(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
+export const EMAIL_LOCAL_MAX_LENGTH = 64;
 export const PHONE_REGEX = /^\+998\d{9}$/;
 export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 

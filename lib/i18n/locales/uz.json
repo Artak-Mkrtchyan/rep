@@ -85,7 +85,7 @@
   "validation.email_invalid": "Iltimos, to'g'ri elektron pochta manzilini kiriting (masalan, name@example.com)",
   "validation.full_name_required": "To'liq ism kiritish shart",
   "validation.full_name_min_length": "Kamida 2 ta belgi bo'lishi kerak",
-  "validation.full_name_max_length": "255 ta belgidan oshmasligi kerak",
+  "validation.full_name_max_length": "80 ta belgidan oshmasligi kerak",
   "validation.no_leading_trailing_spaces": "Boshida yoki oxirida bo'sh joy bo'lmasligi kerak",
   "validation.full_name_invalid_chars": "To'liq ismda faqat harflar, tire va apostroflar bo'lishi mumkin",
   "validation.full_name_allowed_alphabets": "Faqat lotin (A-Z), kirill rus (A-Ya) va o'zbek harflariga ruxsat berilgan",
@@ -171,7 +171,7 @@
   "login.apple_sign_in_message": "Apple orqali kirish tez orada.",
 
   "signup.title": "Ro'yxatdan o'tish",
-  "signup.description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took.",
+  "signup.description": "Bu bizga hisobingiz uchun to'g'ri xususiyatlarni sozlashga yordam beradi",
   "signup.register_as": "Sifatida ro'yxatdan o'tish",
   "signup.individual_broker": "Yakka broker",
   "signup.broker_company": "Brokerlik kompaniyasi",

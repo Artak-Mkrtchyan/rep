@@ -155,6 +155,7 @@ export interface AnnouncementDocument {
   contentType: string;
   url: string;
   sizeInBytes: number;
+  createdAt: string;
 }
 
 export interface AvatarInfoDto {

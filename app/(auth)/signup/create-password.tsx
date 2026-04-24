@@ -193,7 +193,7 @@ export default function CreatePasswordScreen() {
 
               <SignInFooter
                 onGooglePress={isIndividual ? startGoogleAuth : undefined}
-                onApplePress={handleAppleAuth}
+                onApplePress={isIndividual ? handleAppleAuth : undefined}
                 onSignInPress={handleGoToLogin}
                 showSignInLink
               />

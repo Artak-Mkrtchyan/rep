@@ -13,6 +13,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES } from '@/constants/auth';
+import { useGoogleOAuth } from '@/hooks/use-google-oauth';
 import { useTheme } from '@/hooks/use-theme';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { FULL_NAME_MAX_LENGTH, validatePassword, yupSchemas } from '@/lib/auth-validation';
@@ -36,6 +37,8 @@ export default function CreatePasswordScreen() {
   const { tokens: theme } = useTheme();
   const { data, resetData } = useSignUpContext();
   const { goToPrevious } = useSignUpFlow();
+  const { startGoogleAuth } = useGoogleOAuth();
+  const isIndividual = data.role === 'individual';
 
   const handleContinue = async (values: PasswordForm, { setSubmitting, setFieldError }: any) => {
     try {
@@ -74,10 +77,6 @@ export default function CreatePasswordScreen() {
 
   const handleGoToLogin = () => {
     router.replace(AUTH_ROUTES.LOGIN);
-  };
-
-  const handleGoogleAuth = () => {
-    // TODO: Implement Google authentication
   };
 
   const handleAppleAuth = () => {
@@ -193,7 +192,7 @@ export default function CreatePasswordScreen() {
               </Button>
 
               <SignInFooter
-                onGooglePress={handleGoogleAuth}
+                onGooglePress={isIndividual ? startGoogleAuth : undefined}
                 onApplePress={handleAppleAuth}
                 onSignInPress={handleGoToLogin}
                 showSignInLink

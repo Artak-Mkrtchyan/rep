@@ -45,7 +45,7 @@ export default function LoginFormScreen() {
   const [formError, setFormError] = React.useState<string | null>(null);
 
   const { login, isLoading, reset: resetLoginError } = useLogin();
-  const { startGoogleAuth, isLoading: isGoogleLoading } = useGoogleOAuth({ scope });
+  const { startGoogleAuth, isLoading: isGoogleLoading } = useGoogleOAuth();
   const { tokens: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const { horizontalStyle } = useScreenEdgePadding();

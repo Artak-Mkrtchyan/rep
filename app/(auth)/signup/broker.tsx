@@ -72,9 +72,7 @@ export default function BrokerSignUpScreen() {
     router.replace(AUTH_ROUTES.LOGIN);
   };
 
-  const handleGoogleAuth = () => {
-    // TODO: Implement Google authentication
-  };
+  // AC6: Google sign-in is not supported for individual brokers.
 
   const handleAppleAuth = () => {
     // TODO: Implement Apple authentication
@@ -205,7 +203,6 @@ export default function BrokerSignUpScreen() {
               </Button>
 
               <SignInFooter
-                onGooglePress={handleGoogleAuth}
                 onApplePress={handleAppleAuth}
                 onSignInPress={handleGoToLogin}
                 showSignInLink

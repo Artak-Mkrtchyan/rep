@@ -567,6 +567,10 @@
   "announcement.rent.broker_list.sales_in_city": "sales in Chicago",
   "announcement.rent.broker_list.empty": "Sorry, there are no available brokers at this moment. Please check later.",
 
+  "announcement.rent.broker_selected.title": "Broker is selected",
+  "announcement.rent.broker_selected.subtitle": "You have successfully selected a broker. An email notification has been sent to the broker. You may contact them directly to continue working on your application together.",
+  "announcement.rent.broker_selected.cta": "Go to applications",
+
   "announcement.rent.monthly_rent": "Monthly rent",
   "announcement.rent.security_deposit": "Security deposit",
   "announcement.rent.rent_details_title": "How much are the monthly rent and the security deposit?",

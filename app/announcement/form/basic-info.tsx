@@ -9,15 +9,16 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AddressInput } from '@/components/ui/address-input';
-import { CheckboxRow } from '@/components/ui/checkbox';
 import { Select } from '@/components/ui/select';
 import {
   getListingTypeOptions,
   getProcessOptions,
   getPropertyTypeOptions,
 } from '@/constants/announcement';
+import { useAuth } from '@/context/AuthContext';
 import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { AuthScope } from '@/lib/api/auth';
 import { Language } from '@/lib/i18n/i18n';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
@@ -66,10 +67,13 @@ export default function BasicInfoScreen() {
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
+  const { userInfo } = useAuth();
+  const isBrokerScope =
+    userInfo?.scope === AuthScope.BROKER || userInfo?.scope === AuthScope.BROKER_COMPANY;
   let isNext = true;
-
-  const processType =
-    formData.brokerAssignmentNeeded !== undefined
+  const processType = isBrokerScope
+    ? 'AS_BROKER'
+    : formData.brokerAssignmentNeeded !== undefined
       ? formData.brokerAssignmentNeeded
         ? 'AS_BROKER'
         : 'AS_INDIVIDUAL'
@@ -103,7 +107,7 @@ export default function BasicInfoScreen() {
       return;
     }
 
-    nextStep(values.processType === 'AS_BROKER');
+    nextStep(values.processType === 'AS_BROKER' && !isBrokerScope);
   };
 
   const handleNext = (handleSubmit: () => void) => {
@@ -184,24 +188,9 @@ export default function BasicInfoScreen() {
                     value={values.processType}
                     onChange={(v) => setFieldValue('processType', v)}
                     options={getProcessOptions(t)}
+                    disabled={isBrokerScope}
                     error={
                       touched.processType && errors.processType ? errors.processType : undefined
-                    }
-                  />
-
-                  <CheckboxRow
-                    label={t('announcement.rent.need_photographer')}
-                    checked={values.needPhotographer ?? false}
-                    onToggle={() => setFieldValue('needPhotographer', !values.needPhotographer)}
-                    containerClassName="py-[0px]"
-                  />
-
-                  <CheckboxRow
-                    label={t('announcement.rent.need_assessment_expert')}
-                    checked={values.needAssessmentExpert ?? false}
-                    containerClassName="py-[0px]"
-                    onToggle={() =>
-                      setFieldValue('needAssessmentExpert', !values.needAssessmentExpert)
                     }
                   />
                 </View>

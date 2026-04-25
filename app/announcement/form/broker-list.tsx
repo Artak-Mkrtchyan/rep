@@ -13,7 +13,7 @@ import {
   useSearchBrokerCompaniesInfinite,
   useSearchIndividualBrokersInfinite,
 } from '@/hooks/api/use-applications';
-import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router } from 'expo-router';
@@ -30,11 +30,10 @@ export default function BrokerListScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
-  const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
-  const { mutate: assignBroker } = useAssignBroker();
+  const { mutateAsync: assignBroker } = useAssignBroker();
   useEffect(() => {
     const trimmed = searchInput.trim();
     const timer = setTimeout(
@@ -89,9 +88,9 @@ export default function BrokerListScreen() {
     try {
       const { id } = await sendFormData();
 
-      assignBroker({ id, data: { brokerId } });
+      await assignBroker({ id, data: { brokerId } });
 
-      nextStep();
+      router.replace('/announcement/form/broker-selected');
     } catch {
       console.error('Assign broker error');
     }

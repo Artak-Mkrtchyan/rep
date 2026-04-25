@@ -567,6 +567,10 @@
   "announcement.rent.broker_list.sales_in_city": "Chicagodagi sotuvlar",
   "announcement.rent.broker_list.empty": "Kechirasiz, hozirda mavjud brokerlar yo'q. Iltimos, keyinroq tekshiring.",
 
+  "announcement.rent.broker_selected.title": "Broker tanlandi",
+  "announcement.rent.broker_selected.subtitle": "Siz brokerni muvaffaqiyatli tanladingiz. Brokerga e-mail xabari yuborildi. Arizangiz ustida birgalikda ishlash uchun u bilan bevosita bog'lanishingiz mumkin.",
+  "announcement.rent.broker_selected.cta": "Arizalarga o'tish",
+
   "announcement.rent.monthly_rent": "Ijara narx",
   "announcement.rent.security_deposit": "Garov pul",
   "announcement.rent.rent_details_title": "Ijara narx va garov pul nechada?",

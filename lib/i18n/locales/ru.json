@@ -567,6 +567,10 @@
   "announcement.rent.broker_list.sales_in_city": "продаж в Чикаго",
   "announcement.rent.broker_list.empty": "К сожалению, сейчас нет доступных брокеров. Пожалуйста, проверьте позже.",
 
+  "announcement.rent.broker_selected.title": "Брокер выбран",
+  "announcement.rent.broker_selected.subtitle": "Вы успешно выбрали брокера. Брокеру отправлено уведомление по электронной почте. Вы можете связаться с ним напрямую, чтобы продолжить работу над заявкой вместе.",
+  "announcement.rent.broker_selected.cta": "Перейти к заявкам",
+
   "announcement.rent.monthly_rent": "Ежемесячная арендная плата",
   "announcement.rent.security_deposit": "Гарантийный депозит",
   "announcement.rent.rent_details_title": "Укажите ежемесячную арендную плату и размер гарантийного депозита.",

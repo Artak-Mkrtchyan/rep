@@ -61,6 +61,15 @@ export default function AnnouncementRentLayout() {
       />
 
       <Stack.Screen
+        key="broker-selected"
+        name="broker-selected"
+        options={{
+          headerShown: false,
+          gestureEnabled: false,
+        }}
+      />
+
+      <Stack.Screen
         key="[id]"
         name="[id]"
         options={{

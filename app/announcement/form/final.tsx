@@ -11,7 +11,9 @@ import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
 import { CHARACTERISTIC_ICONS, getPetItemsConfig } from '@/constants/announcement';
 import { useAuth } from '@/context/AuthContext';
+import { useBrokerCompanyProfile } from '@/hooks/api/use-profile';
 import { useExitAnnouncementFlow } from '@/hooks/use-announcement';
+import { AuthScope } from '@/lib/api/auth';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { getObjectCharacteristics } from '@/lib/announcement';
 import { Language } from '@/lib/i18n/i18n';
@@ -35,7 +37,14 @@ export default function FinalScreen() {
   const statusCode = metaData?.response?.status?.code;
   const isReadOnly =
     !!statusCode && statusCode !== 'DRAFT' && statusCode !== 'RETURNED_TO_APPLICANT';
-  const name = useAuth().userInfo?.fullName || '';
+  const { userInfo } = useAuth();
+  const isBrokerCompany = userInfo?.scope === AuthScope.BROKER_COMPANY;
+  const { data: brokerCompanyProfile } = useBrokerCompanyProfile(
+    isBrokerCompany ? userInfo?.id : undefined
+  );
+  const name = isBrokerCompany
+    ? brokerCompanyProfile?.name || userInfo?.fullName || ''
+    : userInfo?.fullName || '';
 
   const handlePublish = async () => {
     try {

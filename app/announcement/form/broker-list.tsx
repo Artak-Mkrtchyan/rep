@@ -154,14 +154,18 @@ export default function BrokerListScreen() {
           data={individualList}
           keyExtractor={(item) => item.id.toString()}
           ListFooterComponent={renderIndividualFooter}
+          ListEmptyComponent={
+            !individualQuery.isLoading ? (
+              <ThemedText className="mt-8 text-center text-[14px] text-neutral-500">
+                {t('announcement.rent.broker_list.empty')}
+              </ThemedText>
+            ) : null
+          }
           renderItem={({ item }) => (
             <BrokerCard
               isSelected={brokerId === item.id}
-              avatar={require('@/assets/images/hero.png')}
+              avatar={item.avatarInfo?.thumbnailUrl ?? item.avatarInfo?.url}
               name={item.fullName}
-              rating={5.0}
-              reviewCount={1024}
-              stats={[]}
               onPress={() =>
                 router.replace({
                   pathname: '/announcement/form/broker/[id]',
@@ -183,14 +187,18 @@ export default function BrokerListScreen() {
           data={companiesList}
           keyExtractor={(item) => item.id.toString()}
           ListFooterComponent={renderCompaniesFooter}
+          ListEmptyComponent={
+            !companiesQuery.isLoading ? (
+              <ThemedText className="mt-8 text-center text-[14px] text-neutral-500">
+                {t('announcement.rent.broker_list.empty')}
+              </ThemedText>
+            ) : null
+          }
           renderItem={({ item }) => (
             <BrokerCard
               isSelected={brokerId === item.id}
-              avatar={require('@/assets/images/hero.png')}
+              avatar={item.avatarInfo?.thumbnailUrl ?? item.avatarInfo?.url}
               name={item.name}
-              rating={5.0}
-              reviewCount={1024}
-              stats={[]}
               onPress={() =>
                 router.replace({
                   pathname: '/announcement/form/broker/[id]',

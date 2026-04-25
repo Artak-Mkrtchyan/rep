@@ -565,6 +565,7 @@
   "announcement.rent.broker_list.broker_type": "Broker turi",
   "announcement.rent.broker_list.sales_last_12_months": "oxirgi 12 oydagi sotuvlar",
   "announcement.rent.broker_list.sales_in_city": "Chicagodagi sotuvlar",
+  "announcement.rent.broker_list.empty": "Kechirasiz, hozirda mavjud brokerlar yo'q. Iltimos, keyinroq tekshiring.",
 
   "announcement.rent.monthly_rent": "Ijara narx",
   "announcement.rent.security_deposit": "Garov pul",
@@ -840,6 +841,7 @@
   "partners.price_range": "Narx oralig'i",
   "partners.average_price": "O'rtacha narx",
   "partners.no_results": "Brokerlar topilmadi",
+  "partners.more_details": "Batafsil",
   "partners.see_all": "Hammasini ko'rish",
   "partners.years_of_activity": "{{count}} yillik faoliyat",
   "partners.certified_on": "Sertifikatlangan {{date}}"

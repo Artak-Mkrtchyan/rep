@@ -565,6 +565,7 @@
   "announcement.rent.broker_list.broker_type": "Broker type",
   "announcement.rent.broker_list.sales_last_12_months": "sales last 12 months",
   "announcement.rent.broker_list.sales_in_city": "sales in Chicago",
+  "announcement.rent.broker_list.empty": "Sorry, there are no available brokers at this moment. Please check later.",
 
   "announcement.rent.monthly_rent": "Monthly rent",
   "announcement.rent.security_deposit": "Security deposit",
@@ -840,6 +841,7 @@
   "partners.price_range": "Price range",
   "partners.average_price": "Average price",
   "partners.no_results": "No brokers found",
+  "partners.more_details": "More details",
   "partners.see_all": "See all",
   "partners.years_of_activity": "{{count}} years of activity",
   "partners.certified_on": "Certified {{date}}"

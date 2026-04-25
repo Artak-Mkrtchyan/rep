@@ -1,4 +1,3 @@
-import { useFocusEffect } from '@react-navigation/native';
 import { Href, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,9 +16,12 @@ import { SectionHeaderRow } from '@/components/home/section-header-row';
 import { ThemedView } from '@/components/themed-view';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
 import { useAuth } from '@/context/AuthContext';
-import { useFeaturedAnnouncements } from '@/hooks/api/use-announcements';
+import {
+  useFeaturedAnnouncements,
+  useToggleComparison,
+  useToggleFavourite,
+} from '@/hooks/api/use-announcements';
 import { useHomeMetrics } from '@/hooks/use-home-metrics';
-import { announcementsService } from '@/lib/api/announcements';
 import {
   announcementToFeaturedVm,
   type FeaturedListingViewModel,
@@ -42,7 +44,9 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = () => {
   const router = useRouter();
   const { user } = useAuth();
   const metrics = useHomeMetrics();
-  const { announcements, isLoading, refetch } = useFeaturedAnnouncements();
+  const { announcements, isLoading } = useFeaturedAnnouncements();
+  const toggleFavourite = useToggleFavourite();
+  const toggleComparison = useToggleComparison();
 
   const listings: FeaturedListingViewModel[] = useMemo(
     () => announcements.map(announcementToFeaturedVm),
@@ -66,53 +70,29 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = () => {
     });
   }, [router]);
 
-  const toggleFavourite = useCallback(
-    async (id: string, isFavourite: boolean) => {
-      if (!user) {
-        router.push('/(auth)' as any);
-        return;
-      }
-      try {
-        if (isFavourite) {
-          await announcementsService.removeFromFavourites(id);
-        } else {
-          await announcementsService.addToFavourites(id);
-        }
-        await refetch();
-      } catch {
-        // silently fail
-      }
+  const requireAuth = useCallback(() => {
+    if (!user) {
+      router.push('/(auth)' as any);
+      return false;
+    }
+    return true;
+  }, [user, router]);
+
+  const handleFavouritePress = useCallback(
+    (id: string, isFavourite: boolean) => {
+      if (requireAuth()) toggleFavourite.mutate({ id, isFavourite });
     },
-    [refetch, user, router]
+    [requireAuth, toggleFavourite]
   );
 
-  const toggleComparison = useCallback(
-    async (id: string, isForComparison: boolean) => {
-      if (!user) {
-        router.push('/(auth)' as any);
-        return;
-      }
-      try {
-        if (isForComparison) {
-          await announcementsService.removeFromComparison(id);
-        } else {
-          await announcementsService.addToComparison(id);
-        }
-        await refetch();
-      } catch {
-        // silently fail
-      }
+  const handleComparisonPress = useCallback(
+    (id: string, isForComparison: boolean) => {
+      if (requireAuth()) toggleComparison.mutate({ id, isForComparison });
     },
-    [refetch, user, router]
+    [requireAuth, toggleComparison]
   );
 
   const [activeIndex, setActiveIndex] = useState(0);
-
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch])
-  );
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -165,8 +145,8 @@ export const FeaturedProperties: React.FC<FeaturedPropertiesProps> = () => {
               isFavourite={item.isFavourite}
               isForComparison={item.isForComparison}
               onPress={() => router.push(`/announcement/${item.id}` as any)}
-              onFavouritePress={() => toggleFavourite(item.id, item.isFavourite)}
-              onComparisonPress={() => toggleComparison(item.id, item.isForComparison)}
+              onFavouritePress={() => handleFavouritePress(item.id, item.isFavourite)}
+              onComparisonPress={() => handleComparisonPress(item.id, item.isForComparison)}
             />
           ))}
         </ScrollView>

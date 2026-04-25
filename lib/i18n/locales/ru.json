@@ -565,6 +565,7 @@
   "announcement.rent.broker_list.broker_type": "Тип брокера",
   "announcement.rent.broker_list.sales_last_12_months": "продаж за последние 12 месяцев",
   "announcement.rent.broker_list.sales_in_city": "продаж в Чикаго",
+  "announcement.rent.broker_list.empty": "К сожалению, сейчас нет доступных брокеров. Пожалуйста, проверьте позже.",
 
   "announcement.rent.monthly_rent": "Ежемесячная арендная плата",
   "announcement.rent.security_deposit": "Гарантийный депозит",
@@ -840,6 +841,7 @@
   "partners.price_range": "Диапазон цен",
   "partners.average_price": "Средняя цена",
   "partners.no_results": "Брокеры не найдены",
+  "partners.more_details": "Подробнее",
   "partners.see_all": "Смотреть все",
   "partners.years_of_activity": "{{count}} лет деятельности",
   "partners.certified_on": "Сертифицирован {{date}}"

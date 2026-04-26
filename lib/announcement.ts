@@ -299,9 +299,13 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
     label: t('announcement.rent.floors'),
     getValue: (fd) => {
       const b = fd.property?.attributes?.building;
-      return b?.floorNo != null && b?.numberOfFloors != null
-        ? `${b.floorNo} of ${b.numberOfFloors}`
-        : '—';
+      if (b?.floorNo != null && b?.numberOfFloors != null) {
+        return `${b.floorNo} of ${b.numberOfFloors}`;
+      }
+      if (b?.numberOfFloors != null) {
+        return String(b.numberOfFloors);
+      }
+      return '—';
     },
   },
   {

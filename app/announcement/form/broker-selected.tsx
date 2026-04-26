@@ -17,7 +17,9 @@ export default function BrokerSelectedScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
 
   const handleGoToApplications = () => {
-    router.replace('/applications');
+    router.dismissAll();
+    router.replace('/profile');
+    router.push('/applications');
   };
 
   return (

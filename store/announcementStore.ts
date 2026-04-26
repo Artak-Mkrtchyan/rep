@@ -86,8 +86,9 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         title: formData.title,
         description: formData.description,
         property: formData.property,
-        rentDetails: formData.rentDetails,
-        saleDetails: formData.saleDetails,
+        // Match web: only send the deal-detail block matching listingType.
+        rentDetails: formData.listingType === 'FOR_RENT' ? formData.rentDetails : undefined,
+        saleDetails: formData.listingType === 'FOR_SALE' ? formData.saleDetails : undefined,
         // Always send arrays (never null/undefined) — the backend crashes with a
         // NullPointerException on getDocumentIds().stream() if these are omitted.
         mediaFileIds: formData.mediaFileIds ?? [],

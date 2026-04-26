@@ -31,7 +31,14 @@ export default function ProfileScreen() {
   const handleLogout = useCallback(() => {
     Alert.alert(t('profile.logout'), t('profile.logout_confirm'), [
       { text: t('common.cancel'), style: 'cancel' },
-      { text: t('profile.logout'), style: 'destructive', onPress: logout },
+      {
+        text: t('profile.logout'),
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          router.replace('/(tabs)');
+        },
+      },
     ]);
   }, [t, logout]);
 

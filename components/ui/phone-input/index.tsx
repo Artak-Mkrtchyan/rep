@@ -136,7 +136,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
   };
 
   const wrapperClassName = cn(
-    'flex-row items-center border rounded-[12px] h-12 bg-card',
+    'flex-row items-center border rounded-[12px] h-12 bg-card overflow-hidden',
     resolvedDisabled && 'opacity-50',
     hasError ? 'border-destructive' : isFocused ? 'border-primary' : 'border-default'
   );
@@ -202,7 +202,9 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
         accessibilityLabel={label}
         accessibilityState={{ disabled: resolvedDisabled, selected: isFocused }}>
         {/* Country Code Section */}
-        <View className="h-full items-center justify-center border-r border-default px-3">
+        <View
+          className="h-full items-center justify-center border-r border-default px-3"
+          style={{ backgroundColor: REP.prefixBg }}>
           <Text className="text-[16px] text-muted-foreground">{countryCode}</Text>
         </View>
 

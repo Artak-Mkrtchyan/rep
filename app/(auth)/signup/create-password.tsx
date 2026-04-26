@@ -100,17 +100,18 @@ export default function CreatePasswordScreen() {
 
           return (
             <>
-              <View className="mt-12 w-full">
+              <View className="mt-14 w-full">
                 <Pressable
                   onPress={goToPrevious}
                   accessibilityRole="button"
                   accessibilityLabel={t('common.go_back')}
-                  className="h-10 w-10 items-center justify-center rounded-full">
+                  hitSlop={8}
+                  className="-ml-2 h-10 w-10 items-center justify-center rounded-full">
                   <Ionicons name="chevron-back" size={24} color="black" />
                 </Pressable>
               </View>
 
-              <ThemedText type="title" className="text-center">
+              <ThemedText type="title" className="-mt-3 text-center">
                 {t('signup.title')}
               </ThemedText>
 

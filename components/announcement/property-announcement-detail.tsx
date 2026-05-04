@@ -122,44 +122,52 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               contentFit="contain"
             />
           </Pressable>
-          <View className="flex-row items-center gap-2">
-            <Pressable
-              onPress={onFavoritePress}
-              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
-              <Image
-                source={require('@/assets/images/heart-icon.svg')}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-                contentFit="contain"
-              />
-            </Pressable>
-            <Pressable
-              onPress={onMenuPress}
-              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
-              <Image
-                source={require('@/assets/images/menu-icon.svg')}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-                contentFit="contain"
-              />
-            </Pressable>
-            <Pressable
-              onPress={onSharePress}
-              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
-              <Image
-                source={require('@/assets/images/share-icon.svg')}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-                contentFit="contain"
-              />
-            </Pressable>
-          </View>
+          {onFavoritePress || onMenuPress || onSharePress ? (
+            <View className="flex-row items-center gap-2">
+              {onFavoritePress ? (
+                <Pressable
+                  onPress={onFavoritePress}
+                  className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+                  <Image
+                    source={require('@/assets/images/heart-icon.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                    }}
+                    contentFit="contain"
+                  />
+                </Pressable>
+              ) : null}
+              {onMenuPress ? (
+                <Pressable
+                  onPress={onMenuPress}
+                  className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+                  <Image
+                    source={require('@/assets/images/menu-icon.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                    }}
+                    contentFit="contain"
+                  />
+                </Pressable>
+              ) : null}
+              {onSharePress ? (
+                <Pressable
+                  onPress={onSharePress}
+                  className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+                  <Image
+                    source={require('@/assets/images/share-icon.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                    }}
+                    contentFit="contain"
+                  />
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
         </View>
         <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1">
           {id ? (

@@ -95,20 +95,19 @@ export default function AnnouncementTitleScreen() {
                   <InputLabel>{t('announcement.rent.title_label')}</InputLabel>
                   <TextInput
                     value={values.title}
-                    maxLength={255}
                     onChangeText={handleChange('title')}
                     onBlur={handleBlur('title')}
                     placeholder={t('announcement.rent.title_placeholder')}
                     placeholderTextColor={placeholderColor}
                     multiline
-                    numberOfLines={4}
+                    numberOfLines={8}
                     textAlignVertical="top"
-                    className={`font-regular min-h-[86px] w-full rounded-[12px] border bg-card px-3 py-3 text-[14px] text-foreground ${touched.title && errors.title ? 'border-destructive' : 'border-default'}`}
+                    className={`font-regular min-h-[86px] w-full rounded-[12px] border bg-card px-3 py-3 text-[14px] text-foreground ${(touched.title || (values.title?.length ?? 0) > 255) && errors.title ? 'border-destructive' : 'border-default'}`}
                     style={{ paddingTop: 12 }}
                     accessibilityLabel={t('announcement.rent.title_heading')}
                     accessibilityHint={t('announcement.rent.title_hint')}
                   />
-                  {touched.title && errors.title ? (
+                  {(touched.title || (values.title?.length ?? 0) > 255) && errors.title ? (
                     <InputError>{errors.title}</InputError>
                   ) : null}
                 </View>

@@ -227,39 +227,40 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           </Pressable>
         </View>
       ) : (
-        /* Populated state — same outer frame as empty so layout doesn't jump */
-        <View className="w-full flex-row flex-wrap gap-3">
+        /* Populated state — Figma: 80x80 tiles in a 16px gap row */
+        <View className="w-full flex-row flex-wrap gap-4">
           {/* Uploaded Files */}
           {value.map((attachment, index) => (
-            <View
-              key={attachment.id}
-              className="relative h-[95px] w-[109px] overflow-visible rounded-[12px] border border-default bg-card">
+            <View key={attachment.id} className="relative h-[80px] w-[80px]">
+              {/* File Preview */}
+              <View className="h-full w-full overflow-hidden rounded-[16px] bg-card">
+                {attachment.type === 'application/pdf' ? (
+                  <View className="h-full w-full items-center justify-center">
+                    <Image
+                      source={require('@/assets/images/pdf-icon.svg')}
+                      style={{ width: 28, height: 28 }}
+                      contentFit="contain"
+                    />
+                  </View>
+                ) : (
+                  <Image
+                    source={{ uri: attachment.uri }}
+                    style={{ width: '100%', height: '100%' }}
+                    contentFit="cover"
+                  />
+                )}
+              </View>
+
               {/* Remove Button */}
               <Pressable
                 onPress={() => handleRemoveFile(index)}
                 disabled={disabled}
-                className="absolute right-[-6px] top-[-6px] z-10 h-[22px] w-[22px] items-center justify-center rounded-full bg-destructive"
+                hitSlop={8}
+                className="absolute right-[-6px] top-[-6px] z-10 h-5 w-5 items-center justify-center rounded-full bg-destructive"
                 accessibilityRole="button"
                 accessibilityLabel={t('ui.remove_file')}>
-                <Ionicons name="close" size={14} color="#FFFFFF" />
+                <Ionicons name="close" size={12} color="#FFFFFF" />
               </Pressable>
-
-              {/* File Preview */}
-              <View className="h-full w-full items-center justify-center p-3">
-                {attachment.type === 'application/pdf' ? (
-                  <Image
-                    source={require('@/assets/images/pdf-icon.svg')}
-                    style={{ width: 28, height: 28 }}
-                    contentFit="contain"
-                  />
-                ) : (
-                  <Image
-                    source={{ uri: attachment.uri }}
-                    style={{ width: 100, height: 100 }}
-                    contentFit="contain"
-                  />
-                )}
-              </View>
             </View>
           ))}
 
@@ -267,23 +268,28 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           <Pressable
             onPress={handleFileUpload}
             disabled={disabled || isUploading}
-            className="h-[95px] w-[109px] items-center justify-center rounded-[12px] border border-default bg-muted"
-            style={({ pressed }) =>
-              pressed && !disabled && !isUploading ? { opacity: 0.9 } : undefined
-            }
+            className="h-[80px] w-[80px] items-center justify-center rounded-[16px] border border-default bg-card"
+            style={({ pressed }) => [
+              {
+                shadowColor: '#6E6E6E',
+                shadowOffset: { width: 2, height: 3 },
+                shadowOpacity: 0.15,
+                shadowRadius: 16.5,
+                elevation: 3,
+              },
+              pressed && !disabled && !isUploading ? { opacity: 0.9 } : null,
+            ]}
             accessibilityRole="button"
             accessibilityLabel={t('ui.add_file')}
             accessibilityState={{ disabled: disabled || isUploading }}>
-            <View className="h-12 w-12 items-center justify-center rounded-full bg-card">
-              {icon || (
-                <Image
-                  source={require('@/assets/images/gallery.svg')}
-                  style={{ width: 24, height: 24 }}
-                  contentFit="contain"
-                />
-              )}
-            </View>
-            <ThemedText className="mt-2 text-[14px] font-medium text-foreground">
+            {icon || (
+              <Image
+                source={require('@/assets/images/gallery.svg')}
+                style={{ width: 24, height: 24 }}
+                contentFit="contain"
+              />
+            )}
+            <ThemedText className="mt-1 text-[14px] font-medium text-main-500">
               {isUploading ? t('ui.uploading') : t('common.add')}
             </ThemedText>
           </Pressable>

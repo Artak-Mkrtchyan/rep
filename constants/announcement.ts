@@ -180,6 +180,12 @@ export const getPetItemsConfig = (
   },
 ];
 
+/**
+ * Max upload size for announcement media (photos and PDF documents).
+ * Applies to both `media-first` (images) and `media-second` (PDFs) screens.
+ */
+export const ANNOUNCEMENT_MAX_FILE_SIZE = 15 * 1024 * 1024;
+
 export const ANNOUNCEMENT_ROUTES = {
   RENT_BASIC_INFO: {
     name: 'basic-info',

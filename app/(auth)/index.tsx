@@ -9,10 +9,16 @@ import * as Yup from 'yup';
 
 import { AuthHeader } from '@/components/auth/auth-header';
 import { AuthLayout } from '@/components/auth/auth-layout';
+import { RadioButton } from '@/components/auth/radio-button';
 import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { getAccountTypeOptions, AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
+import {
+  AUTH_ROUTES,
+  IMAGE_DIMENSIONS,
+  getAccountTypeOptions,
+  isBrokerRole,
+} from '@/constants/auth';
 import i18n from '@/lib/i18n/i18n';
 
 import type { AccountRole } from '@/types/auth';
@@ -50,41 +56,66 @@ export default function LoginRoleScreen() {
         initialValues={{ role: '' as AccountRole }}
         validationSchema={LoginRoleSchema}
         onSubmit={handleContinue}>
-        {({ handleSubmit, values, setFieldValue }) => (
-          <>
-            <AuthHeader
-              title={t('login.title')}
-              imageSource={require('@/assets/images/login-illustration.svg')}
-              imageWidth={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION.width}
-              imageHeight={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION.height}
-              description={t('login.description')}
-            />
+        {({ handleSubmit, values, setFieldValue }) => {
+          const showBrokerRadios = isBrokerRole(values.role);
+          const setRole = (value: string) => setFieldValue('role', value);
+          // Picking 'broker' from the dropdown defaults role to individual broker;
+          // the radios below let the user switch to 'broker_company'.
+          const dropdownValue = showBrokerRadios ? 'broker' : values.role;
 
-            <View className="w-full">
-              <Select
-                label={t('login.log_in_as')}
-                placeholder={t('common.select')}
-                value={values.role}
-                onChange={(value) => setFieldValue('role', value)}
-                options={getAccountTypeOptions(t)}
+          return (
+            <>
+              <AuthHeader
+                title={t('login.title')}
+                imageSource={require('@/assets/images/login-illustration.svg')}
+                imageWidth={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION.width}
+                imageHeight={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION.height}
+                description={t('login.description')}
               />
-            </View>
 
-            <Button
-              disabled={!values.role}
-              onPress={() => handleSubmit()}
-              accessibilityLabel={t('common.continue')}>
-              {t('common.continue')}
-            </Button>
+              <View className="w-full gap-3">
+                <Select
+                  label={t('login.log_in_as')}
+                  placeholder={t('common.select')}
+                  value={dropdownValue}
+                  onChange={setRole}
+                  options={getAccountTypeOptions(t)}
+                />
 
-            <SignInFooter
-              onSignInPress={() => router.push('/(auth)/signup')}
-              showSignInLink
-              signInLabel={t('auth.dont_have_account')}
-              signInActionLabel={t('auth.sign_up')}
-            />
-          </>
-        )}
+                {showBrokerRadios && (
+                  <View className="flex-row items-center justify-between">
+                    <RadioButton
+                      value="broker"
+                      label={t('signup.individual_broker')}
+                      selectedValue={values.role}
+                      onSelect={setRole}
+                    />
+                    <RadioButton
+                      value="broker_company"
+                      label={t('signup.broker_company')}
+                      selectedValue={values.role}
+                      onSelect={setRole}
+                    />
+                  </View>
+                )}
+              </View>
+
+              <Button
+                disabled={!values.role}
+                onPress={() => handleSubmit()}
+                accessibilityLabel={t('common.continue')}>
+                {t('common.continue')}
+              </Button>
+
+              <SignInFooter
+                onSignInPress={() => router.push('/(auth)/signup')}
+                showSignInLink
+                signInLabel={t('auth.dont_have_account')}
+                signInActionLabel={t('auth.sign_up')}
+              />
+            </>
+          );
+        }}
       </Formik>
     </AuthLayout>
   );

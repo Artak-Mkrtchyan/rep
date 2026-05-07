@@ -6,6 +6,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
+import { ANNOUNCEMENT_MAX_FILE_SIZE } from '@/constants/announcement';
 import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -60,6 +61,7 @@ export default function MediaScreen() {
             hint={t('ui.upload_your_file')}
             value={documentFiles}
             allowedFileTypes={['application/pdf']}
+            maxFileSize={ANNOUNCEMENT_MAX_FILE_SIZE}
             icon={
               <Image
                 source={require('@/assets/images/upload.svg')}

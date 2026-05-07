@@ -58,6 +58,10 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
   const [otp, setOtp] = useState<string[]>(
     initialValue ? initialValue.split('') : Array(OTP_LENGTH).fill('')
   );
+  // Mirror state in a ref so event handlers can read the latest value
+  // without using the setState updater form (which must stay pure).
+  const otpRef = useRef(otp);
+  otpRef.current = otp;
 
   const hasError = !!error && error.length > 0;
 
@@ -89,29 +93,23 @@ export const OtpInput = forwardRef<OtpInputHandle, OtpInputProps>(function OtpIn
       const char = text.slice(-1);
       if (!/^\d*$/.test(char)) return;
 
-      setOtp((prev) => {
-        const newOtp = [...prev];
-        newOtp[index] = char;
+      const newOtp = [...otpRef.current];
+      newOtp[index] = char;
+      setOtp(newOtp);
 
-        if (char && index < OTP_LENGTH - 1) {
-          inputsRef.current[index + 1]?.focus();
-        }
+      if (char && index < OTP_LENGTH - 1) {
+        inputsRef.current[index + 1]?.focus();
+      }
 
-        const code = newOtp.join('');
-        onChange?.(code);
+      const code = newOtp.join('');
+      onChange?.(code);
 
-        if (char && newOtp.every((val) => val.length === 1)) {
-          onComplete?.(code);
-        }
-
-        return newOtp;
-      });
+      if (char && newOtp.every((val) => val.length === 1)) {
+        onComplete?.(code);
+      }
     },
     [onChange, onComplete]
   );
-
-  const otpRef = useRef(otp);
-  otpRef.current = otp;
 
   const handleKeyPress = useCallback((e: any, index: number) => {
     if (e.nativeEvent.key === 'Backspace' && !otpRef.current[index] && index > 0) {

@@ -41,6 +41,12 @@ export const MAIN_MENU_ITEMS: MenuItemConfig[] = [
     route: '/applications',
   },
   {
+    id: 'bookings',
+    labelKey: 'profile.bookings',
+    icon: 'calendar-outline',
+    route: '/bookings',
+  },
+  {
     id: 'brokers-management',
     labelKey: 'profile.brokers_management',
     icon: 'people-outline',
@@ -71,6 +77,7 @@ export const INDIVIDUAL_BROKER_MAIN_MENU_ITEMS: MenuItemConfig[] = [
     id: 'bookings',
     labelKey: 'profile.bookings',
     icon: 'calendar-outline',
+    route: '/bookings',
   },
   {
     id: 'announcements',

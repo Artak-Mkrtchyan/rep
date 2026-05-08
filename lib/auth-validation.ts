@@ -30,12 +30,12 @@ export const yupSchemas = {
       if (!val) return true;
       const trimmed = val.trim();
 
-      if (trimmed.length > EMAIL_MAX_LENGTH) {
-        return ctx.createError({ message: i18n.t('validation.max_length_255') });
-      }
-
       if (!trimmed.includes('@')) {
         return ctx.createError({ message: i18n.t('validation.email_format') });
+      }
+
+      if (trimmed.length > EMAIL_MAX_LENGTH) {
+        return ctx.createError({ message: i18n.t('validation.max_length_255') });
       }
 
       const [local] = trimmed.split('@');

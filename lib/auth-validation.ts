@@ -19,6 +19,7 @@ export const FULL_NAME_REGEX = /^[a-zA-ZА-Яа-яЁёЎўҚқҒғҲҳ'\u2018\u2
 export const EMAIL_REGEX =
   /^(?=^.{1,64}@)(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_+-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
 export const EMAIL_LOCAL_MAX_LENGTH = 64;
+export const EMAIL_MAX_LENGTH = 255;
 export const PHONE_REGEX = /^\+998\d{9}$/;
 export const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -28,6 +29,10 @@ export const yupSchemas = {
     .test('email-format', (val, ctx) => {
       if (!val) return true;
       const trimmed = val.trim();
+
+      if (trimmed.length > EMAIL_MAX_LENGTH) {
+        return ctx.createError({ message: i18n.t('validation.max_length_255') });
+      }
 
       if (!trimmed.includes('@')) {
         return ctx.createError({ message: i18n.t('validation.email_format') });

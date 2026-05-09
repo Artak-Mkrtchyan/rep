@@ -73,6 +73,12 @@ const LISTING_OPTIONS: ListingType[] = ['FOR_RENT', 'FOR_SALE'];
 
 const SERVICE_OPTIONS: ServiceType[] = [ServiceType.PHOTO_SHOOT, ServiceType.ASSESSMENT];
 
+const isPastIso = (iso: string | undefined): boolean => {
+  if (!iso) return false;
+  const t = new Date(iso).getTime();
+  return Number.isFinite(t) && t <= Date.now();
+};
+
 const buildSchema = (t: TFunction) =>
   Yup.object().shape({
     serviceProvider: Yup.string().required(t('booking.validation.service_provider_required')),
@@ -87,12 +93,26 @@ const buildSchema = (t: TFunction) =>
     timeMode: Yup.string().oneOf(['exact', 'range']).required(),
     scheduledTime: Yup.string().when('timeMode', {
       is: 'exact',
-      then: (schema) => schema.required(t('booking.validation.scheduled_time_required')),
+      then: (schema) =>
+        schema
+          .required(t('booking.validation.scheduled_time_required'))
+          .test(
+            'not-in-past',
+            t('booking.validation.scheduled_time_past'),
+            (value) => !isPastIso(value)
+          ),
       otherwise: (schema) => schema.notRequired(),
     }),
     startTime: Yup.string().when('timeMode', {
       is: 'range',
-      then: (schema) => schema.required(t('booking.validation.start_time_required')),
+      then: (schema) =>
+        schema
+          .required(t('booking.validation.start_time_required'))
+          .test(
+            'not-in-past',
+            t('booking.validation.start_time_past'),
+            (value) => !isPastIso(value)
+          ),
       otherwise: (schema) => schema.notRequired(),
     }),
     endTime: Yup.string().when('timeMode', {
@@ -100,6 +120,11 @@ const buildSchema = (t: TFunction) =>
       then: (schema) =>
         schema
           .required(t('booking.validation.end_time_required'))
+          .test(
+            'not-in-past',
+            t('booking.validation.end_time_past'),
+            (value) => !isPastIso(value)
+          )
           .test(
             'after-start',
             t('booking.validation.end_time_after_start'),
@@ -366,6 +391,9 @@ export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated 
                         </ThemedText>
                         <Ionicons name="chevron-down" size={18} color="#919191" />
                       </Pressable>
+                      <ThemedText className="text-[12px] leading-[16px] text-muted-foreground">
+                        {t('booking.application_id_help')}
+                      </ThemedText>
                     </View>
 
                     <View className="mt-4">

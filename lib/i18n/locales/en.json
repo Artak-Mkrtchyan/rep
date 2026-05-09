@@ -878,6 +878,7 @@
 
   "booking.application_id": "Application ID",
   "booking.application_id_placeholder": "Select application ID, to which booking is related.",
+  "booking.application_id_help": "Optional. Auto-fills property type, listing type, and address from the selected application.",
   "booking.service_provider": "Service provider",
   "booking.select_service_provider": "Select service provider",
   "booking.service_type.photo_shoot": "Photo Shoot",
@@ -944,6 +945,9 @@
   "booking.validation.start_time_required": "Start time is required",
   "booking.validation.end_time_required": "End time is required",
   "booking.validation.end_time_after_start": "End time must be after start time",
+  "booking.validation.scheduled_time_past": "Scheduled time must be in the future",
+  "booking.validation.start_time_past": "Start time must be in the future",
+  "booking.validation.end_time_past": "End time must be in the future",
   "booking.validation.booking_details_required": "Please provide booking details",
   "booking.validation.booking_details_max_length": "Booking details must be 2000 characters or less"
 }

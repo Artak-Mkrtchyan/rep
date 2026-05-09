@@ -1,8 +1,17 @@
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Platform, Pressable, View } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  Easing,
+  Modal,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
@@ -26,6 +35,8 @@ interface Props {
 }
 
 type AndroidStep = 'date' | 'time' | null;
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 /**
  * Combined date + time input field used by the booking create form.
@@ -51,6 +62,31 @@ export const DateTimeInput: React.FC<Props> = ({
   const [iosDraft, setIosDraft] = useState<Date | null>(null);
   const [androidStep, setAndroidStep] = useState<AndroidStep>(null);
   const [androidDraft, setAndroidDraft] = useState<Date | null>(null);
+
+  // Backdrop fades; sheet slides — same treatment as the other booking sheets.
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const backdropAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (iosOpen) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(backdropAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      slideAnim.setValue(SCREEN_HEIGHT);
+      backdropAnim.setValue(0);
+    }
+  }, [iosOpen, slideAnim, backdropAnim]);
 
   const currentDate = useMemo(() => (value ? new Date(value) : new Date()), [value]);
   const display = formatDateTime(value, lang);
@@ -151,16 +187,24 @@ export const DateTimeInput: React.FC<Props> = ({
         <Modal
           visible={iosOpen}
           transparent
-          animationType="slide"
+          animationType="none"
           onRequestClose={handleIosCancel}>
-          <View className="flex-1 justify-end bg-black/50">
-            <Pressable
-              className="absolute inset-0"
-              onPress={handleIosCancel}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.close')}
-            />
-            <View className="rounded-t-[24px] bg-white px-4 pt-4 pb-6">
+          <View className="flex-1 justify-end">
+            <Animated.View
+              style={[
+                StyleSheet.absoluteFillObject,
+                { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropAnim },
+              ]}>
+              <Pressable
+                style={{ flex: 1 }}
+                onPress={handleIosCancel}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.close')}
+              />
+            </Animated.View>
+            <Animated.View
+              className="rounded-t-[24px] bg-white px-4 pt-4 pb-6"
+              style={{ transform: [{ translateY: slideAnim }] }}>
               <View className="mb-2 flex-row items-center justify-between">
                 <Pressable onPress={handleIosCancel} accessibilityRole="button">
                   <ThemedText className="text-[16px] text-neutral-500">
@@ -187,7 +231,7 @@ export const DateTimeInput: React.FC<Props> = ({
                 themeVariant="light"
               />
               <Button onPress={handleIosConfirm}>{t('common.done')}</Button>
-            </View>
+            </Animated.View>
           </View>
         </Modal>
       ) : null}

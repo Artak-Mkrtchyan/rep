@@ -878,6 +878,7 @@
 
   "booking.application_id": "Ariza ID",
   "booking.application_id_placeholder": "Bron tegishli bo'lgan ariza ID sini tanlang.",
+  "booking.application_id_help": "Ixtiyoriy. Tanlangan arizadan mulk turi, ro'yxat turi va manzilni avtomatik to'ldiradi.",
   "booking.service_provider": "Xizmat ko'rsatuvchi",
   "booking.select_service_provider": "Xizmat ko'rsatuvchini tanlang",
   "booking.service_type.photo_shoot": "Suratga olish",
@@ -944,6 +945,9 @@
   "booking.validation.start_time_required": "Boshlanish vaqtini tanlang",
   "booking.validation.end_time_required": "Tugash vaqtini tanlang",
   "booking.validation.end_time_after_start": "Tugash vaqti boshlanish vaqtidan keyin bo'lishi kerak",
+  "booking.validation.scheduled_time_past": "Rejalashtirilgan vaqt kelajakda bo'lishi kerak",
+  "booking.validation.start_time_past": "Boshlanish vaqti kelajakda bo'lishi kerak",
+  "booking.validation.end_time_past": "Tugash vaqti kelajakda bo'lishi kerak",
   "booking.validation.booking_details_required": "Bron tafsilotlarini kiriting",
   "booking.validation.booking_details_max_length": "Tafsilotlar 2000 ta belgidan oshmasligi kerak"
 }

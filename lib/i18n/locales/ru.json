@@ -878,6 +878,7 @@
 
   "booking.application_id": "ID заявки",
   "booking.application_id_placeholder": "Выберите ID заявки, к которой относится бронирование.",
+  "booking.application_id_help": "Необязательно. Автоматически заполняет тип объекта, тип листинга и адрес из выбранной заявки.",
   "booking.service_provider": "Сервис-провайдер",
   "booking.select_service_provider": "Выберите сервис-провайдера",
   "booking.service_type.photo_shoot": "Фотосъёмка",
@@ -944,6 +945,9 @@
   "booking.validation.start_time_required": "Укажите время начала",
   "booking.validation.end_time_required": "Укажите время окончания",
   "booking.validation.end_time_after_start": "Время окончания должно быть позже времени начала",
+  "booking.validation.scheduled_time_past": "Запланированное время должно быть в будущем",
+  "booking.validation.start_time_past": "Время начала должно быть в будущем",
+  "booking.validation.end_time_past": "Время окончания должно быть в будущем",
   "booking.validation.booking_details_required": "Опишите детали бронирования",
   "booking.validation.booking_details_max_length": "Детали не должны превышать 2000 символов"
 }

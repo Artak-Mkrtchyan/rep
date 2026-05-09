@@ -49,9 +49,9 @@ const DATE_PRESETS: { value: DateFilter; labelKey: string }[] = [
 
 const FOOTER_SHADOW = {
   shadowColor: '#6E6E6E',
-  shadowOffset: { width: 0, height: -3 },
-  shadowOpacity: 0.1,
-  shadowRadius: 12,
+  shadowOffset: { width: 2, height: 3 },
+  shadowOpacity: 0.15,
+  shadowRadius: 16.5,
   elevation: 4,
 };
 
@@ -73,13 +73,13 @@ function ToggleChip<T>({ chip, selected, onPress }: ToggleChipProps<T>) {
       accessibilityRole="button"
       accessibilityState={{ selected }}
       className={cn(
-        'rounded-full border px-4 py-2',
+        'rounded-full border px-4 py-3',
         selected ? 'border-primary bg-primary/10' : 'border-default bg-white'
       )}>
       <ThemedText
         className={cn(
-          'text-[14px] leading-[17px]',
-          selected ? 'font-semibold text-primary' : 'text-foreground'
+          'text-[12px] leading-[12px]',
+          selected ? 'font-medium text-primary' : 'font-regular text-foreground'
         )}>
         {chip.label}
       </ThemedText>
@@ -249,7 +249,7 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
       transparent
       onRequestClose={onClose}
       statusBarTranslucent>
-      <View className="flex-1 justify-end">
+      <View className="flex-1">
         <Animated.View
           style={[
             StyleSheet.absoluteFillObject,
@@ -263,12 +263,13 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
           />
         </Animated.View>
         <Animated.View
-          className="h-[92%] rounded-t-[24px] bg-white"
+          className="flex-1 rounded-t-[24px] bg-neutral-50"
           style={{
-            paddingTop: insets.top * 0.4,
             transform: [{ translateY: slideAnim }],
           }}>
-          <View className="flex-row items-center justify-between px-4 pb-3 pt-3">
+          <View
+            className="flex-row items-center justify-between bg-white px-4 pb-3"
+            style={{ paddingTop: insets.top + 12 }}>
             <Pressable
               onPress={onClose}
               accessibilityRole="button"
@@ -280,7 +281,7 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
               {t('booking.filter.title')}
             </ThemedText>
             <Pressable onPress={handleReset} accessibilityRole="button" hitSlop={8}>
-              <ThemedText className="text-[14px] font-semibold text-primary">
+              <ThemedText className="text-[17px] font-regular leading-[22px] text-primary">
                 {t('booking.filter.reset')}
               </ThemedText>
             </Pressable>
@@ -288,23 +289,28 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
 
           <ScrollView
             className="flex-1"
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24 }}
+            contentContainerStyle={{ paddingBottom: 24 }}
             keyboardShouldPersistTaps="handled">
             {/* Search */}
-            <View className="mt-2">
+            <View className="rounded-b-[24px] bg-white px-4 pb-6 pt-2">
               <SearchInput
                 placeholder={t('booking.filter.search_placeholder')}
+                containerClassName="gap-2 rounded-[10px] border-neutral-50 py-[7px]"
+                inputClassName="text-[17px] leading-[22px]"
+                iconColor="#777777"
+                iconSize={20}
+                placeholderColor="#ABABAB"
                 value={values.bookingId ?? ''}
                 onChangeText={(text) => set('bookingId', text)}
               />
             </View>
 
             {/* Service provider */}
-            <View className="mt-6">
-              <ThemedText className="mb-3 text-[16px] font-semibold text-foreground">
+            <View className="mx-4 mt-4 rounded-[24px] border-b border-neutral-50 bg-white px-4 py-6">
+              <ThemedText className="mb-3 text-[16px] font-bold text-foreground">
                 {t('booking.filter.service_provider')}
               </ThemedText>
-              <View className="flex-row flex-wrap gap-2">
+              <View className="flex-row flex-wrap gap-3">
                 {SERVICE_PROVIDERS.map((sp) => (
                   <ToggleChip
                     key={sp.value}
@@ -317,12 +323,12 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
             </View>
 
             {/* Scheduled date */}
-            <View className="mt-6">
-              <ThemedText className="mb-3 text-[16px] font-semibold text-foreground">
+            <View className="mx-4 mt-4 rounded-[24px] border-b border-neutral-50 bg-white px-4 py-6">
+              <ThemedText className="mb-3 text-[16px] font-bold text-foreground">
                 {t('booking.filter.scheduled_date')}
               </ThemedText>
               <DatePicker value={customDateValue} onChange={handleCustomDate} />
-              <View className="mt-3 flex-row flex-wrap gap-2">
+              <View className="mt-3 flex-row flex-wrap gap-3">
                 {DATE_PRESETS.map((p) => (
                   <ToggleChip
                     key={p.value}
@@ -335,11 +341,11 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
             </View>
 
             {/* Status */}
-            <View className="mt-6">
-              <ThemedText className="mb-3 text-[16px] font-semibold text-foreground">
+            <View className="mx-4 mt-4 rounded-[24px] border-b border-neutral-50 bg-white px-4 py-6">
+              <ThemedText className="mb-3 text-[16px] font-bold text-foreground">
                 {t('booking.filter.status')}
               </ThemedText>
-              <View className="flex-row flex-wrap gap-2">
+              <View className="flex-row flex-wrap gap-3">
                 {STATUSES.map((s) => (
                   <ToggleChip
                     key={s.value}
@@ -353,7 +359,7 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
           </ScrollView>
 
           <View
-            className="border-t border-neutral-50 bg-white px-4 pt-3"
+            className="rounded-t-[12px] border-t border-neutral-50 bg-white px-4 pt-6"
             style={[FOOTER_SHADOW, { paddingBottom: insets.bottom + 12 }]}>
             <Button onPress={handleApply}>{t('booking.filter.apply')}</Button>
           </View>

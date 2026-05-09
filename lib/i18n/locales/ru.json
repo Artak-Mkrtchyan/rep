@@ -867,6 +867,8 @@
   "booking.empty.no_results_title": "Нет бронирований по выбранным фильтрам",
   "booking.empty.no_results_subtitle": "Попробуйте изменить запрос или сбросить фильтры.",
   "booking.empty.no_applications": "Нет одобренных заявок.",
+  "booking.empty.no_search_results": "Заявки по запросу не найдены.",
+  "booking.application_id_search_placeholder": "Поиск по названию или ID заявки",
 
   "booking.create.title": "Детали бронирования",
   "booking.create.description": "К вашему запросу будет привязан специалист, который окажет выбранную услугу для этого объявления. Перед отправкой укажите дату и время оказания услуги.",

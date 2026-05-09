@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, FlatList, Modal, Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
+import { SearchInput } from '@/components/ui/search-input';
 import { useGetMyApplicationsInfinite } from '@/hooks/api/use-applications';
 import type { AnnouncementPublicationListResponse } from '@/lib/api/applications';
 import { cn } from '@/lib/utils';
@@ -37,8 +38,19 @@ export const ApplicationPickerSheet: React.FC<Props> = ({
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
+  const [searchText, setSearchText] = useState('');
+  const deferredSearch = useDeferredValue(searchText);
+
+  // Reset the search input when the picker is closed so reopening starts clean.
+  useEffect(() => {
+    if (!visible) setSearchText('');
+  }, [visible]);
+
   // Only approved/completed applications are bookable per the use-case spec.
-  const query = useGetMyApplicationsInfinite({ pageSize: PAGE_SIZE, filter: 'APPROVED' }, visible);
+  const query = useGetMyApplicationsInfinite(
+    { pageSize: PAGE_SIZE, filter: 'APPROVED', search: deferredSearch },
+    visible
+  );
 
   const applications = useMemo(
     () => query.data?.pages.flatMap((p) => p.content) ?? [],
@@ -82,7 +94,7 @@ export const ApplicationPickerSheet: React.FC<Props> = ({
             <Pressable onPress={onClose} accessibilityRole="button" hitSlop={8}>
               <ThemedText className="text-[16px] text-neutral-500">{t('common.cancel')}</ThemedText>
             </Pressable>
-            <ThemedText className="text-[18px] font-semibold text-foreground">
+            <ThemedText className="text-[18px] font-semibold leading-[22px] text-foreground">
               {t('booking.application_id')}
             </ThemedText>
             {selectedId ? (
@@ -94,6 +106,15 @@ export const ApplicationPickerSheet: React.FC<Props> = ({
             ) : (
               <View className="w-12" />
             )}
+          </View>
+
+          <View className="px-4 pb-3">
+            <SearchInput
+              placeholder={t('booking.application_id_search_placeholder')}
+              value={searchText}
+              onChangeText={setSearchText}
+              returnKeyType="search"
+            />
           </View>
 
           {query.isLoading && applications.length === 0 ? (
@@ -143,7 +164,9 @@ export const ApplicationPickerSheet: React.FC<Props> = ({
               ListEmptyComponent={
                 <View className="items-center py-12">
                   <ThemedText className="text-[14px] text-neutral-500">
-                    {t('booking.empty.no_applications')}
+                    {deferredSearch.trim()
+                      ? t('booking.empty.no_search_results')
+                      : t('booking.empty.no_applications')}
                   </ThemedText>
                 </View>
               }

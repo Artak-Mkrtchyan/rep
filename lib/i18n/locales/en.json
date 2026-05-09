@@ -867,6 +867,8 @@
   "booking.empty.no_results_title": "No bookings match your filters",
   "booking.empty.no_results_subtitle": "Try changing the search query or resetting the filters.",
   "booking.empty.no_applications": "You don't have any approved applications yet.",
+  "booking.empty.no_search_results": "No applications match your search.",
+  "booking.application_id_search_placeholder": "Search by title or application ID",
 
   "booking.create.title": "Booking details",
   "booking.create.description": "A professional will be assigned to your request to provide the selected service for this announcement. Before you submit, you should select the date and time for specialist to conduct services.",

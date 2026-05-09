@@ -1,4 +1,3 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +22,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/button';
 import { Header } from '@/components/ui/header';
 import { SearchInput } from '@/components/ui/search-input';
+import { ReIcon } from '@/components/icons/re-icon';
 import { useMyBookingsInfinite } from '@/hooks/api/use-bookings';
 import type { BookingsFilterValues } from '@/types/bookings';
 
@@ -86,8 +86,10 @@ export default function BookingsScreen() {
   const isInitialLoadingButHasFilter =
     isInitialLoading && (activeFilterCount > 0 || !!deferredSearch);
 
-  const showEmptyState = !query.isLoading && items.length === 0 && activeFilterCount === 0 && !deferredSearch;
-  const showNoResultsState = !query.isLoading && items.length === 0 && (activeFilterCount > 0 || !!deferredSearch);
+  const showEmptyState =
+    !query.isLoading && items.length === 0 && activeFilterCount === 0 && !deferredSearch;
+  const showNoResultsState =
+    !query.isLoading && items.length === 0 && (activeFilterCount > 0 || !!deferredSearch);
 
   return (
     <ThemedView className="flex-1">
@@ -96,12 +98,12 @@ export default function BookingsScreen() {
         isStepProgressVisible={false}
         rightComponent={
           <Pressable
-            className="h-10 w-10 items-center justify-center"
+            className="mt-2 h-10 w-10 items-center justify-center"
             accessibilityRole="button"
             accessibilityLabel={t('booking.filter.title')}
             onPress={() => setFiltersOpen(true)}
             hitSlop={8}>
-            <Ionicons name="options-outline" size={24} color="#111111" />
+            <ReIcon name="settings" size={24} color="#a1a1a1" />
             {activeFilterCount > 0 ? (
               <View
                 className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary"
@@ -112,10 +114,11 @@ export default function BookingsScreen() {
         }
       />
 
-      <View className="px-4 pb-2 pt-2">
+      <View className="px-4 pb-4 pt-4">
         <SearchInput
           ref={searchRef}
           placeholder={t('booking.filter.search_placeholder')}
+          inputClassName="text-[17px]"
           value={searchText}
           onChangeText={setSearchText}
           returnKeyType="search"

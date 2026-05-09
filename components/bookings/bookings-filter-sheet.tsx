@@ -1,7 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, ScrollView, View } from 'react-native';
+import {
+  Animated,
+  Dimensions,
+  Easing,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -84,9 +93,7 @@ const endOfDay = (d: Date): Date => {
   return next;
 };
 
-const computeDateRange = (
-  preset: DateFilter
-): { min?: string; max?: string } | undefined => {
+const computeDateRange = (preset: DateFilter): { min?: string; max?: string } | undefined => {
   const now = new Date();
   const startOfToday = new Date(now);
   startOfToday.setHours(0, 0, 0, 0);
@@ -124,10 +131,39 @@ interface Props {
  * scheduled-date row with quick presets (next 7 days / this week / this month)
  * and a manual date picker for the "custom" case.
  */
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
 export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply, onClose }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [values, setValues] = useState<BookingsFilterValues>(initial);
+
+  // Backdrop fades in; sheet slides up. RN Modal `animationType="slide"` would
+  // slide the dimmed backdrop with the sheet, which looks wrong now that the
+  // sheet covers most of the screen.
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const backdropAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(backdropAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      slideAnim.setValue(SCREEN_HEIGHT);
+      backdropAnim.setValue(0);
+    }
+  }, [visible, slideAnim, backdropAnim]);
 
   useEffect(() => {
     if (visible) {
@@ -175,7 +211,7 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
 
   const handleCustomDate = useCallback(
     (input: string | { nativeEvent: { text: string } }) => {
-      const dateString = typeof input === 'string' ? input : input?.nativeEvent?.text ?? '';
+      const dateString = typeof input === 'string' ? input : (input?.nativeEvent?.text ?? '');
       if (!dateString) {
         set('dateFilter', '');
         set('scheduledAt', undefined);
@@ -209,20 +245,29 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="none"
       transparent
       onRequestClose={onClose}
       statusBarTranslucent>
-      <View className="flex-1 justify-end bg-black/40">
-        <Pressable
-          className="absolute inset-0"
-          onPress={onClose}
-          accessibilityRole="button"
-          accessibilityLabel={t('common.close')}
-        />
-        <View
-          className="max-h-[92%] rounded-t-[24px] bg-white"
-          style={{ paddingTop: insets.top * 0.4 }}>
+      <View className="flex-1 justify-end">
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFillObject,
+            { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim },
+          ]}>
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.close')}
+          />
+        </Animated.View>
+        <Animated.View
+          className="h-[92%] rounded-t-[24px] bg-white"
+          style={{
+            paddingTop: insets.top * 0.4,
+            transform: [{ translateY: slideAnim }],
+          }}>
           <View className="flex-row items-center justify-between px-4 pb-3 pt-3">
             <Pressable
               onPress={onClose}
@@ -231,7 +276,7 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
               className="h-10 w-10 items-center justify-center">
               <Ionicons name="chevron-back" size={24} color="#111111" />
             </Pressable>
-            <ThemedText className="text-[20px] font-semibold text-foreground">
+            <ThemedText className="text-[20px] font-semibold leading-[24px] text-foreground">
               {t('booking.filter.title')}
             </ThemedText>
             <Pressable onPress={handleReset} accessibilityRole="button" hitSlop={8}>
@@ -312,7 +357,7 @@ export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply
             style={[FOOTER_SHADOW, { paddingBottom: insets.bottom + 12 }]}>
             <Button onPress={handleApply}>{t('booking.filter.apply')}</Button>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

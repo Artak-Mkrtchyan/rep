@@ -6,12 +6,17 @@ import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
+  Dimensions,
+  Easing,
   KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
   ScrollView,
+  StyleSheet,
   Switch,
+  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,8 +26,11 @@ import { ThemedText } from '@/components/themed-text';
 import { AddressInput } from '@/components/ui/address-input';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { InputLabel } from '@/components/ui/input/label';
 import { Select } from '@/components/ui/select';
 import { getPropertyTypeOptions } from '@/constants/announcement';
+import { useApplicationById } from '@/hooks/api/use-applications';
+import { useThemeValue } from '@/hooks/use-theme';
 import {
   useCreateAssessmentBooking,
   useCreatePhotoShootBooking,
@@ -131,16 +139,68 @@ interface Props {
  * `12521:120892` time range). Renders the Formik state, then submits via
  * the appropriate mutation depending on the chosen service type.
  */
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
 export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated }) => {
   const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
   const formikRef = useRef<FormikProps<BookingFormValues> | null>(null);
+  const placeholderColor = useThemeValue('placeholder');
+
+  // Backdrop fades in; sheet slides up from below — keeps the dimmed area
+  // anchored instead of sliding up with the sheet (which is what the RN
+  // Modal `animationType="slide"` would do).
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const backdropAnim = useRef(new Animated.Value(0)).current;
+
+  React.useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(backdropAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      slideAnim.setValue(SCREEN_HEIGHT);
+      backdropAnim.setValue(0);
+    }
+  }, [visible, slideAnim, backdropAnim]);
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [, setSelectedAppId] = useState<string | undefined>(undefined);
+  const [selectedAppId, setSelectedAppId] = useState<string | undefined>(undefined);
+  const [selectedAppLabel, setSelectedAppLabel] = useState<string>('');
 
   const assessment = useCreateAssessmentBooking();
   const photoShoot = useCreatePhotoShootBooking();
+
+  // After picking an application from the list response (which omits
+  // `propertyType`), fetch the full application so we can autofill the
+  // property type field per AC.
+  const applicationDetail = useApplicationById(selectedAppId, !!selectedAppId);
+
+  // Autofill from the full application detail (list response omits propertyType
+  // and uses plain-string geo; detail has the multi-language GeoDetailsDto).
+  React.useEffect(() => {
+    const formik = formikRef.current;
+    const detail = applicationDetail.data;
+    if (!formik || !detail) return;
+    if (detail.propertyType) {
+      void formik.setFieldValue('propertyType', detail.propertyType);
+    }
+    if (detail.geo) {
+      void formik.setFieldValue('geo', detail.geo);
+      const fa = formatAddress(detail.geo, i18n.language);
+      if (fa) void formik.setFieldValue('addressText', fa);
+    }
+  }, [applicationDetail.data, i18n.language]);
 
   const isPending = assessment.isPending || photoShoot.isPending;
 
@@ -195,19 +255,21 @@ export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated 
       if (!formik) return;
       if (!application) {
         setSelectedAppId(undefined);
+        setSelectedAppLabel('');
         void formik.setFieldValue('applicationId', '');
         return;
       }
       setSelectedAppId(application.id);
+      const title = application.title?.trim();
+      const publicId = application.publicId?.trim();
+      setSelectedAppLabel(title && publicId ? `${title} (${publicId})` : title || publicId || '');
       void formik.setFieldValue('applicationId', application.id);
       if (application.listingType) {
         void formik.setFieldValue('listingType', application.listingType);
       }
-      // Note: the application list response stores `geo.formattedAddress` as
-      // a plain string, not the full multi-language DTO required by the
-      // booking create payload. We pre-fill the visible address but expect
-      // the user to re-select via the address autocomplete so a full
-      // GeoDetailsDto can be attached to the form.
+      // List response carries plain-string geo; the propertyType + full
+      // GeoDetailsDto (multi-language) come in via the application detail
+      // effect below.
       const fa = application.geo?.formattedAddress;
       if (typeof fa === 'string' && fa.trim()) {
         void formik.setFieldValue('addressText', fa.trim());
@@ -219,28 +281,36 @@ export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated 
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType="none"
       transparent
       onRequestClose={onClose}
       statusBarTranslucent>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View className="flex-1 justify-end bg-black/40">
-          <Pressable
-            className="absolute inset-0"
-            onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={t('common.close')}
-          />
-          <View className="max-h-[92%] rounded-t-[24px] bg-white">
+        <View className="flex-1 justify-end">
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFillObject,
+              { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim },
+            ]}>
+            <Pressable
+              style={{ flex: 1 }}
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel={t('common.close')}
+            />
+          </Animated.View>
+          <Animated.View
+            className="h-[92%] rounded-t-[24px] bg-white"
+            style={{ transform: [{ translateY: slideAnim }] }}>
             <View className="items-center pb-2 pt-2">
               <View className="h-[5px] w-[36px] rounded-full bg-neutral-200" />
             </View>
 
             <View className="flex-row items-center justify-between px-4 pb-2">
               <View className="w-8" />
-              <ThemedText className="text-[18px] font-semibold text-foreground">
+              <ThemedText className="text-[18px] font-semibold leading-[22px] text-foreground">
                 {t('booking.create.title')}
               </ThemedText>
               <Pressable
@@ -292,7 +362,7 @@ export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated 
                             values.applicationId ? 'text-foreground' : 'text-muted-foreground'
                           }
                           numberOfLines={1}>
-                          {values.applicationId || t('booking.application_id_placeholder')}
+                          {selectedAppLabel || t('booking.application_id_placeholder')}
                         </ThemedText>
                         <Ionicons name="chevron-down" size={18} color="#919191" />
                       </Pressable>
@@ -462,22 +532,28 @@ export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated 
                       </View>
                     </View>
 
-                    <View className="mt-4">
-                      <Input
-                        label={t('booking.details')}
-                        placeholder={t('booking.details_placeholder')}
+                    <View className="mt-4 gap-1">
+                      <InputLabel>{t('booking.details')}</InputLabel>
+                      <TextInput
                         value={values.bookingDetails}
                         onChangeText={(v) => setFieldValue('bookingDetails', v)}
                         onBlur={() => setFieldTouched('bookingDetails', true)}
+                        placeholder={t('booking.details_placeholder')}
+                        placeholderTextColor={placeholderColor}
                         multiline
                         numberOfLines={4}
-                        style={{ height: 100, textAlignVertical: 'top', paddingTop: 12 }}
-                        error={
+                        textAlignVertical="top"
+                        className={`font-regular min-h-[100px] w-full rounded-[12px] border bg-card px-3 py-3 text-[16px] text-foreground ${
                           touched.bookingDetails && errors.bookingDetails
-                            ? (errors.bookingDetails as string)
-                            : undefined
-                        }
+                            ? 'border-destructive'
+                            : 'border-default'
+                        }`}
                       />
+                      {touched.bookingDetails && errors.bookingDetails ? (
+                        <ThemedText className="mt-1 text-[12px] text-destructive">
+                          {errors.bookingDetails as string}
+                        </ThemedText>
+                      ) : null}
                     </View>
                   </ScrollView>
 
@@ -505,7 +581,7 @@ export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated 
                 </>
               )}
             </Formik>
-          </View>
+          </Animated.View>
         </View>
       </KeyboardAvoidingView>
     </Modal>

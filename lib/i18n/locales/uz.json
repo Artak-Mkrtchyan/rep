@@ -867,6 +867,8 @@
   "booking.empty.no_results_title": "Filtrlarga mos bronlar topilmadi",
   "booking.empty.no_results_subtitle": "So'rovni o'zgartirib ko'ring yoki filtrlarni tozalang.",
   "booking.empty.no_applications": "Tasdiqlangan arizalar mavjud emas.",
+  "booking.empty.no_search_results": "So'rov bo'yicha arizalar topilmadi.",
+  "booking.application_id_search_placeholder": "Sarlavha yoki ariza ID bo'yicha qidiring",
 
   "booking.create.title": "Bron tafsilotlari",
   "booking.create.description": "Ushbu e'lon uchun tanlangan xizmatni ko'rsatish maqsadida sizning so'rovingiz bo'yicha mutaxassis biriktiriladi. Yuborishdan oldin xizmat ko'rsatiladigan sana va vaqtni tanlang.",

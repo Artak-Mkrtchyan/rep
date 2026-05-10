@@ -78,7 +78,7 @@ export const AnnouncementListCard: React.FC<AnnouncementListCardProps> = ({
         <View className="gap-[4px]">
           <ThemedText
             className="text-[14px] font-bold leading-[17px] text-foreground"
-            numberOfLines={1}>
+            numberOfLines={2}>
             {title}
           </ThemedText>
           <ThemedText className="text-[10px] text-muted-foreground" numberOfLines={1}>

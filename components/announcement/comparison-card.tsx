@@ -87,7 +87,7 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
         <View className="flex-row items-center justify-between">
           <ThemedText
             className="flex-1 text-[14px] font-bold leading-[17px] text-foreground"
-            numberOfLines={1}>
+            numberOfLines={2}>
             {title}
           </ThemedText>
           <Pressable

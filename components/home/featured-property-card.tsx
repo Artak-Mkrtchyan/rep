@@ -169,7 +169,7 @@ export const FeaturedPropertyCard: React.FC<FeaturedPropertyCardProps> = ({
         <View className="gap-2">
           <ThemedText
             className="text-[16px] font-bold leading-tight text-foreground"
-            numberOfLines={1}>
+            numberOfLines={2}>
             {title}
           </ThemedText>
           <ThemedText

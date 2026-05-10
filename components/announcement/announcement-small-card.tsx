@@ -101,7 +101,7 @@ export const AnnouncementSmallCard: React.FC<AnnouncementSmallCardProps> = ({
         <View className="gap-1">
           <ThemedText
             className="text-[14px] font-bold leading-[17px] text-foreground"
-            numberOfLines={1}
+            numberOfLines={2}
           >
             {title}
           </ThemedText>

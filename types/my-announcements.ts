@@ -39,8 +39,9 @@ export type AnnouncementListItem = {
   listingType: ListingType;
   rentDetails?: RentDetailsDto;
   saleDetails?: SaleDetailsDto;
-  firstMediaFile: {
-    thumbnailUrl: string;
+  firstMediaFile?: {
+    thumbnailUrl?: string;
+    url?: string;
   };
   assignedBroker?: {
     id?: string;

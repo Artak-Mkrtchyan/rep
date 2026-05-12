@@ -146,8 +146,9 @@ export interface AnnouncementPublicationListResponse {
     fullName: string;
     id: string;
   };
-  firstMediaFile: {
-    thumbnailUrl: string;
+  firstMediaFile?: {
+    thumbnailUrl?: string;
+    url?: string;
   };
   geo: {
     country: string;

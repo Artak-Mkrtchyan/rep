@@ -102,7 +102,8 @@ export const MyAnnouncementCard = ({ item, onPress, className }: MyAnnouncementC
   const listingTypeLabel = rentListing
     ? t('property_details.for_rent')
     : t('property_details.for_sale');
-  const thumbnailUri = item.firstMediaFile?.thumbnailUrl?.trim();
+  const thumbnailUri =
+    item.firstMediaFile?.thumbnailUrl?.trim() || item.firstMediaFile?.url?.trim();
   const badge = STATUS_BADGE[statusTone];
 
   const Container = onPress ? Pressable : View;

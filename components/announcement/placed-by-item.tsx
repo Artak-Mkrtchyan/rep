@@ -14,6 +14,7 @@ export type PlacedByItemProps = {
   label: string;
   labelClassName?: string;
   nameClassName?: string;
+  truncate?: boolean;
 };
 
 export const PlacedByItem: React.FC<PlacedByItemProps> = ({
@@ -23,14 +24,25 @@ export const PlacedByItem: React.FC<PlacedByItemProps> = ({
   label,
   labelClassName,
   nameClassName,
+  truncate,
 }) => (
   <View className={className}>
     <View className="flex-row items-center gap-3">
       {icon}
-      <View className="gap-0.5">
-        <ThemedText className={cn(LABEL_CLASS, labelClassName)}>{label}</ThemedText>
+      <View className={cn('gap-0.5', truncate && 'min-w-0 flex-1 shrink')}>
+        <ThemedText
+          numberOfLines={truncate ? 1 : undefined}
+          ellipsizeMode={truncate ? 'tail' : undefined}
+          className={cn(LABEL_CLASS, labelClassName)}>
+          {label}
+        </ThemedText>
         {typeof name === 'string' ? (
-          <ThemedText className={cn(NAME_CLASS, nameClassName)}>{name}</ThemedText>
+          <ThemedText
+            numberOfLines={truncate ? 1 : undefined}
+            ellipsizeMode={truncate ? 'tail' : undefined}
+            className={cn(NAME_CLASS, nameClassName)}>
+            {name}
+          </ThemedText>
         ) : (
           name
         )}

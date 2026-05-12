@@ -233,17 +233,6 @@ const makeCommercialSpaceCharacteristicsSchema = (t: TFunction) =>
     }),
   });
 
-const makeGarageCharacteristicsSchema = (t: TFunction) =>
-  Yup.object().shape({
-    property: Yup.object().shape({
-      attributes: Yup.object().shape({
-        ceilingHeightM: Yup.number()
-          .required(t('add_application.validation.ceiling_height_required'))
-          .typeError(t('add_application.validation.must_be_number')),
-      }),
-    }),
-  });
-
 const makeLandCharacteristicsSchema = (t: TFunction) =>
   Yup.object().shape({
     roadAccess: Yup.object().shape({
@@ -282,10 +271,6 @@ export const getCharacteristicsSchemaForPropertyType = (type: Property | '', t: 
     return makeCommercialSpaceCharacteristicsSchema(t);
   }
 
-  if (type === 'GARAGE') {
-    return makeGarageCharacteristicsSchema(t);
-  }
-
   if (type === 'LAND') {
     return makeLandCharacteristicsSchema(t);
   }
@@ -295,7 +280,7 @@ export const getCharacteristicsSchemaForPropertyType = (type: Property | '', t: 
 
 export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] => [
   {
-    iconKey: 'floors',
+    iconKey: 'number-of-floors',
     label: t('announcement.rent.floors'),
     getValue: (fd) => {
       const b = fd.property?.attributes?.building;
@@ -309,12 +294,12 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
     },
   },
   {
-    iconKey: 'area',
+    iconKey: 'size',
     label: t('announcement.rent.area'),
     getValue: (fd) => (fd.property?.areaM2 != null ? String(fd.property.areaM2) : '—'),
   },
   {
-    iconKey: 'bedroom',
+    iconKey: 'bed',
     label: t('announcement.rent.bedroom'),
     getValue: (fd) =>
       fd.property?.attributes?.bedroomCount != null
@@ -322,7 +307,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'bathroom',
+    iconKey: 'bath',
     label: t('announcement.rent.bathroom'),
     getValue: (fd) =>
       fd.property?.attributes?.bathroomCount != null
@@ -335,12 +320,12 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
     getValue: (_, h) => h.conditionLabel,
   },
   {
-    iconKey: 'buildingType',
+    iconKey: 'condition',
     label: t('announcement.rent.building_type'),
     getValue: (_, h) => h.buildingTypeLabel || '—',
   },
   {
-    iconKey: 'yearBuilt',
+    iconKey: 'year-built',
     label: t('announcement.rent.year_built'),
     getValue: (fd) =>
       fd.property?.attributes?.building?.yearBuilt != null
@@ -348,12 +333,12 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'ownershipType',
+    iconKey: 'ownership-type',
     label: t('announcement.rent.ownership_type'),
     getValue: (_, h) => h.ownershipLabel || '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'condition',
     label: t('announcement.rent.building_type_commercial'),
     getValue: (fd) =>
       fd.property?.attributes?.buildingType
@@ -361,118 +346,118 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'cooling-heating',
     label: t('announcement.rent.hvac'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.hvac),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'balcony',
     label: t('announcement.rent.balcony'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.balcony),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'elevator',
     label: t('announcement.rent.elevator'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.elevator),
   },
   {
-    iconKey: 'offStreetParking',
+    iconKey: 'parking',
     label: t('announcement.rent.off_street_parking'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.offStreetParking),
   },
   {
-    iconKey: 'attachedGarage',
+    iconKey: 'attached-garage',
     label: t('announcement.rent.attached_garage'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.attachedGarage),
   },
   {
-    iconKey: 'detachedGarage',
+    iconKey: 'detached-garage',
     label: t('announcement.rent.detached_garage'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.detachedGarage),
   },
   {
-    iconKey: 'washerAndLaundry',
+    iconKey: 'laundry',
     label: t('announcement.rent.washer_and_laundry'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.washerLaundry),
   },
   {
-    iconKey: 'disabledAccess',
+    iconKey: 'disabled-access',
     label: t('announcement.rent.disabled_access'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.disabledAccess),
   },
   {
-    iconKey: 'bicycleStorage',
+    iconKey: 'bicycle',
     label: t('announcement.rent.bicycle_storage'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.bicycleStorage),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'ev-charging-station',
     label: t('announcement.rent.amenities_ev_charging_station'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.amenities?.evChargingStation),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'terrace',
     label: t('announcement.rent.terrace'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.terrace),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'garden',
     label: t('announcement.rent.garden_yard'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.gardenYard),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'parking',
     label: t('announcement.rent.parking'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.parking),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'disabled-access',
     label: t('announcement.rent.attribute_disabled_access'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.disabledAccess),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'ev-charging-station',
     label: t('announcement.rent.attribute_ev_charging_station'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.evChargingStation),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'electricity',
     label: t('announcement.rent.electricity_available'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.electricityAvailable),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'electricity',
     label: t('announcement.rent.infrastructure_electricity_available'),
     getValue: (fd, h) =>
       h.formatYesNo(fd.property?.attributes?.infrastructure?.electricityAvailable),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'water-supply',
     label: t('announcement.rent.water_supply'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.waterSupply),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'gas',
     label: t('announcement.rent.gas'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.gas),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'sewage',
     label: t('announcement.rent.sewage'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.sewage),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'wifi',
     label: t('announcement.rent.internet_available'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.infrastructure?.internetAvailable),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'road-access',
     label: t('announcement.rent.road_access'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.roadAccess?.roadAccess),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'road-type',
     label: t('announcement.rent.road_type'),
     getValue: (fd) => {
       const roadType = fd.property?.attributes?.roadAccess?.roadType;
@@ -487,43 +472,43 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
     },
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'remote-automatic-door',
     label: t('announcement.rent.remote_automatic_door'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.remoteAutomaticDoor),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'motorcycle',
     label: t('announcement.rent.motorcycle_bicycle_allowed'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.motorcycleBicycleAllowed),
   },
   {
-    iconKey: 'undefined',
+    iconKey: '24-clock',
     label: t('announcement.rent.security_access_24_7'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.access247),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'gated-entry',
     label: t('announcement.rent.security_gated_entry'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.gatedEntry),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'remote-control-access',
     label: t('announcement.rent.security_remote_control_access'),
     getValue: (fd, h) =>
       h.formatYesNo(fd.property?.attributes?.securityAccess?.remoteControlAccess),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'security-guard',
     label: t('announcement.rent.security_guard'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.securityGuard),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'security-cctv',
     label: t('announcement.rent.security_cctv'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.securityAccess?.securityCctv),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'ceiling-height',
     label: t('announcement.rent.ceiling_height'),
     getValue: (fd) =>
       fd.property?.attributes?.ceilingHeightM != null
@@ -531,7 +516,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'car-height',
     label: t('announcement.rent.max_vehicle_height'),
     getValue: (fd) =>
       fd.property?.attributes?.vehicleRestrictions?.maxVehicleHeightCm != null
@@ -539,7 +524,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'car-length',
     label: t('announcement.rent.max_vehicle_length'),
     getValue: (fd) =>
       fd.property?.attributes?.vehicleRestrictions?.maxVehicleLengthCm != null
@@ -547,57 +532,57 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'cooling',
     label: t('announcement.rent.facilities_cooling_hvac'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.coolingHvac),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'elevator',
     label: t('announcement.rent.facilities_elevator'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.elevator),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'heating',
     label: t('announcement.rent.facilities_heating'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.heating),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'ventilation',
     label: t('announcement.rent.facilities_ventilation_system'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.ventilationSystem),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'fire-safety-system',
     label: t('announcement.rent.facilities_fire_safety_system'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.fireSafetySystem),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'sprinkler',
     label: t('announcement.rent.facilities_sprinklers'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.sprinklers),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'reception-concierge',
     label: t('announcement.rent.facilities_reception_concierge'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.receptionConcierge),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'wifi',
     label: t('announcement.rent.facilities_internet_connectivity'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.internetConnectivity),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'server-room',
     label: t('announcement.rent.facilities_server_room'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.serverRoom),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'kitchenette',
     label: t('announcement.rent.facilities_kitchenette'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.facilities?.kitchenette),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'restrooms-count',
     label: t('announcement.rent.facilities_restrooms_count'),
     getValue: (fd) =>
       fd.property?.attributes?.facilities?.restroomsCount != null
@@ -605,22 +590,22 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'cat',
     label: t('announcement.rent.pet_cat'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.cat),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'large-dog',
     label: t('announcement.rent.pet_large_dogs'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.largeDogs),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'small-dog',
     label: t('announcement.rent.pet_small_dogs'),
     getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.smallDogs),
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'usable-area',
     label: t('announcement.rent.usable_area'),
     getValue: (fd) =>
       fd.property?.attributes?.usableAreaM2 != null
@@ -628,13 +613,13 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'land-area',
     label: t('announcement.rent.land_area'),
     getValue: (fd) =>
       fd.property?.attributes?.landAreaM2 != null ? String(fd.property.attributes.landAreaM2) : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'house-area',
     label: t('announcement.rent.house_area'),
     getValue: (fd) =>
       fd.property?.attributes?.houseAreaM2 != null
@@ -642,7 +627,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'land-area',
     label: t('announcement.rent.garage_type'),
     getValue: (fd) =>
       fd.property?.attributes?.garageType
@@ -650,7 +635,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'space-size',
     label: t('announcement.rent.space_size'),
     getValue: (fd) => {
       const spaceSize = fd.property?.attributes?.spaceSize;
@@ -693,7 +678,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
     },
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'land-type',
     label: t('announcement.rent.land_type'),
     getValue: (fd) =>
       fd.property?.attributes?.landType
@@ -701,7 +686,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'permitted-use',
     label: t('announcement.rent.permitted_use'),
     getValue: (fd) => {
       const permittedUse = fd.property?.attributes?.permittedUse;
@@ -716,7 +701,7 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
     },
   },
   {
-    iconKey: 'undefined',
+    iconKey: 'parking',
     label: t('announcement.rent.parking_type'),
     getValue: (fd) =>
       fd.property?.attributes?.parkingType

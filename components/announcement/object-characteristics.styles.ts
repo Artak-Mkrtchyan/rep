@@ -11,6 +11,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingLeft: 8,
+    paddingRight: 8,
   },
   iconContainer: {
     width: 32,
@@ -20,6 +21,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 4,
+    flexShrink: 0,
   },
   icon: {
     width: 20,

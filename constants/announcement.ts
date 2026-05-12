@@ -86,12 +86,15 @@ export const getProcessOptions = (t: TFunction): SelectOption<string>[] => [
   { label: t('announcement.process_type.as_broker'), value: 'AS_BROKER' },
 ];
 
-export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 10 }, (_, i) => ({
+export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 50 }, (_, i) => ({
   label: String(i + 1),
   value: String(i + 1),
 }));
 
-export const HOUSE_FLOORS_OPTIONS = FLOORS_OPTIONS;
+export const HOUSE_FLOORS_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
+  label: String(i + 1),
+  value: String(i + 1),
+}));
 
 export const RESTROOMS_OPTIONS: SelectOption<string>[] = Array.from({ length: 20 }, (_, i) => ({
   label: String(i + 1),
@@ -143,6 +146,18 @@ export const CHARACTERISTIC_ICONS: Record<string, string> = {
   washerAndLaundry: require('@/assets/images/announcement-icons/washer-icon.svg'),
   disabledAccess: require('@/assets/images/announcement-icons/disabledAccess-icon.svg'),
   bicycleStorage: require('@/assets/images/announcement-icons/bike-icon.svg'),
+  ceilingHeight: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  vehicleHeight: require('@/assets/images/announcement-icons/size-icon.svg'),
+  vehicleLength: require('@/assets/images/announcement-icons/size-icon.svg'),
+  garageType: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  spaceSize: require('@/assets/images/announcement-icons/size-icon.svg'),
+  evCharging: require('@/assets/images/announcement-icons/parking-icon.svg'),
+  motorcycleBicycle: require('@/assets/images/announcement-icons/bike-icon.svg'),
+  automaticDoor: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  elevator: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  petCat: require('@/assets/images/announcement-icons/cat-icon.svg'),
+  petLargeDogs: require('@/assets/images/announcement-icons/large-dog-icon.svg'),
+  petSmallDogs: require('@/assets/images/announcement-icons/small-dog-icon.svg'),
 };
 
 export const INFRASTRUCTURE_ICONS: Record<string, string> = {

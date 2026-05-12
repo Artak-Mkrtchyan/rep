@@ -217,10 +217,9 @@ export default function CharacteristicsScreen() {
                     </View>
                   </Conditional>
 
-                  <View className="mb-[16px] gap-4">
-                    <Conditional condition={isApartment || isHouse}>
-                      <CheckboxRow
-                        label={t('announcement.rent.hvac')}
+                  <Conditional condition={isApartment || isHouse}>
+                    <CheckboxRow
+                      label={t('announcement.rent.hvac')}
                         checked={values.amenities?.hvac ?? false}
                         onToggle={() => setFieldValue('amenities.hvac', !values.amenities?.hvac)}
                         containerClassName="py-[0px]"
@@ -371,9 +370,7 @@ export default function CharacteristicsScreen() {
                         containerClassName="py-[0px]"
                       />
                     </Conditional>
-                  </View>
 
-                  <View className="mb-[16px] gap-4">
                     <Conditional condition={isHouse}>
                       <CheckboxRow
                         label={t('announcement.rent.detached_garage')}
@@ -671,9 +668,7 @@ export default function CharacteristicsScreen() {
                         />
                       </View>
                     </Conditional>
-                  </View>
 
-                  <View className="mb-[8px] gap-4">
                     <Conditional condition={isApartment || isHouse}>
                       <CheckboxRow
                         label={t('announcement.rent.ev_charging_station')}
@@ -723,7 +718,6 @@ export default function CharacteristicsScreen() {
                         containerClassName="mb-1"
                       />
                     </Conditional>
-                  </View>
 
                   <Conditional condition={isApartment || isHouse}>
                     <View className="mb-[8px] rounded-[12px] bg-muted p-4">

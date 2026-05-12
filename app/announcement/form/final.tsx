@@ -5,11 +5,12 @@ import { Alert, ScrollView, View } from 'react-native';
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { PlacedByItem } from '@/components/announcement/placed-by-item';
+import { ReIcon } from '@/components/announcement/re-icon';
 import { PropertyAnnouncementDetail } from '@/components/announcement/property-announcement-detail';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
-import { CHARACTERISTIC_ICONS, getPetItemsConfig } from '@/constants/announcement';
+import { getPetItemsConfig } from '@/constants/announcement';
 import { useAuth } from '@/context/AuthContext';
 import { useBrokerCompanyProfile } from '@/hooks/api/use-profile';
 import { useExitAnnouncementFlow } from '@/hooks/use-announcement';
@@ -19,7 +20,6 @@ import { getObjectCharacteristics } from '@/lib/announcement';
 import { Language } from '@/lib/i18n/i18n';
 import { formatNumericString } from '@/lib/utils';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
-import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 
 export default function FinalScreen() {
@@ -190,23 +190,13 @@ export default function FinalScreen() {
                   <PlacedByItem
                     icon={
                       <View className="h-[32px] w-[32px] items-center justify-center rounded-full bg-muted">
-                        {CHARACTERISTIC_ICONS[config.iconKey] ? (
-                          <Image
-                            source={CHARACTERISTIC_ICONS[config.iconKey]}
-                            style={{
-                              width: 20,
-                              height: 20,
-                            }}
-                            contentFit="contain"
-                          />
-                        ) : (
-                          <Ionicons name="information-circle-outline" size={20} color="black" />
-                        )}
+                        <ReIcon name={config.iconKey} size={20} color="#737373" />
                       </View>
                     }
                     name={value}
                     label={config.label}
                     nameClassName="text-foreground"
+                    truncate
                   />
                 </View>
               ))}

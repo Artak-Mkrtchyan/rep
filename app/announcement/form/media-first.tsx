@@ -22,10 +22,12 @@ export default function MediaScreen() {
   const exitFlow = useExitAnnouncementFlow();
 
   const mediaFiles =
-    mediaFileIds?.map((id) => {
-      const file = tempMediaFiles?.find((f) => f.id === id);
-      return { id, uri: file?.uri || '' };
-    }) || [];
+    mediaFileIds
+      ?.filter(Boolean)
+      .map((id) => {
+        const file = tempMediaFiles?.find((f) => f.id === id);
+        return { id, uri: file?.uri || '', type: file?.type, name: file?.name };
+      }) || [];
 
   const handlePhotoIdsChange = (
     attachments: { id: string; uri: string; type?: string; name?: string }[]

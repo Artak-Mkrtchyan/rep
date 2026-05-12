@@ -16,21 +16,32 @@ export default function MediaScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
   const documentIds = useAnnouncementForRentFormStore((s) => s.formData.documentIds);
+  const tempDocumentFiles = useAnnouncementForRentFormStore(
+    (s) => s.metaData?.tempDocumentFiles
+  );
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const documentFiles =
-    documentIds?.map((id) => {
-      return { id, uri: '', type: 'application/pdf' };
-    }) || [];
+    documentIds
+      ?.filter(Boolean)
+      .map((id) => {
+        const file = tempDocumentFiles?.find((f) => f.id === id);
+        return {
+          id,
+          uri: file?.uri || '',
+          type: 'application/pdf' as const,
+          name: file?.name,
+        };
+      }) || [];
 
   const handleDocumentIdsChange = (
     attachments: { id: string; uri: string; type?: string; name?: string }[]
   ) => {
     const documentIds = attachments.map((attachment) => attachment.id);
-    update({ formData: { documentIds } });
+    update({ formData: { documentIds }, metaData: { tempDocumentFiles: attachments } });
   };
 
   const handleSaveAndExit = async () => {

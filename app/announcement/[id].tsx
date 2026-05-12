@@ -154,7 +154,12 @@ export default function AnnouncementDetailScreen() {
 
           {hasLocationData(location) && <LocationSection location={location!} />}
 
-          <NotableDistancesSection distances={distances} />
+          <NotableDistancesSection
+            distances={distances}
+            lat={announcement.geo?.latitude}
+            lng={announcement.geo?.longitude}
+            mapLabel={[location?.street, location?.house].filter(Boolean).join(' ') || announcement.title}
+          />
 
           <DescriptionSection description={announcement.description} />
 

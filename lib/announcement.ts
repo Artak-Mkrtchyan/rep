@@ -47,9 +47,22 @@ export const getParsedAnnouncementData = (
       mediaFileIds.push(media.id);
       tempMediaFiles.push({
         id: media.id,
-        uri: media.url,
+        uri: media.url || media.thumbnailUrl || '',
         type: media.fileType,
         name: media.fileName,
+      });
+    });
+
+    const documentIds: string[] = [];
+    const tempDocumentFiles: { id: string; uri: string; type?: string; name?: string }[] = [];
+
+    response.documents?.forEach((doc) => {
+      documentIds.push(doc.id);
+      tempDocumentFiles.push({
+        id: doc.id,
+        uri: doc.url || doc.thumbnailUrl || '',
+        type: doc.fileType,
+        name: doc.fileName,
       });
     });
 
@@ -64,6 +77,7 @@ export const getParsedAnnouncementData = (
           applicantEmail: response.applicantEmail,
         },
         tempMediaFiles,
+        tempDocumentFiles,
         brokerId: response.assignedBrokerId,
       },
       formData: {
@@ -80,7 +94,7 @@ export const getParsedAnnouncementData = (
         rentDetails: response.rentDetails,
         saleDetails: response.saleDetails,
         mediaFileIds,
-        documentIds: response.documentIds,
+        documentIds,
         title: response.title,
         brokerAssignmentNeeded: response.brokerAssignmentNeeded,
       },

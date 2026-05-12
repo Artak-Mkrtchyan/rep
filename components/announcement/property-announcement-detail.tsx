@@ -5,8 +5,8 @@ import { Pressable, View } from 'react-native';
 
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { PlacedByItem } from '@/components/announcement/placed-by-item';
+import { ViewOnMapButton } from '@/components/announcement/view-on-map-button';
 import { ThemedText } from '@/components/themed-text';
-import { Button } from '@/components/ui/button';
 import { INFRASTRUCTURE_ICONS } from '@/constants/announcement';
 import { InfrastructureObject, InfrastructureObjectType } from '@/lib/api/infrastructure';
 import { cn } from '@/lib/utils';
@@ -53,7 +53,9 @@ export type PropertyAnnouncementDetailProps = {
   updatedDate?: string;
   location?: PropertyAnnouncementDetailLocation;
   distances?: InfrastructureObject[];
-  onViewMap?: () => void;
+  mapLat?: number | null;
+  mapLng?: number | null;
+  mapLabel?: string;
   containerClassName?: string;
 };
 
@@ -84,8 +86,9 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
   updatedDate,
   location,
   distances,
-  onViewMap,
-
+  mapLat,
+  mapLng,
+  mapLabel,
   containerClassName,
 }) => {
   const { t } = useTranslation();
@@ -312,22 +315,12 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                 );
               })}
             </View>
-            {onViewMap ? (
-              <Button
-                variant="secondary"
-                onPress={onViewMap}
-                accessibilityLabel={t('announcement.detail.view_on_map')}
-                style={{
-                  marginTop: 20,
-                  borderWidth: 0,
-                  backgroundColor: '#F1F1F1',
-                  alignSelf: 'center',
-                }}>
-                <ThemedText className="text-[16px] font-medium text-primary">
-                  {t('announcement.detail.view_on_map')}
-                </ThemedText>
-              </Button>
-            ) : null}
+            <ViewOnMapButton
+              lat={mapLat}
+              lng={mapLng}
+              label={mapLabel}
+              style={{ marginTop: 20 }}
+            />
           </>
         ) : (
           <ThemedText className="text-[14px] text-muted-foreground">—</ThemedText>

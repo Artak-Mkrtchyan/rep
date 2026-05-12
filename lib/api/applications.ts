@@ -198,7 +198,15 @@ export interface AnnouncementPublicationResponse {
     type: InfrastructureObjectType;
   }[];
   description: string;
-  documentIds: string[];
+  documents?: {
+    createdAt: string;
+    fileName: string;
+    fileType: string;
+    id: string;
+    sizeInBytes: number;
+    thumbnailUrl?: string;
+    url?: string;
+  }[];
   geo: GeoDetailsDto;
   initiallySubmittedAt: string;
   listingType: ListingType;

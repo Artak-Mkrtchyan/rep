@@ -1,9 +1,10 @@
 import { Image, type ImageSource } from 'expo-image';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import { ViewOnMapButton } from '@/components/announcement/view-on-map-button';
 import type { DistanceInfo } from '@/lib/utils/announcement-mappers';
 
 type DistanceConfig = {
@@ -37,9 +38,17 @@ const DISTANCE_CONFIGS: DistanceConfig[] = [
 
 type NotableDistancesSectionProps = {
   distances: DistanceInfo[];
+  lat?: number | null;
+  lng?: number | null;
+  mapLabel?: string;
 };
 
-export const NotableDistancesSection: React.FC<NotableDistancesSectionProps> = ({ distances }) => {
+export const NotableDistancesSection: React.FC<NotableDistancesSectionProps> = ({
+  distances,
+  lat,
+  lng,
+  mapLabel,
+}) => {
   const { t } = useTranslation();
 
   return (
@@ -82,11 +91,7 @@ export const NotableDistancesSection: React.FC<NotableDistancesSectionProps> = (
           <ThemedText className="text-[14px] text-muted-foreground">—</ThemedText>
         )}
 
-        <Pressable style={styles.viewOnMapButton}>
-          <ThemedText className="text-[16px] font-medium leading-[21px] text-[#0E9457]">
-            {t('announcement.detail.view_on_map')}
-          </ThemedText>
-        </Pressable>
+        <ViewOnMapButton lat={lat} lng={lng} label={mapLabel} />
       </View>
     </View>
   );
@@ -135,14 +140,5 @@ const styles = StyleSheet.create({
   walkingIcon: {
     width: 14,
     height: 14,
-  },
-  viewOnMapButton: {
-    height: 49,
-    borderRadius: 12,
-    backgroundColor: '#F1F1F1',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
   },
 });

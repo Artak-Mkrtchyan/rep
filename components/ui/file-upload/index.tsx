@@ -233,7 +233,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
           {value.map((attachment, index) => (
             <View key={attachment.id} className="relative h-[80px] w-[80px]">
               {/* File Preview */}
-              <View className="h-full w-full overflow-hidden rounded-[16px] bg-card">
+              <View className="h-full w-full overflow-hidden rounded-[16px] border border-default bg-card">
                 {attachment.type === 'application/pdf' ? (
                   <View className="h-full w-full items-center justify-center">
                     <Image
@@ -242,12 +242,20 @@ export const FileUpload: React.FC<FileUploadProps> = ({
                       contentFit="contain"
                     />
                   </View>
-                ) : (
+                ) : attachment.uri ? (
                   <Image
                     source={{ uri: attachment.uri }}
                     style={{ width: '100%', height: '100%' }}
                     contentFit="cover"
                   />
+                ) : (
+                  <View className="h-full w-full items-center justify-center">
+                    <Image
+                      source={require('@/assets/images/gallery.svg')}
+                      style={{ width: 28, height: 28 }}
+                      contentFit="contain"
+                    />
+                  </View>
                 )}
               </View>
 

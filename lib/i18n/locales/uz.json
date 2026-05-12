@@ -613,6 +613,7 @@
   "announcement.detail.show_less": "Kamroq ko'rsatish",
   "announcement.detail.not_found": "E'lon topilmadi",
   "announcement.detail.view_on_map": "Xaritada ko'rish",
+  "announcement.detail.no_coordinates": "Joylashuv mavjud emas",
   "announcement.detail.request_tour": "Ekskursiya so'rash",
   "announcement.detail.contact_info": "Aloqa ma'lumotlari",
   "announcement.detail.photos": "Suratlar",

@@ -613,6 +613,7 @@
   "announcement.detail.show_less": "Показать меньше",
   "announcement.detail.not_found": "Объявление не найдено",
   "announcement.detail.view_on_map": "Посмотреть на карте",
+  "announcement.detail.no_coordinates": "Местоположение недоступно",
   "announcement.detail.request_tour": "Запросить экскурсию",
   "announcement.detail.contact_info": "Контактная информация",
   "announcement.detail.photos": "Фото",

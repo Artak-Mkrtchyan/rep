@@ -68,9 +68,10 @@ export default function FinalScreen() {
     }
   };
 
-  const handleViewOnMap = () => {
-    // Placeholder: open map with address
-  };
+  const mapAddress = `${formData.geo?.street?.[currentLanguage] || ''} ${
+    formData.geo?.house?.[currentLanguage] || ''
+  }`.trim();
+  const mapLabel = mapAddress || formData.title || '';
 
   const allowedPets = getPetItemsConfig(t).filter((c) => c.getAllowed(formData));
 
@@ -167,7 +168,9 @@ export default function FinalScreen() {
             placedBy={{
               name,
             }}
-            onViewMap={handleViewOnMap}
+            mapLat={formData.geo?.latitude}
+            mapLng={formData.geo?.longitude}
+            mapLabel={mapLabel}
           />
 
           {/* Description */}

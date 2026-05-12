@@ -613,6 +613,7 @@
   "announcement.detail.show_less": "Show less",
   "announcement.detail.not_found": "Announcement not found",
   "announcement.detail.view_on_map": "View on map",
+  "announcement.detail.no_coordinates": "Location is not available",
   "announcement.detail.request_tour": "Request a tour",
   "announcement.detail.contact_info": "Contact information",
   "announcement.detail.photos": "Photos",

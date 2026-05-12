@@ -210,4 +210,5 @@ export type MetaData = {
   };
   brokerId?: string;
   tempMediaFiles?: { id: string; uri: string; type?: string; name?: string }[];
+  tempDocumentFiles?: { id: string; uri: string; type?: string; name?: string }[];
 };

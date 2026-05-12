@@ -193,9 +193,6 @@ const makePropertyInfoLandSchema = (t: TFunction) =>
         .typeError(t('add_application.validation.must_be_number')),
       attributes: Yup.object().shape({
         landType: Yup.string().required(t('add_application.validation.land_type_required')),
-        landAreaM2: Yup.number()
-          .required(t('add_application.validation.land_area_required'))
-          .typeError(t('add_application.validation.must_be_number')),
         permittedUse: Yup.string().required(
           t('add_application.validation.land_permitted_use_required')
         ),

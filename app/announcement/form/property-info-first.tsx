@@ -221,7 +221,7 @@ export default function PropertyInfoFirstScreen() {
                     />
                   </Conditional>
 
-                  <Conditional condition={isHouse || isLand}>
+                  <Conditional condition={isHouse}>
                     <Input
                       label={t('announcement.rent.land_area')}
                       numericOnly

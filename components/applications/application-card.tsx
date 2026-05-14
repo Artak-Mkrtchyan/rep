@@ -8,6 +8,8 @@ import type { AnnouncementPublicationListResponse } from '@/lib/api/applications
 import { cn, formatNumericString } from '@/lib/utils';
 import { initialsFrom } from '@/lib/utils/initials';
 
+import { useAuth } from '@/context/AuthContext';
+import { AuthScope } from '@/types/auth';
 import type { ApplicationCardProps } from './application-card.types';
 
 type StatusTone = 'approved' | 'neutral' | 'warning' | 'danger' | 'submitted';
@@ -89,7 +91,7 @@ const displayPersonName = (person: PersonRef): string => {
 
 const displayBrokerName = (item: Partial<AnnouncementPublicationListResponse>): string => {
   const broker = displayPersonName(item.assignedBroker);
-  if (broker !== '—') {
+  if (broker !== '') {
     return broker;
   }
   const company = item.assignedBrokerCompany?.name?.trim();
@@ -166,6 +168,7 @@ export const ApplicationCard = ({
   className,
 }: ApplicationCardProps) => {
   const { t } = useTranslation();
+  const { userInfo } = useAuth();
 
   const headerTitle = t('applications.announcement_application');
   const addBrokerA11y = t('applications.add_broker');
@@ -191,10 +194,16 @@ export const ApplicationCard = ({
   }, [item.status?.code, item.status?.name, t]);
 
   const brokerName = useMemo(() => displayBrokerName(item), [item]);
-  const authorName = useMemo(() => displayPersonName(item.announcementCreatedBy), [item]);
-  const ownerName = useMemo(() => displayPersonName(item.createdBy), [item]);
+  const ownerName = useMemo(() => displayPersonName(item?.createdBy), [item]);
 
-  const hasPersonNames = brokerName || authorName || ownerName;
+  const isOwner =
+    item?.createdBy && (item?.createdBy.id !== userInfo?.id || userInfo?.scope !== AuthScope.USUAL);
+  const isBroker =
+    item?.assignedBroker && (userInfo?.scope !== AuthScope.BROKER || Boolean(userInfo?.companyId));
+  const isBrokerCompany =
+    item?.assignedBrokerCompany && item?.assignedBrokerCompany.id !== userInfo?.companyId;
+
+  const hasPersonNames = isBroker || isOwner || isBrokerCompany;
 
   const propertyTitle = item.title?.trim() || '';
   const address = useMemo(() => getAddress(item), [item]);
@@ -253,13 +262,17 @@ export const ApplicationCard = ({
 
           {hasPersonNames ? (
             <View className="mt-4 flex-row flex-wrap items-center gap-4 border-b border-neutral-50 py-2">
-              <ApplicationUserChip roleLabel={t('applications.role_broker')} name={brokerName} />
-              <ApplicationUserChip roleLabel={t('applications.role_author')} name={authorName} />
-              <ApplicationUserChip
-                roleLabel={t('applications.role_owner')}
-                name={ownerName}
-                nameTone="owner"
-              />
+              {isBroker || isBrokerCompany ? (
+                <ApplicationUserChip roleLabel={t('applications.role_broker')} name={brokerName} />
+              ) : null}
+
+              {isOwner ? (
+                <ApplicationUserChip
+                  roleLabel={t('applications.role_owner')}
+                  name={ownerName}
+                  nameTone="owner"
+                />
+              ) : null}
             </View>
           ) : null}
 

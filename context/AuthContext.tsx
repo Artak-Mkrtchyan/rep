@@ -20,6 +20,7 @@ export type UserInfo = {
   phone: string;
   role: string;
   scope: AuthScope;
+  companyId?: string;
 };
 
 type AuthContextValue = {
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         phone: actor.phone || '',
         role: actor.roles[0]?.name || 'user',
         scope: actor.scope,
+        companyId: actor.companyId,
       });
     } catch {
       // Non-critical — userInfo will be null
@@ -189,7 +191,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       refreshUser: fetchUserInfo,
       updateUserInfo,
     }),
-    [accessToken, refreshToken, userInfo, isRestoring, setTokens, logout, getAuthHeader, fetchUserInfo, updateUserInfo]
+    [
+      accessToken,
+      refreshToken,
+      userInfo,
+      isRestoring,
+      setTokens,
+      logout,
+      getAuthHeader,
+      fetchUserInfo,
+      updateUserInfo,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

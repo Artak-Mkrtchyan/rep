@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -165,6 +166,7 @@ export const ApplicationCard = ({
   item,
   onPress,
   onAddBrokerPress,
+  onDeletePress,
   className,
 }: ApplicationCardProps) => {
   const { t } = useTranslation();
@@ -172,6 +174,7 @@ export const ApplicationCard = ({
 
   const headerTitle = t('applications.announcement_application');
   const addBrokerA11y = t('applications.add_broker');
+  const deleteA11y = t('applications.delete.button');
 
   const statusTone = useMemo(() => mapStatusCodeToTone(item.status?.code), [item.status?.code]);
 
@@ -311,20 +314,33 @@ export const ApplicationCard = ({
               </ThemedText>
             </View>
 
-            {onAddBrokerPress && !brokerName ? (
-              <View className="mt-1 flex-row justify-end">
-                <Pressable
-                  onPress={onAddBrokerPress}
-                  className="h-8 w-8 items-center justify-center rounded-[20px] border border-main-500 bg-neutral-50"
-                  accessibilityRole="button"
-                  accessibilityLabel={addBrokerA11y}
-                  hitSlop={8}>
-                  <Image
-                    source={require('@/assets/images/add-person-icon.svg')}
-                    style={{ width: 18, height: 16 }}
-                    contentFit="contain"
-                  />
-                </Pressable>
+            {(onAddBrokerPress && !brokerName) || onDeletePress ? (
+              <View className="mt-1 flex-row justify-end gap-2">
+                {onAddBrokerPress && !brokerName ? (
+                  <Pressable
+                    onPress={onAddBrokerPress}
+                    className="h-8 w-8 items-center justify-center rounded-[20px] border border-main-500 bg-neutral-50"
+                    accessibilityRole="button"
+                    accessibilityLabel={addBrokerA11y}
+                    hitSlop={8}>
+                    <Image
+                      source={require('@/assets/images/add-person-icon.svg')}
+                      style={{ width: 18, height: 16 }}
+                      contentFit="contain"
+                    />
+                  </Pressable>
+                ) : null}
+
+                {onDeletePress ? (
+                  <Pressable
+                    onPress={onDeletePress}
+                    className="h-8 w-8 items-center justify-center rounded-[20px] border border-red-500 bg-neutral-50"
+                    accessibilityRole="button"
+                    accessibilityLabel={deleteA11y}
+                    hitSlop={8}>
+                    <Ionicons name="trash-outline" size={16} color="#E53935" />
+                  </Pressable>
+                ) : null}
               </View>
             ) : null}
           </View>

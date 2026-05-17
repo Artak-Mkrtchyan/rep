@@ -1,12 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, View } from 'react-native';
+import { Alert, FlatList, View } from 'react-native';
 
 import { ApplicationCard, AssignBrokerModal } from '@/components/applications';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { HorizontalSegmentedControl } from '@/components/ui/segmented-control';
+import { useAuth } from '@/context/AuthContext';
 import {
+  useDeleteApplication,
   useGetApplicationStatisticsByStatuses,
   useGetMyApplicationsInfinite,
 } from '@/hooks/api/use-applications';
@@ -40,8 +42,41 @@ const getCountByStatus = (
 
 export default function ApplicationsScreen() {
   const { t } = useTranslation();
+  const { userInfo } = useAuth();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [assignBrokerApplicationId, setAssignBrokerApplicationId] = useState<string | null>(null);
+
+  const { mutate: deleteApplication } = useDeleteApplication();
+
+  const handleDelete = useCallback(
+    (id: string, type: 'ANNOUNCEMENT_PUBLICATION' | 'ANNOUNCEMENT_MODIFICATION') => {
+      Alert.alert(
+        t('applications.delete.dialog.title'),
+        t('applications.delete.dialog.description'),
+        [
+          { text: t('applications.delete.dialog.cancel'), style: 'cancel' },
+          {
+            text: t('applications.delete.dialog.confirm'),
+            style: 'destructive',
+            onPress: () => {
+              deleteApplication(
+                { id, type },
+                {
+                  onSuccess: () => {
+                    Alert.alert('', t('applications.delete.success'));
+                  },
+                  onError: () => {
+                    Alert.alert(t('common.error'), t('applications.delete.error'));
+                  },
+                }
+              );
+            },
+          },
+        ]
+      );
+    },
+    [deleteApplication, t]
+  );
 
   const filter =
     selectedIndex === 0
@@ -108,14 +143,26 @@ export default function ApplicationsScreen() {
             </ThemedText>
           </View>
         }
-        renderItem={({ item: row }) => (
-          <ApplicationCard
-            item={row}
-            onAddBrokerPress={() => setAssignBrokerApplicationId(row.id)}
-            onPress={() => handlePress(row.id)}
-            className="max-w-full"
-          />
-        )}
+        renderItem={({ item: row }) => {
+          const announcementOwnerId = row.announcementCreatedBy?.id || row.createdBy?.id;
+          const isAnnouncementOwner =
+            !!userInfo?.id && !!announcementOwnerId && announcementOwnerId === userInfo.id;
+          const isDraft = row.status?.code === 'DRAFT';
+
+          return (
+            <ApplicationCard
+              item={row}
+              onAddBrokerPress={() => setAssignBrokerApplicationId(row.id)}
+              onPress={() => handlePress(row.id)}
+              onDeletePress={
+                isAnnouncementOwner && isDraft
+                  ? () => handleDelete(row.id, row.type as any)
+                  : undefined
+              }
+              className="max-w-full"
+            />
+          );
+        }}
         showsVerticalScrollIndicator={false}
       />
 

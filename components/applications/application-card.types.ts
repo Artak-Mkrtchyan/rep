@@ -4,5 +4,6 @@ export type ApplicationCardProps = {
   item: Partial<AnnouncementPublicationListResponse>;
   onPress?: () => void;
   onAddBrokerPress?: () => void;
+  onDeletePress?: () => void;
   className?: string;
 };

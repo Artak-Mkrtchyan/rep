@@ -826,6 +826,13 @@
   "applications.assign_broker.close_a11y": "Закрыть",
   "applications.assign_broker.error": "Не удалось назначить брокера. Попробуйте ещё раз.",
   "applications.assign_broker.empty": "Брокеры не найдены",
+  "applications.delete.button": "Удалить",
+  "applications.delete.dialog.title": "Вы уверены, что хотите удалить эту заявку?",
+  "applications.delete.dialog.description": "Это действие нельзя отменить.",
+  "applications.delete.dialog.confirm": "Да",
+  "applications.delete.dialog.cancel": "Нет",
+  "applications.delete.success": "Заявка удалена",
+  "applications.delete.error": "Не удалось удалить заявку. Повторите попытку.",
 
   "partners.brokers": "Брокеры",
   "partners.construction_companies": "Строительные компании",

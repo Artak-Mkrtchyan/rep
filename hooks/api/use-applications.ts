@@ -208,6 +208,26 @@ export const useAssignBroker = () => {
   });
 };
 
+// Hook for deleting a draft application
+export const useDeleteApplication = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    void,
+    ApiError,
+    { id: string; type: 'ANNOUNCEMENT_PUBLICATION' | 'ANNOUNCEMENT_MODIFICATION' }
+  >({
+    mutationFn: ({ id, type }) => applicationsService.deleteApplication(id, type),
+    onSuccess: () => {
+      // Invalidate and update queries
+      queryClient.invalidateQueries({ queryKey: [APPLICATIONS_QUERY_KEY] });
+    },
+    onError: (error) => {
+      console.error('Delete application error:', error);
+    },
+  });
+};
+
 export const useGetApplicationStatisticsByStatuses = (enabled = true) => {
   return useQuery<ApplicationStatisticsByStatusResponse, ApiError>({
     queryKey: [APPLICATIONS_QUERY_KEY, 'statistics', 'by-statuses'],

@@ -529,4 +529,26 @@ export const applicationsService = {
     );
     return response.data || (response as unknown as never);
   },
+
+  /**
+   * Delete draft application
+   * @param id Application ID
+   * @param type Application type ('ANNOUNCEMENT_PUBLICATION' or 'ANNOUNCEMENT_MODIFICATION')
+   */
+  deleteApplication: async (
+    id: string,
+    type: 'ANNOUNCEMENT_PUBLICATION' | 'ANNOUNCEMENT_MODIFICATION'
+  ): Promise<void> => {
+    const typeSlug =
+      type === 'ANNOUNCEMENT_PUBLICATION'
+        ? 'announcement-publication'
+        : 'announcement-modification';
+    await httpClient.delete<void>(
+      `/v1/applications/${typeSlug}/${id}`,
+      undefined,
+      {
+        requiresAuth: true,
+      }
+    );
+  },
 };

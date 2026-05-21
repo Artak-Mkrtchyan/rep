@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { BrokerAboutCard } from '@/components/profile/broker-about-card';
 import { BrokerUploadedFilesCard } from '@/components/profile/broker-uploaded-files-card';
 import { EditFieldSheet } from '@/components/profile/edit-field-sheet';
 import { PersonalInfoRow } from '@/components/profile/personal-info-row';
@@ -13,10 +14,12 @@ import { ThemedText } from '@/components/themed-text';
 import { useAuth } from '@/context/AuthContext';
 import {
   useIndividualBrokerProfile,
+  useUpdateIndividualBroker,
   useUpdateUsualUser,
   useUserProfile,
 } from '@/hooks/api/use-profile';
 import { AuthScope } from '@/lib/api/auth';
+import type { UpdateIndividualBrokerRequest } from '@/lib/api/profile';
 import {
   buildPersonalInfoEditSheetProps,
   buildPersonalInformationRows,
@@ -45,6 +48,7 @@ export default function PersonalInformationScreen() {
     !isBroker && !isBrokerCompany ? userInfo?.id : undefined
   );
   const { mutateAsync: updateUser } = useUpdateUsualUser();
+  const { mutateAsync: updateBroker } = useUpdateIndividualBroker();
   const editingFieldRef = useRef<EditingField>(null);
 
   const onEditField = useCallback((field: PersonalInfoEditableField) => {
@@ -58,14 +62,50 @@ export default function PersonalInformationScreen() {
       if (!field || !userInfo?.id) return;
 
       try {
-        // PUT replaces the full resource — always send all current fields
-        // with the edited one overridden
-        const currentData = {
-          fullName: userInfo.fullName || '',
-          phone: userInfo.phone || '',
-        };
-        const payload = { ...currentData, [field]: value };
-        await updateUser({ id: userInfo.id, data: payload });
+        if (isBroker) {
+          // Broker: use PUT /v1/brokers/individuals/{id}
+          // PUT replaces the full resource — always send all current fields
+          const apiFieldName = field === 'phone' ? 'phoneNumber' : field;
+
+          let apiValue: string | number | undefined = value;
+          if (field === 'yearsOfActivity') {
+            const num = Number(value);
+            if (isNaN(num) || num < 0 || num > 100) {
+              Alert.alert(
+                t('common.error', 'Error'),
+                t('profile.years_validation', 'Years of activity must be between 0 and 100.')
+              );
+              return;
+            }
+            apiValue = num;
+          }
+
+          const payload: UpdateIndividualBrokerRequest = {
+            fullName: brokerProfile?.fullName || userInfo.fullName || '',
+            phoneNumber: brokerProfile?.phoneNumber || userInfo.phone || '',
+            ...(brokerProfile?.certifiedBy !== undefined && {
+              certifiedBy: brokerProfile.certifiedBy,
+            }),
+            ...(brokerProfile?.certifiedOn !== undefined && {
+              certifiedOn: brokerProfile.certifiedOn,
+            }),
+            ...(brokerProfile?.yearsOfActivity !== undefined && {
+              yearsOfActivity: brokerProfile.yearsOfActivity,
+            }),
+            ...(brokerProfile?.bio !== undefined && { bio: brokerProfile.bio }),
+            [apiFieldName]: apiValue,
+          };
+
+          await updateBroker({ id: userInfo.id, data: payload });
+        } else {
+          // Non-broker: use PUT /v1/users/usual/{id}
+          const currentData = {
+            fullName: userInfo.fullName || '',
+            phone: userInfo.phone || '',
+          };
+          const payload = { ...currentData, [field]: value };
+          await updateUser({ id: userInfo.id, data: payload });
+        }
         setEditingField(null);
       } catch {
         Alert.alert(
@@ -74,7 +114,7 @@ export default function PersonalInformationScreen() {
         );
       }
     },
-    [userInfo, updateUser, t]
+    [userInfo, brokerProfile, isBroker, updateUser, updateBroker, t]
   );
 
   const handleUploadedFilesEdit = useCallback(() => {
@@ -102,10 +142,10 @@ export default function PersonalInformationScreen() {
         t,
         userInfo,
         isBroker,
-        brokerProfile?.phoneNumber,
+        brokerProfile,
         userProfile?.dateOfBirth
       ),
-    [editingField, t, userInfo, isBroker, brokerProfile?.phoneNumber, userProfile?.dateOfBirth]
+    [editingField, t, userInfo, isBroker, brokerProfile, userProfile?.dateOfBirth]
   );
 
   const showBrokerPersonalLayout = Boolean(isBroker && brokerProfile);
@@ -151,7 +191,13 @@ export default function PersonalInformationScreen() {
         </View>
 
         {showBrokerPersonalLayout ? (
-          <BrokerUploadedFilesCard files={[]} onEditPress={handleUploadedFilesEdit} />
+          <>
+            <BrokerAboutCard
+              bio={brokerProfile?.bio || ''}
+              onEditPress={() => onEditField('bio')}
+            />
+            <BrokerUploadedFilesCard files={[]} onEditPress={handleUploadedFilesEdit} />
+          </>
         ) : null}
       </ScrollView>
 
@@ -163,6 +209,8 @@ export default function PersonalInformationScreen() {
           placeholder={editSheetProps.placeholder}
           type={editSheetProps.type}
           keyboardType={editSheetProps.keyboardType}
+          maxLength={editSheetProps.maxLength}
+          numberOfLines={editSheetProps.numberOfLines}
           onSave={handleSave}
           onClose={() => setEditingField(null)}
         />

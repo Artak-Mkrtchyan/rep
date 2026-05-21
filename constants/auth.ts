@@ -2,12 +2,16 @@ import type { TFunction } from 'i18next';
 
 import type { AccountRole } from '@/types/auth';
 
+// Role dropdown uses an umbrella "Broker" entry; the concrete role
+// (broker | broker_company) is then chosen via radio buttons.
 export const getAccountTypeOptions = (t: TFunction) => [
-  { label: t('auth.account_type.individual'), value: 'individual' as AccountRole },
-  { label: t('auth.account_type.company'), value: 'company' as AccountRole },
-  { label: t('auth.account_type.broker'), value: 'broker' as AccountRole },
-  { label: t('auth.account_type.broker_company'), value: 'broker_company' as AccountRole },
+  { label: t('auth.account_type.individual'), value: 'individual' as const },
+  { label: t('auth.account_type.company'), value: 'company' as const },
+  { label: t('auth.account_type.broker'), value: 'broker' as const },
 ];
+
+export const isBrokerRole = (role: AccountRole) =>
+  role === 'broker' || role === 'broker_company';
 export const AUTH_ROUTES = {
   LOGIN: '/(auth)',
   LOGIN_FORM: '/(auth)/login-form',

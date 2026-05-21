@@ -1,0 +1,370 @@
+import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  Animated,
+  Dimensions,
+  Easing,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { ThemedText } from '@/components/themed-text';
+import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
+import { SearchInput } from '@/components/ui/search-input';
+import { cn } from '@/lib/utils';
+import {
+  BookingStatus,
+  ServiceType,
+  type BookingsFilterValues,
+  type DateFilter,
+} from '@/types/bookings';
+
+const SERVICE_PROVIDERS: { value: ServiceType; labelKey: string }[] = [
+  { value: ServiceType.PHOTO_SHOOT, labelKey: 'booking.service_provider.photographer' },
+  { value: ServiceType.ASSESSMENT, labelKey: 'booking.service_provider.assessment_expert' },
+];
+
+const STATUSES: { value: BookingStatus; labelKey: string }[] = [
+  { value: BookingStatus.COMPLETED, labelKey: 'booking.status.completed' },
+  {
+    value: BookingStatus.PENDING_FOR_CONFIRMATION,
+    labelKey: 'booking.status.pending_for_confirmation',
+  },
+  { value: BookingStatus.DECLINED, labelKey: 'booking.status.declined' },
+  { value: BookingStatus.CONFIRMED, labelKey: 'booking.status.confirmed' },
+  { value: BookingStatus.CANCELLED, labelKey: 'booking.status.cancelled' },
+];
+
+const DATE_PRESETS: { value: DateFilter; labelKey: string }[] = [
+  { value: 'next_7_days', labelKey: 'booking.filter.date.next_7_days' },
+  { value: 'this_week', labelKey: 'booking.filter.date.this_week' },
+  { value: 'this_month', labelKey: 'booking.filter.date.this_month' },
+];
+
+const FOOTER_SHADOW = {
+  shadowColor: '#6E6E6E',
+  shadowOffset: { width: 2, height: 3 },
+  shadowOpacity: 0.15,
+  shadowRadius: 16.5,
+  elevation: 4,
+};
+
+interface Chip<T> {
+  value: T;
+  label: string;
+}
+
+interface ToggleChipProps<T> {
+  chip: Chip<T>;
+  selected: boolean;
+  onPress: () => void;
+}
+
+function ToggleChip<T>({ chip, selected, onPress }: ToggleChipProps<T>) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      className={cn(
+        'rounded-full border px-4 py-3',
+        selected ? 'border-primary bg-primary/10' : 'border-default bg-white'
+      )}>
+      <ThemedText
+        className={cn(
+          'text-[12px] leading-[12px]',
+          selected ? 'font-medium text-primary' : 'font-regular text-foreground'
+        )}>
+        {chip.label}
+      </ThemedText>
+    </Pressable>
+  );
+}
+
+const endOfDay = (d: Date): Date => {
+  const next = new Date(d);
+  next.setHours(23, 59, 59, 999);
+  return next;
+};
+
+const computeDateRange = (preset: DateFilter): { min?: string; max?: string } | undefined => {
+  const now = new Date();
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+
+  if (preset === 'next_7_days') {
+    const end = new Date(now);
+    end.setDate(end.getDate() + 7);
+    return { min: startOfToday.toISOString(), max: endOfDay(end).toISOString() };
+  }
+  if (preset === 'this_week') {
+    // Treat week as Mon→Sun. Sunday's day-of-week is 0; shift to make Mon = 0.
+    const day = (now.getDay() + 6) % 7;
+    const end = new Date(now);
+    end.setDate(end.getDate() + (6 - day));
+    return { min: startOfToday.toISOString(), max: endOfDay(end).toISOString() };
+  }
+  if (preset === 'this_month') {
+    const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return { min: startOfToday.toISOString(), max: endOfDay(end).toISOString() };
+  }
+  return undefined;
+};
+
+interface Props {
+  visible: boolean;
+  initial: BookingsFilterValues;
+  onApply: (values: BookingsFilterValues) => void;
+  onClose: () => void;
+}
+
+/**
+ * Filters sheet for the Bookings list screen (Figma `12196:114201`).
+ *
+ * Multi-select chips for "Service provider" and "Status"; a single-select
+ * scheduled-date row with quick presets (next 7 days / this week / this month)
+ * and a manual date picker for the "custom" case.
+ */
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
+export const BookingsFilterSheet: React.FC<Props> = ({ visible, initial, onApply, onClose }) => {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
+  const [values, setValues] = useState<BookingsFilterValues>(initial);
+
+  // Backdrop fades in; sheet slides up. RN Modal `animationType="slide"` would
+  // slide the dimmed backdrop with the sheet, which looks wrong now that the
+  // sheet covers most of the screen.
+  const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const backdropAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(backdropAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      slideAnim.setValue(SCREEN_HEIGHT);
+      backdropAnim.setValue(0);
+    }
+  }, [visible, slideAnim, backdropAnim]);
+
+  useEffect(() => {
+    if (visible) {
+      setValues(initial);
+    }
+  }, [visible, initial]);
+
+  const set = useCallback(
+    <K extends keyof BookingsFilterValues>(key: K, value: BookingsFilterValues[K]) =>
+      setValues((prev) => ({ ...prev, [key]: value })),
+    []
+  );
+
+  const toggleProvider = useCallback((provider: ServiceType) => {
+    setValues((prev) => {
+      const list = prev.serviceProviders ?? [];
+      const isSelected = list.includes(provider);
+      const next = isSelected ? list.filter((p) => p !== provider) : [...list, provider];
+      return { ...prev, serviceProviders: next.length ? next : undefined };
+    });
+  }, []);
+
+  const toggleStatus = useCallback((status: BookingStatus) => {
+    setValues((prev) => {
+      const list = prev.status ?? [];
+      const isSelected = list.includes(status);
+      const next = isSelected ? list.filter((s) => s !== status) : [...list, status];
+      return { ...prev, status: next.length ? next : undefined };
+    });
+  }, []);
+
+  const handleDatePreset = useCallback(
+    (preset: DateFilter) => {
+      if (values.dateFilter === preset) {
+        set('dateFilter', '');
+        set('scheduledAt', undefined);
+        return;
+      }
+      const range = computeDateRange(preset);
+      set('dateFilter', preset);
+      set('scheduledAt', range);
+    },
+    [set, values.dateFilter]
+  );
+
+  const handleCustomDate = useCallback(
+    (input: string | { nativeEvent: { text: string } }) => {
+      const dateString = typeof input === 'string' ? input : (input?.nativeEvent?.text ?? '');
+      if (!dateString) {
+        set('dateFilter', '');
+        set('scheduledAt', undefined);
+        return;
+      }
+      const parsed = new Date(dateString);
+      if (Number.isNaN(parsed.getTime())) return;
+      const min = new Date(parsed);
+      min.setHours(0, 0, 0, 0);
+      const max = new Date(parsed);
+      max.setHours(23, 59, 59, 999);
+      set('dateFilter', 'custom');
+      set('scheduledAt', { min: min.toISOString(), max: max.toISOString() });
+    },
+    [set]
+  );
+
+  const handleReset = useCallback(() => {
+    setValues({});
+  }, []);
+
+  const handleApply = useCallback(() => {
+    onApply(values);
+  }, [onApply, values]);
+
+  const customDateValue =
+    values.dateFilter === 'custom' && values.scheduledAt?.min
+      ? values.scheduledAt.min.slice(0, 10)
+      : '';
+
+  return (
+    <Modal
+      visible={visible}
+      animationType="none"
+      transparent
+      onRequestClose={onClose}
+      statusBarTranslucent>
+      <View className="flex-1">
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFillObject,
+            { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim },
+          ]}>
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.close')}
+          />
+        </Animated.View>
+        <Animated.View
+          className="flex-1 rounded-t-[24px] bg-neutral-50"
+          style={{
+            transform: [{ translateY: slideAnim }],
+          }}>
+          <View
+            className="flex-row items-center justify-between bg-white px-4 pb-3"
+            style={{ paddingTop: insets.top + 12 }}>
+            <Pressable
+              onPress={onClose}
+              accessibilityRole="button"
+              hitSlop={8}
+              className="h-10 w-10 items-center justify-center">
+              <Ionicons name="chevron-back" size={24} color="#111111" />
+            </Pressable>
+            <ThemedText className="text-[20px] font-semibold leading-[24px] text-foreground">
+              {t('booking.filter.title')}
+            </ThemedText>
+            <Pressable onPress={handleReset} accessibilityRole="button" hitSlop={8}>
+              <ThemedText className="text-[17px] font-regular leading-[22px] text-primary">
+                {t('booking.filter.reset')}
+              </ThemedText>
+            </Pressable>
+          </View>
+
+          <ScrollView
+            className="flex-1"
+            contentContainerStyle={{ paddingBottom: 24 }}
+            keyboardShouldPersistTaps="handled">
+            {/* Search */}
+            <View className="rounded-b-[24px] bg-white px-4 pb-6 pt-2">
+              <SearchInput
+                placeholder={t('booking.filter.search_placeholder')}
+                containerClassName="gap-2 rounded-[10px] border-neutral-50 py-[7px]"
+                inputClassName="text-[17px] leading-[22px]"
+                iconColor="#777777"
+                iconSize={20}
+                placeholderColor="#ABABAB"
+                value={values.bookingId ?? ''}
+                onChangeText={(text) => set('bookingId', text)}
+              />
+            </View>
+
+            {/* Service provider */}
+            <View className="mx-4 mt-4 rounded-[24px] border-b border-neutral-50 bg-white px-4 py-6">
+              <ThemedText className="mb-3 text-[16px] font-bold text-foreground">
+                {t('booking.filter.service_provider')}
+              </ThemedText>
+              <View className="flex-row flex-wrap gap-3">
+                {SERVICE_PROVIDERS.map((sp) => (
+                  <ToggleChip
+                    key={sp.value}
+                    chip={{ value: sp.value, label: t(sp.labelKey) }}
+                    selected={!!values.serviceProviders?.includes(sp.value)}
+                    onPress={() => toggleProvider(sp.value)}
+                  />
+                ))}
+              </View>
+            </View>
+
+            {/* Scheduled date */}
+            <View className="mx-4 mt-4 rounded-[24px] border-b border-neutral-50 bg-white px-4 py-6">
+              <ThemedText className="mb-3 text-[16px] font-bold text-foreground">
+                {t('booking.filter.scheduled_date')}
+              </ThemedText>
+              <DatePicker value={customDateValue} onChange={handleCustomDate} />
+              <View className="mt-3 flex-row flex-wrap gap-3">
+                {DATE_PRESETS.map((p) => (
+                  <ToggleChip
+                    key={p.value}
+                    chip={{ value: p.value, label: t(p.labelKey) }}
+                    selected={values.dateFilter === p.value}
+                    onPress={() => handleDatePreset(p.value)}
+                  />
+                ))}
+              </View>
+            </View>
+
+            {/* Status */}
+            <View className="mx-4 mt-4 rounded-[24px] border-b border-neutral-50 bg-white px-4 py-6">
+              <ThemedText className="mb-3 text-[16px] font-bold text-foreground">
+                {t('booking.filter.status')}
+              </ThemedText>
+              <View className="flex-row flex-wrap gap-3">
+                {STATUSES.map((s) => (
+                  <ToggleChip
+                    key={s.value}
+                    chip={{ value: s.value, label: t(s.labelKey) }}
+                    selected={!!values.status?.includes(s.value)}
+                    onPress={() => toggleStatus(s.value)}
+                  />
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+
+          <View
+            className="rounded-t-[12px] border-t border-neutral-50 bg-white px-4 pt-6"
+            style={[FOOTER_SHADOW, { paddingBottom: insets.bottom + 12 }]}>
+            <Button onPress={handleApply}>{t('booking.filter.apply')}</Button>
+          </View>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+};

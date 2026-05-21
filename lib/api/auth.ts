@@ -117,6 +117,7 @@ export interface CurrentActorResponse {
   temporaryPassword: boolean;
   email: string;
   phone: string;
+  companyId?: string;
 }
 
 export const authService = {
@@ -220,10 +221,9 @@ export const authService = {
   },
 
   getCurrentActor: async (): Promise<CurrentActorResponse> => {
-    const response = await httpClient.get<ApiResponse<CurrentActorResponse>>(
-      '/v1/actors/current',
-      { requiresAuth: true }
-    );
+    const response = await httpClient.get<ApiResponse<CurrentActorResponse>>('/v1/actors/current', {
+      requiresAuth: true,
+    });
     return response.data || (response as unknown as CurrentActorResponse);
   },
 };

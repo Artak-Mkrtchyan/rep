@@ -146,8 +146,9 @@ export interface AnnouncementPublicationListResponse {
     fullName: string;
     id: string;
   };
-  firstMediaFile: {
-    thumbnailUrl: string;
+  firstMediaFile?: {
+    thumbnailUrl?: string;
+    url?: string;
   };
   geo: {
     country: string;
@@ -198,7 +199,15 @@ export interface AnnouncementPublicationResponse {
     type: InfrastructureObjectType;
   }[];
   description: string;
-  documentIds: string[];
+  documents?: {
+    createdAt: string;
+    fileName: string;
+    fileType: string;
+    id: string;
+    sizeInBytes: number;
+    thumbnailUrl?: string;
+    url?: string;
+  }[];
   geo: GeoDetailsDto;
   initiallySubmittedAt: string;
   listingType: ListingType;
@@ -361,7 +370,7 @@ export const applicationsService = {
     const response = await httpClient.post<ApiResponse<SearchResponse<BrokerCompany>>>(
       `/v1/brokers/companies/search`,
       data,
-      { requiresAuth: true }
+      { requiresAuth: false }
     );
     return response.data || (response as unknown as SearchResponse<BrokerCompany>);
   },
@@ -376,7 +385,7 @@ export const applicationsService = {
     const response = await httpClient.post<ApiResponse<SearchResponse<IndividualBroker>>>(
       `/v1/brokers/individuals/search`,
       data,
-      { requiresAuth: true }
+      { requiresAuth: false }
     );
     return response.data || (response as unknown as SearchResponse<IndividualBroker>);
   },

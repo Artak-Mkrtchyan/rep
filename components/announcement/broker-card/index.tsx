@@ -1,6 +1,6 @@
-import { Image } from 'expo-image';
-import React from 'react';
-import { Pressable, View } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
+import React, { useState } from 'react';
+import { Image, Pressable, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { cn } from '@/lib/utils';
@@ -26,15 +26,22 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
   className,
   onPress,
 }) => {
+  const [avatarFailed, setAvatarFailed] = useState(false);
+  const avatarSource = typeof avatar === 'string' ? { uri: avatar } : avatar;
+  const showAvatar = !!avatarSource && !avatarFailed;
+  const hasRating = typeof rating === 'number';
+  const hasStats = stats && stats.length > 0;
+
   const content = (
     <>
       <View className="flex-row items-center gap-2">
         <View className="h-[42px] w-[42px] items-center justify-center rounded-full bg-muted">
-          {avatar ? (
+          {showAvatar ? (
             <Image
-              source={avatar}
-              className="h-[42px] w-[42px] rounded-full bg-muted"
-              contentFit="cover"
+              source={avatarSource}
+              style={{ width: 42, height: 42, borderRadius: 21, backgroundColor: '#E5E5E5' }}
+              resizeMode="cover"
+              onError={() => setAvatarFailed(true)}
               accessibilityLabel={`Avatar of ${name}`}
             />
           ) : (
@@ -46,40 +53,46 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
 
         <View className="min-w-0 flex-1 flex-row items-start justify-between gap-3">
           <ThemedText
-            className="w-[50%] text-[16px] font-bold leading-tight text-foreground"
+            className="flex-1 text-[16px] font-bold leading-tight text-foreground"
             numberOfLines={1}>
             {name}
           </ThemedText>
-          <View className="flex-row items-center gap-2">
-            <ThemedText className="text-[14px] font-medium leading-5 text-foreground">
-              {rating.toFixed(1)}
-            </ThemedText>
-            <Image
-              source={require('@/assets/images/rating-star-icon.svg')}
-              style={{ width: 18, height: 18 }}
-              contentFit="contain"
-            />
-            <ThemedText className="text-[14px] leading-6 text-foreground">
-              ({reviewCount})
-            </ThemedText>
-          </View>
+          {hasRating && (
+            <View className="flex-row items-center gap-2">
+              <ThemedText className="text-[14px] font-medium leading-5 text-foreground">
+                {rating.toFixed(1)}
+              </ThemedText>
+              <ExpoImage
+                source={require('@/assets/images/rating-star-icon.svg')}
+                style={{ width: 18, height: 18 }}
+                contentFit="contain"
+              />
+              {typeof reviewCount === 'number' && (
+                <ThemedText className="text-[14px] leading-6 text-foreground">
+                  ({reviewCount})
+                </ThemedText>
+              )}
+            </View>
+          )}
         </View>
       </View>
 
-      <View className="flex-col gap-2">
-        <View className="flex-row flex-wrap items-center gap-4">
-          {stats.map((stat, index) => (
-            <View key={index} className="flex-row items-center">
-              <ThemedText className="text-[12px] font-bold leading-[11px] text-foreground">
-                {stat.value}{' '}
-                <ThemedText className="font-regular text-[12px] leading-normal text-neutral-400">
-                  {stat.label}
+      {hasStats && (
+        <View className="flex-col gap-2">
+          <View className="flex-row flex-wrap items-center gap-4">
+            {stats.map((stat, index) => (
+              <View key={index} className="flex-row items-center">
+                <ThemedText className="text-[12px] font-bold leading-[11px] text-foreground">
+                  {stat.value}{' '}
+                  <ThemedText className="font-regular text-[12px] leading-normal text-neutral-400">
+                    {stat.label}
+                  </ThemedText>
                 </ThemedText>
-              </ThemedText>
-            </View>
-          ))}
+              </View>
+            ))}
+          </View>
         </View>
-      </View>
+      )}
     </>
   );
 
@@ -92,7 +105,7 @@ export const BrokerCard: React.FC<BrokerCardProps> = ({
         className={cn(cardClassName, isSelected && 'border-2 border-primary')}
         style={CARD_SHADOW}
         accessibilityRole="button"
-        accessibilityLabel={`Broker ${name}, rating ${rating}`}>
+        accessibilityLabel={hasRating ? `Broker ${name}, rating ${rating}` : `Broker ${name}`}>
         {content}
       </Pressable>
     );

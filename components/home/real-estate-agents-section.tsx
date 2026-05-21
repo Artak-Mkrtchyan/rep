@@ -12,7 +12,7 @@ import { AgentCard } from '@/components/home/agent-card';
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
 import { useHomeMetrics } from '@/hooks/use-home-metrics';
-import { MOCK_AGENTS } from '@/lib/mocks/home-mock-data';
+import { useHomeBrokers } from '@/hooks/api/use-home-partners';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
 
 const styles = StyleSheet.create({
@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     backgroundColor: HOME_DESIGN.neutral50,
     paddingVertical: 16,
   },
-  /** ScrollView defaults can show through `gap` between cards — keep strip color continuous */
   stripScroll: {
     backgroundColor: HOME_DESIGN.neutral50,
   },
@@ -38,21 +37,25 @@ const styles = StyleSheet.create({
 
 type RealEstateAgentsSectionProps = {
   onSeeMorePress?: () => void;
+  onCardPress?: () => void;
 };
 
 export const RealEstateAgentsSection: React.FC<RealEstateAgentsSectionProps> = ({
   onSeeMorePress,
+  onCardPress,
 }) => {
   const { t } = useTranslation();
   const metrics = useHomeMetrics();
+  const { brokers } = useHomeBrokers();
   const [activeIndex, setActiveIndex] = useState(0);
+
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offsetX = event.nativeEvent.contentOffset.x;
       const index = Math.round(offsetX / metrics.agentStride);
-      setActiveIndex(Math.min(Math.max(index, 0), MOCK_AGENTS.length - 1));
+      setActiveIndex(Math.min(Math.max(index, 0), brokers.length - 1));
     },
-    [metrics.agentStride]
+    [metrics.agentStride, brokers.length]
   );
 
   return (
@@ -76,27 +79,28 @@ export const RealEstateAgentsSection: React.FC<RealEstateAgentsSectionProps> = (
           ]}
           onScroll={handleScroll}
           scrollEventThrottle={16}>
-          {MOCK_AGENTS.map((agent, index) => (
-            <View
-              key={agent.id}
-              style={{
-                width: metrics.agentCardWidth,
-                marginRight: index < MOCK_AGENTS.length - 1 ? metrics.gap : 0,
-              }}>
-              <AgentCard
-                name={agent.name}
-                company={agent.company}
-                rating={agent.rating}
-                reviewCount={agent.reviewCount}
-                avatarUri={agent.avatarUri}
-              />
-            </View>
-          ))}
+          {brokers.map((broker, index) => (
+              <View
+                key={broker.id}
+                style={{
+                  width: metrics.agentCardWidth,
+                  marginRight: index < brokers.length - 1 ? metrics.gap : 0,
+                }}>
+                <AgentCard
+                  name={broker.fullName}
+                  company={broker.email}
+                  rating="5.0"
+                  reviewCount=""
+                  avatarUri={broker.avatarInfo?.thumbnailUrl || broker.avatarInfo?.url}
+                  onPress={onCardPress}
+                />
+              </View>
+            ))}
         </ScrollView>
       </View>
 
       <PaginationIndicator
-        count={MOCK_AGENTS.length}
+        count={brokers.length}
         activeIndex={activeIndex}
         variant="inline"
         inlineMarginTop={HOME_DESIGN.layout.carouselToDots}

@@ -1,6 +1,6 @@
-import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import { TFunction } from 'i18next';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 
@@ -8,7 +8,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { InputLabel } from '@/components/ui/input/label';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useThemeValue } from '@/hooks/use-theme';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -17,16 +17,33 @@ import * as Yup from 'yup';
 
 type DescriptionFormValues = { description: RentForApartmentsFormStep3['description'] };
 
-const DescriptionSchema = Yup.object().shape({
-  description: Yup.string().required('Required'),
-});
+const PROPERTY_TYPES_WITH_OPTIONAL_DESCRIPTION = ['GARAGE', 'COMMERCIAL_SPACE'] as const;
+
+const makeDescriptionSchema = (t: TFunction, isDescriptionRequired: boolean) =>
+  Yup.object().shape({
+    description: isDescriptionRequired
+      ? Yup.string()
+          .required(t('add_application.validation.description_required'))
+          .max(4000, t('add_application.validation.description_max_length'))
+      : Yup.string().max(4000, t('add_application.validation.description_max_length')),
+  });
+
 export default function PropertyInfoSecondScreen() {
   const { t } = useTranslation();
+  const propertyType = useAnnouncementForRentFormStore((s) => s.formData.propertyType);
+  const isDescriptionRequired = !PROPERTY_TYPES_WITH_OPTIONAL_DESCRIPTION.includes(
+    propertyType as (typeof PROPERTY_TYPES_WITH_OPTIONAL_DESCRIPTION)[number]
+  );
+  const validationSchema = useMemo(
+    () => makeDescriptionSchema(t, isDescriptionRequired),
+    [t, isDescriptionRequired]
+  );
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
@@ -44,7 +61,7 @@ export default function PropertyInfoSecondScreen() {
     } else {
       try {
         await sendFormData();
-        router.back();
+        exitFlow();
       } catch {
         Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       }
@@ -65,7 +82,7 @@ export default function PropertyInfoSecondScreen() {
     <ThemedView className="flex-1">
       <Formik<DescriptionFormValues>
         initialValues={initialValues}
-        validationSchema={DescriptionSchema}
+        validationSchema={validationSchema}
         enableReinitialize
         validateOnMount={true}
         onSubmit={saveTitle}>
@@ -75,7 +92,9 @@ export default function PropertyInfoSecondScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.describe_property')}
@@ -85,7 +104,9 @@ export default function PropertyInfoSecondScreen() {
                 </ThemedText>
 
                 <View className="gap-1">
-                  <InputLabel>{t('announcement.rent.property_description')}</InputLabel>
+                  <InputLabel required={isDescriptionRequired}>
+                    {t('announcement.rent.property_description')}
+                  </InputLabel>
                   <TextInput
                     value={values.description}
                     onChangeText={handleChange('description')}

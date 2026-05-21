@@ -9,31 +9,30 @@ import { SearchModal } from '@/components/search/search-modal';
 import { SearchResultsHeader } from '@/components/search/search-results-header';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useSearchAnnouncements } from '@/hooks/api/use-search-announcements';
 import { useSearchMapWebView } from '@/hooks/use-search-map-webview';
 import { announcementsService } from '@/lib/api/announcements';
-import { buildSearchRequest } from '@/lib/utils/search-filters';
 import type { Announcement } from '@/types/api';
 import type { SearchFilters } from '@/types/search';
 
 const DEFAULT_FILTERS: SearchFilters = {
   query: '',
-  listingType: 'BUY',
+  address: '',
+  listingType: null,
   propertyTypes: [],
   priceMin: '',
   priceMax: '',
+  sortOption: 'NEWEST_FIRST',
 };
-
-/** Large page so map pins cover the filtered result set in one request */
-const MAP_RESULTS_PAGE_SIZE = 500;
 
 export default function SearchMapFullscreenScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ filters?: string }>();
+  const params = useLocalSearchParams<{ filters?: string; center?: string }>();
 
   const initialFilters = useMemo<SearchFilters>(() => {
     if (params.filters) {
       try {
-        return JSON.parse(params.filters) as SearchFilters;
+        return { ...DEFAULT_FILTERS, ...JSON.parse(params.filters) };
       } catch {
         /* fall through */
       }
@@ -43,53 +42,39 @@ export default function SearchMapFullscreenScreen() {
 
   const [currentFilters, setCurrentFilters] = useState<SearchFilters>(initialFilters);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
   const [headerHeight, setHeaderHeight] = useState(0);
   const [mapPinAnnouncement, setMapPinAnnouncement] = useState<Announcement | null>(null);
 
-  const handleMapMarkerPress = useCallback((publicId: string) => {
-    const match = announcements.find((a) => a.publicId === publicId || a.id === publicId);
-    if (!match) return;
-    setMapPinAnnouncement((prev) => (prev?.id === match.id ? null : match));
-  }, [announcements]);
+  const initialCenter = useMemo<[number, number] | null>(() => {
+    if (params.center) {
+      const [lng, lat] = params.center.split(',').map(Number);
+      if (!isNaN(lng) && !isNaN(lat)) return [lng, lat];
+    }
+    return null;
+  }, [params.center]);
 
-  const { webViewRef, embedUrl, zoomIn, zoomOut, handleMessage, resetCenter } = useSearchMapWebView(
-    announcements,
-    { fitBoundsToMarkers: true, onMarkerPress: handleMapMarkerPress },
+  const { announcements, isLoading, error, search } = useSearchAnnouncements();
+
+  const handleMapMarkerPress = useCallback(
+    (publicId: string) => {
+      const match = announcements.find((a) => a.publicId === publicId || a.id === publicId);
+      if (!match) return;
+      setMapPinAnnouncement((prev) => (prev?.id === match.id ? null : match));
+    },
+    [announcements],
   );
 
+  const { webViewRef, embedUrl, zoomIn, zoomOut, handleMessage, resetCenter } =
+    useSearchMapWebView(announcements, {
+      fitBoundsToMarkers: false,
+      onMarkerPress: handleMapMarkerPress,
+      initialCenter: initialCenter ?? undefined,
+    });
+
   useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      setIsLoading(true);
-      setFetchError(null);
-      resetCenter();
-      setAnnouncements([]);
-      try {
-        const request = buildSearchRequest(currentFilters, 0, MAP_RESULTS_PAGE_SIZE);
-        const response = await announcementsService.searchAnnouncements(request);
-        if (!cancelled) {
-          setAnnouncements(response.content);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setFetchError(err instanceof Error ? err.message : 'Search failed');
-          setAnnouncements([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [currentFilters, resetCenter]);
+    search(currentFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setMapPinAnnouncement((prev) => {
@@ -108,13 +93,14 @@ export default function SearchMapFullscreenScreen() {
       setIsModalVisible(false);
       setMapPinAnnouncement(null);
       resetCenter();
+      search(filters);
       router.setParams({ filters: JSON.stringify(filters) });
     },
-    [resetCenter, router],
+    [resetCenter, search, router],
   );
 
   const handleClearQuery = useCallback(
-    () => handleSearch({ ...currentFilters, query: '' }),
+    () => handleSearch({ ...currentFilters, query: '', address: '' }),
     [currentFilters, handleSearch],
   );
 
@@ -134,14 +120,12 @@ export default function SearchMapFullscreenScreen() {
         } else {
           await announcementsService.addToComparison(id);
         }
-        const request = buildSearchRequest(currentFilters, 0, MAP_RESULTS_PAGE_SIZE);
-        const response = await announcementsService.searchAnnouncements(request);
-        setAnnouncements(response.content);
+        search(currentFilters);
       } catch (err) {
         console.error('Failed to toggle comparison:', err);
       }
     },
-    [currentFilters],
+    [currentFilters, search],
   );
 
   return (
@@ -150,6 +134,7 @@ export default function SearchMapFullscreenScreen() {
 
       <SearchResultsHeader
         query={currentFilters.query}
+        address={currentFilters.address}
         onBack={handleBack}
         onOpenFilters={() => {
           setMapPinAnnouncement(null);
@@ -177,9 +162,9 @@ export default function SearchMapFullscreenScreen() {
         </View>
       ) : null}
 
-      {fetchError ? (
+      {error ? (
         <View className="absolute bottom-[40px] left-4 right-4 rounded-md bg-white/95 px-3 py-2 shadow">
-          <ThemedText className="text-center text-[14px] text-destructive">{fetchError}</ThemedText>
+          <ThemedText className="text-center text-[14px] text-destructive">{error}</ThemedText>
         </View>
       ) : null}
 
@@ -187,6 +172,7 @@ export default function SearchMapFullscreenScreen() {
         visible={isModalVisible}
         onClose={() => setIsModalVisible(false)}
         onSearch={handleSearch}
+        initialFilters={currentFilters}
       />
     </ThemedView>
   );

@@ -1,6 +1,6 @@
-import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import { TFunction } from 'i18next';
+import React, { useMemo } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -8,7 +8,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep4 } from '@/types/announcement';
@@ -20,23 +20,31 @@ const SQUARE_METERS_SUFFIX = 'm²';
 
 type RentDetailsFormValues = RentForApartmentsFormStep4;
 
-/** When rentDetails is present, monthlyRent and securityDeposit are required. */
-const RentDetailsSchema = Yup.object().shape({
-  rentDetails: Yup.object()
-    .optional()
-    .nullable()
-    .shape({
-      monthlyRent: Yup.number().required('Required').typeError('Must be a number'),
-      securityDeposit: Yup.number().optional().nullable().typeError('Must be a number'),
-    }),
-});
+/** When rentDetails is present, monthlyRent is required. */
+const makeRentDetailsSchema = (t: TFunction) =>
+  Yup.object().shape({
+    rentDetails: Yup.object()
+      .optional()
+      .nullable()
+      .shape({
+        monthlyRent: Yup.number()
+          .required(t('add_application.validation.monthly_rent_required'))
+          .typeError(t('add_application.validation.must_be_number')),
+        securityDeposit: Yup.number()
+          .optional()
+          .nullable()
+          .typeError(t('add_application.validation.must_be_number')),
+      }),
+  });
 
 export default function RentDetailsScreen() {
   const { t } = useTranslation();
+  const validationSchema = useMemo(() => makeRentDetailsSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
@@ -57,7 +65,7 @@ export default function RentDetailsScreen() {
     } else {
       try {
         await sendFormData();
-        router.back();
+        exitFlow();
       } catch {
         Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       }
@@ -78,7 +86,7 @@ export default function RentDetailsScreen() {
     <ThemedView className="flex-1">
       <Formik<RentDetailsFormValues>
         initialValues={initialValues}
-        validationSchema={RentDetailsSchema}
+        validationSchema={validationSchema}
         validateOnMount={true}
         enableReinitialize
         onSubmit={saveRentDetails}>
@@ -88,7 +96,9 @@ export default function RentDetailsScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.rent_details_title')}
@@ -104,7 +114,11 @@ export default function RentDetailsScreen() {
                     placeholder=""
                     value={`${values.rentDetails?.monthlyRent ?? ''}`}
                     onChangeText={(v) => setFieldValue('rentDetails.monthlyRent', v)}
-                    error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
+                    error={
+                      touched.rentDetails && errors.rentDetails
+                        ? t('add_application.validation.monthly_rent_required')
+                        : undefined
+                    }
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}
@@ -126,7 +140,6 @@ export default function RentDetailsScreen() {
                     numericOnly
                     value={`${values.rentDetails?.securityDeposit ?? ''}`}
                     onChangeText={(v) => setFieldValue('rentDetails.securityDeposit', v)}
-                    error={touched.rentDetails && errors.rentDetails ? 'Required' : undefined}
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}

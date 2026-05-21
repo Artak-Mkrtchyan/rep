@@ -109,9 +109,10 @@ export const useSearchIndividualBrokersInfinite = (
 };
 
 export const useGetMyApplicationsInfinite = (
-  params: { filter?: ApplicationStatusType; pageSize?: number } = {},
+  params: { filter?: ApplicationStatusType; pageSize?: number; search?: string } = {},
   enabled = true
 ) => {
+  const trimmedSearch = params.search?.trim();
   return useInfiniteQuery<SearchResponse<AnnouncementPublicationListResponse>, ApiError>({
     queryKey: [APPLICATIONS_QUERY_KEY, 'my-applications', params],
     initialPageParam: 1,
@@ -120,6 +121,9 @@ export const useGetMyApplicationsInfinite = (
         filter: {
           ...(params.filter && { statuses: [params.filter] }),
           types: ['ANNOUNCEMENT_PUBLICATION', 'ANNOUNCEMENT_MODIFICATION'],
+          ...(trimmedSearch && {
+            _or_: [{ titleContains: trimmedSearch }, { publicIdContains: trimmedSearch }],
+          }),
         },
         pagination: {
           pageNumber: (pageParam as number) - 1, // API uses 0-based indexing
@@ -134,6 +138,15 @@ export const useGetMyApplicationsInfinite = (
       }),
     getNextPageParam,
     enabled,
+  });
+};
+
+export const useApplicationById = (id: string | undefined, enabled = true) => {
+  return useQuery({
+    queryKey: [APPLICATIONS_QUERY_KEY, 'application', id],
+    queryFn: () => applicationsService.getApplicationById(id!),
+    enabled: enabled && !!id,
+    staleTime: 5 * 60 * 1000,
   });
 };
 

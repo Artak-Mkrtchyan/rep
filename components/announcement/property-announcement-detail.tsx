@@ -5,8 +5,8 @@ import { Pressable, View } from 'react-native';
 
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { PlacedByItem } from '@/components/announcement/placed-by-item';
+import { ViewOnMapButton } from '@/components/announcement/view-on-map-button';
 import { ThemedText } from '@/components/themed-text';
-import { Button } from '@/components/ui/button';
 import { INFRASTRUCTURE_ICONS } from '@/constants/announcement';
 import { InfrastructureObject, InfrastructureObjectType } from '@/lib/api/infrastructure';
 import { cn } from '@/lib/utils';
@@ -53,7 +53,9 @@ export type PropertyAnnouncementDetailProps = {
   updatedDate?: string;
   location?: PropertyAnnouncementDetailLocation;
   distances?: InfrastructureObject[];
-  onViewMap?: () => void;
+  mapLat?: number | null;
+  mapLng?: number | null;
+  mapLabel?: string;
   containerClassName?: string;
 };
 
@@ -84,8 +86,9 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
   updatedDate,
   location,
   distances,
-  onViewMap,
-
+  mapLat,
+  mapLng,
+  mapLabel,
   containerClassName,
 }) => {
   const { t } = useTranslation();
@@ -122,51 +125,63 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
               contentFit="contain"
             />
           </Pressable>
-          <View className="flex-row items-center gap-2">
-            <Pressable
-              onPress={onFavoritePress}
-              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
-              <Image
-                source={require('@/assets/images/heart-icon.svg')}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-                contentFit="contain"
-              />
-            </Pressable>
-            <Pressable
-              onPress={onMenuPress}
-              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
-              <Image
-                source={require('@/assets/images/menu-icon.svg')}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-                contentFit="contain"
-              />
-            </Pressable>
-            <Pressable
-              onPress={onSharePress}
-              className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
-              <Image
-                source={require('@/assets/images/share-icon.svg')}
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-                contentFit="contain"
-              />
-            </Pressable>
-          </View>
+          {onFavoritePress || onMenuPress || onSharePress ? (
+            <View className="flex-row items-center gap-2">
+              {onFavoritePress ? (
+                <Pressable
+                  onPress={onFavoritePress}
+                  className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+                  <Image
+                    source={require('@/assets/images/heart-icon.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                    }}
+                    contentFit="contain"
+                  />
+                </Pressable>
+              ) : null}
+              {onMenuPress ? (
+                <Pressable
+                  onPress={onMenuPress}
+                  className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+                  <Image
+                    source={require('@/assets/images/menu-icon.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                    }}
+                    contentFit="contain"
+                  />
+                </Pressable>
+              ) : null}
+              {onSharePress ? (
+                <Pressable
+                  onPress={onSharePress}
+                  className="h-[36px] w-[36px] items-center justify-center rounded-[31px] bg-muted">
+                  <Image
+                    source={require('@/assets/images/share-icon.svg')}
+                    style={{
+                      width: 24,
+                      height: 24,
+                    }}
+                    contentFit="contain"
+                  />
+                </Pressable>
+              ) : null}
+            </View>
+          ) : null}
         </View>
         <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1">
-          <ThemedText className="text-[14px] font-semibold  text-foreground">ID: {id}</ThemedText>
+          {id ? (
+            <ThemedText className="text-[14px] font-semibold text-foreground">ID: {id}</ThemedText>
+          ) : null}
 
           {typeLabel ? (
             <View className="flex-row items-center gap-1.5">
-              <View className={`h-[16px] w-[16px] rounded-full ${listingType === 'FOR_RENT' ? 'bg-main-500' : 'bg-destructive'}`} />
+              <View
+                className={`h-[16px] w-[16px] rounded-full ${listingType === 'FOR_RENT' ? 'bg-main-500' : 'bg-destructive'}`}
+              />
               <ThemedText className="text-[14px] text-foreground">{typeLabel}</ThemedText>
             </View>
           ) : null}
@@ -300,22 +315,12 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                 );
               })}
             </View>
-            {onViewMap ? (
-              <Button
-                variant="secondary"
-                onPress={onViewMap}
-                accessibilityLabel={t('announcement.detail.view_on_map')}
-                style={{
-                  marginTop: 20,
-                  borderWidth: 0,
-                  backgroundColor: '#F1F1F1',
-                  alignSelf: 'center',
-                }}>
-                <ThemedText className="text-[16px] font-medium text-primary">
-                  {t('announcement.detail.view_on_map')}
-                </ThemedText>
-              </Button>
-            ) : null}
+            <ViewOnMapButton
+              lat={mapLat}
+              lng={mapLng}
+              label={mapLabel}
+              style={{ marginTop: 20 }}
+            />
           </>
         ) : (
           <ThemedText className="text-[14px] text-muted-foreground">—</ThemedText>

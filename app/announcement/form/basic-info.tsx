@@ -1,5 +1,6 @@
 import { Formik } from 'formik';
-import React from 'react';
+import { TFunction } from 'i18next';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
@@ -8,24 +9,24 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AddressInput } from '@/components/ui/address-input';
-import { CheckboxRow } from '@/components/ui/checkbox';
 import { Select } from '@/components/ui/select';
 import {
   getListingTypeOptions,
   getProcessOptions,
   getPropertyTypeOptions,
 } from '@/constants/announcement';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useAuth } from '@/context/AuthContext';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { AuthScope } from '@/lib/api/auth';
 import { Language } from '@/lib/i18n/i18n';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep1 } from '@/types/announcement';
-import { router } from 'expo-router';
 
 type BasicInfoFormValues = RentForApartmentsFormStep1;
 
-/** LangFormDTO: хотя бы одна локаль заполнена непустой строкой */
-const langFormAtLeastOne = (message = 'Required') =>
+/** LangFormDTO: at least one locale is filled with a non-empty string */
+const langFormAtLeastOne = (message: string) =>
   Yup.object({
     ru: Yup.string(),
     en: Yup.string(),
@@ -35,35 +36,44 @@ const langFormAtLeastOne = (message = 'Required') =>
     return [value.ru, value.en, value.uz].some((s) => typeof s === 'string' && s.trim().length > 0);
   });
 
-const geoSchema = Yup.object({
-  formattedAddress: langFormAtLeastOne(),
-  country: langFormAtLeastOne(),
-  province: langFormAtLeastOne(),
-  locality: langFormAtLeastOne(),
-  street: langFormAtLeastOne(),
-  latitude: Yup.number().required('Required'),
-  longitude: Yup.number().required('Required'),
-});
+const makeBasicInfoSchema = (t: TFunction) => {
+  const addressRequired = t('add_application.validation.address_required');
 
-const BasicInfoSchema = Yup.object().shape({
-  geo: geoSchema.required('Required'),
-  listingType: Yup.string().required('Required'),
-  propertyType: Yup.string().required('Required'),
-  processType: Yup.string().required('Required'),
-});
+  const geoSchema = Yup.object({
+    formattedAddress: langFormAtLeastOne(addressRequired),
+    country: langFormAtLeastOne(addressRequired),
+    province: langFormAtLeastOne(addressRequired),
+    locality: langFormAtLeastOne(addressRequired),
+    street: langFormAtLeastOne(addressRequired),
+    latitude: Yup.number().required(addressRequired),
+    longitude: Yup.number().required(addressRequired),
+  });
+
+  return Yup.object().shape({
+    geo: geoSchema.required(addressRequired),
+    listingType: Yup.string().required(t('add_application.validation.listing_type_required')),
+    propertyType: Yup.string().required(t('add_application.validation.property_type_required')),
+    processType: Yup.string().required(t('add_application.validation.process_type_required')),
+  });
+};
 
 export default function BasicInfoScreen() {
   const { t, i18n } = useTranslation();
   const currentLanguage = i18n.language as Language;
+  const validationSchema = useMemo(() => makeBasicInfoSchema(t), [t]);
 
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
+  const { userInfo } = useAuth();
+  const isBrokerScope =
+    userInfo?.scope === AuthScope.BROKER || userInfo?.scope === AuthScope.BROKER_COMPANY;
   let isNext = true;
-
-  const processType =
-    formData.brokerAssignmentNeeded !== undefined
+  const processType = isBrokerScope
+    ? 'AS_BROKER'
+    : formData.brokerAssignmentNeeded !== undefined
       ? formData.brokerAssignmentNeeded
         ? 'AS_BROKER'
         : 'AS_INDIVIDUAL'
@@ -93,11 +103,11 @@ export default function BasicInfoScreen() {
     });
 
     if (!isNext) {
-      router.back();
+      exitFlow();
       return;
     }
 
-    nextStep(values.processType === 'AS_BROKER');
+    nextStep(values.processType === 'AS_BROKER' && !isBrokerScope);
   };
 
   const handleNext = (handleSubmit: () => void) => {
@@ -117,14 +127,16 @@ export default function BasicInfoScreen() {
         enableReinitialize
         onSubmit={saveBasicInfo}
         validateOnMount={true}
-        validationSchema={BasicInfoSchema}>
+        validationSchema={validationSchema}>
         {({ handleChange, handleSubmit, setFieldValue, values, errors, touched, isValid }) => (
           <>
             <ScrollView
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
                 <View className="gap-4">
                   <ThemedText className="text-[16px] font-bold text-foreground">
@@ -151,7 +163,11 @@ export default function BasicInfoScreen() {
                       setFieldValue('geo', geo.address);
                       setFieldValue('infrastructureObjects', geo.infrastructureObjects);
                     }}
-                    error={touched.geo && errors.geo ? t('validation.address_required') : undefined}
+                    error={
+                      touched.geo && errors.geo
+                        ? t('add_application.validation.address_required')
+                        : undefined
+                    }
                     lang={currentLanguage}
                   />
 
@@ -172,24 +188,9 @@ export default function BasicInfoScreen() {
                     value={values.processType}
                     onChange={(v) => setFieldValue('processType', v)}
                     options={getProcessOptions(t)}
+                    disabled={isBrokerScope}
                     error={
                       touched.processType && errors.processType ? errors.processType : undefined
-                    }
-                  />
-
-                  <CheckboxRow
-                    label={t('announcement.rent.need_photographer')}
-                    checked={values.needPhotographer ?? false}
-                    onToggle={() => setFieldValue('needPhotographer', !values.needPhotographer)}
-                    containerClassName="py-[0px]"
-                  />
-
-                  <CheckboxRow
-                    label={t('announcement.rent.need_assessment_expert')}
-                    checked={values.needAssessmentExpert ?? false}
-                    containerClassName="py-[0px]"
-                    onToggle={() =>
-                      setFieldValue('needAssessmentExpert', !values.needAssessmentExpert)
                     }
                   />
                 </View>

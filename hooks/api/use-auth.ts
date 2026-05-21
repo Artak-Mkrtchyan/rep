@@ -73,7 +73,7 @@ export function useLogout(): UseLogoutResult {
       }
     } catch (err) {
       // Even if server logout fails, clear local tokens
-      console.error('Logout error:', err);
+      console.warn('Logout error:', err);
     } finally {
       await clearAuth();
       setIsLoading(false);

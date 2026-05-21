@@ -7,4 +7,7 @@ export type SearchInputProps = Omit<
   placeholder?: string;
   containerClassName?: string;
   inputClassName?: string;
+  placeholderColor?: string;
+  iconColor?: string;
+  iconSize?: number;
 };

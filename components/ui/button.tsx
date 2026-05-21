@@ -52,6 +52,16 @@ export const Button: React.FC<ButtonProps> = ({
     <Pressable
       disabled={disabled}
       className={className}
+      android_ripple={
+        disabled
+          ? undefined
+          : {
+              color:
+                variant === 'primary' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)',
+              borderless: false,
+              foreground: true,
+            }
+      }
       style={[({ pressed }) => (pressed && !disabled ? { opacity: 0.9 } : undefined), style]}
       {...props}>
       {typeof children === 'string' ? (

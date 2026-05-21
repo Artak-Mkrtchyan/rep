@@ -12,21 +12,25 @@ import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/select';
-import { getAccountTypeOptions, AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
+import {
+  AUTH_ROUTES,
+  IMAGE_DIMENSIONS,
+  getAccountTypeOptions,
+  isBrokerRole,
+} from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
-
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
+import i18n from '@/lib/i18n/i18n';
 
 import type { AccountRole } from '@/types/auth';
 
 const SignUpSchema = Yup.object().shape({
-  role: Yup.string().required('Required'),
+  role: Yup.string().required(() => i18n.t('validation.required')),
 });
 
 export default function SignUpFirstScreen() {
   const { t } = useTranslation();
   const { data, updateData, resetData } = useSignUpContext();
-
   const { goToNext } = useSignUpFlow();
 
   const handleContinue = (values: { role: AccountRole }) => {
@@ -37,7 +41,6 @@ export default function SignUpFirstScreen() {
     updateData({ role: values.role });
     goToNext();
   };
-
 
   const handleGoToLogin = () => {
     router.replace(AUTH_ROUTES.LOGIN);
@@ -50,61 +53,66 @@ export default function SignUpFirstScreen() {
         enableReinitialize
         validationSchema={SignUpSchema}
         onSubmit={handleContinue}>
-        {({ handleSubmit, values, setFieldValue }) => (
-          <>
-            <AuthHeader
-              title={t('signup.title')}
-              imageSource={require('@/assets/images/signup-illustration.svg')}
-              imageWidth={IMAGE_DIMENSIONS.SIGNUP_ILLUSTRATION.width}
-              imageHeight={IMAGE_DIMENSIONS.SIGNUP_ILLUSTRATION.height}
-            />
+        {({ handleSubmit, values, setFieldValue }) => {
+          const showBrokerRadios = isBrokerRole(values.role);
+          const setRole = (value: string) => setFieldValue('role', value);
+          // Picking 'broker' from the dropdown defaults role to individual broker;
+          // the radios below let the user switch to 'broker_company'.
+          const dropdownValue = showBrokerRadios ? 'broker' : values.role;
 
-            <View className="w-full gap-4">
-              <ThemedText className="text-[14px] text-muted-foreground">
-                {t('signup.description')}
-              </ThemedText>
+          return (
+            <>
+              <AuthHeader
+                title={t('signup.title')}
+                imageSource={require('@/assets/images/signup-illustration.svg')}
+                imageWidth={IMAGE_DIMENSIONS.SIGNUP_ILLUSTRATION.width}
+                imageHeight={IMAGE_DIMENSIONS.SIGNUP_ILLUSTRATION.height}
+              />
 
-              <View className="gap-3">
-                <Select
-                  label={t('signup.register_as')}
-                  placeholder={t('common.select')}
-                  value={values.role}
-                  onChange={(value) => setFieldValue('role', value)}
-                  options={getAccountTypeOptions(t)}
-                />
+              <View className="w-full gap-4">
+                <ThemedText className="text-[14px] text-muted-foreground">
+                  {t('signup.description')}
+                </ThemedText>
 
-                {(values.role === 'broker' || values.role === 'broker_company') && (
-                  <View className="flex-row items-center justify-between">
-                    <RadioButton
-                      value="broker"
-                      label={t('signup.individual_broker')}
-                      selectedValue={values.role}
-                      onSelect={(value) => setFieldValue('role', value)}
-                    />
-                    <RadioButton
-                      value="broker_company"
-                      label={t('signup.broker_company')}
-                      selectedValue={values.role}
-                      onSelect={(value) => setFieldValue('role', value)}
-                    />
-                  </View>
-                )}
+                <View className="gap-3">
+                  <Select
+                    label={t('signup.register_as')}
+                    placeholder={t('common.select')}
+                    value={dropdownValue}
+                    onChange={setRole}
+                    options={getAccountTypeOptions(t)}
+                  />
+
+                  {showBrokerRadios && (
+                    <View className="flex-row items-center justify-between">
+                      <RadioButton
+                        value="broker"
+                        label={t('signup.individual_broker')}
+                        selectedValue={values.role}
+                        onSelect={setRole}
+                      />
+                      <RadioButton
+                        value="broker_company"
+                        label={t('signup.broker_company')}
+                        selectedValue={values.role}
+                        onSelect={setRole}
+                      />
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
 
-            <Button
-              disabled={!values.role}
-              onPress={() => handleSubmit()}
-              accessibilityLabel={t('common.continue')}>
-              {t('common.continue')}
-            </Button>
+              <Button
+                disabled={!values.role}
+                onPress={() => handleSubmit()}
+                accessibilityLabel={t('common.continue')}>
+                {t('common.continue')}
+              </Button>
 
-            <SignInFooter
-              onSignInPress={handleGoToLogin}
-              showSignInLink
-            />
-          </>
-        )}
+              <SignInFooter onSignInPress={handleGoToLogin} showSignInLink />
+            </>
+          );
+        }}
       </Formik>
     </AuthLayout>
   );

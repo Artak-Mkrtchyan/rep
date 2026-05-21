@@ -1,40 +1,36 @@
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
+import { Redirect } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
+import { LoginRequiredScreen } from '@/components/auth/login-required-screen';
+import { useAuth } from '@/context/AuthContext';
 
+/**
+ * The Announcement tab doubles as an "Add announcement" action button:
+ * - Signed-in users: the tab-bar listener pushes them into the create-listing
+ *   flow (outside the tabs stack). This screen only renders on deep links /
+ *   programmatic navigation, where we redirect them to the form.
+ * - Guests: we render the login-required screen INSIDE the tabs stack so the
+ *   bottom navigation bar stays visible (bug fix: tab bar was hidden when the
+ *   login-required page lived at /login-required/announcement outside tabs).
+ */
 export default function AnnouncementScreen() {
   const { t } = useTranslation();
-  const { horizontalStyle } = useScreenEdgePadding();
-  const handleAddPress = () => {
-    router.push('/announcement/form/new');
-  };
+  const { user, isRestoring } = useAuth();
+
+  if (isRestoring) {
+    return null;
+  }
+
+  if (user) {
+    return <Redirect href="/announcement/form/new" />;
+  }
 
   return (
-    <ThemedView className="flex-1">
-      <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-center" style={horizontalStyle}>
-          <Pressable
-            onPress={handleAddPress}
-            style={({ pressed }) => (pressed ? { opacity: 0.8 } : undefined)}
-            accessibilityRole="button"
-            accessibilityLabel={t('announcement.create')}>
-            <Ionicons name="add-circle-outline" size={64} color="#ABABAB" />
-          </Pressable>
-          <ThemedText type="title" className="mt-4 text-center">
-            {t('announcement.title')}
-          </ThemedText>
-          <ThemedText className="mt-2 text-center text-muted-foreground">
-            {t('announcement.subtitle')}
-          </ThemedText>
-        </View>
-      </SafeAreaView>
-    </ThemedView>
+    <LoginRequiredScreen
+      title={t('announcement.add')}
+      subtitle={t('auth.login_required_announcement')}
+      illustration={require('@/assets/images/login-required-announcement.svg')}
+    />
   );
 }

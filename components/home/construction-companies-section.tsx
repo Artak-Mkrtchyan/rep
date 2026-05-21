@@ -12,7 +12,7 @@ import { ConstructionCompanyCard } from '@/components/home/construction-company-
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
 import { useHomeMetrics } from '@/hooks/use-home-metrics';
-import { MOCK_CONSTRUCTION_COMPANIES } from '@/lib/mocks/home-mock-data';
+import { useHomeConstructionCompanies } from '@/hooks/api/use-home-partners';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
 
 const styles = StyleSheet.create({
@@ -38,21 +38,25 @@ const styles = StyleSheet.create({
 
 type ConstructionCompaniesSectionProps = {
   onSeeMorePress?: () => void;
+  onCardPress?: () => void;
 };
 
 export const ConstructionCompaniesSection: React.FC<ConstructionCompaniesSectionProps> = ({
   onSeeMorePress,
+  onCardPress,
 }) => {
   const { t } = useTranslation();
   const metrics = useHomeMetrics();
+  const { companies } = useHomeConstructionCompanies();
   const [activeIndex, setActiveIndex] = useState(0);
+
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       const offsetX = event.nativeEvent.contentOffset.x;
       const index = Math.round(offsetX / metrics.companyStride);
-      setActiveIndex(Math.min(Math.max(index, 0), MOCK_CONSTRUCTION_COMPANIES.length - 1));
+      setActiveIndex(Math.min(Math.max(index, 0), companies.length - 1));
     },
-    [metrics.companyStride]
+    [metrics.companyStride, companies.length]
   );
 
   return (
@@ -76,25 +80,26 @@ export const ConstructionCompaniesSection: React.FC<ConstructionCompaniesSection
           ]}
           onScroll={handleScroll}
           scrollEventThrottle={16}>
-          {MOCK_CONSTRUCTION_COMPANIES.map((company, index) => (
-            <View
-              key={company.id}
-              style={{
-                width: metrics.companyCardWidth,
-                marginRight: index < MOCK_CONSTRUCTION_COMPANIES.length - 1 ? metrics.gap : 0,
-              }}>
-              <ConstructionCompanyCard
-                name={company.name}
-                rating={company.rating}
-                logoUri={company.logoUri}
-              />
-            </View>
-          ))}
+          {companies.map((company, index) => (
+              <View
+                key={company.id}
+                style={{
+                  width: metrics.companyCardWidth,
+                  marginRight: index < companies.length - 1 ? metrics.gap : 0,
+                }}>
+                <ConstructionCompanyCard
+                  name={company.name}
+                  rating="4.9"
+                  logoUri={company.avatarInfo?.thumbnailUrl || company.avatarInfo?.url}
+                  onPress={onCardPress}
+                />
+              </View>
+            ))}
         </ScrollView>
       </View>
 
       <PaginationIndicator
-        count={MOCK_CONSTRUCTION_COMPANIES.length}
+        count={companies.length}
         activeIndex={activeIndex}
         variant="inline"
         inlineMarginTop={HOME_DESIGN.layout.carouselToDots}

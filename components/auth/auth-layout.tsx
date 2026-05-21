@@ -26,7 +26,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}>
       <Pressable style={{ flex: 1 }} onPress={Keyboard.dismiss} accessible={false}>
         <ThemedView className="flex-1" style={horizontalStyle}>

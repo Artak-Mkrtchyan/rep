@@ -50,9 +50,13 @@ export const AttachedFiles: React.FC<AttachedFilesProps> = ({ documents }) => {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const totalPages = Math.ceil(documents.length / PAGE_SIZE);
+  const sortedDocs = [...documents].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  const totalPages = Math.ceil(sortedDocs.length / PAGE_SIZE);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
-  const currentDocs = documents.slice(startIndex, startIndex + PAGE_SIZE);
+  const currentDocs = sortedDocs.slice(startIndex, startIndex + PAGE_SIZE);
 
   const handleDownload = useCallback(
     async (doc: AnnouncementDocument) => {

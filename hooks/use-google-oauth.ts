@@ -7,12 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { AuthScope } from '@/lib/api/auth';
 import { OAuthProvider, oauthService } from '@/lib/api/oauth.service';
 
-interface UseGoogleOAuthOptions {
-  scope?: AuthScope;
-}
-
-export const useGoogleOAuth = (options: UseGoogleOAuthOptions = {}) => {
-  const { scope = AuthScope.USUAL } = options;
+export const useGoogleOAuth = () => {
   const { setTokens } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +17,10 @@ export const useGoogleOAuth = (options: UseGoogleOAuthOptions = {}) => {
       setIsLoading(true);
       setError(null);
 
-      // Build the backend start URL — browser handles all redirects:
-      // backend → Google → backend callback → auth/complete page
-      const startUrl = oauthService.getOAuthStartUrl(OAuthProvider.GOOGLE, scope);
+      // AC7: Google sign-in is only supported for individual users, so we
+      // always request the USUAL scope regardless of where the button is
+      // invoked from. This locks the account type pre-redirect.
+      const startUrl = oauthService.getOAuthStartUrl(OAuthProvider.GOOGLE, AuthScope.USUAL);
 
       // The auth/complete web page will detect mobile context and redirect
       // to rep://auth/callback with tokens. openAuthSessionAsync catches this.
@@ -58,7 +54,7 @@ export const useGoogleOAuth = (options: UseGoogleOAuthOptions = {}) => {
     } finally {
       setIsLoading(false);
     }
-  }, [scope, setTokens]);
+  }, [setTokens]);
 
   return { startGoogleAuth, isLoading, error };
 };

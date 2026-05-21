@@ -57,9 +57,7 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
     <View style={detailStyles.headerSection}>
       {/* Row 1: Title (left) + Status badge (right) */}
       <View className="flex-row items-center justify-between">
-        <ThemedText
-          className="flex-1 text-[20px] font-bold leading-[24px] text-foreground"
-          numberOfLines={2}>
+        <ThemedText className="flex-1 text-[20px] font-bold leading-[24px] text-foreground">
           {title}
         </ThemedText>
         <Pressable

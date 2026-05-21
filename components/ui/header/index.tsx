@@ -69,7 +69,7 @@ export const Header: React.FC<Props> = ({
             <Ionicons name="chevron-back" size={24} color="#111111" />
           </Pressable>
           <ThemedText
-            className="text-[20px] font-semibold leading-[22px] text-foreground"
+            className="text-[20px] font-semibold leading-[24px] text-foreground"
             numberOfLines={1}>
             {headerTitle}
           </ThemedText>

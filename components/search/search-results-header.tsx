@@ -4,11 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { type LayoutChangeEvent, Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ReIcon } from '@/components/icons/re-icon';
+
 import { ThemedText } from '@/components/themed-text';
 import { styles } from '@/app/search/results.styles';
 
 type SearchResultsHeaderProps = {
   query: string;
+  address?: string;
   onBack: () => void;
   onOpenFilters: () => void;
   onClearQuery: () => void;
@@ -17,6 +20,7 @@ type SearchResultsHeaderProps = {
 
 export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
   query,
+  address,
   onBack,
   onOpenFilters,
   onClearQuery,
@@ -52,9 +56,9 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
           style={styles.headerButton}>
           <Ionicons name="search-outline" size={20} color="#ABABAB" />
           <ThemedText className="flex-1 text-[17px] text-foreground" numberOfLines={1}>
-            {query || t('search.title')}
+            {address || query || t('search.title')}
           </ThemedText>
-          {query ? (
+          {(address || query) ? (
             <Pressable
               onPress={onClearQuery}
               className="h-[24px] w-[24px] items-center justify-center rounded-full bg-[#E2E2E2]">
@@ -69,7 +73,7 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
           accessibilityLabel={t('search.title')}
           className="h-[46px] w-[46px] items-center justify-center rounded-full bg-white"
           style={styles.headerButton}>
-          <Ionicons name="options-outline" size={20} color="#111111" />
+          <ReIcon name="settings" size={20} color="#a1a1a1" />
         </Pressable>
       </View>
     </SafeAreaView>

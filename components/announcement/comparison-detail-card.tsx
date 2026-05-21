@@ -47,7 +47,10 @@ export const ComparisonDetailCard: React.FC<ComparisonDetailCardProps> = ({ anno
           </View>
 
           <View style={cardStyles.body}>
-            <ThemedText className="text-[20px] font-bold leading-[24px] text-[#111111]">
+            <ThemedText
+              className="text-[20px] font-bold leading-[24px] text-[#111111]"
+              numberOfLines={2}
+              ellipsizeMode="tail">
               {announcement.title}
             </ThemedText>
 

@@ -9,6 +9,7 @@ import { AuthLayout } from '@/components/auth/auth-layout';
 import { SignInFooter } from '@/components/auth/sign-in-footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ANNOUNCEMENT_MAX_FILE_SIZE } from '@/constants/announcement';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
 import { ERROR_MESSAGES, showErrorAlert } from '@/lib/error-handler';
@@ -19,7 +20,7 @@ import { FileUpload } from '@/components/ui/file-upload';
 import { NumberPicker } from '@/components/ui/number-picker';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { applicationsService, BrokerCompanyRegistrationRequest } from '@/lib/api/applications';
-import { FULL_NAME_MAX_LENGTH, yupSchemas } from '@/lib/auth-validation';
+import { yupSchemas } from '@/lib/auth-validation';
 import { router } from 'expo-router';
 
 const BrokerCompanySchema = Yup.object().shape({
@@ -32,14 +33,20 @@ const BrokerCompanySchema = Yup.object().shape({
       .max(255, () => i18n.t('validation.max_length_255')),
     certifiedOn: yupSchemas.certifiedOn,
     email: yupSchemas.email,
-    name: Yup.string().required(() => i18n.t('validation.required')),
+    name: Yup.string()
+      .required(() => i18n.t('validation.required'))
+      .max(255, () => i18n.t('validation.max_length_255')),
     phoneNumber: yupSchemas.phone,
-    yearsOfActivity: Yup.number().required('Required'),
+    yearsOfActivity: Yup.number()
+      .min(0, () => i18n.t('validation.required'))
+      .required(() => i18n.t('validation.required')),
   }),
   managerInfo: Yup.object().shape({
     email: yupSchemas.email,
-    fullName: yupSchemas.fullName,
-    phoneNumber: yupSchemas.phone,
+    fullName: Yup.string()
+      .required(() => i18n.t('validation.required'))
+      .max(255, () => i18n.t('validation.max_length_255')),
+    phoneNumber: yupSchemas.phoneOptional,
   }),
 });
 
@@ -75,7 +82,6 @@ export default function BrokerSignUpScreen() {
   const handleGoToLogin = () => {
     router.replace(AUTH_ROUTES.LOGIN);
   };
-
 
   return (
     <AuthLayout scrollable>
@@ -126,8 +132,8 @@ export default function BrokerSignUpScreen() {
                 value={values.managerInfo.email}
                 helper={t('signup.broker_company.manager_email_helper')}
                 disabled
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
+                onChangeText={handleChange('managerInfo.email')}
+                onBlur={handleBlur('managerInfo.email')}
                 error={
                   touched.managerInfo?.email && errors.managerInfo?.email
                     ? errors.managerInfo?.email
@@ -136,6 +142,7 @@ export default function BrokerSignUpScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
+                maxLength={255}
               />
 
               <Input
@@ -150,7 +157,7 @@ export default function BrokerSignUpScreen() {
                     : undefined
                 }
                 placeholder=""
-                maxLength={FULL_NAME_MAX_LENGTH}
+                maxLength={255}
               />
 
               <PhoneInput
@@ -167,6 +174,7 @@ export default function BrokerSignUpScreen() {
 
               <Input
                 label={t('signup.broker_company.company_email')}
+                required
                 value={values.companyInfo.email}
                 onChangeText={handleChange('companyInfo.email')}
                 onBlur={handleBlur('companyInfo.email')}
@@ -179,6 +187,7 @@ export default function BrokerSignUpScreen() {
                 autoCapitalize="none"
                 helper={t('signup.broker_company.company_email_helper')}
                 autoCorrect={false}
+                maxLength={255}
               />
 
               <Input
@@ -193,10 +202,12 @@ export default function BrokerSignUpScreen() {
                     : undefined
                 }
                 placeholder=""
+                maxLength={255}
               />
 
               <PhoneInput
                 label={t('signup.broker_company.mobile_number')}
+                required
                 value={values.companyInfo.phoneNumber}
                 onChangeText={(text) => setFieldValue('companyInfo.phoneNumber', text)}
                 onBlur={handleBlur('companyInfo.phoneNumber')}
@@ -256,6 +267,7 @@ export default function BrokerSignUpScreen() {
                 value={values.attachments}
                 onChange={(attachments) => setFieldValue('attachments', attachments)}
                 required
+                maxFileSize={ANNOUNCEMENT_MAX_FILE_SIZE}
                 error={
                   touched.attachments && errors.attachments ? String(errors.attachments) : undefined
                 }
@@ -268,10 +280,7 @@ export default function BrokerSignUpScreen() {
                 {isSubmitting ? t('common.submitting') : t('common.continue')}
               </Button>
 
-              <SignInFooter
-                onSignInPress={handleGoToLogin}
-                showSignInLink
-              />
+              <SignInFooter onSignInPress={handleGoToLogin} showSignInLink />
             </View>
           </View>
         )}

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { AUTH_ROUTES, IMAGE_DIMENSIONS } from '@/constants/auth';
 import { useSignUpContext } from '@/context/SignUpContext';
+import { useGoogleOAuth } from '@/hooks/use-google-oauth';
 import { useSignUpFlow } from '@/hooks/use-signup-flow';
 import { useTheme } from '@/hooks/use-theme';
 import { authService, AuthScope } from '@/lib/api/auth';
@@ -41,6 +42,8 @@ export default function SignUpEmailStepScreen() {
   const { data, updateData } = useSignUpContext();
   const { goToNext } = useSignUpFlow();
   const router = useRouter();
+  const { startGoogleAuth } = useGoogleOAuth();
+  const isIndividual = data.role === 'individual';
 
   const handleContinue = async (
     values: { email: string },
@@ -84,10 +87,6 @@ export default function SignUpEmailStepScreen() {
     router.replace(AUTH_ROUTES.LOGIN);
   };
 
-  const handleGoogleAuth = () => {
-    // TODO: Implement Google authentication
-  };
-
   const handleAppleAuth = () => {
     // TODO: Implement Apple authentication
   };
@@ -129,8 +128,8 @@ export default function SignUpEmailStepScreen() {
             </Button>
 
             <SignInFooter
-              onGooglePress={data.role === 'individual' ? handleGoogleAuth : undefined}
-              onApplePress={data.role === 'individual' ? handleAppleAuth : undefined}
+              onGooglePress={isIndividual ? startGoogleAuth : undefined}
+              onApplePress={isIndividual ? handleAppleAuth : undefined}
               onSignInPress={handleGoToLogin}
               showSignInLink
             />

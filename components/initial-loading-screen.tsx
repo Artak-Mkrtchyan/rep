@@ -8,21 +8,13 @@ const SPLASH_BACKGROUND = '#ffffff';
 const SPLASH_LOGO_WIDTH = 200;
 
 /**
- * Hide native splash only after the logo has decoded and the next frame has painted,
- * so we never flash an empty or half-drawn view. Keep the logo square here so it
- * matches the generated native splash (rounded PNG would “pop” after hide).
+ * Hide native splash as soon as the React loading screen mounts so only one
+ * logo is ever visible (no flicker between native splash icon and the
+ * React-rendered rounded icon).
  */
 export function InitialLoadingScreen() {
-  const didHideSplash = React.useRef(false);
-
-  const hideSplashWhenReady = React.useCallback(() => {
-    if (didHideSplash.current) return;
-    didHideSplash.current = true;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        void SplashScreen.hideAsync();
-      });
-    });
+  React.useEffect(() => {
+    void SplashScreen.hideAsync();
   }, []);
 
   return (
@@ -33,7 +25,6 @@ export function InitialLoadingScreen() {
         contentFit="contain"
         transition={0}
         cachePolicy="memory-disk"
-        onLoadEnd={hideSplashWhenReady}
       />
     </View>
   );
@@ -49,6 +40,7 @@ const styles = StyleSheet.create({
   logo: {
     width: SPLASH_LOGO_WIDTH,
     height: SPLASH_LOGO_WIDTH,
+    borderRadius: 44,
     backgroundColor: SPLASH_BACKGROUND,
   },
 });

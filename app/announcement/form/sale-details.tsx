@@ -1,6 +1,6 @@
-import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import { TFunction } from 'i18next';
+import React, { useMemo } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
@@ -8,7 +8,7 @@ import { AnnouncementFooter } from '@/components/announcement/announcement-foote
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import type { RentForApartmentsFormStep4 } from '@/types/announcement';
@@ -18,33 +18,36 @@ const CURRENCY_PREFIX = '$';
 
 type SaleDetailsFormValues = RentForApartmentsFormStep4;
 
-/** When saleDetails is present, price is required. */
-const SaleDetailsSchema = Yup.object().shape({
-  saleDetails: Yup.object()
-    .optional()
-    .nullable()
-    .shape({
-      price: Yup.number().required('Required').typeError('Must be a number'),
-    }),
-});
+const makeSaleDetailsSchema = (t: TFunction) =>
+  Yup.object().shape({
+    saleDetails: Yup.object()
+      .shape({
+        price: Yup.number()
+          .required(t('add_application.validation.price_required'))
+          .typeError(t('add_application.validation.must_be_number')),
+      })
+      .required(t('add_application.validation.price_required')),
+  });
 
 export default function SaleDetailsScreen() {
   const { t } = useTranslation();
+  const validationSchema = useMemo(() => makeSaleDetailsSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   let isNext = true;
 
-  const initialValues: SaleDetailsFormValues = { saleDetails: formData.saleDetails };
+  const initialValues: SaleDetailsFormValues = {
+    saleDetails: formData.saleDetails ?? { price: undefined as unknown as number },
+  };
 
   const saveSaleDetails = async ({ saleDetails }: SaleDetailsFormValues) => {
-    if (saleDetails) {
+    if (saleDetails?.price != null) {
       updateFormData({
-        saleDetails: {
-          price: Number(saleDetails.price) || 0,
-        },
+        saleDetails: { price: Number(saleDetails.price) },
       });
     }
 
@@ -53,7 +56,7 @@ export default function SaleDetailsScreen() {
     } else {
       try {
         await sendFormData();
-        router.back();
+        exitFlow();
       } catch {
         Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       }
@@ -74,7 +77,7 @@ export default function SaleDetailsScreen() {
     <ThemedView className="flex-1">
       <Formik<SaleDetailsFormValues>
         initialValues={initialValues}
-        validationSchema={SaleDetailsSchema}
+        validationSchema={validationSchema}
         validateOnMount={true}
         enableReinitialize
         onSubmit={saveSaleDetails}>
@@ -84,7 +87,9 @@ export default function SaleDetailsScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.sale_details_title')}
@@ -99,8 +104,14 @@ export default function SaleDetailsScreen() {
                     numericOnly
                     placeholder=""
                     value={`${values.saleDetails?.price ?? ''}`}
-                    onChangeText={(v) => setFieldValue('saleDetails.price', v)}
-                    error={touched.saleDetails && errors.saleDetails ? 'Required' : undefined}
+                    onChangeText={(v) =>
+                      setFieldValue('saleDetails.price', v === '' ? undefined : Number(v))
+                    }
+                    error={
+                      touched.saleDetails && (errors.saleDetails as { price?: string })?.price
+                        ? (errors.saleDetails as { price?: string }).price
+                        : undefined
+                    }
                     left={
                       <ThemedText className="text-[16px] text-muted-foreground">
                         {CURRENCY_PREFIX}

@@ -14,6 +14,7 @@ import { SearchResultsSheet } from '@/components/search/search-results-sheet';
 import { ThemedView } from '@/components/themed-view';
 import { getWebBaseUrl } from '@/constants/env';
 import { useMapSearchAnnouncements } from '@/hooks/api/use-map-search-announcements';
+import { useSearchAnnouncements } from '@/hooks/api/use-search-announcements';
 import { boundsToGeoRectangle } from '@/lib/utils/map-helpers';
 import { announcementsService } from '@/lib/api/announcements';
 import type { Announcement } from '@/types/api';
@@ -52,28 +53,57 @@ export default function SearchMapScreen() {
         /* fall through */
       }
     }
-    return { query: '', listingType: 'BUY', propertyTypes: [], priceMin: '', priceMax: '' };
+    return {
+      query: '',
+      address: '',
+      listingType: null,
+      propertyTypes: [],
+      priceMin: '',
+      priceMax: '',
+      sortOption: 'NEWEST_FIRST' as const,
+    };
   }, [params.filters]);
 
   const [currentFilters, setCurrentFilters] = useState<SearchFilters>(initialFilters);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
-  const [locationText, setLocationText] = useState(initialFilters.query || '');
+  const [locationText, setLocationText] = useState(
+    initialFilters.address || initialFilters.query || '',
+  );
   const [mapPinAnnouncement, setMapPinAnnouncement] = useState<Announcement | null>(null);
 
-  const { announcements, isLoading, error, totalElements, searchWithBounds, reset } =
+  // Map pins: fetched by visible bounds
+  const { announcements: mapAnnouncements, searchWithBounds, resetAndRefetch } =
     useMapSearchAnnouncements();
+
+  // Results list: all matching results (no geo constraint), like web
+  const {
+    announcements: listAnnouncements,
+    isLoading,
+    isLoadingMore,
+    error,
+    totalElements,
+    hasMore,
+    search: searchList,
+    loadMore,
+  } = useSearchAnnouncements();
 
   const filtersRef = useRef(currentFilters);
   filtersRef.current = currentFilters;
 
-  // Send markers to WebView whenever announcements change
+  // Initial list fetch
   useEffect(() => {
-    if (!webViewRef.current || announcements.length === 0) return;
+    searchList(currentFilters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const markers = announcements
-      .filter((a) => a.geo?.latitude != null && a.geo?.longitude != null)
-      .map((a) => ({
+  // Send markers to WebView whenever map announcements change
+  useEffect(() => {
+    if (!webViewRef.current || mapAnnouncements.length === 0) return;
+
+    const markers = mapAnnouncements
+      .filter((a: Announcement) => a.geo?.latitude != null && a.geo?.longitude != null)
+      .map((a: Announcement) => ({
         id: a.id,
         publicId: a.publicId,
         coordinates: [a.geo.longitude!, a.geo.latitude!],
@@ -87,14 +117,14 @@ export default function SearchMapScreen() {
       true;
     `;
     webViewRef.current.injectJavaScript(js);
-  }, [announcements]);
+  }, [mapAnnouncements]);
 
   useEffect(() => {
     setMapPinAnnouncement((prev) => {
       if (!prev) return prev;
-      return announcements.find((a) => a.id === prev.id) ?? null;
+      return mapAnnouncements.find((a: Announcement) => a.id === prev.id) ?? null;
     });
-  }, [announcements]);
+  }, [mapAnnouncements]);
 
   const handleWebViewMessage = useCallback(
     (event: WebViewMessageEvent) => {
@@ -114,7 +144,9 @@ export default function SearchMapScreen() {
         }
         case 'markerClick': {
           const markerId = data.id;
-          const match = announcements.find((a) => a.publicId === markerId || a.id === markerId);
+          const match = mapAnnouncements.find(
+            (a: Announcement) => a.publicId === markerId || a.id === markerId,
+          );
           if (!match) break;
           setMapPinAnnouncement((prev) => (prev?.id === match.id ? null : match));
           break;
@@ -124,7 +156,7 @@ export default function SearchMapScreen() {
           break;
       }
     },
-    [searchWithBounds, announcements],
+    [searchWithBounds, mapAnnouncements],
   );
 
   const handleBack = useCallback(() => router.back(), [router]);
@@ -133,12 +165,14 @@ export default function SearchMapScreen() {
     (filters: SearchFilters) => {
       setCurrentFilters(filters);
       setIsModalVisible(false);
-      setLocationText(filters.query || '');
+      setLocationText(filters.address || filters.query || '');
       setMapPinAnnouncement(null);
-      // Reset bounds cache so next map event triggers a fresh fetch
-      reset();
+      // Re-fetch map pins with new filters using current viewport
+      resetAndRefetch(filters);
+      // Re-fetch results list with new filters (no geo constraint)
+      searchList(filters);
     },
-    [reset]
+    [resetAndRefetch, searchList],
   );
 
   const handleCardPress = useCallback(
@@ -212,14 +246,14 @@ export default function SearchMapScreen() {
 
         <SearchResultsSheet expandedTop={headerHeight || undefined} collapsedRatio={0.55}>
           <SearchResultsGrid
-            announcements={announcements}
+            announcements={listAnnouncements}
             totalElements={totalElements}
             isLoading={isLoading}
-            isLoadingMore={false}
+            isLoadingMore={isLoadingMore}
             error={error}
-            hasMore={false}
-            onRetry={() => reset()}
-            onLoadMore={() => Promise.resolve()}
+            hasMore={hasMore}
+            onRetry={() => searchList(currentFilters)}
+            onLoadMore={loadMore}
             onCardPress={handleCardPress}
             onComparisonPress={handleComparisonPress}
           />
@@ -229,6 +263,7 @@ export default function SearchMapScreen() {
           visible={isModalVisible}
           onClose={() => setIsModalVisible(false)}
           onSearch={handleSearch}
+          initialFilters={currentFilters}
         />
       </ThemedView>
     </GestureHandlerRootView>

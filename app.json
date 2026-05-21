@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Real Estate Platform",
+    "name": "Test Real Estate",
     "slug": "rep",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "rep",
@@ -12,7 +12,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.rep",
       "infoPlist": {
-        "CFBundleDisplayName": "Real Estate Platform"
+        "CFBundleDisplayName": "Test Real Estate",
+        "LSApplicationQueriesSchemes": ["tel", "mailto"]
       },
       "associatedDomains": [
         "applinks:rep-dev.utspdev.com",
@@ -22,6 +23,7 @@
       "appleTeamId": "85A3D5474J"
     },
     "android": {
+      "versionCode": 2,
       "softwareKeyboardLayoutMode": "resize",
       "adaptiveIcon": {
         "backgroundColor": "#141414",
@@ -51,10 +53,7 @@
               "pathPrefix": "/app/open"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         },
         {
           "action": "VIEW",
@@ -76,15 +75,10 @@
               "pathPrefix": "/app/open"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["android.permission.RECORD_AUDIO"],
       "package": "com.anonymous.rep"
     },
     "web": {
@@ -105,9 +99,6 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
       ],

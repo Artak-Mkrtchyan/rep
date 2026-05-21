@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import React from 'react';
@@ -44,7 +45,7 @@ export default function LoginFormScreen() {
   const [formError, setFormError] = React.useState<string | null>(null);
 
   const { login, isLoading, reset: resetLoginError } = useLogin();
-  const { startGoogleAuth, isLoading: isGoogleLoading } = useGoogleOAuth({ scope });
+  const { startGoogleAuth, isLoading: isGoogleLoading } = useGoogleOAuth();
   const { tokens: theme } = useTheme();
   const insets = useSafeAreaInsets();
   const { horizontalStyle } = useScreenEdgePadding();
@@ -149,6 +150,16 @@ export default function LoginFormScreen() {
         contentInsetAdjustmentBehavior="automatic">
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View className="w-full items-center">
+            <View className="mb-2 w-full">
+              <Pressable
+                onPress={() => router.back()}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.go_back')}
+                className="h-10 w-10 items-center justify-center rounded-full">
+                <Ionicons name="chevron-back" size={24} color="black" />
+              </Pressable>
+            </View>
+
             <Image
               style={IMAGE_DIMENSIONS.LOGIN_ILLUSTRATION}
               source={require('@/assets/images/login-illustration.svg')}
@@ -222,7 +233,7 @@ export default function LoginFormScreen() {
             <View className="w-full">
               <SignInFooter
                 onGooglePress={role === 'individual' ? handleGoogleSignIn : undefined}
-                onApplePress={handleAppleSignIn}
+                onApplePress={role === 'individual' ? handleAppleSignIn : undefined}
                 onSignInPress={() => router.push('/(auth)/signup')}
                 showSignInLink
                 signInLabel={t('auth.dont_have_account')}

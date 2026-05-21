@@ -8,6 +8,10 @@ export const styles = StyleSheet.create({
     shadowRadius: 33,
     elevation: 4,
   },
+  /** Keeps the image in the original 151:97 ratio (card width 175 − px-12 × 2 = 151, image height 97). */
+  heroContainer: {
+    aspectRatio: 151 / 97,
+  },
   heroImage: {
     width: '100%',
     height: '100%',

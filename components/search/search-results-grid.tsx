@@ -6,6 +6,7 @@ import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
 import { AnnouncementListCard } from '@/components/announcement/announcement-list-card';
 import { AnnouncementSmallCard } from '@/components/announcement/announcement-small-card';
 import { ThemedText } from '@/components/themed-text';
+import { useResponsiveGrid } from '@/hooks/use-responsive-grid';
 import {
   getAddress,
   getCardAttributes,
@@ -13,6 +14,7 @@ import {
   getPriceLabel,
 } from '@/lib/utils/announcement-helpers';
 import type { Announcement } from '@/types/api';
+import type { SortOption } from '@/types/search';
 
 type ViewMode = 'grid' | 'list';
 
@@ -27,6 +29,9 @@ type SearchResultsGridProps = {
   onLoadMore: () => void;
   onCardPress?: (id: string) => void;
   onComparisonPress?: (id: string, isForComparison: boolean) => void;
+  sortOption?: SortOption;
+  sortLabel?: string;
+  onSortPress?: () => void;
 };
 
 export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
@@ -40,9 +45,12 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   onLoadMore,
   onCardPress,
   onComparisonPress,
+  sortLabel,
+  onSortPress,
 }) => {
   const { t } = useTranslation();
   const [viewMode] = useState<ViewMode>('grid');
+  const { cardWidth, columns, gap, onLayout: handleGridLayout } = useResponsiveGrid();
 
   const isCloseToBottom = useCallback(
     ({ layoutMeasurement, contentOffset, contentSize }: any) =>
@@ -90,28 +98,14 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
         <ThemedText className="text-[20px] font-bold leading-[24px] text-foreground">
           {t('search.results_title', { count: totalElements })}
         </ThemedText>
-        {/* <View className="flex-row items-center gap-[4px]">
-          <Pressable
-            onPress={() => setViewMode('grid')}
-            className="h-[32px] w-[32px] items-center justify-center rounded-[8px]"
-            style={viewMode === 'grid' ? { backgroundColor: '#F1F1F1' } : undefined}>
-            <Ionicons
-              name="grid-outline"
-              size={18}
-              color={viewMode === 'grid' ? '#111111' : '#ABABAB'}
-            />
+        {onSortPress && sortLabel ? (
+          <Pressable onPress={onSortPress} className="flex-row items-center gap-1">
+            <ThemedText className="text-[16px] font-medium text-primary">
+              {t('search.sort.label')}:
+            </ThemedText>
+            <ThemedText className="text-[16px] font-medium text-primary">{sortLabel}</ThemedText>
           </Pressable>
-          <Pressable
-            onPress={() => setViewMode('list')}
-            className="h-[32px] w-[32px] items-center justify-center rounded-[8px]"
-            style={viewMode === 'list' ? { backgroundColor: '#F1F1F1' } : undefined}>
-            <Ionicons
-              name="list-outline"
-              size={18}
-              color={viewMode === 'list' ? '#111111' : '#ABABAB'}
-            />
-          </Pressable>
-        </View> */}
+        ) : null}
       </View>
 
       {announcements.length === 0 ? (
@@ -122,23 +116,29 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
           </ThemedText>
         </View>
       ) : viewMode === 'grid' ? (
-        <View className="mt-[16px] flex-row flex-wrap gap-x-[8px] gap-y-[16px]">
+        <View
+          onLayout={handleGridLayout}
+          className="mt-[16px] flex-row flex-wrap gap-y-[16px]"
+          style={{ columnGap: gap }}
+          accessibilityLabel={`${columns}-column results grid`}>
           {announcements.map((item) => (
-            <AnnouncementSmallCard
-              key={item.id}
-              className="w-[175px]"
-              imageSource={getImageSource(item)}
-              title={item.title}
-              address={getAddress(item)}
-              attributes={getCardAttributes(item)}
-              priceLabel={getPriceLabel(item)}
-              isFavourite={item.favourite}
-              isForComparison={item.forComparison}
-              onPress={onCardPress ? () => onCardPress(item.id) : undefined}
-              onComparisonPress={
-                onComparisonPress ? () => onComparisonPress(item.id, item.forComparison) : undefined
-              }
-            />
+            <View key={item.id} style={{ width: cardWidth }}>
+              <AnnouncementSmallCard
+                imageSource={getImageSource(item)}
+                title={item.title}
+                address={getAddress(item)}
+                attributes={getCardAttributes(item)}
+                priceLabel={getPriceLabel(item)}
+                isFavourite={item.favourite}
+                isForComparison={item.forComparison}
+                onPress={onCardPress ? () => onCardPress(item.id) : undefined}
+                onComparisonPress={
+                  onComparisonPress
+                    ? () => onComparisonPress(item.id, item.forComparison)
+                    : undefined
+                }
+              />
+            </View>
           ))}
         </View>
       ) : (

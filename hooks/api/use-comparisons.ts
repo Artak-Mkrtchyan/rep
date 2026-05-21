@@ -8,25 +8,33 @@ export function useComparisons() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const mountedRef = useRef(true);
+  const hasLoadedRef = useRef(false);
 
-  const fetch = useCallback(async () => {
-    setIsLoading(true);
+  const fetch = useCallback(async ({ silent = false }: { silent?: boolean } = {}) => {
+    const shouldShowLoading = !silent && !hasLoadedRef.current;
+    if (shouldShowLoading) {
+      setIsLoading(true);
+    }
     setError(null);
     try {
       const data = await announcementsService.getComparisons(0, 50);
       if (mountedRef.current) {
         setAnnouncements(data.content);
+        hasLoadedRef.current = true;
       }
     } catch (err) {
       if (mountedRef.current) {
         setError(err instanceof Error ? err.message : 'Failed to load comparisons');
       }
     } finally {
-      if (mountedRef.current) {
+      if (mountedRef.current && shouldShowLoading) {
         setIsLoading(false);
       }
     }
   }, []);
+
+  const refetch = useCallback(() => fetch(), [fetch]);
+  const refetchSilent = useCallback(() => fetch({ silent: true }), [fetch]);
 
   const removeFromComparison = useCallback(
     async (id: string) => {
@@ -67,7 +75,8 @@ export function useComparisons() {
     announcements,
     isLoading,
     error,
-    refetch: fetch,
+    refetch,
+    refetchSilent,
     removeFromComparison,
     toggleFavourite,
   };

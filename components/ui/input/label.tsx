@@ -12,10 +12,10 @@ export const InputLabel = React.memo(function InputLabel({
 }: InputLabelProps) {
   if (!children) return null;
   return (
-    <View className="flex-row" style={{ gap: 5 }}>
+    <View className="flex-row items-center" style={{ gap: 5 }}>
       <Text
         className={cn(
-          'text-[12px] font-bold leading-[11px]',
+          'text-[12px] font-bold leading-[16px]',
           disabled ? 'text-muted-foreground' : 'text-foreground'
         )}>
         {children}

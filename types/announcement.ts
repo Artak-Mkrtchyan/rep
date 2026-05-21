@@ -1,4 +1,4 @@
-import { CHARACTERISTIC_ICONS } from '@/constants/announcement';
+import { ReIconName } from '@/components/announcement/re-icon';
 import { ApplicationStatus } from '@/lib/api/applications';
 import { InfrastructureObjectType } from '@/lib/api/infrastructure';
 import { Language } from '@/lib/i18n/i18n';
@@ -186,7 +186,7 @@ export type Attributes = {
 };
 
 export type CharacteristicConfig = {
-  iconKey: keyof typeof CHARACTERISTIC_ICONS;
+  iconKey: ReIconName;
   label: string;
   getValue: (
     formData: RentForApartmentsForm,
@@ -210,4 +210,5 @@ export type MetaData = {
   };
   brokerId?: string;
   tempMediaFiles?: { id: string; uri: string; type?: string; name?: string }[];
+  tempDocumentFiles?: { id: string; uri: string; type?: string; name?: string }[];
 };

@@ -205,90 +205,102 @@ export const AddressInput = React.forwardRef<TextInput, AddressInputProps>(funct
   return (
     <View
       className={cn('w-full gap-1', containerClassName)}
-      style={{ zIndex: showDropdown ? 100 : 0 }}>
+      style={{ zIndex: 1000, elevation: 1000 }}>
       {label ? <InputLabel>{label}</InputLabel> : null}
 
-      <Pressable
-        onPress={() => inputRef.current?.focus()}
-        className={cn(
-          'h-12 flex-row items-center rounded-[12px] border px-3',
-          error ? 'border-destructive bg-card' : 'border-default bg-card',
-          isFocused && !error && 'border-primary'
-        )}
-        accessibilityRole="combobox"
-        accessibilityLabel={label}
-        accessibilityState={{ expanded: showDropdown }}
-        accessibilityHint="Type to search address. Select a suggestion from the list.">
-        <TextInput
-          ref={mergedRef}
-          value={value}
-          onChangeText={handleChangeText}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          placeholder={placeholder}
-          placeholderTextColor={placeholderColor}
-          className="font-regular flex-1 text-[16px] text-foreground placeholder:text-muted-foreground"
-          returnKeyType="done"
-          {...textInputProps}
-        />
-        {isLoading ? (
-          <ActivityIndicator
-            size="small"
-            color="#6B7280"
-            accessibilityLabel="Loading suggestions"
+      {/**
+       * Inner wrapper is the positioning parent for the dropdown so that
+       * `top: 100%` resolves to "right below the input field" — not to
+       * "below the error message below the input" (the outer container's
+       * full height).
+       */}
+      <View>
+        <Pressable
+          onPress={() => inputRef.current?.focus()}
+          className={cn(
+            'h-12 flex-row items-center rounded-[12px] border px-3',
+            error ? 'border-destructive bg-card' : 'border-default bg-card',
+            isFocused && !error && 'border-primary'
+          )}
+          accessibilityRole="combobox"
+          accessibilityLabel={label}
+          accessibilityState={{ expanded: showDropdown }}
+          accessibilityHint="Type to search address. Select a suggestion from the list.">
+          <TextInput
+            ref={mergedRef}
+            value={value}
+            onChangeText={handleChangeText}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            placeholder={placeholder}
+            placeholderTextColor={placeholderColor}
+            className="font-regular flex-1 text-[16px] text-foreground placeholder:text-muted-foreground"
+            returnKeyType="done"
+            {...textInputProps}
           />
-        ) : null}
-      </Pressable>
+          {isLoading ? (
+            <ActivityIndicator
+              size="small"
+              color="#6B7280"
+              accessibilityLabel="Loading suggestions"
+            />
+          ) : null}
+        </Pressable>
 
-      {showDropdown ? (
-        <View
-          className="max-h-[240px] rounded-[12px] border border-default bg-card"
-          style={{
-            position: 'absolute',
-            top: '100%',
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            marginTop: 4,
-            elevation: 5,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.15,
-            shadowRadius: 6,
-          }}>
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            nestedScrollEnabled
-            showsVerticalScrollIndicator
-            className="max-h-[240px]">
-            {showNoResults ? (
-              <View className="px-3 py-3">
-                <ThemedText className="text-[14px] text-muted-foreground">No results</ThemedText>
-              </View>
-            ) : (
-              results.map((result, index) => (
-                <Pressable
-                  key={`${result.title.text}-${index}`}
-                  onPress={() => handleSelectSuggestion(result)}
-                  className="border-b border-default px-3 py-3 last:border-b-0"
-                  accessibilityRole="button"
-                  accessibilityLabel={`${result.title.text}${result.subtitle?.text ? `, ${result.subtitle.text}` : ''}`}>
-                  <ThemedText className="text-[14px] font-medium text-foreground" numberOfLines={1}>
-                    {result.title.text}
+        {showDropdown ? (
+          <View
+            className="max-h-[240px] rounded-[12px] border border-default bg-card"
+            style={{
+              position: 'absolute',
+              top: '100%',
+              left: 0,
+              right: 0,
+              zIndex: 1001,
+              marginTop: 4,
+              elevation: 8,
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.15,
+              shadowRadius: 6,
+            }}>
+            <ScrollView
+              keyboardShouldPersistTaps="handled"
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+              className="max-h-[240px]">
+              {showNoResults ? (
+                <View className="px-3 py-3">
+                  <ThemedText className="text-[14px] text-muted-foreground">
+                    No results
                   </ThemedText>
-                  {result.subtitle?.text ? (
+                </View>
+              ) : (
+                results.map((result, index) => (
+                  <Pressable
+                    key={`${result.title.text}-${index}`}
+                    onPress={() => handleSelectSuggestion(result)}
+                    className="border-b border-default px-3 py-3 last:border-b-0"
+                    accessibilityRole="button"
+                    accessibilityLabel={`${result.title.text}${result.subtitle?.text ? `, ${result.subtitle.text}` : ''}`}>
                     <ThemedText
-                      className="mt-0.5 text-[12px] text-muted-foreground"
+                      className="text-[14px] font-medium text-foreground"
                       numberOfLines={1}>
-                      {result.subtitle.text}
+                      {result.title.text}
                     </ThemedText>
-                  ) : null}
-                </Pressable>
-              ))
-            )}
-          </ScrollView>
-        </View>
-      ) : null}
+                    {result.subtitle?.text ? (
+                      <ThemedText
+                        className="mt-0.5 text-[12px] text-muted-foreground"
+                        numberOfLines={1}>
+                        {result.subtitle.text}
+                      </ThemedText>
+                    ) : null}
+                  </Pressable>
+                ))
+              )}
+            </ScrollView>
+          </View>
+        ) : null}
+      </View>
 
       {error ? <InputError>{error}</InputError> : null}
     </View>

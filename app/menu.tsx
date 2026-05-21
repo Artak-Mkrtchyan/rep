@@ -9,6 +9,26 @@ import { MenuAccordionItem } from '@/components/menu/menu-accordion-item';
 import { ThemedView } from '@/components/themed-view';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { MENU_SECTIONS } from '@/constants/search';
+import type { PropertyTypeValue, SearchFilters } from '@/types/search';
+
+const MENU_ITEM_TO_PROPERTY_TYPE: Record<string, PropertyTypeValue> = {
+  Homes: 'HOUSE',
+  Apartments: 'APARTMENT',
+  'Commercial Space': 'COMMERCIAL_SPACE',
+  Land: 'LAND',
+  'Parking spots': 'PARKING_SPACE',
+  Garages: 'GARAGE',
+};
+
+const DEFAULT_FILTERS: SearchFilters = {
+  query: '',
+  address: '',
+  listingType: null,
+  propertyTypes: [],
+  priceMin: '',
+  priceMax: '',
+  sortOption: 'NEWEST_FIRST',
+};
 
 export default function MenuScreen() {
   const { t } = useTranslation();
@@ -28,6 +48,22 @@ export default function MenuScreen() {
     (item: string, sectionTitle: string) => {
       if (sectionTitle === 'Partners' && item === 'Brokers') {
         router.push('/partners/brokers');
+      }
+      if (sectionTitle === 'Partners' && item === 'Construction companies') {
+        router.push('/partners/construction-companies');
+      }
+
+      const propertyType = MENU_ITEM_TO_PROPERTY_TYPE[item];
+      if ((sectionTitle === 'Buy' || sectionTitle === 'Rent') && propertyType) {
+        const filters: SearchFilters = {
+          ...DEFAULT_FILTERS,
+          listingType: sectionTitle === 'Buy' ? 'BUY' : 'RENT',
+          propertyTypes: [propertyType],
+        };
+        router.push({
+          pathname: '/search/results',
+          params: { filters: JSON.stringify(filters) },
+        });
       }
     },
     [router]

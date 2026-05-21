@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 
-export const featuredPropertyFigmaCardStyles = StyleSheet.create({
+export const featuredPropertyCardStyles = StyleSheet.create({
   card: {
     borderRadius: 16,
     borderWidth: 1,

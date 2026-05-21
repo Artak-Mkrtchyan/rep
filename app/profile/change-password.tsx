@@ -113,7 +113,7 @@ export default function ChangePasswordScreen() {
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}>
       <ThemedView className="flex-1" style={horizontalStyle}>
         <SafeAreaView className="flex-1" edges={['top']}>

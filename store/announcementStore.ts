@@ -7,7 +7,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 interface AnnouncementForRentFormStore {
   formData: RentForApartmentsForm;
   metaData?: MetaData;
-  nextStep: () => void;
+  nextStep: () => number;
   setBrokerId: (id: string) => void;
   sendFormData: () => Promise<{ id: string }>;
   publishFormData: () => Promise<void>;
@@ -61,12 +61,16 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         metaData: { ...state?.metaData, brokerId: id },
       })),
 
-    nextStep: () =>
+    nextStep: () => {
+      let newStep = 0;
       set((state) => {
+        newStep = state.formData.stepNumber + 1;
         return {
-          formData: { ...state.formData, stepNumber: ++state.formData.stepNumber },
+          formData: { ...state.formData, stepNumber: newStep },
         };
-      }),
+      });
+      return newStep;
+    },
 
     sendFormData: async () => {
       const { formData, metaData } = get();
@@ -82,15 +86,20 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
         title: formData.title,
         description: formData.description,
         property: formData.property,
-        rentDetails: formData.rentDetails,
-        saleDetails: formData.saleDetails,
-        mediaFileIds: formData.mediaFileIds,
-        documentIds: formData.documentIds,
-        infrastructureObjects: formData.infrastructureObjects,
+        // Match web: only send the deal-detail block matching listingType.
+        rentDetails: formData.listingType === 'FOR_RENT' ? formData.rentDetails : undefined,
+        saleDetails: formData.listingType === 'FOR_SALE' ? formData.saleDetails : undefined,
+        // Always send arrays (never null/undefined) — the backend crashes with a
+        // NullPointerException on getDocumentIds().stream() if these are omitted.
+        mediaFileIds: formData.mediaFileIds ?? [],
+        documentIds: formData.documentIds ?? [],
+        infrastructureObjects: formData.infrastructureObjects ?? [],
       };
 
-      // Strip undefined/null optional fields
+      // Strip undefined/null optional fields, but preserve array fields even when empty
+      const ALWAYS_SEND = new Set(['mediaFileIds', 'documentIds', 'infrastructureObjects']);
       Object.keys(payload).forEach((k) => {
+        if (ALWAYS_SEND.has(k)) return;
         if (payload[k] === undefined || payload[k] === null) delete payload[k];
       });
 
@@ -137,16 +146,11 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
     },
 
     publishFormData: async () => {
-      try {
-        const { metaData } = get();
-        if (!metaData?.response?.id) {
-          const error = new Error('Save the form first before publishing');
-          throw error;
-        }
-        await applicationsService.publishApplication(metaData.response.id);
-      } catch (error) {
-        throw error;
+      const { metaData } = get();
+      if (!metaData?.response?.id) {
+        throw new Error('Save the form first before publishing');
       }
+      await applicationsService.publishApplication(metaData.response.id);
     },
 
     updateFormData: (data) =>

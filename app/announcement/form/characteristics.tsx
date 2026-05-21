@@ -1,6 +1,5 @@
-import { router } from 'expo-router';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 
@@ -12,6 +11,8 @@ import { ChipGroup } from '@/components/ui/chip-group';
 import { Select } from '@/components/ui/select';
 import {
   FLOORS_OPTIONS,
+  HOUSE_FLOORS_OPTIONS,
+  RESTROOMS_OPTIONS,
   getBuildingTypeOptions,
   getConditionOptions,
   getOwnershipTypeOptions,
@@ -23,7 +24,7 @@ import { Attributes, Property } from '@/types/announcement';
 
 import { Conditional } from '@/components/conditional';
 import { Input } from '@/components/ui/input';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { getCharacteristicsSchemaForPropertyType, getPropertyTypeInfo } from '@/lib/announcement';
 type CharacteristicsFormValues = Attributes;
 
@@ -33,6 +34,13 @@ export default function CharacteristicsScreen() {
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
+  const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const validationSchema = useMemo(
+    () => getCharacteristicsSchemaForPropertyType(formData.propertyType, t),
+    [formData.propertyType, t]
+  );
 
   let isNext = true;
 
@@ -60,13 +68,18 @@ export default function CharacteristicsScreen() {
     }
 
     try {
+      // Persist before showing the preview so metaData.response.publicId is available.
+      setIsSaving(true);
+      await sendFormData();
       if (isNext) {
         nextStep();
       } else {
-        router.back();
+        exitFlow();
       }
     } catch {
       Alert.alert(t('common.error'), t('error.failed_to_send_form'));
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -86,7 +99,7 @@ export default function CharacteristicsScreen() {
         initialValues={initialValues}
         validateOnMount={true}
         enableReinitialize
-        validationSchema={getCharacteristicsSchemaForPropertyType(formData.propertyType)}
+        validationSchema={validationSchema}
         onSubmit={saveCharacteristics}>
         {({ handleSubmit, setFieldValue, values, isValid, errors, touched }) => (
           <>
@@ -94,7 +107,9 @@ export default function CharacteristicsScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: 31 }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[16px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.characteristics_title')}
@@ -175,7 +190,7 @@ export default function CharacteristicsScreen() {
                       placeholder=""
                       value={`${values.building?.numberOfFloors || ''}`}
                       onChange={(v) => setFieldValue('building.numberOfFloors', Number(v))}
-                      options={FLOORS_OPTIONS}
+                      options={isHouse ? HOUSE_FLOORS_OPTIONS : FLOORS_OPTIONS}
                       containerClassName="mb-1"
                     />
                   </Conditional>
@@ -202,10 +217,9 @@ export default function CharacteristicsScreen() {
                     </View>
                   </Conditional>
 
-                  <View className="mb-[16px] gap-4">
-                    <Conditional condition={isApartment || isHouse}>
-                      <CheckboxRow
-                        label={t('announcement.rent.hvac')}
+                  <Conditional condition={isApartment || isHouse}>
+                    <CheckboxRow
+                      label={t('announcement.rent.hvac')}
                         checked={values.amenities?.hvac ?? false}
                         onToggle={() => setFieldValue('amenities.hvac', !values.amenities?.hvac)}
                         containerClassName="py-[0px]"
@@ -356,9 +370,7 @@ export default function CharacteristicsScreen() {
                         containerClassName="py-[0px]"
                       />
                     </Conditional>
-                  </View>
 
-                  <View className="mb-[16px] gap-4">
                     <Conditional condition={isHouse}>
                       <CheckboxRow
                         label={t('announcement.rent.detached_garage')}
@@ -656,9 +668,7 @@ export default function CharacteristicsScreen() {
                         />
                       </View>
                     </Conditional>
-                  </View>
 
-                  <View className="mb-[8px] gap-4">
                     <Conditional condition={isApartment || isHouse}>
                       <CheckboxRow
                         label={t('announcement.rent.ev_charging_station')}
@@ -699,15 +709,15 @@ export default function CharacteristicsScreen() {
                     </Conditional>
 
                     <Conditional condition={isCommercialSpace}>
-                      <Input
+                      <Select
                         label={t('property_details.restrooms')}
-                        numericOnly
+                        placeholder=""
                         value={`${values.facilities?.restroomsCount || ''}`}
-                        onChangeText={(v) => setFieldValue('facilities.restroomsCount', Number(v))}
-                        keyboardType="number-pad"
+                        onChange={(v) => setFieldValue('facilities.restroomsCount', Number(v))}
+                        options={RESTROOMS_OPTIONS}
+                        containerClassName="mb-1"
                       />
                     </Conditional>
-                  </View>
 
                   <Conditional condition={isApartment || isHouse}>
                     <View className="mb-[8px] rounded-[12px] bg-muted p-4">
@@ -776,7 +786,7 @@ export default function CharacteristicsScreen() {
 
             <AnnouncementFooter
               firstButtonLabel={t('common.next')}
-              firstButtonDisabled={!isValid}
+              firstButtonDisabled={!isValid || isSaving}
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}

@@ -1,4 +1,4 @@
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Header } from '@/components/ui/header';
@@ -9,15 +9,17 @@ import { Pressable } from 'react-native';
 
 export default function AnnouncementRentLayout() {
   const { t } = useTranslation();
-  const { shouldRedirect, targetRoute } = useStepRedirect();
+  // Side effect: redirects once on mount if persisted step disagrees with pathname.
+  useStepRedirect();
   const handleBackPress = useHandleBackPress();
 
-  if (shouldRedirect && targetRoute) {
-    return <Redirect href={targetRoute} />;
-  }
-
   return (
-    <Stack>
+    <Stack
+      screenOptions={{
+        animation: 'slide_from_right',
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+      }}>
       {Object.values(ANNOUNCEMENT_ROUTES).map((route) => (
         <Stack.Screen
           key={route.name}
@@ -55,6 +57,15 @@ export default function AnnouncementRentLayout() {
               }
             />
           ),
+        }}
+      />
+
+      <Stack.Screen
+        key="broker-selected"
+        name="broker-selected"
+        options={{
+          headerShown: false,
+          gestureEnabled: false,
         }}
       />
 

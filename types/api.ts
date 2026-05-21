@@ -155,4 +155,35 @@ export interface AnnouncementDocument {
   contentType: string;
   url: string;
   sizeInBytes: number;
+  createdAt: string;
+}
+
+export interface AvatarInfoDto {
+  id: string;
+  url: string;
+  thumbnailUrl: string;
+}
+
+export interface AnnouncementFullInfoDto {
+  assignedBroker: {
+    id: string;
+    fullName: string;
+    avatarInfo: AvatarInfoDto;
+    phoneNumber: string;
+    email: string;
+  };
+  createdBy: {
+    id: string;
+    fullName: string;
+    avatarInfo: AvatarInfoDto;
+    phone: string;
+    email: string;
+  };
+  assignedBrokerCompany: {
+    id: string;
+    name: string;
+    avatarInfo: AvatarInfoDto;
+    phoneNumber: string;
+    email: string;
+  };
 }

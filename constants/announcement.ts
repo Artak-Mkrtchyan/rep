@@ -16,18 +16,11 @@ export const getPropertyTypeOptions = (t: TFunction): SelectOption<string>[] => 
   { label: t('announcement.property_type.land'), value: 'LAND' },
   { label: t('announcement.property_type.parking_space'), value: 'PARKING_SPACE' },
 ];
-export const BATHROOMS_OPTIONS: SelectOption<string>[] = [
-  { label: '1', value: '1' },
-  { label: '2', value: '2' },
-  { label: '3', value: '3' },
-  { label: '4', value: '4' },
-  { label: '5', value: '5' },
-  { label: '6', value: '6' },
-  { label: '7', value: '7' },
-  { label: '8', value: '8' },
-  { label: '9', value: '9' },
-  { label: '10', value: '10' },
-];
+
+export const BATHROOMS_OPTIONS: SelectOption<string>[] = Array.from({ length: 11 }, (_, i) => ({
+  label: String(i),
+  value: String(i),
+}));
 
 export const getBuildingTypeOptionsCommercial = (t: TFunction): SelectOption<string>[] => [
   { label: t('building_options.office'), value: 'OFFICE' },
@@ -83,25 +76,27 @@ export const getPermittedUseOptions = (t: TFunction): SelectOption<string>[] => 
   { label: t('permitted_use.gardening'), value: 'GARDENING' },
   { label: t('permitted_use.other'), value: 'OTHER' },
 ];
-export const BEDROOMS_OPTIONS: SelectOption<string>[] = [
-  { label: '1', value: '1' },
-  { label: '2', value: '2' },
-  { label: '3', value: '3' },
-  { label: '4', value: '4' },
-  { label: '5', value: '5' },
-  { label: '6', value: '6' },
-  { label: '7', value: '7' },
-  { label: '8', value: '8' },
-  { label: '9', value: '9' },
-  { label: '10', value: '10' },
-];
+export const BEDROOMS_OPTIONS: SelectOption<string>[] = Array.from({ length: 11 }, (_, i) => ({
+  label: String(i),
+  value: String(i),
+}));
 
 export const getProcessOptions = (t: TFunction): SelectOption<string>[] => [
   { label: t('announcement.process_type.as_individual'), value: 'AS_INDIVIDUAL' },
   { label: t('announcement.process_type.as_broker'), value: 'AS_BROKER' },
 ];
 
-export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 20 }, (_, i) => ({
+export const FLOORS_OPTIONS: SelectOption<string>[] = Array.from({ length: 50 }, (_, i) => ({
+  label: String(i + 1),
+  value: String(i + 1),
+}));
+
+export const HOUSE_FLOORS_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
+  label: String(i + 1),
+  value: String(i + 1),
+}));
+
+export const RESTROOMS_OPTIONS: SelectOption<string>[] = Array.from({ length: 20 }, (_, i) => ({
   label: String(i + 1),
   value: String(i + 1),
 }));
@@ -129,7 +124,7 @@ export const getOwnershipTypeOptions = (t: TFunction): SelectOption<string>[] =>
 
 const CURRENT_YEAR = new Date().getFullYear();
 export const YEAR_BUILT_OPTIONS: SelectOption<string>[] = Array.from(
-  { length: CURRENT_YEAR - 1900 + 1 },
+  { length: CURRENT_YEAR - 1970 + 1 },
   (_, i) => {
     const year = CURRENT_YEAR - i;
     return { label: String(year), value: String(year) };
@@ -151,6 +146,18 @@ export const CHARACTERISTIC_ICONS: Record<string, string> = {
   washerAndLaundry: require('@/assets/images/announcement-icons/washer-icon.svg'),
   disabledAccess: require('@/assets/images/announcement-icons/disabledAccess-icon.svg'),
   bicycleStorage: require('@/assets/images/announcement-icons/bike-icon.svg'),
+  ceilingHeight: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  vehicleHeight: require('@/assets/images/announcement-icons/size-icon.svg'),
+  vehicleLength: require('@/assets/images/announcement-icons/size-icon.svg'),
+  garageType: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  spaceSize: require('@/assets/images/announcement-icons/size-icon.svg'),
+  evCharging: require('@/assets/images/announcement-icons/parking-icon.svg'),
+  motorcycleBicycle: require('@/assets/images/announcement-icons/bike-icon.svg'),
+  automaticDoor: require('@/assets/images/announcement-icons/garage-icon.svg'),
+  elevator: require('@/assets/images/announcement-icons/floors-icon.svg'),
+  petCat: require('@/assets/images/announcement-icons/cat-icon.svg'),
+  petLargeDogs: require('@/assets/images/announcement-icons/large-dog-icon.svg'),
+  petSmallDogs: require('@/assets/images/announcement-icons/small-dog-icon.svg'),
 };
 
 export const INFRASTRUCTURE_ICONS: Record<string, string> = {
@@ -187,6 +194,12 @@ export const getPetItemsConfig = (
     getAllowed: (f) => !!f.property?.attributes?.pets?.largeDogs,
   },
 ];
+
+/**
+ * Max upload size for announcement media (photos and PDF documents).
+ * Applies to both `media-first` (images) and `media-second` (PDFs) screens.
+ */
+export const ANNOUNCEMENT_MAX_FILE_SIZE = 15 * 1024 * 1024;
 
 export const ANNOUNCEMENT_ROUTES = {
   RENT_BASIC_INFO: {

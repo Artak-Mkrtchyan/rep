@@ -13,7 +13,7 @@ import {
   useSearchBrokerCompaniesInfinite,
   useSearchIndividualBrokersInfinite,
 } from '@/hooks/api/use-applications';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router } from 'expo-router';
@@ -30,10 +30,10 @@ export default function BrokerListScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
-  const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
-  const { mutate: assignBroker } = useAssignBroker();
+  const { mutateAsync: assignBroker } = useAssignBroker();
   useEffect(() => {
     const trimmed = searchInput.trim();
     const timer = setTimeout(
@@ -88,9 +88,9 @@ export default function BrokerListScreen() {
     try {
       const { id } = await sendFormData();
 
-      assignBroker({ id, data: { brokerId } });
+      await assignBroker({ id, data: { brokerId } });
 
-      nextStep();
+      router.replace('/announcement/form/broker-selected');
     } catch {
       console.error('Assign broker error');
     }
@@ -102,7 +102,7 @@ export default function BrokerListScreen() {
     } catch {
       Alert.alert(t('common.error'), t('Assign broker error'));
     } finally {
-      router.back();
+      exitFlow();
     }
   };
 
@@ -153,14 +153,18 @@ export default function BrokerListScreen() {
           data={individualList}
           keyExtractor={(item) => item.id.toString()}
           ListFooterComponent={renderIndividualFooter}
+          ListEmptyComponent={
+            !individualQuery.isLoading ? (
+              <ThemedText className="mt-8 text-center text-[14px] text-neutral-500">
+                {t('announcement.rent.broker_list.empty')}
+              </ThemedText>
+            ) : null
+          }
           renderItem={({ item }) => (
             <BrokerCard
               isSelected={brokerId === item.id}
-              avatar={require('@/assets/images/hero.png')}
+              avatar={item.avatarInfo?.thumbnailUrl ?? item.avatarInfo?.url}
               name={item.fullName}
-              rating={5.0}
-              reviewCount={1024}
-              stats={[]}
               onPress={() =>
                 router.replace({
                   pathname: '/announcement/form/broker/[id]',
@@ -182,14 +186,18 @@ export default function BrokerListScreen() {
           data={companiesList}
           keyExtractor={(item) => item.id.toString()}
           ListFooterComponent={renderCompaniesFooter}
+          ListEmptyComponent={
+            !companiesQuery.isLoading ? (
+              <ThemedText className="mt-8 text-center text-[14px] text-neutral-500">
+                {t('announcement.rent.broker_list.empty')}
+              </ThemedText>
+            ) : null
+          }
           renderItem={({ item }) => (
             <BrokerCard
               isSelected={brokerId === item.id}
-              avatar={require('@/assets/images/hero.png')}
+              avatar={item.avatarInfo?.thumbnailUrl ?? item.avatarInfo?.url}
               name={item.name}
-              rating={5.0}
-              reviewCount={1024}
-              stats={[]}
               onPress={() =>
                 router.replace({
                   pathname: '/announcement/form/broker/[id]',

@@ -1,6 +1,5 @@
-import { router } from 'expo-router';
-import { Formik } from 'formik';
-import React from 'react';
+import { Formik, FormikErrors, FormikTouched } from 'formik';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -22,7 +21,7 @@ import {
   getSpaceSizeGarageOptions,
   getSpaceSizeParkingOptions,
 } from '@/constants/announcement';
-import { useHandleNextPress } from '@/hooks/use-announcement';
+import { useExitAnnouncementFlow, useHandleNextPress } from '@/hooks/use-announcement';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { getPropertyTypeInfo, getSchemaForPropertyType } from '@/lib/announcement';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -33,6 +32,31 @@ const FOOTER_APPROX_HEIGHT = 152;
 
 type PropertyInfoFormValues = RentForApartmentsFormStep3;
 
+type PropertyErrors = FormikErrors<PropertyInfoFormValues>['property'];
+type PropertyTouched = FormikTouched<PropertyInfoFormValues>['property'];
+
+const getPropertyError = (
+  errors: PropertyErrors,
+  touched: PropertyTouched,
+  key: string
+) => {
+  const propertyErrors = errors as Record<string, unknown> | undefined;
+  const propertyTouched = touched as Record<string, unknown> | undefined;
+  if (!propertyErrors || !propertyTouched) return undefined;
+  const error = propertyErrors[key];
+  const wasTouched = propertyTouched[key];
+  return wasTouched && typeof error === 'string' ? error : undefined;
+};
+
+const getAttrError = (errors: PropertyErrors, touched: PropertyTouched, key: string) => {
+  const attrErrors = (errors as { attributes?: Record<string, unknown> } | undefined)?.attributes;
+  const attrTouched = (touched as { attributes?: Record<string, unknown> } | undefined)?.attributes;
+  if (!attrErrors || !attrTouched) return undefined;
+  const error = attrErrors[key];
+  const wasTouched = attrTouched[key];
+  return wasTouched && typeof error === 'string' ? error : undefined;
+};
+
 export default function PropertyInfoFirstScreen() {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -41,6 +65,11 @@ export default function PropertyInfoFirstScreen() {
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
+  const exitFlow = useExitAnnouncementFlow();
+  const validationSchema = useMemo(
+    () => getSchemaForPropertyType(formData.propertyType, t),
+    [formData.propertyType, t]
+  );
 
   const { isGarage, isApartment, isHouse, isCommercialSpace, isLand, isParkingSpace } =
     getPropertyTypeInfo(formData.propertyType);
@@ -80,7 +109,7 @@ export default function PropertyInfoFirstScreen() {
     } else {
       try {
         await sendFormData();
-        router.back();
+        exitFlow();
       } catch {
         Alert.alert(t('common.error'), t('error.failed_to_send_form'));
       }
@@ -101,7 +130,7 @@ export default function PropertyInfoFirstScreen() {
     <ThemedView className="flex-1">
       <Formik<PropertyInfoFormValues>
         initialValues={initialValues}
-        validationSchema={getSchemaForPropertyType(formData.propertyType)}
+        validationSchema={validationSchema}
         validateOnMount={true}
         enableReinitialize
         onSubmit={savePropertyInfo}>
@@ -111,7 +140,9 @@ export default function PropertyInfoFirstScreen() {
               className="flex-1"
               contentContainerStyle={{ paddingBottom: scrollPaddingBottom }}
               showsVerticalScrollIndicator={false}
-              keyboardShouldPersistTaps="handled">
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="on-drag"
+              automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.property_info_first_title')}
@@ -136,7 +167,7 @@ export default function PropertyInfoFirstScreen() {
                     keyboardType="decimal-pad"
                     accessibilityLabel="Square footage"
                     accessibilityHint="Enter property area in square meters"
-                    error={touched.property && errors.property ? 'Required' : undefined}
+                    error={getPropertyError(errors.property, touched.property, 'areaM2')}
                   />
 
                   <Conditional condition={isCommercialSpace}>
@@ -154,7 +185,7 @@ export default function PropertyInfoFirstScreen() {
                       keyboardType="number-pad"
                       accessibilityLabel="Usable area"
                       accessibilityHint="Enter usable area in square meters"
-                      error={touched.property && errors.property ? 'Required' : undefined}
+                      error={getAttrError(errors.property, touched.property, 'usableAreaM2')}
                     />
                   </Conditional>
 
@@ -190,7 +221,7 @@ export default function PropertyInfoFirstScreen() {
                     />
                   </Conditional>
 
-                  <Conditional condition={isHouse || isLand}>
+                  <Conditional condition={isHouse}>
                     <Input
                       label={t('announcement.rent.land_area')}
                       numericOnly
@@ -205,7 +236,7 @@ export default function PropertyInfoFirstScreen() {
                       keyboardType="number-pad"
                       accessibilityLabel="Land area"
                       accessibilityHint="Enter land area in square meters"
-                      error={touched.property && errors.property ? 'Required' : undefined}
+                      error={getAttrError(errors.property, touched.property, 'landAreaM2')}
                     />
                   </Conditional>
 
@@ -224,7 +255,7 @@ export default function PropertyInfoFirstScreen() {
                       keyboardType="number-pad"
                       accessibilityLabel="House area"
                       accessibilityHint="Enter house area in square meters"
-                      error={touched.property && errors.property ? 'Required' : undefined}
+                      error={getAttrError(errors.property, touched.property, 'houseAreaM2')}
                     />
                   </Conditional>
 

@@ -15,6 +15,7 @@ export interface UseMapSearchAnnouncementsResult {
   totalElements: number;
   searchWithBounds: (filters: SearchFilters, geoRectangle: GeoRectangle) => Promise<void>;
   reset: () => void;
+  resetAndRefetch: (filters: SearchFilters) => void;
 }
 
 export function useMapSearchAnnouncements(): UseMapSearchAnnouncementsResult {
@@ -24,10 +25,13 @@ export function useMapSearchAnnouncements(): UseMapSearchAnnouncementsResult {
   const [totalElements, setTotalElements] = useState(0);
 
   const loadedBoundsRef = useRef<GeoRectangle | null>(null);
+  const lastBoundsRef = useRef<GeoRectangle | null>(null);
   const mountedRef = useRef(true);
 
   const searchWithBounds = useCallback(
     async (filters: SearchFilters, geoRectangle: GeoRectangle) => {
+      lastBoundsRef.current = geoRectangle;
+
       // Skip fetch if the new bounds are within already-loaded area
       if (loadedBoundsRef.current && isWithinBounds(geoRectangle, loadedBoundsRef.current)) {
         return;
@@ -80,7 +84,7 @@ export function useMapSearchAnnouncements(): UseMapSearchAnnouncementsResult {
         }
       }
     },
-    [],
+    []
   );
 
   const reset = useCallback(() => {
@@ -90,6 +94,20 @@ export function useMapSearchAnnouncements(): UseMapSearchAnnouncementsResult {
     setError(null);
   }, []);
 
+  /** Reset cache and re-fetch with new filters using the last known map bounds */
+  const resetAndRefetch = useCallback(
+    (filters: SearchFilters) => {
+      loadedBoundsRef.current = null;
+      setAnnouncements([]);
+      setTotalElements(0);
+      setError(null);
+      if (lastBoundsRef.current) {
+        searchWithBounds(filters, lastBoundsRef.current);
+      }
+    },
+    [searchWithBounds]
+  );
+
   return {
     announcements,
     isLoading,
@@ -97,5 +115,6 @@ export function useMapSearchAnnouncements(): UseMapSearchAnnouncementsResult {
     totalElements,
     searchWithBounds,
     reset,
+    resetAndRefetch,
   };
 }

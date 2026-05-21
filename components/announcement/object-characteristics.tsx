@@ -346,9 +346,17 @@ const CharacteristicItem: React.FC<CharacteristicItemProps> = ({
     <View style={styles.iconContainer}>
       <Image source={icon} style={styles.icon} contentFit="contain" />
     </View>
-    <View className="flex-1 gap-[4px]">
-      <ThemedText className="text-[12px] text-muted-foreground">{label}</ThemedText>
-      <ThemedText className="text-[14px] font-semibold leading-[17px] text-foreground">
+    <View className="min-w-0 flex-1 shrink gap-[4px]">
+      <ThemedText
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        className="text-[12px] text-muted-foreground">
+        {label}
+      </ThemedText>
+      <ThemedText
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        className="text-[14px] font-semibold leading-[17px] text-foreground">
         {value}
       </ThemedText>
     </View>

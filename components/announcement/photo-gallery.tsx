@@ -76,7 +76,13 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({
   );
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="fullScreen"
+      onRequestClose={onClose}
+      statusBarTranslucent
+      navigationBarTranslucent>
       <View style={styles.root}>
         <View style={[styles.flex, { paddingTop: insets.top }]}>
           <View style={styles.navBar}>

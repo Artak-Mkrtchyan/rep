@@ -43,6 +43,12 @@ export interface SearchResponse<T> {
 }
 
 // Broker interfaces
+export type AvatarInfo = {
+  id: string;
+  url: string;
+  thumbnailUrl: string;
+};
+
 export interface BrokerCompany {
   id: string;
   createdAt: string;
@@ -52,6 +58,7 @@ export interface BrokerCompany {
   certifiedOn: string;
   certifiedBy?: string;
   yearsOfActivity: number;
+  avatarInfo?: AvatarInfo;
 }
 
 export interface IndividualBroker {
@@ -63,6 +70,7 @@ export interface IndividualBroker {
   certifiedOn: string;
   certifiedBy?: string;
   yearsOfActivity: number;
+  avatarInfo?: AvatarInfo;
 }
 
 export type ApplicationDetails = {

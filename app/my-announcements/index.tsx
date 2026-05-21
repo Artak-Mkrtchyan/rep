@@ -70,7 +70,9 @@ export default function MyAnnouncementsScreen() {
     [t, statistics]
   );
 
-  const handleCardPress = (id: string) => {
+  const handleCardPress = (id: string, isDisabled: boolean) => {
+    if (isDisabled) return;
+
     router.push({
       pathname: '/announcement/[id]',
       params: { id },
@@ -111,7 +113,7 @@ export default function MyAnnouncementsScreen() {
         renderItem={({ item: row }) => (
           <MyAnnouncementCard
             item={row}
-            onPress={() => handleCardPress(row.id)}
+            onPress={() => handleCardPress(row.id, row.status.code !== AnnouncementStatus.ACTIVE)}
             className="max-w-full"
           />
         )}

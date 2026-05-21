@@ -1,6 +1,11 @@
-import { getParsedAnnouncementData } from '@/lib/announcement';
-import { applicationsService } from '@/lib/api/applications';
+import { getParsedAnnouncementData, getParsedApplicationData } from '@/lib/announcement';
+import { announcementsService } from '@/lib/api/announcements';
+import {
+  applicationsService,
+  CreateAnnouncementModificationFormApiRequest,
+} from '@/lib/api/applications';
 import { MetaData, RentForApartmentsForm } from '@/types/announcement';
+import { CreateAnnouncementUpdateRequest } from '@/types/my-announcements';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
@@ -14,7 +19,11 @@ interface AnnouncementForRentFormStore {
   setCurrentStep: (step: number) => void;
 
   getApplicationById: (id: string) => Promise<void>;
+  getAnnouncementById: (id: string) => Promise<void>;
   updateFormData: (data: Partial<RentForApartmentsForm>) => void;
+  createAnnouncementModificationApplication: () => Promise<string | undefined>;
+  publishAnnouncementModificationApplication: (id: string) => Promise<void>;
+  updateAnnouncement: () => Promise<void>;
 
   update: ({
     formData,
@@ -134,12 +143,79 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
       try {
         const response = await applicationsService.getApplicationById(id);
 
+        const { formData, metaData } = getParsedApplicationData(response);
+
+        set(() => ({
+          formData,
+          metaData,
+        }));
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    getAnnouncementById: async (id: string) => {
+      try {
+        const response = await announcementsService.getAnnouncementById(id);
+
         const { formData, metaData } = getParsedAnnouncementData(response);
 
         set(() => ({
           formData,
           metaData,
         }));
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    updateAnnouncement: async () => {
+      const { formData, metaData } = get();
+
+      const payload: CreateAnnouncementUpdateRequest = {
+        property: formData.property,
+        mediaFileIds: formData.mediaFileIds,
+        documentIds: formData.documentIds,
+      };
+
+      const id = metaData?.response?.id;
+
+      if (id) {
+        await announcementsService.updateAnnouncementWithoutModeration(id, payload);
+      }
+    },
+
+    createAnnouncementModificationApplication: async () => {
+      try {
+        const { formData, metaData } = get();
+
+        const announcementId = metaData?.response?.id;
+
+        if (announcementId) {
+          const payload: CreateAnnouncementModificationFormApiRequest = {
+            announcementId,
+            description: formData.description,
+            documentIds: formData.documentIds,
+            mediaFileIds: formData.mediaFileIds,
+            rentDetails: formData.listingType === 'FOR_RENT' ? formData.rentDetails : undefined,
+            saleDetails: formData.listingType === 'FOR_SALE' ? formData.saleDetails : undefined,
+            stepNumber: formData.stepNumber,
+            title: formData.title,
+          };
+
+          const response =
+            await applicationsService.createAnnouncementModificationApplication(payload);
+
+          return response.id;
+        }
+      } catch (error) {
+        throw error;
+      }
+    },
+
+    publishAnnouncementModificationApplication: async (id: string) => {
+      try {
+        await applicationsService.publishAnnouncementModificationApplication(id);
       } catch (error) {
         throw error;
       }

@@ -41,7 +41,10 @@ export default function PropertyInfoSecondScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
+  const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
@@ -53,7 +56,12 @@ export default function PropertyInfoSecondScreen() {
 
   const saveTitle = async (values: DescriptionFormValues) => {
     if (values.description) {
-      updateFormData({ description: values.description });
+      const isChangeFields = values.description !== formData.description;
+
+      update({
+        formData: { description: values.description },
+        metaData: isChangeFields ? { isChangeFields } : {},
+      });
     }
 
     if (isNext) {
@@ -136,6 +144,7 @@ export default function PropertyInfoSecondScreen() {
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
+              hideSecondButton={isAnnouncementEdit}
             />
           </>
         )}

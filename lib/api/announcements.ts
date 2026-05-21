@@ -1,5 +1,3 @@
-import { ApiResponse } from './auth.types';
-import { httpClient } from './http/client';
 import {
   Announcement,
   AnnouncementFullInfoDto,
@@ -10,7 +8,10 @@ import {
 import type {
   AnnouncementListItem,
   AnnouncementStatisticsByStatusResponse,
+  CreateAnnouncementUpdateRequest,
 } from '@/types/my-announcements';
+import { ApiResponse } from './auth.types';
+import { httpClient } from './http/client';
 
 export const announcementsService = {
   getAnnouncementById: async (id: string): Promise<Announcement> => {
@@ -157,6 +158,24 @@ export const announcementsService = {
     const response = await httpClient.patch<ApiResponse<Announcement>>(
       `/v1/announcements/${id}/reopen`,
       {},
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as Announcement);
+  },
+
+  /**
+   * Update announcement without moderation
+   * @param id Announcement ID
+   * @param data Updated announcement data
+   * @returns A promise that resolves to the updated announcement data
+   */
+  updateAnnouncementWithoutModeration: async (
+    id: string,
+    data: CreateAnnouncementUpdateRequest
+  ): Promise<Announcement> => {
+    const response = await httpClient.put<ApiResponse<Announcement>>(
+      `/v1/announcements/${id}`,
+      data,
       { requiresAuth: true }
     );
     return response.data || (response as unknown as Announcement);

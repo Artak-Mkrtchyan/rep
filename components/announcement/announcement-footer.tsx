@@ -19,6 +19,7 @@ export type AnnouncementFooterProps = {
   firstButtonDisabled?: boolean;
   onNextPress: () => void;
   onSaveAndExitPress: () => void;
+  hideSecondButton?: boolean;
 };
 
 export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
@@ -27,6 +28,7 @@ export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
   firstButtonLabel = '',
   secondButtonLabel = '',
   firstButtonDisabled = false,
+  hideSecondButton = false,
 }) => {
   const insets = useSafeAreaInsets();
   const paddingBottom = insets.bottom > 0 ? insets.bottom + 21 : 24;
@@ -43,15 +45,17 @@ export const AnnouncementFooter: React.FC<AnnouncementFooterProps> = ({
       <Button onPress={onNextPress} accessibilityLabel="Next" disabled={firstButtonDisabled}>
         <ThemedText className="text-[16px] font-medium text-white">{firstButtonLabel}</ThemedText>
       </Button>
-      <Button
-        variant="secondary"
-        onPress={onSaveAndExitPress}
-        accessibilityLabel="Save and exit"
-        style={{ backgroundColor: '#F1F1F1', borderWidth: 0 }}>
-        <ThemedText className="text-[16px] font-medium text-primary">
-          {secondButtonLabel}
-        </ThemedText>
-      </Button>
+      {hideSecondButton ? null : (
+        <Button
+          variant="secondary"
+          onPress={onSaveAndExitPress}
+          accessibilityLabel="Save and exit"
+          style={{ backgroundColor: '#F1F1F1', borderWidth: 0 }}>
+          <ThemedText className="text-[16px] font-medium text-primary">
+            {secondButtonLabel}
+          </ThemedText>
+        </Button>
+      )}
     </View>
   );
 };

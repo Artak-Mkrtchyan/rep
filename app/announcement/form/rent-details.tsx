@@ -42,7 +42,10 @@ export default function RentDetailsScreen() {
   const validationSchema = useMemo(() => makeRentDetailsSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
+  const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
@@ -52,11 +55,21 @@ export default function RentDetailsScreen() {
 
   const saveRentDetails = async ({ rentDetails }: RentDetailsFormValues) => {
     if (rentDetails) {
-      updateFormData({
-        rentDetails: {
-          monthlyRent: Number(rentDetails.monthlyRent) || 0,
-          securityDeposit: Number(rentDetails.securityDeposit) || 0,
+      const monthlyRent = Number(rentDetails.monthlyRent) || 0;
+      const securityDeposit = Number(rentDetails.securityDeposit) || 0;
+
+      const isChangeFields =
+        monthlyRent !== formData.rentDetails?.monthlyRent ||
+        securityDeposit !== formData.rentDetails?.securityDeposit;
+
+      update({
+        formData: {
+          rentDetails: {
+            monthlyRent,
+            securityDeposit,
+          },
         },
+        metaData: isChangeFields ? { isChangeFields } : {},
       });
     }
 
@@ -164,6 +177,7 @@ export default function RentDetailsScreen() {
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
+              hideSecondButton={isAnnouncementEdit}
             />
           </>
         )}

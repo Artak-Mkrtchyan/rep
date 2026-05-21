@@ -16,8 +16,8 @@ import { LocationSection } from '@/components/announcement/detail/location-secti
 import { NotableDistancesSection } from '@/components/announcement/detail/notable-distances-section';
 import { ImageCarousel } from '@/components/announcement/image-carousel';
 import { ObjectCharacteristics } from '@/components/announcement/object-characteristics';
-import { PhotoGallery } from '@/components/announcement/photo-gallery';
 import { PetsAllowed } from '@/components/announcement/pets-allowed';
+import { PhotoGallery } from '@/components/announcement/photo-gallery';
 import { PriceHistory } from '@/components/announcement/price-history';
 import { ChangeStatusBottomSheet } from '@/components/my-announcements';
 import { ThemedText } from '@/components/themed-text';
@@ -61,9 +61,10 @@ export default function AnnouncementDetailScreen() {
 
   const handleEdit = useCallback(() => {
     if (!id) return;
+
     router.push({
       pathname: '/announcement/form/[id]',
-      params: { id },
+      params: { id, isAnnouncement: 'true' },
     });
   }, [id, router]);
 
@@ -158,7 +159,9 @@ export default function AnnouncementDetailScreen() {
             distances={distances}
             lat={announcement.geo?.latitude}
             lng={announcement.geo?.longitude}
-            mapLabel={[location?.street, location?.house].filter(Boolean).join(' ') || announcement.title}
+            mapLabel={
+              [location?.street, location?.house].filter(Boolean).join(' ') || announcement.title
+            }
           />
 
           <DescriptionSection description={announcement.description} />
@@ -246,7 +249,9 @@ export default function AnnouncementDetailScreen() {
                 {t('announcement.detail.request_tour')}
               </ThemedText>
             </Pressable>
-            <Pressable style={detailStyles.secondaryButton} onPress={() => setContactInfoVisible(true)}>
+            <Pressable
+              style={detailStyles.secondaryButton}
+              onPress={() => setContactInfoVisible(true)}>
               <ThemedText className="text-[16px] font-medium leading-[21px] text-[#0E9457]">
                 {t('announcement.detail.contact_info')}
               </ThemedText>

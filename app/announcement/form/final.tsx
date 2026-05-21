@@ -5,8 +5,8 @@ import { Alert, ScrollView, View } from 'react-native';
 import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { PlacedByItem } from '@/components/announcement/placed-by-item';
-import { ReIcon } from '@/components/announcement/re-icon';
 import { PropertyAnnouncementDetail } from '@/components/announcement/property-announcement-detail';
+import { ReIcon } from '@/components/announcement/re-icon';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ImageSlider } from '@/components/ui/image-slider';
@@ -14,9 +14,9 @@ import { getPetItemsConfig } from '@/constants/announcement';
 import { useAuth } from '@/context/AuthContext';
 import { useBrokerCompanyProfile } from '@/hooks/api/use-profile';
 import { useExitAnnouncementFlow } from '@/hooks/use-announcement';
-import { AuthScope } from '@/lib/api/auth';
 import { useScreenEdgePadding } from '@/hooks/use-screen-edge-padding';
 import { getObjectCharacteristics } from '@/lib/announcement';
+import { AuthScope } from '@/lib/api/auth';
 import { Language } from '@/lib/i18n/i18n';
 import { formatNumericString } from '@/lib/utils';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
@@ -32,11 +32,22 @@ export default function FinalScreen() {
   const publishFormData = useAnnouncementForRentFormStore((s) => s.publishFormData);
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
+  const updateAnnouncement = useAnnouncementForRentFormStore((s) => s.updateAnnouncement);
+  const createAnnouncementModificationApplication = useAnnouncementForRentFormStore(
+    (s) => s.createAnnouncementModificationApplication
+  );
+  const publishAnnouncementModificationApplication = useAnnouncementForRentFormStore(
+    (s) => s.publishAnnouncementModificationApplication
+  );
   const exitFlow = useExitAnnouncementFlow();
 
   const statusCode = metaData?.response?.status?.code;
+  const isAnnouncementEdit = metaData?.isAnnouncementEdit;
+  const isChangeFields = metaData?.isChangeFields;
+
   const isReadOnly =
     !!statusCode && statusCode !== 'DRAFT' && statusCode !== 'RETURNED_TO_APPLICANT';
+
   const { userInfo } = useAuth();
   const isBrokerCompany = userInfo?.scope === AuthScope.BROKER_COMPANY;
   const { data: brokerCompanyProfile } = useBrokerCompanyProfile(
@@ -48,8 +59,20 @@ export default function FinalScreen() {
 
   const handlePublish = async () => {
     try {
-      await sendFormData();
-      await publishFormData();
+      if (isAnnouncementEdit) {
+        if (isChangeFields) {
+          const id = await createAnnouncementModificationApplication();
+
+          await updateAnnouncement();
+          await publishAnnouncementModificationApplication(id || '');
+        } else {
+          await updateAnnouncement();
+        }
+      } else {
+        await sendFormData();
+        await publishFormData();
+      }
+
       resetForm();
       exitFlow();
     } catch (error) {
@@ -259,14 +282,15 @@ export default function FinalScreen() {
         </View>
       </ScrollView>
 
-      {!isReadOnly && (
+      {!isReadOnly || isAnnouncementEdit ? (
         <AnnouncementFooter
           firstButtonLabel={t('common.publish')}
           secondButtonLabel={t('common.save_and_exit')}
           onNextPress={handlePublish}
           onSaveAndExitPress={handleSaveAndExit}
+          hideSecondButton={isAnnouncementEdit}
         />
-      )}
+      ) : null}
     </ThemedView>
   );
 }

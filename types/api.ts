@@ -1,3 +1,6 @@
+import { InfrastructureObjectType } from '@/lib/api/infrastructure';
+import { Attributes, Property } from '@/types/announcement';
+
 export interface ItemsListApiResponse<T> {
   content: T[];
   pageNumber: number;
@@ -64,7 +67,7 @@ export type GeoDetailsDto = {
 
 export type RentDetailsDto = {
   monthlyRent: number;
-  securityDeposit?: number;
+  securityDeposit: number;
 };
 
 export type SaleDetailsDto = {
@@ -85,8 +88,9 @@ export type MediaFile = {
 
 export type PropertyDetailsDto = {
   areaM2: number;
-  attributes?: Record<string, unknown>;
-  description?: string;
+  attributes: Attributes;
+  description: string;
+  propertyType: Property;
 };
 
 export interface Announcement {
@@ -97,6 +101,7 @@ export interface Announcement {
   archived: boolean;
   closureReason?: { code: string; name?: string; comment?: string };
   assignedBrokerId?: string;
+  assignedBrokerCompanyId?: string;
   listingType: ListingType;
   propertyType: PropertyType;
   processType: ProcessType;
@@ -118,7 +123,7 @@ export interface Announcement {
 }
 
 export interface InfrastructureObject {
-  type: string;
+  type: InfrastructureObjectType;
   distanceInMeters: number;
 }
 

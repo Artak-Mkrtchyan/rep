@@ -16,24 +16,28 @@ export default function MediaScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const mediaFileIds = useAnnouncementForRentFormStore((s) => s.formData.mediaFileIds);
   const tempMediaFiles = useAnnouncementForRentFormStore((s) => s.metaData?.tempMediaFiles);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
 
   const mediaFiles =
-    mediaFileIds
-      ?.filter(Boolean)
-      .map((id) => {
-        const file = tempMediaFiles?.find((f) => f.id === id);
-        return { id, uri: file?.uri || '', type: file?.type, name: file?.name };
-      }) || [];
+    mediaFileIds?.filter(Boolean).map((id) => {
+      const file = tempMediaFiles?.find((f) => f.id === id);
+      return { id, uri: file?.uri || '', type: file?.type, name: file?.name };
+    }) || [];
 
   const handlePhotoIdsChange = (
     attachments: { id: string; uri: string; type?: string; name?: string }[]
   ) => {
     const mediaFileIds = attachments.map((attachment) => attachment.id);
-    update({ formData: { mediaFileIds }, metaData: { tempMediaFiles: attachments } });
+    update({
+      formData: { mediaFileIds },
+      metaData: { tempMediaFiles: attachments, isChangeFields: true },
+    });
   };
 
   const handleSaveAndExit = async () => {
@@ -75,6 +79,7 @@ export default function MediaScreen() {
         secondButtonLabel={t('common.save_and_exit')}
         onNextPress={nextStep}
         onSaveAndExitPress={handleSaveAndExit}
+        hideSecondButton={isAnnouncementEdit}
       />
     </ThemedView>
   );

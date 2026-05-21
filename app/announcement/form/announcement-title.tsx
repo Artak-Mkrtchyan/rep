@@ -29,7 +29,10 @@ export default function AnnouncementTitleScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
+  const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
@@ -41,7 +44,12 @@ export default function AnnouncementTitleScreen() {
 
   const saveTitle = async (values: RentForApartmentsFormStep2) => {
     if (values.title) {
-      updateFormData({ title: values.title });
+      const isChangeFields = values.title !== formData.title;
+
+      update({
+        formData: { title: values.title },
+        metaData: isChangeFields ? { isChangeFields } : {},
+      });
     }
 
     if (isNext) {
@@ -120,6 +128,7 @@ export default function AnnouncementTitleScreen() {
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
+              hideSecondButton={isAnnouncementEdit}
             />
           </>
         )}

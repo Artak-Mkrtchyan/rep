@@ -209,6 +209,8 @@ export type MetaData = {
     applicantEmail: string;
   };
   brokerId?: string;
+  isAnnouncementEdit?: boolean;
+  isChangeFields?: boolean;
   tempMediaFiles?: { id: string; uri: string; type?: string; name?: string }[];
   tempDocumentFiles?: { id: string; uri: string; type?: string; name?: string }[];
 };

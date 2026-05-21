@@ -74,6 +74,7 @@ export interface IndividualBroker {
 }
 
 export type ApplicationDetails = {
+  id: string;
   stepNumber: number;
   assignedBrokerCompanyId?: string;
   assignedBrokerId?: string;

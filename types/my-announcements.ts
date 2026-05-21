@@ -1,3 +1,4 @@
+import { RentForApartmentsFormStep3 } from '@/types/announcement';
 import type { ListingType, RentDetailsDto, SaleDetailsDto } from './api';
 
 export enum AnnouncementStatus {
@@ -68,4 +69,10 @@ export type AnnouncementListItem = {
 export interface AnnouncementStatisticsByStatusResponse {
   counterByStatuses: Record<AnnouncementStatus, number>;
   countersByClosureReasons: Record<ClosureReason, number>;
+}
+
+export interface CreateAnnouncementUpdateRequest {
+  documentIds?: string[];
+  mediaFileIds?: string[];
+  property?: RentForApartmentsFormStep3['property'];
 }

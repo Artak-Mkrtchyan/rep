@@ -30,6 +30,9 @@ export default function BrokerListScreen() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const brokerId = useAnnouncementForRentFormStore((s) => s.metaData?.brokerId);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
   const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
@@ -215,6 +218,7 @@ export default function BrokerListScreen() {
         firstButtonDisabled={!brokerId}
         onNextPress={() => handleNext()}
         onSaveAndExitPress={() => handleSaveAndExit()}
+        hideSecondButton={isAnnouncementEdit}
       />
     </ThemedView>
   );

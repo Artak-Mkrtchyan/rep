@@ -243,6 +243,20 @@ export interface AnnouncementPublicationResponse {
   title: string;
 }
 
+export interface CreateAnnouncementModificationFormApiRequest {
+  announcementId: string;
+  description?: string;
+  documentIds?: string[];
+  mediaFileIds?: string[];
+  rentDetails?: {
+    monthlyRent: number;
+    securityDeposit?: number;
+  };
+  saleDetails?: { price: number };
+  stepNumber: number;
+  title?: string;
+}
+
 export const applicationsService = {
   /**
    * Upload a temporary attachment file
@@ -484,5 +498,35 @@ export const applicationsService = {
       }
     );
     return response.data || (response as unknown as AnnouncementPublicationResponse);
+  },
+
+  /**
+   * Creates a new announcement modification application
+   * @param data The data for creating the announcement modification application
+   * @returns A promise that resolves to the created application data
+   */
+  createAnnouncementModificationApplication: async (
+    data: CreateAnnouncementModificationFormApiRequest
+  ): Promise<ApplicationDetails> => {
+    const response = await httpClient.post<ApiResponse<ApplicationDetails>>(
+      `/v1/applications/announcement-modification`,
+      data,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as ApplicationDetails);
+  },
+
+  /**
+   * Submit announcement modification application for moderator review
+   * @param id Application ID
+   * @returns A promise that resolves to the updated application data
+   */
+  publishAnnouncementModificationApplication: async (id: string): Promise<never> => {
+    const response = await httpClient.patch<ApiResponse<never>>(
+      `/v1/applications/announcement-modification/${id}/submit`,
+      {},
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as never);
   },
 };

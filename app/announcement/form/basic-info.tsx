@@ -64,6 +64,9 @@ export default function BasicInfoScreen() {
 
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
@@ -146,6 +149,7 @@ export default function BasicInfoScreen() {
                   <Select
                     label={t('announcement.rent.listing_type')}
                     placeholder={t('announcement.rent.for_rent_placeholder')}
+                    disabled={isAnnouncementEdit}
                     value={values.listingType}
                     onChange={(v) => setFieldValue('listingType', v)}
                     options={getListingTypeOptions(t)}
@@ -155,6 +159,7 @@ export default function BasicInfoScreen() {
                   />
 
                   <AddressInput
+                    readOnly={Boolean(isAnnouncementEdit)}
                     label={t('announcement.rent.address')}
                     placeholder={t('announcement.rent.enter_address')}
                     value={values.geo.formattedAddress[currentLanguage] || ''}
@@ -174,6 +179,7 @@ export default function BasicInfoScreen() {
                   <Select
                     label={t('announcement.rent.property_type')}
                     placeholder={t('announcement.rent.apartments_placeholder')}
+                    disabled={isAnnouncementEdit}
                     value={values.propertyType}
                     onChange={(v) => setFieldValue('propertyType', v)}
                     options={getPropertyTypeOptions(t)}
@@ -188,7 +194,7 @@ export default function BasicInfoScreen() {
                     value={values.processType}
                     onChange={(v) => setFieldValue('processType', v)}
                     options={getProcessOptions(t)}
-                    disabled={isBrokerScope}
+                    disabled={isBrokerScope || isAnnouncementEdit}
                     error={
                       touched.processType && errors.processType ? errors.processType : undefined
                     }
@@ -203,6 +209,7 @@ export default function BasicInfoScreen() {
               firstButtonDisabled={!isValid}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
+              hideSecondButton={isAnnouncementEdit}
             />
           </>
         )}

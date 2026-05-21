@@ -1,13 +1,14 @@
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
+import { AnnouncementPublicationResponse, ApplicationStatus } from '@/lib/api/applications';
 import {
   CharacteristicConfig,
   MetaData,
   Property,
   RentForApartmentsForm,
 } from '@/types/announcement';
+import { Announcement } from '@/types/api';
 import { TFunction } from 'i18next';
 import * as Yup from 'yup';
-import { AnnouncementPublicationResponse } from './api/applications';
 
 export type AnnouncementRoutePath =
   (typeof ANNOUNCEMENT_ROUTES)[keyof typeof ANNOUNCEMENT_ROUTES]['path'];
@@ -36,7 +37,7 @@ export const getCurrentStep = (path: string): number | undefined => {
   return route?.completedStep;
 };
 
-export const getParsedAnnouncementData = (
+export const getParsedApplicationData = (
   response: AnnouncementPublicationResponse
 ): { formData: RentForApartmentsForm; metaData: MetaData } => {
   try {
@@ -104,6 +105,75 @@ export const getParsedAnnouncementData = (
   }
 };
 
+export const getParsedAnnouncementData = (
+  response: Announcement
+): { formData: RentForApartmentsForm; metaData: MetaData } => {
+  try {
+    const mediaFileIds: string[] = [];
+    const tempMediaFiles: { id: string; uri: string; type?: string; name?: string }[] = [];
+
+    response.mediaFiles.forEach((media) => {
+      mediaFileIds.push(media.id);
+      tempMediaFiles.push({
+        id: media.id,
+        uri: media.url || media.thumbnailUrl || '',
+        type: media.fileType,
+        name: media.fileName,
+      });
+    });
+
+    const documentIds: string[] = [];
+    const tempDocumentFiles: { id: string; uri: string; type?: string; name?: string }[] = [];
+
+    response.documents?.forEach((doc) => {
+      documentIds.push(doc.id);
+      tempDocumentFiles.push({
+        id: doc.id,
+        uri: doc.url || '',
+        type: doc.contentType,
+        name: doc.fileName,
+      });
+    });
+
+    return {
+      metaData: {
+        response: {
+          id: response.id,
+          publicId: response.publicId,
+          status: response.status as ApplicationStatus,
+          createdAt: response.createdAt || '',
+          createdBy: response.createdBy || '',
+          applicantEmail: '',
+        },
+        tempMediaFiles,
+        tempDocumentFiles,
+        brokerId: response.assignedBrokerId,
+        isAnnouncementEdit: true,
+      },
+      formData: {
+        stepNumber: 1,
+        listingType: response.listingType,
+        geo: response.geo,
+        propertyType: response.propertyType,
+        processType: response.processType,
+        needPhotographer: response.needPhotographer,
+        needAssessmentExpert: response.needAssessmentExpert,
+        infrastructureObjects: response.infrastructureObjects,
+        property: response.property,
+        description: response.description,
+        rentDetails: response.rentDetails,
+        saleDetails: response.saleDetails,
+        mediaFileIds,
+        documentIds,
+        title: response.title,
+        brokerAssignmentNeeded: !!response.assignedBrokerId || !!response.assignedBrokerCompanyId,
+      },
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getPropertyTypeInfo = (type: Property | '') => ({
   isApartment: type === 'APARTMENT',
   isCommercialSpace: type === 'COMMERCIAL_SPACE',
@@ -140,9 +210,7 @@ const makePropertyInfoCommercialSpacesSchema = (t: TFunction) =>
         usableAreaM2: Yup.number()
           .required(t('add_application.validation.usable_area_required'))
           .typeError(t('add_application.validation.must_be_number')),
-        buildingType: Yup.string().required(
-          t('add_application.validation.building_type_required')
-        ),
+        buildingType: Yup.string().required(t('add_application.validation.building_type_required')),
       }),
     }),
   });

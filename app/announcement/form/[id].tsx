@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Alert, View } from 'react-native';
 
-const EDITABLE_STATUSES = ['DRAFT', 'RETURNED_TO_APPLICANT'];
+const EDITABLE_STATUSES = ['DRAFT', 'RETURNED_TO_APPLICANT', 'ACTIVE'];
 
 /**
  * Ordered screen names for each step of the rent/sale flow. Used when resuming
@@ -31,10 +31,13 @@ const getStepScreenChain = (savedStep: number, listingType?: string): string[] =
 
 export default function AnnouncementFormScreen() {
   const { t } = useTranslation();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const { id, isAnnouncement } = useLocalSearchParams<{ id?: string; isAnnouncement?: string }>();
   const resetForm = useAnnouncementForRentFormStore((s) => s.resetForm);
   const getApplicationById = useAnnouncementForRentFormStore((s) => s.getApplicationById);
+  const getAnnouncementById = useAnnouncementForRentFormStore((s) => s.getAnnouncementById);
   const navigation = useNavigation();
+
+  const getFormData = isAnnouncement === 'true' ? getAnnouncementById : getApplicationById;
 
   useEffect(() => {
     async function initialize() {
@@ -43,7 +46,7 @@ export default function AnnouncementFormScreen() {
           resetForm();
           router.replace(ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path);
         } else if (id) {
-          await getApplicationById(id);
+          await getFormData(id);
           const store = useAnnouncementForRentFormStore.getState();
           const statusCode = store.metaData?.response?.status?.code;
           const isEditable = !statusCode || EDITABLE_STATUSES.includes(statusCode);
@@ -77,7 +80,7 @@ export default function AnnouncementFormScreen() {
     }
 
     initialize();
-  }, [id, resetForm, getApplicationById, navigation, t]);
+  }, [id, resetForm, getFormData, navigation, t]);
 
   return (
     <View className="flex-1 items-center justify-center">

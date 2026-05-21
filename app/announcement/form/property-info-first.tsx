@@ -35,11 +35,7 @@ type PropertyInfoFormValues = RentForApartmentsFormStep3;
 type PropertyErrors = FormikErrors<PropertyInfoFormValues>['property'];
 type PropertyTouched = FormikTouched<PropertyInfoFormValues>['property'];
 
-const getPropertyError = (
-  errors: PropertyErrors,
-  touched: PropertyTouched,
-  key: string
-) => {
+const getPropertyError = (errors: PropertyErrors, touched: PropertyTouched, key: string) => {
   const propertyErrors = errors as Record<string, unknown> | undefined;
   const propertyTouched = touched as Record<string, unknown> | undefined;
   if (!propertyErrors || !propertyTouched) return undefined;
@@ -62,6 +58,9 @@ export default function PropertyInfoFirstScreen() {
   const insets = useSafeAreaInsets();
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
@@ -320,6 +319,7 @@ export default function PropertyInfoFirstScreen() {
               firstButtonDisabled={!isValid}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
+              hideSecondButton={isAnnouncementEdit}
             />
           </>
         )}

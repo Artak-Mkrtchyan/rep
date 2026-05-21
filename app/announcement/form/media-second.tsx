@@ -16,8 +16,9 @@ export default function MediaScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
   const documentIds = useAnnouncementForRentFormStore((s) => s.formData.documentIds);
-  const tempDocumentFiles = useAnnouncementForRentFormStore(
-    (s) => s.metaData?.tempDocumentFiles
+  const tempDocumentFiles = useAnnouncementForRentFormStore((s) => s.metaData?.tempDocumentFiles);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
   );
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
@@ -25,23 +26,24 @@ export default function MediaScreen() {
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
 
   const documentFiles =
-    documentIds
-      ?.filter(Boolean)
-      .map((id) => {
-        const file = tempDocumentFiles?.find((f) => f.id === id);
-        return {
-          id,
-          uri: file?.uri || '',
-          type: 'application/pdf' as const,
-          name: file?.name,
-        };
-      }) || [];
+    documentIds?.filter(Boolean).map((id) => {
+      const file = tempDocumentFiles?.find((f) => f.id === id);
+      return {
+        id,
+        uri: file?.uri || '',
+        type: 'application/pdf' as const,
+        name: file?.name,
+      };
+    }) || [];
 
   const handleDocumentIdsChange = (
     attachments: { id: string; uri: string; type?: string; name?: string }[]
   ) => {
     const documentIds = attachments.map((attachment) => attachment.id);
-    update({ formData: { documentIds }, metaData: { tempDocumentFiles: attachments } });
+    update({
+      formData: { documentIds },
+      metaData: { tempDocumentFiles: attachments, isChangeFields: true },
+    });
   };
 
   const handleSaveAndExit = async () => {
@@ -92,6 +94,7 @@ export default function MediaScreen() {
         secondButtonLabel={t('common.save_and_exit')}
         onNextPress={nextStep}
         onSaveAndExitPress={handleSaveAndExit}
+        hideSecondButton={isAnnouncementEdit}
       />
     </ThemedView>
   );

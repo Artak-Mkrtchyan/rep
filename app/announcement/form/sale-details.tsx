@@ -34,7 +34,10 @@ export default function SaleDetailsScreen() {
   const validationSchema = useMemo(() => makeSaleDetailsSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
+  const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
@@ -46,8 +49,14 @@ export default function SaleDetailsScreen() {
 
   const saveSaleDetails = async ({ saleDetails }: SaleDetailsFormValues) => {
     if (saleDetails?.price != null) {
-      updateFormData({
-        saleDetails: { price: Number(saleDetails.price) },
+      const price = Number(saleDetails.price);
+      const isChangeFields = price !== formData.saleDetails?.price;
+
+      update({
+        formData: {
+          saleDetails: { price },
+        },
+        metaData: isChangeFields ? { isChangeFields } : {},
       });
     }
 
@@ -131,6 +140,7 @@ export default function SaleDetailsScreen() {
               secondButtonLabel={t('common.save_and_exit')}
               onNextPress={() => handleNext(handleSubmit)}
               onSaveAndExitPress={() => handleSaveAndExit(handleSubmit)}
+              hideSecondButton={isAnnouncementEdit}
             />
           </>
         )}

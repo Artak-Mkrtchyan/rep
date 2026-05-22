@@ -19,6 +19,7 @@ export type UserInfo = {
   fullName: string;
   phone: string;
   role: string;
+  roles: string[];
   scope: AuthScope;
   companyId?: string;
 };
@@ -60,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         fullName: actor.fullName,
         phone: actor.phone || '',
         role: actor.roles[0]?.name || 'user',
+        roles: actor.roles.map((r) => r.code),
         scope: actor.scope,
         companyId: actor.companyId,
       });

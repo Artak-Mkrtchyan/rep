@@ -25,7 +25,16 @@ export function buildMainProfileSectionItems(
 ): ProfileMenuSectionItem[] {
   const config =
     userInfo?.scope === AuthScope.BROKER ? INDIVIDUAL_BROKER_MAIN_MENU_ITEMS : MAIN_MENU_ITEMS;
-  return config.map((item) => ({
+  
+  const isBrokerCompanyManager = userInfo?.roles?.includes('broker-company-manager');
+  const filteredConfig = config.filter((item) => {
+    if (item.id === 'brokers-management') {
+      return isBrokerCompanyManager;
+    }
+    return true;
+  });
+
+  return filteredConfig.map((item) => ({
     id: item.id,
     label: t(item.labelKey),
     icon: <Ionicons name={item.icon} size={ICON_SIZE} color={iconColor} />,

@@ -50,6 +50,7 @@ export const MAIN_MENU_ITEMS: MenuItemConfig[] = [
     id: 'brokers-management',
     labelKey: 'profile.brokers_management',
     icon: 'people-outline',
+    route: '/profile/brokers-management',
   },
   {
     id: 'comparisons',
@@ -95,6 +96,7 @@ export const INDIVIDUAL_BROKER_MAIN_MENU_ITEMS: MenuItemConfig[] = [
     id: 'brokers-management',
     labelKey: 'profile.brokers_management',
     icon: 'people-outline',
+    route: '/profile/brokers-management',
   },
   {
     id: 'account-security',

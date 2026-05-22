@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -8,6 +8,7 @@ import {
   Animated,
   Dimensions,
   Easing,
+  Image,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -16,13 +17,19 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PhoneInput } from '@/components/ui/phone-input';
+import { SearchInput } from '@/components/ui/search-input';
 import { SegmentedControl } from '@/components/ui/segmented-control';
+import { Header } from '@/components/ui/header';
+import { ReIcon } from '@/components/icons/re-icon';
+import { BrokersFilterSheet } from '@/components/profile/brokers-filter-sheet';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import {
   useCreateBrokerEmployeeMutation,
@@ -44,8 +51,49 @@ export default function BrokersManagementScreen() {
 
   const isBrokerCompanyManager = userInfo?.roles?.includes('broker-company-manager');
 
-  const [page] = useState(1);
+  const [page, setPage] = useState(1);
   const [modalVisible, setModalVisible] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [positionsFilter, setPositionsFilter] = useState<BrokerEmployeePosition[]>([]);
+  const [statusFilter, setStatusFilter] = useState<BrokerEmployeeStatus[]>([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const handleApplyFilters = useCallback(
+    (positions: BrokerEmployeePosition[], status: BrokerEmployeeStatus[]) => {
+      setPositionsFilter(positions);
+      setStatusFilter(status);
+      setFiltersOpen(false);
+      setPage(1);
+    },
+    []
+  );
+
+  const activeFilter = useMemo(() => {
+    const filter: any = {};
+    if (debouncedSearch) {
+      if (debouncedSearch.includes('@')) {
+        filter.email = debouncedSearch;
+      } else {
+        filter.fullName = debouncedSearch;
+      }
+    }
+    if (positionsFilter.length > 0) {
+      filter.positions = positionsFilter;
+    }
+    if (statusFilter.length > 0) {
+      filter.status = statusFilter;
+    }
+    return filter;
+  }, [debouncedSearch, positionsFilter, statusFilter]);
 
   // Animations config
   const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -84,11 +132,29 @@ export default function BrokersManagementScreen() {
   const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
+  const isFormValid = useMemo(() => {
+    const trimmedName = fullName.trim();
+    if (!trimmedName || trimmedName.length < 2 || trimmedName.length > 80) return false;
+    if (!FULL_NAME_REGEX.test(trimmedName)) return false;
+    const words = trimmedName.split(/\s+/);
+    if (words.length < 2 || words.some((w) => w.length === 0)) return false;
+
+    const emailTrimmed = email.trim();
+    if (!emailTrimmed || !EMAIL_REGEX.test(emailTrimmed)) return false;
+
+    const rawNumber = phone.startsWith('+998') ? phone.slice(4) : phone;
+    const phoneDigits = rawNumber.replace(/\D/g, '');
+    if (!phone || phoneDigits.length !== 9) return false;
+
+    return true;
+  }, [fullName, email, phone]);
+
   // Fetch employees
   const { data, isLoading, refetch } = useSearchBrokerEmployees(
     isBrokerCompanyManager ? userInfo?.companyId : undefined,
     page,
-    20
+    10,
+    activeFilter
   );
 
   const createEmployeeMutation = useCreateBrokerEmployeeMutation();
@@ -96,16 +162,11 @@ export default function BrokersManagementScreen() {
   // If not authorized, display Access Denied Screen
   if (!isBrokerCompanyManager) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
-            <Ionicons name="chevron-back" size={24} color={NEUTRAL_950} />
-          </Pressable>
-          <ThemedText style={styles.headerTitle}>
-            {t('brokers_management.title', 'Brokers management')}
-          </ThemedText>
-          <View style={styles.headerSpacer} />
-        </View>
+      <ThemedView className="flex-1 bg-white">
+        <Header
+          headerTitle={t('brokers_management.title', 'Brokers management')}
+          isStepProgressVisible={false}
+        />
 
         <View style={styles.accessDeniedContainer}>
           <View style={styles.lockIconContainer}>
@@ -124,7 +185,7 @@ export default function BrokersManagementScreen() {
             {t('common.go_back', 'Go back')}
           </Button>
         </View>
-      </SafeAreaView>
+      </ThemedView>
     );
   }
 
@@ -253,17 +314,44 @@ export default function BrokersManagementScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <ThemedView className="flex-1 bg-white">
       {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12} accessibilityRole="button">
-          <Ionicons name="chevron-back" size={24} color={NEUTRAL_950} />
-        </Pressable>
-        <ThemedText style={styles.headerTitle}>
-          {t('brokers_management.title', 'Brokers management')}
-        </ThemedText>
-        <Pressable onPress={handleOpenAddModal} hitSlop={12} accessibilityRole="button">
-          <Ionicons name="person-add-outline" size={24} color={MAIN_500} />
+      <Header
+        headerTitle={t('brokers_management.title', 'Brokers management')}
+        isStepProgressVisible={false}
+        rightComponent={
+          <Pressable
+            className="h-10 w-10 items-center justify-center"
+            accessibilityRole="button"
+            onPress={handleOpenAddModal}
+            hitSlop={8}>
+            <Ionicons name="person-add-outline" size={24} color={MAIN_500} />
+          </Pressable>
+        }
+      />
+
+      {/* Search and Filters */}
+      <View className="flex-row items-center gap-3 border-b border-neutral-100 bg-white px-4 pb-4 pt-4">
+        <View className="flex-1">
+          <SearchInput
+            placeholder={t('brokers_management.search_placeholder', 'Search by name or email')}
+            value={searchInput}
+            onChangeText={setSearchInput}
+            returnKeyType="search"
+          />
+        </View>
+        <Pressable
+          onPress={() => setFiltersOpen(true)}
+          className={cn(
+            'h-[48px] w-[48px] items-center justify-center rounded-[10px]',
+            positionsFilter.length > 0 || statusFilter.length > 0 ? 'bg-primary/10' : 'bg-white'
+          )}
+          hitSlop={8}>
+          <ReIcon
+            name="settings"
+            size={24}
+            color={positionsFilter.length > 0 || statusFilter.length > 0 ? '#087443' : '#a1a1a1'}
+          />
         </Pressable>
       </View>
 
@@ -296,11 +384,18 @@ export default function BrokersManagementScreen() {
             {data.content.map((employee) => (
               <View key={employee.id} style={styles.card}>
                 <View style={styles.cardHeader}>
-                  <View style={styles.avatarPlaceholder}>
-                    <ThemedText style={styles.avatarText}>
-                      {employee.fullName.charAt(0).toUpperCase()}
-                    </ThemedText>
-                  </View>
+                  {employee.avatarInfo?.thumbnailUrl || employee.avatarInfo?.url ? (
+                    <Image
+                      source={{ uri: employee.avatarInfo.thumbnailUrl || employee.avatarInfo.url }}
+                      style={styles.avatarImage}
+                    />
+                  ) : (
+                    <View style={styles.avatarPlaceholder}>
+                      <ThemedText style={styles.avatarText}>
+                        {employee.fullName.charAt(0).toUpperCase()}
+                      </ThemedText>
+                    </View>
+                  )}
                   <View style={styles.employeeMainInfo}>
                     <ThemedText type="defaultSemiBold" style={styles.fullName}>
                       {employee.fullName}
@@ -344,6 +439,38 @@ export default function BrokersManagementScreen() {
               </View>
             ))}
           </View>
+
+          {/* Pagination Controls */}
+          {data.totalPages > 1 && (
+            <View style={styles.paginationContainer}>
+              <Pressable
+                disabled={page === 1}
+                onPress={() => setPage((p) => Math.max(1, p - 1))}
+                style={[styles.pageButton, page === 1 && styles.pageButtonDisabled]}>
+                <Ionicons
+                  name="chevron-back"
+                  size={20}
+                  color={page === 1 ? '#ABABAB' : NEUTRAL_950}
+                />
+              </Pressable>
+              <ThemedText style={styles.pageIndicator}>
+                {t('common.page_indicator', 'Page {{current}} of {{total}}', {
+                  current: page,
+                  total: data.totalPages,
+                })}
+              </ThemedText>
+              <Pressable
+                disabled={page === data.totalPages}
+                onPress={() => setPage((p) => Math.min(data.totalPages, p + 1))}
+                style={[styles.pageButton, page === data.totalPages && styles.pageButtonDisabled]}>
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={page === data.totalPages ? '#ABABAB' : NEUTRAL_950}
+                />
+              </Pressable>
+            </View>
+          )}
         </ScrollView>
       )}
 
@@ -450,7 +577,7 @@ export default function BrokersManagementScreen() {
                   variant="primary"
                   style={styles.submitButton}
                   onPress={handleCreateEmployee}
-                  disabled={createEmployeeMutation.isPending}>
+                  disabled={!isFormValid || createEmployeeMutation.isPending}>
                   {createEmployeeMutation.isPending
                     ? t('common.submitting', 'Submitting...')
                     : t('brokers_management.add_dialog.create', 'Create')}
@@ -460,7 +587,14 @@ export default function BrokersManagementScreen() {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </SafeAreaView>
+      <BrokersFilterSheet
+        visible={filtersOpen}
+        initialPositions={positionsFilter}
+        initialStatus={statusFilter}
+        onApply={handleApplyFilters}
+        onClose={() => setFiltersOpen(false)}
+      />
+    </ThemedView>
   );
 }
 
@@ -474,25 +608,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 50,
-  },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 20,
-    fontWeight: '600',
-    lineHeight: 24,
-    color: NEUTRAL_900,
-  },
-  headerSpacer: {
-    width: 24,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -524,6 +639,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#E6F4EA',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 12,
+  },
+  avatarImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     marginRight: 12,
   },
   avatarText: {
@@ -595,6 +716,32 @@ const styles = StyleSheet.create({
   },
   addFirstButton: {
     alignSelf: 'center',
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 24,
+    gap: 16,
+  },
+  pageButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#E2E2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  pageButtonDisabled: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#E2E2E2',
+  },
+  pageIndicator: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#404040',
   },
   accessDeniedContainer: {
     flex: 1,

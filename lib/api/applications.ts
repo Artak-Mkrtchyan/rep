@@ -543,12 +543,8 @@ export const applicationsService = {
       type === 'ANNOUNCEMENT_PUBLICATION'
         ? 'announcement-publication'
         : 'announcement-modification';
-    await httpClient.delete<void>(
-      `/v1/applications/${typeSlug}/${id}`,
-      undefined,
-      {
-        requiresAuth: true,
-      }
-    );
+    await httpClient.delete<void>(`/v1/applications/${typeSlug}/${id}`, undefined, {
+      requiresAuth: true,
+    });
   },
 };

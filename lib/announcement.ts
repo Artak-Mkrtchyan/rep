@@ -669,21 +669,6 @@ export const getObjectCharacteristics = (t: TFunction): CharacteristicConfig[] =
         : '—',
   },
   {
-    iconKey: 'cat',
-    label: t('announcement.rent.pet_cat'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.cat),
-  },
-  {
-    iconKey: 'large-dog',
-    label: t('announcement.rent.pet_large_dogs'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.largeDogs),
-  },
-  {
-    iconKey: 'small-dog',
-    label: t('announcement.rent.pet_small_dogs'),
-    getValue: (fd, h) => h.formatYesNo(fd.property?.attributes?.pets?.smallDogs),
-  },
-  {
     iconKey: 'usable-area',
     label: t('announcement.rent.usable_area'),
     getValue: (fd) =>

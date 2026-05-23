@@ -35,11 +35,13 @@ import {
   mapTypeLabel,
 } from '@/lib/utils/announcement-mappers';
 
+const REOPENABLE_REASONS = ['SOLD_OUT', 'GIVEN_FOR_RENT', 'WITHDRAWN_FOR_OTHER_REASONS'];
+
 export default function AnnouncementDetailScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { user } = useAuth();
+  const { user, userInfo } = useAuth();
   const isAuthenticated = !!user;
   const { announcement, isLoading, error, refetch, toggleFavourite, toggleComparison } =
     useAnnouncementDetails(id!);
@@ -98,6 +100,27 @@ export default function AnnouncementDetailScreen() {
   const isActive = announcement?.status?.code === 'ACTIVE';
   const closureReason = announcement?.closureReason;
 
+
+  const canReopen = useMemo(() => {
+    return !!(closureReason?.code && REOPENABLE_REASONS.includes(closureReason.code));
+  }, [closureReason]);
+
+  const createdById = typeof announcement?.createdBy === 'object'
+    ? (announcement.createdBy as any)?.id
+    : announcement?.createdBy;
+
+  const isOwner = !!(userInfo?.id && createdById && userInfo.id === createdById);
+
+  const canChangeStatus = useMemo(() => {
+    if (!announcement || !isOwner) return false;
+    const status = announcement.status?.code;
+    if (!status || status === 'ACTIVE') return true;
+    if (status === 'CLOSED') {
+      return canReopen;
+    }
+    return false;
+  }, [announcement, isOwner, canReopen]);
+
   if (isLoading) {
     return (
       <ThemedView className="flex-1 items-center justify-center">
@@ -150,7 +173,7 @@ export default function AnnouncementDetailScreen() {
             statusCode={announcement.status?.code}
             postedDate={announcement.createdAt}
             updatedDate={announcement.updatedAt}
-            onStatusPress={isActive ? () => setStatusSheetVisible(true) : undefined}
+            onStatusPress={canChangeStatus ? () => setStatusSheetVisible(true) : undefined}
           />
 
           {hasLocationData(location) && <LocationSection location={location!} />}
@@ -264,6 +287,7 @@ export default function AnnouncementDetailScreen() {
       <ChangeStatusBottomSheet
         visible={statusSheetVisible}
         currentStatus={announcement.status?.code || 'ACTIVE'}
+        currentClosureReason={announcement.closureReason?.code}
         announcementId={id!}
         onClose={() => setStatusSheetVisible(false)}
         onStatusChanged={handleStatusChanged}

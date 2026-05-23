@@ -15,9 +15,7 @@ import { httpClient } from './http/client';
 
 export const announcementsService = {
   getAnnouncementById: async (id: string): Promise<Announcement> => {
-    const response = await httpClient.get<ApiResponse<Announcement>>(`/v1/announcements/${id}`, {
-      requiresAuth: false,
-    });
+    const response = await httpClient.get<ApiResponse<Announcement>>(`/v1/announcements/${id}`);
     return response.data || (response as unknown as Announcement);
   },
 

@@ -74,11 +74,11 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
             />
           ) : null}
           <ThemedText className={`text-[12px] ${badgeTextColor}`}>{displayStatus}</ThemedText>
-          {isActive && onStatusPress ? (
-            <Image
-              source={require('@/assets/images/chevron-down-icon.svg')}
-              style={detailStyles.chevronIcon}
-              contentFit="contain"
+          {onStatusPress ? (
+            <Ionicons
+              name="chevron-down"
+              size={12}
+              color={isActive ? '#5EBC39' : '#EF4444'}
             />
           ) : null}
         </Pressable>

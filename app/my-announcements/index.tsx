@@ -52,7 +52,9 @@ export default function MyAnnouncementsScreen() {
       : (STATUS_SEGMENTS[selectedIndex].label as AnnouncementStatus | ClosureReason);
 
   const query = useGetMyAnnouncementsInfinite({ filter, pageSize: 5 });
-  const { data: statistics } = useGetMyAnnouncementsStatistics();
+  const { data: statistics, refetch: refetchStatistics } = useGetMyAnnouncementsStatistics();
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const list = useMemo(() => query.data?.pages.flatMap((p) => p.content) ?? [], [query.data]);
 
@@ -62,6 +64,20 @@ export default function MyAnnouncementsScreen() {
     }
   }, [query]);
 
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        query.refetch(),
+        refetchStatistics(),
+      ]);
+    } catch (err) {
+      console.error('Failed to refresh announcements:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [query, refetchStatistics]);
+
   const segments = useMemo(
     () =>
       STATUS_SEGMENTS.map(
@@ -70,9 +86,7 @@ export default function MyAnnouncementsScreen() {
     [t, statistics]
   );
 
-  const handleCardPress = (id: string, isDisabled: boolean) => {
-    if (isDisabled) return;
-
+  const handleCardPress = (id: string) => {
     router.push({
       pathname: '/announcement/[id]',
       params: { id },
@@ -97,6 +111,8 @@ export default function MyAnnouncementsScreen() {
         keyExtractor={(row) => row.id}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32, flexGrow: 1 }}
         onEndReached={handleLoadMore}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
         ItemSeparatorComponent={() => <View className="h-4" />}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center px-6">
@@ -113,7 +129,7 @@ export default function MyAnnouncementsScreen() {
         renderItem={({ item: row }) => (
           <MyAnnouncementCard
             item={row}
-            onPress={() => handleCardPress(row.id, row.status.code !== AnnouncementStatus.ACTIVE)}
+            onPress={() => handleCardPress(row.id)}
             className="max-w-full"
           />
         )}

@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Modal, Pressable, View } from 'react-native';
+import { ActivityIndicator, Animated, Easing, Dimensions, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
 import { useCloseAnnouncement, useReopenAnnouncement } from '@/hooks/api/use-my-announcements';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { ClosureReason } from '@/types/my-announcements';
 
@@ -16,6 +17,7 @@ export type ChangeStatusBottomSheetProps = {
   announcementId: string;
   onClose: () => void;
   onStatusChanged: () => void;
+  currentClosureReason?: string;
 };
 
 type StatusChoice = 'ACTIVE' | 'CLOSE';
@@ -37,19 +39,48 @@ const FOOTER_SHADOW = {
   elevation: 4,
 };
 
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
 export const ChangeStatusBottomSheet = ({
   visible,
   currentStatus,
   announcementId,
   onClose,
   onStatusChanged,
+  currentClosureReason,
 }: ChangeStatusBottomSheetProps) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
+  const slideAnim = React.useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+  const backdropAnim = React.useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(backdropAnim, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      slideAnim.setValue(SCREEN_HEIGHT);
+      backdropAnim.setValue(0);
+    }
+  }, [visible, slideAnim, backdropAnim]);
+
   const isCurrentlyActive = currentStatus === 'ACTIVE';
   const [choice, setChoice] = useState<StatusChoice>(isCurrentlyActive ? 'ACTIVE' : 'CLOSE');
-  const [selectedReason, setSelectedReason] = useState<ClosureReason | null>(null);
+  const [selectedReason, setSelectedReason] = useState<ClosureReason | null>(
+    currentClosureReason ? (currentClosureReason as ClosureReason) : null
+  );
 
   const { mutateAsync: closeAnnouncement, isPending: isClosing } = useCloseAnnouncement();
   const { mutateAsync: reopenAnnouncement, isPending: isReopening } = useReopenAnnouncement();
@@ -58,9 +89,11 @@ export const ChangeStatusBottomSheet = ({
   useEffect(() => {
     if (visible) {
       setChoice(isCurrentlyActive ? 'ACTIVE' : 'CLOSE');
-      setSelectedReason(null);
+      setSelectedReason(currentClosureReason ? (currentClosureReason as ClosureReason) : null);
     }
-  }, [visible, isCurrentlyActive]);
+  }, [visible, isCurrentlyActive, currentClosureReason]);
+
+  const toast = useToast();
 
   const canSave =
     (choice === 'ACTIVE' && !isCurrentlyActive) ||
@@ -72,8 +105,16 @@ export const ChangeStatusBottomSheet = ({
     try {
       if (choice === 'CLOSE' && selectedReason) {
         await closeAnnouncement({ id: announcementId, closureReason: selectedReason });
+        toast.success(
+          t('announcement.my.change_status.close_success_title'),
+          t('announcement.my.change_status.close_success_subtitle')
+        );
       } else if (choice === 'ACTIVE') {
         await reopenAnnouncement(announcementId);
+        toast.success(
+          t('announcement.my.change_status.reopen_success_title'),
+          t('announcement.my.change_status.reopen_success_subtitle')
+        );
       }
       onStatusChanged();
     } catch {
@@ -85,18 +126,26 @@ export const ChangeStatusBottomSheet = ({
     <Modal
       visible={visible}
       transparent
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
       statusBarTranslucent>
-      <View className="flex-1 justify-end bg-black/50">
-        <Pressable
-          className="absolute inset-0"
-          onPress={onClose}
-          accessibilityRole="button"
-          accessibilityLabel={t('common.close')}
-        />
+      <View className="flex-1 justify-end">
+        <Animated.View
+          style={[
+            StyleSheet.absoluteFillObject,
+            { backgroundColor: 'rgba(0,0,0,0.5)', opacity: backdropAnim },
+          ]}>
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={onClose}
+            accessibilityRole="button"
+            accessibilityLabel={t('common.close')}
+          />
+        </Animated.View>
 
-        <View className="rounded-t-[24px] bg-white">
+        <Animated.View
+          className="rounded-t-[24px] bg-white"
+          style={{ transform: [{ translateY: slideAnim }] }}>
           {/* Header */}
           <View className="items-center px-4 pb-3 pt-4">
             <View className="w-full flex-row items-center justify-end">
@@ -121,17 +170,20 @@ export const ChangeStatusBottomSheet = ({
             {/* Active option */}
             <Pressable
               onPress={() => setChoice('ACTIVE')}
-              className="flex-row items-center gap-3 border-b border-neutral-100 py-4"
+              className="flex-row items-center gap-3 py-4"
               accessibilityRole="radio"
               accessibilityState={{ checked: choice === 'ACTIVE' }}>
               <View
                 className={cn(
-                  'h-5 w-5 items-center justify-center rounded-full border-2',
-                  choice === 'ACTIVE' ? 'border-green-500' : 'border-neutral-300'
+                  'h-5 w-5 items-center justify-center rounded-full border',
+                  choice === 'ACTIVE' ? 'border-primary' : 'border-neutral-300'
                 )}>
-                {choice === 'ACTIVE' ? (
-                  <View className="h-2.5 w-2.5 rounded-full bg-green-500" />
-                ) : null}
+                <View
+                  className={cn(
+                    'h-2.5 w-2.5 rounded-full',
+                    choice === 'ACTIVE' ? 'bg-primary' : 'bg-transparent'
+                  )}
+                />
               </View>
               <ThemedText className="text-[16px] font-medium text-foreground">
                 {t('announcement.my.change_status.active')}
@@ -141,17 +193,20 @@ export const ChangeStatusBottomSheet = ({
             {/* Close option */}
             <Pressable
               onPress={() => setChoice('CLOSE')}
-              className="flex-row items-center gap-3 border-b border-neutral-100 py-4"
+              className="flex-row items-center gap-3 py-4"
               accessibilityRole="radio"
               accessibilityState={{ checked: choice === 'CLOSE' }}>
               <View
                 className={cn(
-                  'h-5 w-5 items-center justify-center rounded-full border-2',
-                  choice === 'CLOSE' ? 'border-neutral-800' : 'border-neutral-300'
+                  'h-5 w-5 items-center justify-center rounded-full border',
+                  choice === 'CLOSE' ? 'border-primary' : 'border-neutral-300'
                 )}>
-                {choice === 'CLOSE' ? (
-                  <View className="h-2.5 w-2.5 rounded-full bg-neutral-800" />
-                ) : null}
+                <View
+                  className={cn(
+                    'h-2.5 w-2.5 rounded-full',
+                    choice === 'CLOSE' ? 'bg-primary' : 'bg-transparent'
+                  )}
+                />
               </View>
               <ThemedText className="text-[16px] font-medium text-foreground">
                 {t('announcement.my.change_status.close')}
@@ -170,19 +225,22 @@ export const ChangeStatusBottomSheet = ({
                   <Pressable
                     key={reason.value}
                     onPress={() => setSelectedReason(reason.value)}
-                    className="flex-row items-center gap-3 border-b border-neutral-50 py-3"
+                    className="flex-row items-center gap-3 py-3"
                     accessibilityRole="radio"
                     accessibilityState={{ checked: selectedReason === reason.value }}>
                     <View
                       className={cn(
-                        'h-4 w-4 items-center justify-center rounded-full border-2',
+                        'h-4 w-4 items-center justify-center rounded-full border',
                         selectedReason === reason.value
-                          ? 'border-green-500'
+                          ? 'border-primary'
                           : 'border-neutral-300'
                       )}>
-                      {selectedReason === reason.value ? (
-                        <View className="h-2 w-2 rounded-full bg-green-500" />
-                      ) : null}
+                      <View
+                        className={cn(
+                          'h-2 w-2 rounded-full',
+                          selectedReason === reason.value ? 'bg-primary' : 'bg-transparent'
+                        )}
+                      />
                     </View>
                     <ThemedText className="text-[14px] text-foreground">
                       {t(reason.labelKey)}
@@ -205,7 +263,7 @@ export const ChangeStatusBottomSheet = ({
               )}
             </Button>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   );

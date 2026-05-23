@@ -44,6 +44,22 @@ export default function MenuScreen() {
     router.back();
   }, [router]);
 
+  const handleSectionPress = useCallback(
+    (title: string) => {
+      if (title === 'Buy' || title === 'Rent') {
+        const filters: SearchFilters = {
+          ...DEFAULT_FILTERS,
+          listingType: title === 'Buy' ? 'BUY' : 'RENT',
+        };
+        router.push({
+          pathname: '/search/results',
+          params: { filters: JSON.stringify(filters) },
+        });
+      }
+    },
+    [router]
+  );
+
   const handleItemPress = useCallback(
     (item: string, sectionTitle: string) => {
       if (sectionTitle === 'Partners' && item === 'Brokers') {
@@ -91,6 +107,11 @@ export default function MenuScreen() {
               isExpanded={expandedIndex === index}
               onToggle={() => handleToggle(index)}
               onItemPress={(item) => handleItemPress(item, section.title)}
+              onTitlePress={
+                (section.title === 'Buy' || section.title === 'Rent')
+                  ? () => handleSectionPress(section.title)
+                  : undefined
+              }
             />
           ))}
         </ScrollView>

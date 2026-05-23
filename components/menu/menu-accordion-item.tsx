@@ -19,6 +19,7 @@ type MenuAccordionItemProps = {
   isExpanded: boolean;
   onToggle: () => void;
   onItemPress?: (item: string) => void;
+  onTitlePress?: () => void;
 };
 
 export const MenuAccordionItem: React.FC<MenuAccordionItemProps> = ({
@@ -27,6 +28,7 @@ export const MenuAccordionItem: React.FC<MenuAccordionItemProps> = ({
   isExpanded,
   onToggle,
   onItemPress,
+  onTitlePress,
 }) => {
   const rotation = useDerivedValue(() => withTiming(isExpanded ? 180 : 0, { duration: 250 }));
 
@@ -37,21 +39,31 @@ export const MenuAccordionItem: React.FC<MenuAccordionItemProps> = ({
   return (
     <Animated.View layout={LinearTransition.duration(250)}>
       <Pressable
-        onPress={onToggle}
+        onPress={onTitlePress || onToggle}
         className="flex-row items-center justify-between border-b border-border px-4 py-4"
-        accessibilityRole="button"
-        accessibilityState={{ expanded: isExpanded }}>
+        accessibilityRole="button">
         <ThemedText
-          className={`text-[16px] font-medium ${isExpanded ? 'text-primary' : 'text-foreground'}`}>
+          className={`flex-1 text-[16px] font-medium ${isExpanded ? 'text-primary' : 'text-foreground'}`}>
           {title}
         </ThemedText>
-        <Animated.View style={chevronStyle}>
-          <Ionicons
-            name="chevron-down"
-            size={20}
-            color={isExpanded ? THEME.light.primary : THEME.light.foreground}
-          />
-        </Animated.View>
+        {items.length > 0 ? (
+          <Pressable
+            onPress={(e) => {
+              e.stopPropagation();
+              onToggle();
+            }}
+            className="h-10 w-10 items-center justify-center -mr-2 -my-2"
+            accessibilityRole="button"
+            accessibilityState={{ expanded: isExpanded }}>
+            <Animated.View style={chevronStyle}>
+              <Ionicons
+                name="chevron-down"
+                size={20}
+                color={isExpanded ? THEME.light.primary : THEME.light.foreground}
+              />
+            </Animated.View>
+          </Pressable>
+        ) : null}
       </Pressable>
 
       {isExpanded && items.length > 0 && (

@@ -85,13 +85,17 @@ export default function SearchResultsScreen() {
     { onMarkerPress: handleMapMarkerPress, initialCenter: mapCenter ?? undefined }
   );
 
-  // Resolve address to map center and run initial search
+  // Resolve address to map center and run search when initialFilters change
   useEffect(() => {
+    setCurrentFilters(initialFilters);
+    setMapPinAnnouncement(null);
+    resetCenter();
+
     (async () => {
-      if (currentFilters.address) {
+      if (initialFilters.address) {
         try {
           const geoResult = await announcementsService.searchAnnouncements({
-            filter: { formattedAddressStartsWith: currentFilters.address },
+            filter: { formattedAddressStartsWith: initialFilters.address },
             pagination: { pageNumber: 0, pageSize: 1 },
             sorts: [{ sort: 'UPDATED_AT', direction: 'DESC' }],
           });
@@ -104,11 +108,12 @@ export default function SearchResultsScreen() {
         } catch {
           // Geocoding failed
         }
+      } else {
+        setMapCenter(null);
       }
-      search(currentFilters);
+      search(initialFilters);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialFilters, search, resetCenter, setCenter]);
 
   useEffect(() => {
     setMapPinAnnouncement((prev) => {

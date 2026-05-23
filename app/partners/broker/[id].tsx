@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ScrollView, View , ActivityIndicator } from 'react-native';
+import { ScrollView, View , ActivityIndicator, useWindowDimensions } from 'react-native';
 
 import { AnnouncementSmallCard } from '@/components/announcement/announcement-small-card';
 import { BrokerProfileCard } from '@/components/announcement/broker-profile-card';
@@ -53,7 +53,10 @@ const truncateByLength = (text: string, maxLength: number, isExpanded: boolean) 
 
 export default function BrokerDetailsScreen() {
   const { t } = useTranslation();
-  const { horizontalStyle } = useScreenEdgePadding();
+  const { horizontalStyle, paddingLeft, paddingRight } = useScreenEdgePadding();
+  const { width: windowWidth } = useWindowDimensions();
+  const usableWidth = windowWidth - paddingLeft - paddingRight;
+  const cardWidth = (usableWidth - 8) / 2;
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const { id, type } = useLocalSearchParams<{ id: string; type: 'individual' | 'company' }>();
 
@@ -118,23 +121,27 @@ export default function BrokerDetailsScreen() {
         </View>
 
         <ScrollView
-          className="overflow-visible pl-4"
-          contentContainerStyle={{ gap: 8 }}
+          className="overflow-visible"
+          contentContainerStyle={{
+            paddingLeft,
+            paddingRight,
+            gap: 8,
+          }}
           showsHorizontalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           horizontal>
           {PLACEHOLDER_DEALS.map((deal) => (
-            <AnnouncementSmallCard
-              key={deal.id}
-              imageSource={require('@/assets/images/hero.png')}
-              className="w-[175px]"
-              title={deal.title}
-              address={deal.address}
-              bedsLabel={deal.bedsLabel}
-              bathsLabel={deal.bathsLabel}
-              sizeLabel={deal.sizeLabel}
-              priceLabel={deal.priceLabel}
-            />
+            <View key={deal.id} style={{ width: cardWidth }}>
+              <AnnouncementSmallCard
+                imageSource={require('@/assets/images/hero.png')}
+                title={deal.title}
+                address={deal.address}
+                bedsLabel={deal.bedsLabel}
+                bathsLabel={deal.bathsLabel}
+                sizeLabel={deal.sizeLabel}
+                priceLabel={deal.priceLabel}
+              />
+            </View>
           ))}
         </ScrollView>
 

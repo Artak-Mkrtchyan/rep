@@ -1,5 +1,6 @@
 import { Image as ExpoImage } from 'expo-image';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Image, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -16,15 +17,28 @@ const CARD_SHADOW = {
   elevation: 4,
 };
 
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+  return dateStr;
+}
+
 export const BrokerProfileCard: React.FC<BrokerProfileCardProps> = ({
   avatar,
   name,
   phone,
   email,
+  certifiedOn,
+  certifiedBy,
+  yearsOfActivity,
   rating,
   reviewCount,
   className,
 }) => {
+  const { t } = useTranslation();
   const [avatarFailed, setAvatarFailed] = useState(false);
   const avatarSource = typeof avatar === 'string' ? { uri: avatar } : avatar;
   const showAvatar = !!avatarSource && !avatarFailed;
@@ -87,6 +101,29 @@ export const BrokerProfileCard: React.FC<BrokerProfileCardProps> = ({
                 <ThemedText className="text-[14px] leading-5 text-foreground">{email}</ThemedText>
               </View>
             </View>
+
+            {(certifiedOn || certifiedBy || yearsOfActivity !== undefined) && (
+              <View className="mt-2 items-center gap-1.5 border-t border-neutral-100 pt-2 w-full">
+                {certifiedOn ? (
+                  <ThemedText className="text-[13px] text-neutral-500">
+                    {t('profile.certified_on')}:{' '}
+                    <ThemedText className="font-semibold text-foreground">{formatDate(certifiedOn)}</ThemedText>
+                  </ThemedText>
+                ) : null}
+                {certifiedBy ? (
+                  <ThemedText className="text-[13px] text-neutral-500">
+                    {t('profile.certified_by')}:{' '}
+                    <ThemedText className="font-semibold text-foreground">{certifiedBy}</ThemedText>
+                  </ThemedText>
+                ) : null}
+                {yearsOfActivity !== undefined ? (
+                  <ThemedText className="text-[13px] text-neutral-500">
+                    {t('profile.years_of_activity')}:{' '}
+                    <ThemedText className="font-semibold text-foreground">{yearsOfActivity}</ThemedText>
+                  </ThemedText>
+                ) : null}
+              </View>
+            )}
           </View>
 
           {hasRating && (

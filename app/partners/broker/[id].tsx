@@ -71,6 +71,15 @@ export default function BrokerDetailsScreen() {
   const email = isIndividual
     ? (individualQuery.data?.email ?? '')
     : (companyQuery.data?.email ?? '');
+  const certifiedOn = isIndividual
+    ? individualQuery.data?.certifiedOn
+    : companyQuery.data?.certifiedOn;
+  const certifiedBy = isIndividual
+    ? individualQuery.data?.certifiedBy
+    : companyQuery.data?.certifiedBy;
+  const yearsOfActivity = isIndividual
+    ? individualQuery.data?.yearsOfActivity
+    : companyQuery.data?.yearsOfActivity;
 
   if (isLoading) {
     return (
@@ -92,6 +101,9 @@ export default function BrokerDetailsScreen() {
             name={name}
             phone={phone}
             email={email}
+            certifiedOn={certifiedOn}
+            certifiedBy={certifiedBy}
+            yearsOfActivity={yearsOfActivity}
             rating={5.0}
             reviewCount={1024}
             className="mb-6"

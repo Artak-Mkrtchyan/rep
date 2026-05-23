@@ -5,6 +5,9 @@ export type BrokerProfileCardProps = {
   name: string;
   phone: string;
   email: string;
+  certifiedOn?: string;
+  certifiedBy?: string;
+  yearsOfActivity?: number;
   rating?: number;
   reviewCount?: number;
   className?: string;

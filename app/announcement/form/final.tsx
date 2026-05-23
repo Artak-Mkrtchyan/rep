@@ -21,6 +21,7 @@ import { Language } from '@/lib/i18n/i18n';
 import { formatNumericString } from '@/lib/utils';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
+import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
 
 export default function FinalScreen() {
   const { t, i18n } = useTranslation();
@@ -185,6 +186,11 @@ export default function FinalScreen() {
         contentContainerStyle={{ paddingBottom: 31 }}
         showsVerticalScrollIndicator={false}>
         <View className="pt-[24px]" style={horizontalStyle}>
+          <ApplicationCommentBanner
+            status={statusCode}
+            comment={metaData?.applicationComment}
+          />
+
           <View className="mb-4">
             <ImageSlider
               images={imageSources}
@@ -300,7 +306,7 @@ export default function FinalScreen() {
         </View>
       </ScrollView>
 
-      {!isReadOnly || isAnnouncementEdit ? (
+      {(!isReadOnly || isAnnouncementEdit) && statusCode !== 'REJECTED' ? (
         <AnnouncementFooter
           firstButtonLabel={t('common.publish')}
           secondButtonLabel={t('common.save_and_exit')}

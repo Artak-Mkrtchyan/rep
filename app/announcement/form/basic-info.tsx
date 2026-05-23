@@ -6,6 +6,7 @@ import { ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AddressInput } from '@/components/ui/address-input';
@@ -64,9 +65,8 @@ export default function BasicInfoScreen() {
 
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((state) => state.formData);
-  const isAnnouncementEdit = useAnnouncementForRentFormStore(
-    (state) => state.metaData?.isAnnouncementEdit
-  );
+  const metaData = useAnnouncementForRentFormStore((state) => state.metaData);
+  const isAnnouncementEdit = metaData?.isAnnouncementEdit;
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
@@ -141,6 +141,10 @@ export default function BasicInfoScreen() {
               keyboardDismissMode="on-drag"
               automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
+                <ApplicationCommentBanner
+                  status={metaData?.response?.status?.code}
+                  comment={metaData?.applicationComment}
+                />
                 <View className="gap-4">
                   <ThemedText className="text-[16px] font-bold text-foreground">
                     {t('announcement.rent.basic_info')}

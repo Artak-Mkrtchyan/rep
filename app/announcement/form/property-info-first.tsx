@@ -5,6 +5,7 @@ import { Alert, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
 import { Conditional } from '@/components/conditional';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -58,9 +59,8 @@ export default function PropertyInfoFirstScreen() {
   const insets = useSafeAreaInsets();
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const isAnnouncementEdit = useAnnouncementForRentFormStore(
-    (state) => state.metaData?.isAnnouncementEdit
-  );
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData);
+  const isAnnouncementEdit = metaData?.isAnnouncementEdit;
   const sendFormData = useAnnouncementForRentFormStore((state) => state.sendFormData);
   const updateFormData = useAnnouncementForRentFormStore((state) => state.updateFormData);
   const nextStep = useHandleNextPress();
@@ -143,6 +143,10 @@ export default function PropertyInfoFirstScreen() {
               keyboardDismissMode="on-drag"
               automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
+                <ApplicationCommentBanner
+                  status={metaData?.response?.status?.code}
+                  comment={metaData?.applicationComment}
+                />
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.property_info_first_title')}
                 </ThemedText>

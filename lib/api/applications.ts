@@ -48,6 +48,40 @@ export interface ApplicationStatus {
   name: string;
 }
 
+export interface ApplicationStatusChange {
+  applicationId: string;
+  createdAt: string;
+  createdBy: {
+    fullName: string;
+    id: string;
+  };
+  type: string;
+  comment?: string;
+  currentStatus?: {
+    code: ApplicationStatusType;
+    name: string;
+  };
+  previousStatus?: {
+    code: ApplicationStatusType;
+    name: string;
+  };
+}
+
+export interface ApplicationHistoryFilter {
+  applicationId?: string;
+  ids?: string[];
+  types?: string[];
+  _and_?: ApplicationHistoryFilter[];
+  _or_?: ApplicationHistoryFilter[];
+  _not_?: ApplicationHistoryFilter;
+}
+
+export interface SearchApplicationHistoryRequest {
+  filter?: ApplicationHistoryFilter;
+  pagination?: { pageNumber?: number; pageSize?: number };
+  sorts?: { sort: string; direction: 'ASC' | 'DESC' }[];
+}
+
 export interface BrokerRegistrationResponse {
   id: string;
   applicantEmail: string;
@@ -551,5 +585,20 @@ export const applicationsService = {
     await httpClient.delete<void>(`/v1/applications/${typeSlug}/${id}`, undefined, {
       requiresAuth: true,
     });
+  },
+
+  /**
+   * Search application history (status changes, comments, etc)
+   * POST /api/v1/applications/history/search/for-screen/application-timeline
+   */
+  searchApplicationHistory: async (
+    params: SearchApplicationHistoryRequest = {}
+  ): Promise<SearchResponse<ApplicationStatusChange>> => {
+    const response = await httpClient.post<ApiResponse<SearchResponse<ApplicationStatusChange>>>(
+      '/v1/applications/history/search/for-screen/application-timeline',
+      params,
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown as SearchResponse<ApplicationStatusChange>);
   },
 };

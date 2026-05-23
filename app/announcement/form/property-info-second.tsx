@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { InputLabel } from '@/components/ui/input/label';
@@ -41,9 +42,8 @@ export default function PropertyInfoSecondScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const placeholderColor = useThemeValue('placeholder');
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const isAnnouncementEdit = useAnnouncementForRentFormStore(
-    (state) => state.metaData?.isAnnouncementEdit
-  );
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData);
+  const isAnnouncementEdit = metaData?.isAnnouncementEdit;
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
@@ -104,6 +104,10 @@ export default function PropertyInfoSecondScreen() {
               keyboardDismissMode="on-drag"
               automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
+                <ApplicationCommentBanner
+                  status={metaData?.response?.status?.code}
+                  comment={metaData?.applicationComment}
+                />
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.describe_property')}
                 </ThemedText>

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
@@ -15,10 +16,9 @@ export default function MediaScreen() {
   const { t } = useTranslation();
   const { horizontalStyle } = useScreenEdgePadding();
   const mediaFileIds = useAnnouncementForRentFormStore((s) => s.formData.mediaFileIds);
-  const tempMediaFiles = useAnnouncementForRentFormStore((s) => s.metaData?.tempMediaFiles);
-  const isAnnouncementEdit = useAnnouncementForRentFormStore(
-    (state) => state.metaData?.isAnnouncementEdit
-  );
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData);
+  const tempMediaFiles = metaData?.tempMediaFiles;
+  const isAnnouncementEdit = metaData?.isAnnouncementEdit;
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const sendFormData = useAnnouncementForRentFormStore((s) => s.sendFormData);
   const nextStep = useHandleNextPress();
@@ -57,6 +57,10 @@ export default function MediaScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
         <View className="pt-[24px]" style={horizontalStyle}>
+          <ApplicationCommentBanner
+            status={metaData?.response?.status?.code}
+            comment={metaData?.applicationComment}
+          />
           <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
             {t('announcement.rent.add_photos_title')}
           </ThemedText>

@@ -5,6 +5,7 @@ import { Alert, ScrollView, View } from 'react-native';
 import * as Yup from 'yup';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Input } from '@/components/ui/input';
@@ -42,9 +43,8 @@ export default function RentDetailsScreen() {
   const validationSchema = useMemo(() => makeRentDetailsSchema(t), [t]);
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
-  const isAnnouncementEdit = useAnnouncementForRentFormStore(
-    (state) => state.metaData?.isAnnouncementEdit
-  );
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData);
+  const isAnnouncementEdit = metaData?.isAnnouncementEdit;
   const update = useAnnouncementForRentFormStore((s) => s.update);
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
@@ -113,6 +113,10 @@ export default function RentDetailsScreen() {
               keyboardDismissMode="on-drag"
               automaticallyAdjustKeyboardInsets>
               <View className="pt-[24px]" style={horizontalStyle}>
+                <ApplicationCommentBanner
+                  status={metaData?.response?.status?.code}
+                  comment={metaData?.applicationComment}
+                />
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.rent_details_title')}
                 </ThemedText>

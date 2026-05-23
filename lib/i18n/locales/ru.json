@@ -104,6 +104,9 @@
   "validation.max_length_255": "Не должно превышать 255 символов",
   "validation.address_required": "Адрес обязателен",
 
+  "add_application.application_comment.returned": "Причина возврата",
+  "add_application.application_comment.rejected": "Причина отклонения",
+
   "add_application.validation.listing_type_required": "Обязательное поле",
   "add_application.validation.address_required": "Обязательное поле",
   "add_application.validation.property_type_required": "Обязательное поле",

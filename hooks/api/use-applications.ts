@@ -2,6 +2,7 @@ import {
   AnnouncementPublicationListResponse,
   applicationsService,
   ApplicationStatusType,
+  ApplicationStatusChange,
 } from '@/lib/api/applications';
 import { ApiError } from '@/lib/api/auth.types';
 import { useAuth } from '@/context/AuthContext';
@@ -309,3 +310,33 @@ export const useGetApplicationStatisticsByStatuses = (enabled = true) => {
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });
 };
+
+// Hook for searching application history
+export const useSearchApplicationHistory = (
+  params: { applicationId?: string; page?: number; pageSize?: number; enabled?: boolean } = {}
+) => {
+  const { applicationId, page = 1, pageSize = 10, enabled = true } = params;
+
+  return useQuery<SearchResponse<ApplicationStatusChange>, ApiError>({
+    queryKey: [APPLICATIONS_QUERY_KEY, 'history', { applicationId, page, pageSize }],
+    queryFn: () =>
+      applicationsService.searchApplicationHistory({
+        filter: {
+          ...(applicationId && { applicationId }),
+          types: ['application-status-changed'],
+        },
+        pagination: {
+          pageNumber: page - 1,
+          pageSize,
+        },
+        sorts: [
+          {
+            sort: 'CREATED_AT',
+            direction: 'DESC',
+          },
+        ],
+      }),
+    enabled: enabled && !!applicationId,
+  });
+};
+

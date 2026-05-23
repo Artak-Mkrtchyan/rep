@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
+import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { CheckboxRow } from '@/components/ui/checkbox';
@@ -33,9 +34,8 @@ export default function CharacteristicsScreen() {
   const { horizontalStyle } = useScreenEdgePadding();
   const formData = useAnnouncementForRentFormStore((s) => s.formData);
   const updateFormData = useAnnouncementForRentFormStore((s) => s.updateFormData);
-  const isAnnouncementEdit = useAnnouncementForRentFormStore(
-    (state) => state.metaData?.isAnnouncementEdit
-  );
+  const metaData = useAnnouncementForRentFormStore((s) => s.metaData);
+  const isAnnouncementEdit = metaData?.isAnnouncementEdit;
   const nextStep = useHandleNextPress();
   const exitFlow = useExitAnnouncementFlow();
 
@@ -114,6 +114,10 @@ export default function CharacteristicsScreen() {
               keyboardDismissMode="on-drag"
               automaticallyAdjustKeyboardInsets>
               <View className="pt-[16px]" style={horizontalStyle}>
+                <ApplicationCommentBanner
+                  status={metaData?.response?.status?.code}
+                  comment={metaData?.applicationComment}
+                />
                 <ThemedText className="mb-2 text-[16px] font-bold text-foreground">
                   {t('announcement.rent.characteristics_title')}
                 </ThemedText>

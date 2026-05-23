@@ -104,6 +104,9 @@
   "validation.max_length_255": "Must be no more than 255 characters",
   "validation.address_required": "Address is required",
 
+  "add_application.application_comment.returned": "Return reason",
+  "add_application.application_comment.rejected": "Rejection reason",
+
   "add_application.validation.listing_type_required": "This field is required",
   "add_application.validation.address_required": "This field is required",
   "add_application.validation.property_type_required": "This field is required",

@@ -104,6 +104,9 @@
   "validation.max_length_255": "255 ta belgidan oshmasligi kerak",
   "validation.address_required": "Manzil kiritish shart",
 
+  "add_application.application_comment.returned": "Qaytarish sababi",
+  "add_application.application_comment.rejected": "Rad etish sababi",
+
   "add_application.validation.listing_type_required": "Bu maydon talab qilinadi",
   "add_application.validation.address_required": "Bu maydon talab qilinadi",
   "add_application.validation.property_type_required": "Bu maydon talab qilinadi",

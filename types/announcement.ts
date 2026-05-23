@@ -213,4 +213,5 @@ export type MetaData = {
   isChangeFields?: boolean;
   tempMediaFiles?: { id: string; uri: string; type?: string; name?: string }[];
   tempDocumentFiles?: { id: string; uri: string; type?: string; name?: string }[];
+  applicationComment?: string;
 };

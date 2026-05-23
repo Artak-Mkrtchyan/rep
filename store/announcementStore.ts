@@ -145,9 +145,38 @@ export const useAnnouncementForRentFormStore = create<AnnouncementForRentFormSto
 
         const { formData, metaData } = getParsedApplicationData(response);
 
+        let applicationComment: string | undefined;
+        const statusCode = response.status?.code;
+        if (statusCode === 'RETURNED_TO_APPLICANT' || statusCode === 'REJECTED') {
+          try {
+            const historyResponse = await applicationsService.searchApplicationHistory({
+              filter: {
+                applicationId: id,
+                types: ['application-status-changed'],
+              },
+              pagination: {
+                pageNumber: 0,
+                pageSize: 1,
+              },
+              sorts: [
+                {
+                  sort: 'CREATED_AT',
+                  direction: 'DESC',
+                },
+              ],
+            });
+            applicationComment = historyResponse.content?.[0]?.comment;
+          } catch (historyError) {
+            console.error('Failed to load application history comment:', historyError);
+          }
+        }
+
         set(() => ({
           formData,
-          metaData,
+          metaData: {
+            ...metaData,
+            applicationComment,
+          },
         }));
       } catch (error) {
         throw error;

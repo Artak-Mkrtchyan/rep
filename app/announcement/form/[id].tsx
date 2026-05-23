@@ -1,4 +1,5 @@
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
+import { useAuth } from '@/context/AuthContext';
 import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect } from 'react';
@@ -36,6 +37,7 @@ export default function AnnouncementFormScreen() {
   const getApplicationById = useAnnouncementForRentFormStore((s) => s.getApplicationById);
   const getAnnouncementById = useAnnouncementForRentFormStore((s) => s.getAnnouncementById);
   const navigation = useNavigation();
+  const { userInfo } = useAuth();
 
   const getFormData = isAnnouncement === 'true' ? getAnnouncementById : getApplicationById;
 
@@ -49,7 +51,27 @@ export default function AnnouncementFormScreen() {
           await getFormData(id);
           const store = useAnnouncementForRentFormStore.getState();
           const statusCode = store.metaData?.response?.status?.code;
-          const isEditable = !statusCode || EDITABLE_STATUSES.includes(statusCode);
+
+          const createdById = typeof store.metaData?.response?.createdBy === 'object'
+            ? (store.metaData.response.createdBy as any)?.id
+            : store.metaData?.response?.createdBy;
+
+          const isAnnouncementOwner =
+            !createdById ||
+            createdById === userInfo?.id;
+
+          const assignedBrokerId = store.metaData?.brokerId;
+          const isAssignedBroker =
+            !!assignedBrokerId &&
+            assignedBrokerId === userInfo?.id;
+
+          const isManager = userInfo?.roles?.includes('broker-company-manager');
+
+          const isUserAllowedToEdit = isAnnouncementOwner || isAssignedBroker || isManager;
+
+          const isEditable =
+            (!statusCode || EDITABLE_STATUSES.includes(statusCode)) &&
+            isUserAllowedToEdit;
 
           if (!isEditable) {
             // Read-only published apps — force step to final so in-flow navigation
@@ -80,7 +102,7 @@ export default function AnnouncementFormScreen() {
     }
 
     initialize();
-  }, [id, resetForm, getFormData, navigation, t]);
+  }, [id, resetForm, getFormData, navigation, t, userInfo]);
 
   return (
     <View className="flex-1 items-center justify-center">

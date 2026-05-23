@@ -45,10 +45,28 @@ export default function FinalScreen() {
   const isAnnouncementEdit = metaData?.isAnnouncementEdit;
   const isChangeFields = metaData?.isChangeFields;
 
-  const isReadOnly =
-    !!statusCode && statusCode !== 'DRAFT' && statusCode !== 'RETURNED_TO_APPLICANT';
-
   const { userInfo } = useAuth();
+  
+  const createdById = typeof metaData?.response?.createdBy === 'object'
+    ? (metaData.response.createdBy as any)?.id
+    : metaData?.response?.createdBy;
+
+  const isAnnouncementOwner =
+    !createdById ||
+    createdById === userInfo?.id;
+
+  const isAssignedBroker =
+    !!metaData?.brokerId &&
+    metaData.brokerId === userInfo?.id;
+
+  const isManager = userInfo?.roles?.includes('broker-company-manager');
+
+  const isUserAllowedToEdit = isAnnouncementOwner || isAssignedBroker || isManager;
+
+  const isReadOnly =
+    (!!statusCode && statusCode !== 'DRAFT' && statusCode !== 'RETURNED_TO_APPLICANT') ||
+    !isUserAllowedToEdit;
+
   const isBrokerCompany = userInfo?.scope === AuthScope.BROKER_COMPANY;
   const { data: brokerCompanyProfile } = useBrokerCompanyProfile(
     isBrokerCompany ? userInfo?.id : undefined

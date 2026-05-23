@@ -4,6 +4,7 @@ import {
   ApplicationStatusType,
 } from '@/lib/api/applications';
 import { ApiError } from '@/lib/api/auth.types';
+import { useAuth } from '@/context/AuthContext';
 import {
   ApplicationDetails,
   ApplicationStatisticsByStatusResponse,
@@ -112,15 +113,49 @@ export const useGetMyApplicationsInfinite = (
   params: { filter?: ApplicationStatusType; pageSize?: number; search?: string } = {},
   enabled = true
 ) => {
+  const { userInfo } = useAuth();
   const trimmedSearch = params.search?.trim();
   return useInfiniteQuery<SearchResponse<AnnouncementPublicationListResponse>, ApiError>({
-    queryKey: [APPLICATIONS_QUERY_KEY, 'my-applications', params],
+    queryKey: [APPLICATIONS_QUERY_KEY, 'my-applications', params, userInfo?.id],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
       applicationsService.getMyApplications({
         filter: {
           ...(params.filter && { statuses: [params.filter] }),
           types: ['ANNOUNCEMENT_PUBLICATION', 'ANNOUNCEMENT_MODIFICATION'],
+          ...(userInfo?.id
+            ? {
+                _or_: [
+                  ...(userInfo?.companyId
+                    ? [
+                        {
+                          announcementApplication: {
+                            assignedBrokerCompanyId: userInfo.companyId,
+                          },
+                        },
+                        {
+                          announcementApplication: {
+                            announcementOwnerCompanyId: userInfo.companyId,
+                          },
+                        },
+                      ]
+                    : []),
+                  {
+                    announcementApplication: {
+                      assignedBrokerId: userInfo.id,
+                    },
+                  },
+                  {
+                    announcementApplication: {
+                      announcementOwnerId: userInfo.id,
+                    },
+                  },
+                  {
+                    createdBy: userInfo.id,
+                  },
+                ],
+              }
+            : {}),
           ...(trimmedSearch && {
             _or_: [{ titleContains: trimmedSearch }, { publicIdContains: trimmedSearch }],
           }),
@@ -137,7 +172,7 @@ export const useGetMyApplicationsInfinite = (
         ],
       }),
     getNextPageParam,
-    enabled,
+    enabled: enabled && !!userInfo?.id,
   });
 };
 
@@ -229,10 +264,47 @@ export const useDeleteApplication = () => {
 };
 
 export const useGetApplicationStatisticsByStatuses = (enabled = true) => {
+  const { userInfo } = useAuth();
   return useQuery<ApplicationStatisticsByStatusResponse, ApiError>({
-    queryKey: [APPLICATIONS_QUERY_KEY, 'statistics', 'by-statuses'],
-    queryFn: () => applicationsService.getApplicationStatisticsByStatuses(),
-    enabled,
+    queryKey: [APPLICATIONS_QUERY_KEY, 'statistics', 'by-statuses', userInfo?.id],
+    queryFn: () =>
+      applicationsService.getApplicationStatisticsByStatuses({
+        ...(userInfo?.id
+          ? {
+              _or_: [
+                ...(userInfo?.companyId
+                  ? [
+                      {
+                        announcementApplication: {
+                          assignedBrokerCompanyId: userInfo.companyId,
+                        },
+                      },
+                      {
+                        announcementApplication: {
+                          announcementOwnerCompanyId: userInfo.companyId,
+                        },
+                      },
+                    ]
+                  : []),
+                {
+                  announcementApplication: {
+                    assignedBrokerId: userInfo.id,
+                  },
+                },
+                {
+                  announcementApplication: {
+                    announcementOwnerId: userInfo.id,
+                  },
+                },
+                {
+                  createdBy: userInfo.id,
+                },
+              ],
+            }
+          : {}),
+        types: ['ANNOUNCEMENT_PUBLICATION', 'ANNOUNCEMENT_MODIFICATION'],
+      }),
+    enabled: enabled && !!userInfo?.id,
     staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
     gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
   });

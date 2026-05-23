@@ -6,13 +6,16 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { Button } from '@/components/ui/button';
-import { useAssignBroker, useSearchIndividualBrokersInfinite } from '@/hooks/api/use-applications';
+import { SearchInput } from '@/components/ui/search-input';
+import { useAuth } from '@/context/AuthContext';
+import { useAssignBroker } from '@/hooks/api/use-applications';
+import { useSearchBrokerEmployees } from '@/hooks/api/use-broker-employees';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { initialsFrom } from '@/lib/utils/initials';
-import type { IndividualBroker } from '@/types/applications';
+import type { BrokerEmployee } from '@/types/brokers';
 
-const PAGE_SIZE = 15;
-const ON_END_THRESHOLD = 0.35;
+const PAGE_SIZE = 50;
 
 const FOOTER_CARD_SHADOW = {
   shadowColor: '#6E6E6E',
@@ -25,31 +28,53 @@ const FOOTER_CARD_SHADOW = {
 export type AssignBrokerModalProps = {
   visible: boolean;
   applicationId: string;
+  assignedBrokerId?: string;
   onClose: () => void;
 };
 
-export const AssignBrokerModal = ({ visible, applicationId, onClose }: AssignBrokerModalProps) => {
+export const AssignBrokerModal = ({
+  visible,
+  applicationId,
+  assignedBrokerId,
+  onClose,
+}: AssignBrokerModalProps) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
+  const { userInfo } = useAuth();
+  const toast = useToast();
   const [selectedBrokerId, setSelectedBrokerId] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const query = useSearchIndividualBrokersInfinite('', PAGE_SIZE, visible);
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchQuery(inputValue.trim().length >= 3 ? inputValue.trim() : '');
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [inputValue]);
 
-  const brokers = useMemo(() => query.data?.pages.flatMap((p) => p.content) ?? [], [query.data]);
+  const query = useSearchBrokerEmployees(
+    userInfo?.companyId,
+    1,
+    PAGE_SIZE,
+    visible ? { status: ['ACTIVE' as any], fullName: searchQuery } : {}
+  );
+
+  const brokers = useMemo(() => query.data?.content ?? [], [query.data]);
 
   const { mutateAsync: assignBroker, isPending: isAssigning } = useAssignBroker();
 
   useEffect(() => {
     if (visible) {
-      setSelectedBrokerId(null);
+      setSelectedBrokerId(assignedBrokerId ?? null);
+      setInputValue('');
+      setSearchQuery('');
     }
-  }, [visible]);
+  }, [visible, assignedBrokerId]);
 
   const handleLoadMore = useCallback(() => {
-    if (query.hasNextPage && !query.isFetchingNextPage) {
-      void query.fetchNextPage();
-    }
-  }, [query]);
+    // No-op for company employees search (fetches top 50 active employees)
+  }, []);
 
   const handleAssign = async () => {
     if (!selectedBrokerId || !applicationId) {
@@ -58,10 +83,18 @@ export const AssignBrokerModal = ({ visible, applicationId, onClose }: AssignBro
     try {
       await assignBroker({
         id: applicationId,
-        data: { brokerId: selectedBrokerId },
+        data: {
+          brokerId: selectedBrokerId,
+          brokerCompanyId: userInfo?.companyId,
+        },
       });
       onClose();
-    } catch {
+      toast.success(
+        t('applications.assign_broker.success_title'),
+        t('applications.assign_broker.success_subtitle')
+      );
+    } catch (error) {
+      console.error('AssignBrokerModal handleAssign error:', error);
       Alert.alert(t('common.error'), t('applications.assign_broker.error'));
     }
   };
@@ -71,7 +104,7 @@ export const AssignBrokerModal = ({ visible, applicationId, onClose }: AssignBro
   }, []);
 
   const renderItem = useCallback(
-    ({ item }: { item: IndividualBroker }) => {
+    ({ item }: { item: BrokerEmployee }) => {
       const isSelected = selectedBrokerId === item.id;
       return (
         <Pressable
@@ -106,11 +139,7 @@ export const AssignBrokerModal = ({ visible, applicationId, onClose }: AssignBro
     [handleSelectBroker, selectedBrokerId]
   );
 
-  const listFooter = query.isFetchingNextPage ? (
-    <View className="py-4">
-      <ActivityIndicator />
-    </View>
-  ) : null;
+  const listFooter = null;
 
   const isInitialLoading = query.isLoading && brokers.length === 0;
 
@@ -150,6 +179,14 @@ export const AssignBrokerModal = ({ visible, applicationId, onClose }: AssignBro
             </ThemedText>
           </View>
 
+          <View className="mb-3 px-4">
+            <SearchInput
+              value={inputValue}
+              onChangeText={setInputValue}
+              placeholder={t('applications.assign_broker.search_placeholder', 'Search your broker')}
+            />
+          </View>
+
           {isInitialLoading ? (
             <View
               className="mx-4 mb-2 h-[420px] items-center justify-center overflow-hidden rounded-[8px] bg-white px-1 py-0.5"
@@ -173,7 +210,7 @@ export const AssignBrokerModal = ({ visible, applicationId, onClose }: AssignBro
                 }
                 ListFooterComponent={listFooter}
                 onEndReached={handleLoadMore}
-                onEndReachedThreshold={ON_END_THRESHOLD}
+                onEndReachedThreshold={0.35}
                 showsVerticalScrollIndicator
                 keyboardShouldPersistTaps="handled"
               />

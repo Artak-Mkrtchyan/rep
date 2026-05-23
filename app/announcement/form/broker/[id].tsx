@@ -22,7 +22,7 @@ export default function BrokerDetailsScreen() {
   const brokerCompanyQuery = useGetBrokerCompanyById(id, !isIndividualBroker);
 
   const data = isIndividualBroker ? individualBrokerQuery?.data : brokerCompanyQuery?.data;
-  const name = (isIndividualBroker ? data?.fullName : data?.name) ?? '';
+  const name = (isIndividualBroker ? (data as any)?.fullName : (data as any)?.name) ?? '';
   const avatarUrl = data?.avatarInfo?.url ?? data?.avatarInfo?.thumbnailUrl;
 
   const handleSelect = () => {

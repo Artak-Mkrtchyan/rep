@@ -132,6 +132,7 @@ export interface AnnouncementPublicationListResponse {
   announcementCreatedBy: {
     fullName: string;
     id: string;
+    scope?: string;
   };
   assignedBroker: {
     fullName: string;
@@ -145,6 +146,7 @@ export interface AnnouncementPublicationListResponse {
   createdBy: {
     fullName: string;
     id: string;
+    scope?: string;
   };
   firstMediaFile?: {
     thumbnailUrl?: string;
@@ -477,9 +479,12 @@ export const applicationsService = {
    * Get statistics for applications in different statuses
    * @returns A promise that resolves to application statistics by status
    */
-  getApplicationStatisticsByStatuses: async (): Promise<ApplicationStatisticsByStatusResponse> => {
+  getApplicationStatisticsByStatuses: async (
+    data: any
+  ): Promise<ApplicationStatisticsByStatusResponse> => {
     const response = await httpClient.post<ApiResponse<ApplicationStatisticsByStatusResponse>>(
       `/v1/applications/statistics/by-statuses`,
+      data,
       { requiresAuth: true }
     );
     return response.data || (response as unknown as ApplicationStatisticsByStatusResponse);

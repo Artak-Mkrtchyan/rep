@@ -314,9 +314,9 @@ export const ApplicationCard = ({
               </ThemedText>
             </View>
 
-            {(onAddBrokerPress && !brokerName) || onDeletePress ? (
+            {onAddBrokerPress || onDeletePress ? (
               <View className="mt-1 flex-row justify-end gap-2">
-                {onAddBrokerPress && !brokerName ? (
+                {onAddBrokerPress ? (
                   <Pressable
                     onPress={onAddBrokerPress}
                     className="h-8 w-8 items-center justify-center rounded-[20px] border border-main-500 bg-neutral-50"

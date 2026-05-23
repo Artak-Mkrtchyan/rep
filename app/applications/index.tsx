@@ -85,14 +85,34 @@ export default function ApplicationsScreen() {
 
   const query = useGetMyApplicationsInfinite({ pageSize: 5, filter });
 
-  const { data: statistics } = useGetApplicationStatisticsByStatuses();
+  const { data: statistics, refetch: refetchStatistics } = useGetApplicationStatisticsByStatuses();
+
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const list = useMemo(() => query.data?.pages.flatMap((p) => p.content) ?? [], [query.data]);
+  const selectedApplication = useMemo(
+    () => list.find((app) => app.id === assignBrokerApplicationId),
+    [list, assignBrokerApplicationId]
+  );
   const handleLoadMore = useCallback(() => {
     if (query.hasNextPage && !query.isFetchingNextPage) {
       void query.fetchNextPage();
     }
   }, [query]);
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        query.refetch(),
+        refetchStatistics(),
+      ]);
+    } catch (err) {
+      console.error('Failed to refresh applications:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [query, refetchStatistics]);
 
   const segments = useMemo(
     () =>
@@ -129,6 +149,8 @@ export default function ApplicationsScreen() {
         keyExtractor={(row) => row.id}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32, flexGrow: 1 }}
         onEndReached={handleLoadMore}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
         ItemSeparatorComponent={() => <View className="h-4" />}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center px-6">
@@ -149,10 +171,21 @@ export default function ApplicationsScreen() {
             !!userInfo?.id && !!announcementOwnerId && announcementOwnerId === userInfo.id;
           const isDraft = row.status?.code === 'DRAFT';
 
+          const isBrokerCompanyManager = userInfo?.roles?.includes('broker-company-manager');
+          const isAssignAllowedStatus = !['COMPLETED', 'REJECTED', 'APPROVED'].includes(row.status?.code ?? '');
+          const isAnnouncementPublication = row.type === 'ANNOUNCEMENT_PUBLICATION';
+          const isAuthorBroker = row.createdBy?.scope === 'BROKER';
+
+          const canAssignBroker =
+            isBrokerCompanyManager &&
+            isAssignAllowedStatus &&
+            isAnnouncementPublication &&
+            !isAuthorBroker;
+
           return (
             <ApplicationCard
               item={row}
-              onAddBrokerPress={() => setAssignBrokerApplicationId(row.id)}
+              onAddBrokerPress={canAssignBroker ? () => setAssignBrokerApplicationId(row.id) : undefined}
               onPress={() => handlePress(row.id)}
               onDeletePress={
                 isAnnouncementOwner && isDraft
@@ -169,6 +202,7 @@ export default function ApplicationsScreen() {
       <AssignBrokerModal
         visible={assignBrokerApplicationId !== null}
         applicationId={assignBrokerApplicationId ?? ''}
+        assignedBrokerId={selectedApplication?.assignedBroker?.id}
         onClose={handleCloseAssignBroker}
       />
     </ThemedView>

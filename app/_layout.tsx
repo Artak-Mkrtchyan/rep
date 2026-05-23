@@ -19,6 +19,7 @@ import { loadSavedLanguage } from '@/hooks/use-language';
 import { NAV_THEME } from '@/lib/theme';
 import { ThemeProvider } from '@react-navigation/native';
 import { PortalHost } from '@rn-primitives/portal';
+import { ToastProvider } from '@/components/ui/toast-provider';
 
 Appearance.setColorScheme('light');
 
@@ -48,9 +49,11 @@ export default function RootLayout() {
         <AuthProvider>
           <ThemeProvider value={NAV_THEME.light}>
             <SafeAreaProvider>
-              <RootNavigator />
-              <StatusBar style="auto" />
-              <PortalHost />
+              <ToastProvider>
+                <RootNavigator />
+                <StatusBar style="auto" />
+                <PortalHost />
+              </ToastProvider>
             </SafeAreaProvider>
           </ThemeProvider>
         </AuthProvider>

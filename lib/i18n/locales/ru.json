@@ -428,6 +428,12 @@
   "announcement.rent.as_individual_placeholder": "Как частное лицо",
   "announcement.rent.need_photographer": "Нужны услуги фотографа?",
   "announcement.rent.need_assessment_expert": "Нужны услуги оценщика?",
+  "announcement.rent.upload_from_booking": "Загрузить из бронирования",
+  "announcement.rent.upload_from_booking_placeholder": "Выберите бронирования для загрузки фото",
+  "announcement.rent.upload_from_booking_import_btn": "Импортировать фото",
+  "announcement.rent.upload_from_booking_loading": "Импорт фотографий...",
+  "announcement.rent.upload_from_booking_empty": "Завершенные бронирования фотографа не найдены",
+  "announcement.rent.upload_from_booking_success": "Успешно импортировано фото: {{count}}",
 
   "announcement.rent.property_info_first_title": "Информация о недвижимости",
   "announcement.rent.property_info_first_subtitle": "Добавьте или проверьте данные о площади вашей недвижимости.",

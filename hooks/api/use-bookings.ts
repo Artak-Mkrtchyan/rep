@@ -11,8 +11,29 @@ import type {
   CreateAssessmentBookingRequest,
   CreatePhotoShootBookingRequest,
 } from '@/types/bookings';
+import { ServiceType, BookingStatus } from '@/types/bookings';
 
 export const BOOKINGS_QUERY_KEY = 'bookings';
+
+/** Bookings that are Completed and type Photo Shoot, eligible for uploading photos to announcement. */
+export const useEligibleBookingsForUpload = (enabled: boolean = true) => {
+  return useQuery<SearchResponse<BookingListItem>, ApiError>({
+    queryKey: [BOOKINGS_QUERY_KEY, 'eligible-for-upload'],
+    queryFn: () =>
+      bookingsService.searchMyBookings({
+        filter: {
+          types: [ServiceType.PHOTO_SHOOT],
+          statuses: [BookingStatus.COMPLETED],
+        },
+        pagination: {
+          pageNumber: 0,
+          pageSize: 100,
+        },
+        sorts: [{ sort: 'CREATED_AT', direction: 'DESC' }],
+      }),
+    enabled,
+  });
+};
 
 const PAGE_SIZE = 10;
 

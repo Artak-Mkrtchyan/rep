@@ -428,6 +428,12 @@
   "announcement.rent.as_individual_placeholder": "As individual",
   "announcement.rent.need_photographer": "Do you need photographer services?",
   "announcement.rent.need_assessment_expert": "Do you need assessment expert services?",
+  "announcement.rent.upload_from_booking": "Upload from booking",
+  "announcement.rent.upload_from_booking_placeholder": "Select bookings to upload photos",
+  "announcement.rent.upload_from_booking_import_btn": "Import Photos",
+  "announcement.rent.upload_from_booking_loading": "Importing photos...",
+  "announcement.rent.upload_from_booking_empty": "No completed photographer bookings found",
+  "announcement.rent.upload_from_booking_success": "Successfully imported {{count}} photos",
 
   "announcement.rent.property_info_first_title": "Property info",
   "announcement.rent.property_info_first_subtitle": "Add or review details about your property's size.",

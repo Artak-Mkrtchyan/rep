@@ -4,6 +4,7 @@ import { Alert, ScrollView, View } from 'react-native';
 
 import { AnnouncementFooter } from '@/components/announcement/announcement-footer';
 import { ApplicationCommentBanner } from '@/components/announcement/application-comment-banner';
+import { BookingPhotoPicker } from '@/components/announcement/booking-photo-picker';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { FileUpload } from '@/components/ui/file-upload';
@@ -67,6 +68,18 @@ export default function MediaScreen() {
           <ThemedText className="font-regular mb-4 text-[12px] text-muted-foreground">
             {t('announcement.rent.add_photos_subtitle')}
           </ThemedText>
+
+          <BookingPhotoPicker
+            existingPhotoIds={mediaFileIds || []}
+            onPhotosImported={(newPhotos) => {
+              const updatedPhotos = [...(tempMediaFiles || []), ...newPhotos];
+              const updatedPhotoIds = updatedPhotos.map((p) => p.id);
+              update({
+                formData: { mediaFileIds: updatedPhotoIds },
+                metaData: { tempMediaFiles: updatedPhotos, isChangeFields: true },
+              });
+            }}
+          />
 
           <FileUpload
             hint={t('ui.upload_your_photo')}

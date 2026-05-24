@@ -428,6 +428,12 @@
   "announcement.rent.as_individual_placeholder": "Jismoniy shaxs sifatida",
   "announcement.rent.need_photographer": "Fotograf xizmatiga ehtiyojingiz bormi?",
   "announcement.rent.need_assessment_expert": "Baholash mutaxassisi xizmatiga ehtiyojingiz bormi?",
+  "announcement.rent.upload_from_booking": "Bron qilishdan yuklash",
+  "announcement.rent.upload_from_booking_placeholder": "Rasmlarni yuklash uchun bronlarni tanlang",
+  "announcement.rent.upload_from_booking_import_btn": "Rasmlarni import qilish",
+  "announcement.rent.upload_from_booking_loading": "Rasmlar import qilinmoqda...",
+  "announcement.rent.upload_from_booking_empty": "Yakunlangan fotograf bronlari topilmadi",
+  "announcement.rent.upload_from_booking_success": "{{count}} ta rasm muvaffaqiyatli import qilindi",
 
   "announcement.rent.property_info_first_title": "Mulk haqida ma'lumot",
   "announcement.rent.property_info_first_subtitle": "Mulkingiz o'lchami haqida ma'lumotlarni qo'shing yoki ko'rib chiqing.",

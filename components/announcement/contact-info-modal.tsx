@@ -14,11 +14,14 @@ import {
 } from 'react-native';
 
 import { announcementsService } from '@/lib/api/announcements';
+import { applicationsService, type ApplicationFullInfoDto } from '@/lib/api/applications';
 import type { AnnouncementFullInfoDto } from '@/types/api';
 
 type ContactInfoModalProps = {
   visible: boolean;
-  announcementId: string;
+  announcementId?: string;
+  applicationId?: string;
+  type?: 'broker' | 'company' | 'creator';
   brokerId?: string;
   onClose: () => void;
 };
@@ -26,59 +29,125 @@ type ContactInfoModalProps = {
 export const ContactInfoModal: React.FC<ContactInfoModalProps> = ({
   visible,
   announcementId,
+  applicationId,
+  type,
   brokerId,
   onClose,
 }) => {
   const { t } = useTranslation();
-  const [data, setData] = useState<AnnouncementFullInfoDto | null>(null);
+  const [announcementData, setAnnouncementData] = useState<AnnouncementFullInfoDto | null>(null);
+  const [applicationData, setApplicationData] = useState<ApplicationFullInfoDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!visible) return;
     let cancelled = false;
     setIsLoading(true);
+    setAnnouncementData(null);
+    setApplicationData(null);
 
-    announcementsService
-      .getAnnouncementFullInfo(announcementId)
-      .then((result) => {
-        if (!cancelled) setData(result);
-      })
-      .catch(() => {})
-      .finally(() => {
+    const fetchData = async () => {
+      try {
+        if (applicationId) {
+          const result = await applicationsService.getApplicationFullInfo(applicationId);
+          if (!cancelled) setApplicationData(result);
+        } else if (announcementId) {
+          const result = await announcementsService.getAnnouncementFullInfo(announcementId);
+          if (!cancelled) setAnnouncementData(result);
+        }
+      } catch (error) {
+        console.error('Failed to fetch contact details:', error);
+      } finally {
         if (!cancelled) setIsLoading(false);
-      });
+      }
+    };
+
+    void fetchData();
 
     return () => {
       cancelled = true;
     };
-  }, [visible, announcementId]);
+  }, [visible, announcementId, applicationId]);
 
   const contact = React.useMemo(() => {
-    if (!data) return null;
-
-    if (brokerId && data.assignedBroker) {
-      return {
-        name: data.assignedBroker.fullName,
-        avatarUrl:
-          data.assignedBroker.avatarInfo?.thumbnailUrl || data.assignedBroker.avatarInfo?.url,
-        phone: data.assignedBroker.phoneNumber,
-        email: data.assignedBroker.email,
-        type: t('announcement.contact.broker'),
-      };
+    // 1. If it's an application:
+    if (applicationData) {
+      if (type === 'broker' && applicationData.assignedBroker) {
+        return {
+          name: applicationData.assignedBroker.fullName,
+          avatarUrl:
+            applicationData.assignedBroker.avatarInfo?.thumbnailUrl ||
+            applicationData.assignedBroker.avatarInfo?.url,
+          phone: applicationData.assignedBroker.phoneNumber,
+          email: applicationData.assignedBroker.email,
+          type: t('announcement.contact.broker'),
+        };
+      }
+      if (type === 'company' && applicationData.assignedBrokerCompany) {
+        return {
+          name: applicationData.assignedBrokerCompany.name,
+          avatarUrl:
+            applicationData.assignedBrokerCompany.avatarInfo?.thumbnailUrl ||
+            applicationData.assignedBrokerCompany.avatarInfo?.url,
+          phone: applicationData.assignedBrokerCompany.phoneNumber,
+          email: applicationData.assignedBrokerCompany.email,
+          type: t('announcement.contact.broker_company'),
+        };
+      }
+      // Default to creator/owner
+      if (applicationData.createdBy) {
+        return {
+          name: applicationData.createdBy.fullName,
+          avatarUrl:
+            applicationData.createdBy.avatarInfo?.thumbnailUrl ||
+            applicationData.createdBy.avatarInfo?.url,
+          phone: applicationData.createdBy.phone,
+          email: applicationData.createdBy.email,
+          type: t('announcement.contact.individual_user'),
+        };
+      }
+      return null;
     }
 
-    if (data.createdBy) {
-      return {
-        name: data.createdBy.fullName,
-        avatarUrl: data.createdBy.avatarInfo?.thumbnailUrl || data.createdBy.avatarInfo?.url,
-        phone: data.createdBy.phone,
-        email: data.createdBy.email,
-        type: t('announcement.contact.individual_user'),
-      };
+    // 2. If it's an announcement:
+    if (announcementData) {
+      if ((type === 'broker' || brokerId) && announcementData.assignedBroker) {
+        return {
+          name: announcementData.assignedBroker.fullName,
+          avatarUrl:
+            announcementData.assignedBroker.avatarInfo?.thumbnailUrl ||
+            announcementData.assignedBroker.avatarInfo?.url,
+          phone: announcementData.assignedBroker.phoneNumber,
+          email: announcementData.assignedBroker.email,
+          type: t('announcement.contact.broker'),
+        };
+      }
+      if (type === 'company' && announcementData.assignedBrokerCompany) {
+        return {
+          name: announcementData.assignedBrokerCompany.name,
+          avatarUrl:
+            announcementData.assignedBrokerCompany.avatarInfo?.thumbnailUrl ||
+            announcementData.assignedBrokerCompany.avatarInfo?.url,
+          phone: announcementData.assignedBrokerCompany.phoneNumber,
+          email: announcementData.assignedBrokerCompany.email,
+          type: t('announcement.contact.broker_company'),
+        };
+      }
+      if (announcementData.createdBy) {
+        return {
+          name: announcementData.createdBy.fullName,
+          avatarUrl:
+            announcementData.createdBy.avatarInfo?.thumbnailUrl ||
+            announcementData.createdBy.avatarInfo?.url,
+          phone: announcementData.createdBy.phone,
+          email: announcementData.createdBy.email,
+          type: t('announcement.contact.individual_user'),
+        };
+      }
     }
 
     return null;
-  }, [data, brokerId, t]);
+  }, [applicationData, announcementData, type, brokerId, t]);
 
   const handleCall = useCallback(() => {
     if (contact?.phone) Linking.openURL(`tel:${contact.phone}`).catch(() => {});

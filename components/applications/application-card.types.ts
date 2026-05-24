@@ -5,5 +5,6 @@ export type ApplicationCardProps = {
   onPress?: () => void;
   onAddBrokerPress?: () => void;
   onDeletePress?: () => void;
+  onUserPress?: (type: 'broker' | 'company' | 'creator') => void;
   className?: string;
 };

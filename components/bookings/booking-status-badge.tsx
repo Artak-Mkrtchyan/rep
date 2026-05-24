@@ -11,10 +11,11 @@ type BadgeStyle = { container: string; text: string };
 const STATUS_STYLES: Record<BookingStatus, BadgeStyle> = {
   [BookingStatus.COMPLETED]: { container: 'bg-green-50', text: 'text-green-500' },
   [BookingStatus.CONFIRMED]: { container: 'bg-blue-50', text: 'text-blue-500' },
-  [BookingStatus.IN_PROGRESS]: { container: 'bg-purple-50', text: 'text-purple-500' },
+  [BookingStatus.IN_PROGRESS]: { container: 'bg-orange-50', text: 'text-orange-500' },
   [BookingStatus.PENDING_FOR_CONFIRMATION]: { container: 'bg-orange-50', text: 'text-orange-500' },
-  [BookingStatus.CANCELLED]: { container: 'bg-purple-50', text: 'text-purple-500' },
+  [BookingStatus.CANCELLED]: { container: 'bg-yellow-50', text: 'text-yellow-500' },
   [BookingStatus.DECLINED]: { container: 'bg-red-50', text: 'text-red-500' },
+  [BookingStatus.WORK_COMPLETED]: { container: 'bg-green-50', text: 'text-green-500' },
 };
 
 const STATUS_LABEL_KEY: Record<BookingStatus, string> = {
@@ -24,6 +25,7 @@ const STATUS_LABEL_KEY: Record<BookingStatus, string> = {
   [BookingStatus.PENDING_FOR_CONFIRMATION]: 'booking.status.pending_for_confirmation',
   [BookingStatus.CANCELLED]: 'booking.status.cancelled',
   [BookingStatus.DECLINED]: 'booking.status.declined',
+  [BookingStatus.WORK_COMPLETED]: 'booking.status.work_completed',
 };
 
 interface Props {
@@ -44,7 +46,7 @@ export const BookingStatusBadge: React.FC<Props> = ({ status, fallback, classNam
   });
 
   return (
-    <View className={cn('self-start rounded-md px-3 py-1', style.container, className)}>
+    <View className={cn('self-start rounded-[4px] px-3 py-1', style.container, className)}>
       <ThemedText className={cn('text-[12px] font-medium leading-[14px]', style.text)}>
         {label}
       </ThemedText>

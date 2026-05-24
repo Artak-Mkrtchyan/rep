@@ -633,6 +633,7 @@
   "announcement.contact.subtitle": "Aloqa ma'lumotlarini ko'ring va ushbu mulk bo'yicha bog'laning.",
   "announcement.contact.broker": "Broker",
   "announcement.contact.individual_user": "Jismoniy shaxs",
+  "announcement.contact.broker_company": "Broker kompaniyasi",
   "announcement.contact.not_available": "Aloqa ma'lumotlari mavjud emas",
 
   "profile.my_announcements": "E'lonlar",
@@ -952,6 +953,14 @@
   "booking.status.confirmed": "Tasdiqlangan",
   "booking.status.cancelled": "Bekor qilingan",
   "booking.status.in_progress": "Jarayonda",
+  "booking.status.work_completed": "Ish yakunlangan",
+  "booking.status.change_status": "Holatni o'zgartirish",
+  "booking.status.cancel_confirm_title": "Bronni bekor qilish",
+  "booking.status.cancel_confirm_desc": "Haqiqatan ham ushbu bronni bekor qilmoqchimisiz?",
+  "booking.status.complete_confirm_title": "Bronni yakunlash",
+  "booking.status.complete_confirm_desc": "Haqiqatan ham ushbu bronni bajarilgan deb belgilamoqchimisiz?",
+  "booking.status.save_success_title": "Holat yangilandi",
+  "booking.status.save_success_subtitle": "Bron holati muvaffaqiyatli yangilandi.",
 
   "booking.validation.service_provider_required": "Xizmat ko'rsatuvchini tanlang",
   "booking.validation.listing_type_required": "E'lon turini tanlang",

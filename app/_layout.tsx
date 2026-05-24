@@ -63,7 +63,7 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, redirectPath, setRedirectPath } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
@@ -73,15 +73,16 @@ function RootNavigator() {
     const currentSegment = segments[0] as string | undefined;
     const inAuthGroup = currentSegment === '(auth)';
 
-    // Only force-navigate signed-in users away from the auth stack. Guests
-    // are never pushed to (auth) automatically — the Home tab is the
-    // landing screen, and individual protected actions (profile, add
-    // announcement, favourites toggle, etc.) handle auth prompts
-    // themselves via login-required screens.
     if (user && inAuthGroup) {
-      router.replace('/(tabs)');
+      if (redirectPath) {
+        const target = redirectPath;
+        setRedirectPath(null);
+        router.replace(target as any);
+      } else {
+        router.replace('/(tabs)');
+      }
     }
-  }, [user, isLoading, segments, router]);
+  }, [user, isLoading, segments, router, redirectPath, setRedirectPath]);
 
   React.useEffect(() => {
     if (isLoading) return;

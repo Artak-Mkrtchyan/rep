@@ -633,6 +633,7 @@
   "announcement.contact.subtitle": "View the contact details and get in touch about this property.",
   "announcement.contact.broker": "Broker",
   "announcement.contact.individual_user": "Individual user",
+  "announcement.contact.broker_company": "Broker company",
   "announcement.contact.not_available": "Contact information is not available",
 
   "profile.my_announcements": "Announcements",
@@ -952,6 +953,14 @@
   "booking.status.confirmed": "Confirmed",
   "booking.status.cancelled": "Cancelled",
   "booking.status.in_progress": "In progress",
+  "booking.status.work_completed": "Work completed",
+  "booking.status.change_status": "Change status",
+  "booking.status.cancel_confirm_title": "Cancel Booking",
+  "booking.status.cancel_confirm_desc": "Are you sure you want to cancel this booking?",
+  "booking.status.complete_confirm_title": "Complete Booking",
+  "booking.status.complete_confirm_desc": "Are you sure you want to mark this booking as completed?",
+  "booking.status.save_success_title": "Status Updated",
+  "booking.status.save_success_subtitle": "Booking status has been updated successfully.",
 
   "booking.validation.service_provider_required": "Service provider is required",
   "booking.validation.listing_type_required": "Listing type is required",

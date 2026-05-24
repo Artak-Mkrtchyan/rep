@@ -3,6 +3,7 @@ import {
   applicationsService,
   ApplicationStatusType,
   ApplicationStatusChange,
+  ApplicationFullInfoDto,
 } from '@/lib/api/applications';
 import { ApiError } from '@/lib/api/auth.types';
 import { useAuth } from '@/context/AuthContext';
@@ -181,6 +182,15 @@ export const useApplicationById = (id: string | undefined, enabled = true) => {
   return useQuery({
     queryKey: [APPLICATIONS_QUERY_KEY, 'application', id],
     queryFn: () => applicationsService.getApplicationById(id!),
+    enabled: enabled && !!id,
+    staleTime: 5 * 60 * 1000,
+  });
+};
+
+export const useGetApplicationFullInfo = (id: string | undefined, enabled = true) => {
+  return useQuery<ApplicationFullInfoDto, ApiError>({
+    queryKey: [APPLICATIONS_QUERY_KEY, 'application-full-info', id],
+    queryFn: () => applicationsService.getApplicationFullInfo(id!),
     enabled: enabled && !!id,
     staleTime: 5 * 60 * 1000,
   });

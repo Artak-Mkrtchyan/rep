@@ -310,24 +310,26 @@ export const BookingFormSheet: React.FC<Props> = ({ visible, onClose, onCreated 
       transparent
       onRequestClose={onClose}
       statusBarTranslucent>
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFillObject,
+          { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim },
+        ]}>
+        <Pressable
+          style={{ flex: 1 }}
+          onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel={t('common.close')}
+        />
+      </Animated.View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View className="flex-1 justify-end">
-          <Animated.View
-            style={[
-              StyleSheet.absoluteFillObject,
-              { backgroundColor: 'rgba(0,0,0,0.4)', opacity: backdropAnim },
-            ]}>
-            <Pressable
-              style={{ flex: 1 }}
-              onPress={onClose}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.close')}
-            />
-          </Animated.View>
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        pointerEvents="box-none">
+        <View className="flex-1 justify-end" pointerEvents="box-none">
           <Animated.View
             className="h-[92%] rounded-t-[24px] bg-white"
+            pointerEvents="auto"
             style={{ transform: [{ translateY: slideAnim }] }}>
             <View className="items-center pb-2 pt-2">
               <View className="h-[5px] w-[36px] rounded-full bg-neutral-200" />

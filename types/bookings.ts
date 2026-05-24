@@ -22,6 +22,7 @@ export enum BookingStatus {
   CONFIRMED = 'CONFIRMED',
   CANCELLED = 'CANCELLED',
   IN_PROGRESS = 'IN_PROGRESS',
+  WORK_COMPLETED = 'WORK_COMPLETED',
 }
 
 /** Quick scheduled-date filter chip selected by the user. */

@@ -633,6 +633,7 @@
   "announcement.contact.subtitle": "Просмотрите контактные данные и свяжитесь по этому объекту.",
   "announcement.contact.broker": "Брокер",
   "announcement.contact.individual_user": "Частное лицо",
+  "announcement.contact.broker_company": "Брокерская компания",
   "announcement.contact.not_available": "Контактная информация недоступна",
 
   "profile.my_announcements": "Объявления",
@@ -952,6 +953,14 @@
   "booking.status.confirmed": "Подтверждено",
   "booking.status.cancelled": "Отменено",
   "booking.status.in_progress": "В работе",
+  "booking.status.work_completed": "Работа завершена",
+  "booking.status.change_status": "Изменить статус",
+  "booking.status.cancel_confirm_title": "Отменить бронирование",
+  "booking.status.cancel_confirm_desc": "Вы уверены, что хотите отменить это бронирование?",
+  "booking.status.complete_confirm_title": "Завершить бронирование",
+  "booking.status.complete_confirm_desc": "Вы уверены, что хотите отметить это бронирование как выполненное?",
+  "booking.status.save_success_title": "Статус обновлен",
+  "booking.status.save_success_subtitle": "Статус бронирования был успешно обновлен.",
 
   "booking.validation.service_provider_required": "Выберите сервис-провайдера",
   "booking.validation.listing_type_required": "Выберите тип объявления",

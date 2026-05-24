@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, View } from 'react-native';
 
 import { ApplicationCard, AssignBrokerModal } from '@/components/applications';
+import { ContactInfoModal } from '@/components/announcement/contact-info-modal';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { HorizontalSegmentedControl } from '@/components/ui/segmented-control';
@@ -45,6 +46,9 @@ export default function ApplicationsScreen() {
   const { userInfo } = useAuth();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [assignBrokerApplicationId, setAssignBrokerApplicationId] = useState<string | null>(null);
+  const [contactModalVisible, setContactModalVisible] = useState(false);
+  const [contactApplicationId, setContactApplicationId] = useState<string | null>(null);
+  const [contactType, setContactType] = useState<'broker' | 'company' | 'creator' | undefined>(undefined);
 
   const { mutate: deleteApplication } = useDeleteApplication();
 
@@ -171,16 +175,22 @@ export default function ApplicationsScreen() {
             !!userInfo?.id && !!announcementOwnerId && announcementOwnerId === userInfo.id;
           const isDraft = row.status?.code === 'DRAFT';
 
-          const isBrokerCompanyManager = userInfo?.roles?.includes('broker-company-manager');
-          const isAssignAllowedStatus = !['COMPLETED', 'REJECTED', 'APPROVED'].includes(row.status?.code ?? '');
-          const isAnnouncementPublication = row.type === 'ANNOUNCEMENT_PUBLICATION';
-          const isAuthorBroker = row.createdBy?.scope === 'BROKER';
+           const isBrokerCompanyManager = userInfo?.roles?.includes('broker-company-manager');
+          const isAssignAllowedStatus = [
+            'DRAFT',
+            'RETURNED_TO_APPLICANT',
+            'SUBMITTED',
+            'UNDER_REVIEW',
+          ].includes(row.status?.code ?? '');
+          const isAllowedType = [
+            'ANNOUNCEMENT_PUBLICATION',
+            'ANNOUNCEMENT_MODIFICATION',
+          ].includes(row.type ?? '');
 
           const canAssignBroker =
             isBrokerCompanyManager &&
             isAssignAllowedStatus &&
-            isAnnouncementPublication &&
-            !isAuthorBroker;
+            isAllowedType;
 
           return (
             <ApplicationCard
@@ -192,6 +202,11 @@ export default function ApplicationsScreen() {
                   ? () => handleDelete(row.id, row.type as any)
                   : undefined
               }
+              onUserPress={(type) => {
+                setContactType(type);
+                setContactApplicationId(row.id);
+                setContactModalVisible(true);
+              }}
               className="max-w-full"
             />
           );
@@ -204,6 +219,17 @@ export default function ApplicationsScreen() {
         applicationId={assignBrokerApplicationId ?? ''}
         assignedBrokerId={selectedApplication?.assignedBroker?.id}
         onClose={handleCloseAssignBroker}
+      />
+
+      <ContactInfoModal
+        visible={contactModalVisible}
+        applicationId={contactApplicationId ?? undefined}
+        type={contactType}
+        onClose={() => {
+          setContactModalVisible(false);
+          setContactApplicationId(null);
+          setContactType(undefined);
+        }}
       />
     </ThemedView>
   );

@@ -163,24 +163,44 @@ export interface ConstructionCompanyRegistrationResponse {
 export type FileInput = { uri: string; type: string; name: string }; // React Native format
 
 export interface AnnouncementPublicationListResponse {
-  announcementCreatedBy: {
+  announcementCreatedBy?: {
     fullName: string;
     id: string;
     scope?: string;
+    avatarInfo?: {
+      id: string;
+      url: string;
+      thumbnailUrl: string;
+    };
   };
-  assignedBroker: {
+  assignedBroker?: {
     fullName: string;
     id: string;
+    avatarInfo?: {
+      id: string;
+      url: string;
+      thumbnailUrl: string;
+    };
   };
-  assignedBrokerCompany: {
+  assignedBrokerCompany?: {
     id: string;
     name: string;
+    avatarInfo?: {
+      id: string;
+      url: string;
+      thumbnailUrl: string;
+    };
   };
   createdAt: string;
-  createdBy: {
+  createdBy?: {
     fullName: string;
     id: string;
     scope?: string;
+    avatarInfo?: {
+      id: string;
+      url: string;
+      thumbnailUrl: string;
+    };
   };
   firstMediaFile?: {
     thumbnailUrl?: string;
@@ -601,4 +621,54 @@ export const applicationsService = {
     );
     return response.data || (response as unknown as SearchResponse<ApplicationStatusChange>);
   },
+
+  /**
+   * Get application full info by ID (including owner and broker contact info)
+   * GET /api/v1/applications/{id}/full-info
+   */
+  getApplicationFullInfo: async (id: string): Promise<ApplicationFullInfoDto> => {
+    const response = await httpClient.get<ApiResponse<ApplicationFullInfoDto>>(
+      `/v1/applications/${id}/full-info`,
+      {
+        requiresAuth: true,
+      }
+    );
+    return response.data || (response as unknown as ApplicationFullInfoDto);
+  },
 };
+
+export interface ApplicationFullInfoDto {
+  assignedBroker?: {
+    id: string;
+    fullName: string;
+    avatarInfo?: {
+      id: string;
+      url: string;
+      thumbnailUrl: string;
+    };
+    phoneNumber?: string;
+    email?: string;
+  };
+  createdBy?: {
+    id: string;
+    fullName: string;
+    avatarInfo?: {
+      id: string;
+      url: string;
+      thumbnailUrl: string;
+    };
+    phone?: string;
+    email?: string;
+  };
+  assignedBrokerCompany?: {
+    id: string;
+    name: string;
+    avatarInfo?: {
+      id: string;
+      url: string;
+      thumbnailUrl: string;
+    };
+    phoneNumber?: string;
+    email?: string;
+  };
+}

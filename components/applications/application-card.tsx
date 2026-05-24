@@ -121,14 +121,14 @@ type UserChipProps = {
   roleLabel: string;
   name: string;
   avatarUri?: string;
-  nameTone?: 'default' | 'owner';
+  onPress?: () => void;
 };
 
 const ApplicationUserChip = ({
   roleLabel,
   name,
   avatarUri,
-  nameTone = 'default',
+  onPress,
 }: UserChipProps) =>
   name ? (
     <View className="flex-row items-center gap-1">
@@ -150,14 +150,21 @@ const ApplicationUserChip = ({
         <ThemedText className="text-[10px] font-medium leading-[10px] text-neutral-500">
           {roleLabel}
         </ThemedText>
-        <ThemedText
-          className={cn(
-            'text-[12px] font-bold leading-[11px]',
-            nameTone === 'owner' ? 'text-main-500' : 'text-foreground'
-          )}
-          numberOfLines={1}>
-          {name}
-        </ThemedText>
+        {onPress ? (
+          <Pressable onPress={onPress}>
+            <ThemedText
+              className="text-[12px] font-bold leading-[11px] text-main-500 underline"
+              numberOfLines={1}>
+              {name}
+            </ThemedText>
+          </Pressable>
+        ) : (
+          <ThemedText
+            className="text-[12px] font-bold leading-[11px] text-foreground"
+            numberOfLines={1}>
+            {name}
+          </ThemedText>
+        )}
       </View>
     </View>
   ) : null;
@@ -167,6 +174,7 @@ export const ApplicationCard = ({
   onPress,
   onAddBrokerPress,
   onDeletePress,
+  onUserPress,
   className,
 }: ApplicationCardProps) => {
   const { t } = useTranslation();
@@ -230,7 +238,7 @@ export const ApplicationCard = ({
       style={CARD_SHADOW}
       accessibilityLabel={headerTitle}>
       <View className="w-[50%] rounded-t-[16px] border border-b-0 border-neutral-50 bg-[#FFF8F0] px-4 pb-1 pt-2">
-        <ThemedText className="text-center text-[12px] font-semibold text-foreground">
+        <ThemedText className="text-[12px] font-semibold text-foreground">
           {headerTitle}
         </ThemedText>
       </View>
@@ -267,14 +275,33 @@ export const ApplicationCard = ({
           {hasPersonNames ? (
             <View className="mt-4 flex-row flex-wrap items-center gap-4 border-b border-neutral-50 py-2">
               {isBroker || isBrokerCompany ? (
-                <ApplicationUserChip roleLabel={t('applications.role_broker')} name={brokerName} />
+                <ApplicationUserChip
+                  roleLabel={t('applications.role_broker')}
+                  name={brokerName}
+                  avatarUri={
+                    item.assignedBroker?.avatarInfo?.thumbnailUrl ||
+                    item.assignedBroker?.avatarInfo?.url ||
+                    item.assignedBrokerCompany?.avatarInfo?.thumbnailUrl ||
+                    item.assignedBrokerCompany?.avatarInfo?.url
+                  }
+                  onPress={
+                    onUserPress
+                      ? () => onUserPress(item.assignedBroker ? 'broker' : 'company')
+                      : undefined
+                  }
+                />
               ) : null}
 
               {isOwner ? (
                 <ApplicationUserChip
                   roleLabel={t('applications.role_owner')}
                   name={ownerName}
-                  nameTone="owner"
+                  avatarUri={item.createdBy?.avatarInfo?.thumbnailUrl || item.createdBy?.avatarInfo?.url}
+                  onPress={
+                    onUserPress
+                      ? () => onUserPress('creator')
+                      : undefined
+                  }
                 />
               ) : null}
             </View>

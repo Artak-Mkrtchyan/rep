@@ -117,3 +117,26 @@ export const useCreatePhotoShootBooking = () => {
     },
   });
 };
+
+/** Cancel a photo-shoot/assessment booking by the author. */
+export const useCancelPhotoShootBookingByAuthor = () => {
+  const queryClient = useQueryClient();
+  return useMutation<unknown, ApiError, string>({
+    mutationFn: (id: string) => bookingsService.cancelPhotoShootBookingByAuthor(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [BOOKINGS_QUERY_KEY] });
+    },
+  });
+};
+
+/** Complete a photo-shoot/assessment booking by the author. */
+export const useCompletePhotoShootBookingByAuthor = () => {
+  const queryClient = useQueryClient();
+  return useMutation<unknown, ApiError, string>({
+    mutationFn: (id: string) => bookingsService.completePhotoShootBookingByAuthor(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [BOOKINGS_QUERY_KEY] });
+    },
+  });
+};
+

@@ -81,4 +81,31 @@ export const bookingsService = {
     );
     return response.data || (response as unknown as SearchResponse<BookingPhoto>);
   },
+
+  /**
+   * Cancel photo shoot booking by author.
+   * Backed by `PATCH /v1/bookings/photo-shoots/{id}/cancel`.
+   */
+  cancelPhotoShootBookingByAuthor: async (id: string): Promise<unknown> => {
+    const response = await httpClient.patch<ApiResponse<unknown>>(
+      `/v1/bookings/photo-shoots/${encodeURIComponent(id)}/cancel`,
+      {},
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown);
+  },
+
+  /**
+   * Complete photo shoot booking by author.
+   * Backed by `PATCH /v1/bookings/photo-shoots/{id}/complete`.
+   */
+  completePhotoShootBookingByAuthor: async (id: string): Promise<unknown> => {
+    const response = await httpClient.patch<ApiResponse<unknown>>(
+      `/v1/bookings/photo-shoots/${encodeURIComponent(id)}/complete`,
+      {},
+      { requiresAuth: true }
+    );
+    return response.data || (response as unknown);
+  },
 };
+

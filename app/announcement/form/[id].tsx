@@ -37,12 +37,22 @@ export default function AnnouncementFormScreen() {
   const getApplicationById = useAnnouncementForRentFormStore((s) => s.getApplicationById);
   const getAnnouncementById = useAnnouncementForRentFormStore((s) => s.getAnnouncementById);
   const navigation = useNavigation();
-  const { userInfo } = useAuth();
+  const { userInfo, setRedirectPath } = useAuth();
 
   const getFormData = isAnnouncement === 'true' ? getAnnouncementById : getApplicationById;
 
   useEffect(() => {
     async function initialize() {
+      if (!userInfo) {
+        if (id && id !== 'new') {
+          setRedirectPath(
+            `/announcement/form/${id}${isAnnouncement === 'true' ? '?isAnnouncement=true' : ''}`
+          );
+        }
+        router.replace('/(auth)');
+        return;
+      }
+
       try {
         if (id === 'new') {
           resetForm();
@@ -102,7 +112,7 @@ export default function AnnouncementFormScreen() {
     }
 
     initialize();
-  }, [id, resetForm, getFormData, navigation, t, userInfo]);
+  }, [id, resetForm, getFormData, navigation, t, userInfo, isAnnouncement, setRedirectPath]);
 
   return (
     <View className="flex-1 items-center justify-center">

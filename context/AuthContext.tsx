@@ -37,6 +37,8 @@ type AuthContextValue = {
   getAuthHeader: () => Record<string, string>;
   refreshUser: () => Promise<void>;
   updateUserInfo: (partial: Partial<UserInfo>) => void;
+  redirectPath: string | null;
+  setRedirectPath: (path: string | null) => void;
 };
 
 const ACCESS_TOKEN_KEY = 'auth.accessToken';
@@ -51,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [refreshTokenExpiresAt, setRefreshTokenExpiresAt] = React.useState<string | null>(null);
   const [userInfo, setUserInfo] = React.useState<UserInfo | null>(null);
   const [isRestoring, setIsRestoring] = React.useState(true);
+  const [redirectPath, setRedirectPath] = React.useState<string | null>(null);
 
   const fetchUserInfo = React.useCallback(async () => {
     try {
@@ -192,6 +195,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       getAuthHeader,
       refreshUser: fetchUserInfo,
       updateUserInfo,
+      redirectPath,
+      setRedirectPath,
     }),
     [
       accessToken,
@@ -203,6 +208,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       getAuthHeader,
       fetchUserInfo,
       updateUserInfo,
+      redirectPath,
     ]
   );
 

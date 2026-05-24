@@ -9,6 +9,7 @@ export { BookingsFilterSheet } from './bookings-filter-sheet';
 export { DateTimeInput } from './datetime-input';
 export { EmptyBookingsState } from './empty-bookings-state';
 export { FeedbackSection } from './feedback-section';
+export { ChangeBookingStatusBottomSheet } from './change-status-bottom-sheet';
 export {
   formatAddress,
   formatDateTime,

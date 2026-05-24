@@ -12,6 +12,7 @@ import { formatDateTimeRange } from './format';
 
 interface Props {
   booking: BookingDetails;
+  onPressStatus?: () => void;
 }
 
 const InfoRow: React.FC<{ value: string; href: string; ariaLabel: string }> = ({
@@ -32,7 +33,7 @@ const InfoRow: React.FC<{ value: string; href: string; ariaLabel: string }> = ({
  *
  * Figma `6736:116390` (with assignee) and `12196:115677` (no assignee).
  */
-export const BookingDetailHeader: React.FC<Props> = ({ booking }) => {
+export const BookingDetailHeader: React.FC<Props> = ({ booking, onPressStatus }) => {
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
 
@@ -102,7 +103,17 @@ export const BookingDetailHeader: React.FC<Props> = ({ booking }) => {
           </View>
         ) : null}
         <View className="ml-auto">
-          <BookingStatusBadge status={booking.status.code} fallback={booking.status.name} />
+          {onPressStatus ? (
+            <Pressable
+              onPress={onPressStatus}
+              accessibilityRole="button"
+              accessibilityLabel={t('booking.status.change_status')}
+              className="active:opacity-80">
+              <BookingStatusBadge status={booking.status.code} fallback={booking.status.name} />
+            </Pressable>
+          ) : (
+            <BookingStatusBadge status={booking.status.code} fallback={booking.status.name} />
+          )}
         </View>
       </View>
 

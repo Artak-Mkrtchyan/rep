@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, RefreshControl, ScrollView, View } from 'react-native';
 
@@ -8,15 +8,19 @@ import {
   BookingDetailHeader,
   BookingDetailInfo,
   FeedbackSection,
+  ChangeBookingStatusBottomSheet,
 } from '@/components/bookings';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useAuth } from '@/context/AuthContext';
 import { useBookingById } from '@/hooks/api/use-bookings';
-import { ServiceType } from '@/types/bookings';
+import { ServiceType, BookingStatus } from '@/types/bookings';
 
 export default function BookingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation();
+  const { userInfo } = useAuth();
+  const [statusSheetVisible, setStatusSheetVisible] = useState(false);
 
   const { data, isLoading, error, refetch, isRefetching } = useBookingById(id);
 
@@ -44,6 +48,15 @@ export default function BookingDetailScreen() {
   const isPhotoShoot = data.type === ServiceType.PHOTO_SHOOT;
   const hasFeedbacks = (data.feedbacks?.length ?? 0) > 0;
 
+  const isOwner = userInfo?.id === data.createdBy;
+  const changeableStatuses = [
+    BookingStatus.CONFIRMED,
+    BookingStatus.PENDING_FOR_CONFIRMATION,
+    BookingStatus.IN_PROGRESS,
+    BookingStatus.WORK_COMPLETED,
+  ];
+  const canChange = isOwner && changeableStatuses.includes(data.status.code);
+
   return (
     <ThemedView className="flex-1">
       <ScrollView
@@ -51,7 +64,10 @@ export default function BookingDetailScreen() {
         refreshControl={
           <RefreshControl refreshing={!!isRefetching} onRefresh={() => refetch()} />
         }>
-        <BookingDetailHeader booking={data} />
+        <BookingDetailHeader 
+          booking={data} 
+          onPressStatus={canChange ? () => setStatusSheetVisible(true) : undefined}
+        />
 
         <View className="mt-4">
           <BookingDetailInfo booking={data} />
@@ -72,6 +88,17 @@ export default function BookingDetailScreen() {
           </View>
         ) : null}
       </ScrollView>
+
+      {canChange && (
+        <ChangeBookingStatusBottomSheet
+          visible={statusSheetVisible}
+          bookingId={data.id}
+          currentStatus={data.status.code}
+          onClose={() => setStatusSheetVisible(false)}
+          onStatusChanged={() => refetch()}
+        />
+      )}
     </ThemedView>
   );
 }
+

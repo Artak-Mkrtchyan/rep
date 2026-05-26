@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Header } from '@/components/ui/header';
 import { ANNOUNCEMENT_ROUTES } from '@/constants/announcement';
 import { useHandleBackPress, useStepRedirect } from '@/hooks/use-announcement';
+import { useAnnouncementForRentFormStore } from '@/store/announcementStore';
 import { Image } from 'expo-image';
 import { Pressable } from 'react-native';
 
@@ -12,6 +13,9 @@ export default function AnnouncementRentLayout() {
   // Side effect: redirects once on mount if persisted step disagrees with pathname.
   useStepRedirect();
   const handleBackPress = useHandleBackPress();
+  const isAnnouncementEdit = useAnnouncementForRentFormStore(
+    (state) => state.metaData?.isAnnouncementEdit
+  );
 
   return (
     <Stack
@@ -31,6 +35,7 @@ export default function AnnouncementRentLayout() {
                 headerTitle={t('announcement.add')}
                 label={t(route.labelKey)}
                 completedStep={route.completedStep}
+                isEditNotificationVisible={isAnnouncementEdit}
                 onHandleBackPress={() => handleBackPress(route.completedStep, route.name)}
               />
             ),

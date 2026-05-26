@@ -388,6 +388,8 @@
   "announcement.subtitle": "Create and manage your property listings",
   "announcement.create": "Create announcement",
   "announcement.add": "Add announcement",
+  "announcement.edit_notification_title": "Some changes require admin approval",
+  "announcement.edit_notification_description": "Changes to the title, description, price, rent, security deposit, or uploading new images or files will be reviewed by an administrator before being published.",
 
   "announcement.listing_type.for_rent": "For rent",
   "announcement.listing_type.for_sale": "For sale",

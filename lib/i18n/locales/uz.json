@@ -388,6 +388,8 @@
   "announcement.subtitle": "Mulk e'lonlaringizni yarating va boshqaring",
   "announcement.create": "E'lon yaratish",
   "announcement.add": "E'lon qo'shish",
+  "announcement.edit_notification_title": "Ba'zi o'zgarishlar administrator tasdig'ini talab qiladi",
+  "announcement.edit_notification_description": "Sarlavha, tavsif, narx, ijara, garov puli yoki yangi rasm va fayllarni yuklashdagi o'zgarishlar e'lon qilinishidan oldin administrator tomonidan tekshiriladi.",
 
   "announcement.listing_type.for_rent": "Ijaraga",
   "announcement.listing_type.for_sale": "Sotuvga",

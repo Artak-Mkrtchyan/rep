@@ -12,6 +12,14 @@ import type { StepProgressProps } from '@/components/ui/header/step-progress';
 import { StepProgress } from '@/components/ui/header/step-progress';
 import { cn } from '@/lib/utils';
 
+const EDIT_NOTIFICATION_SHADOW = {
+  shadowColor: '#6E6E6E',
+  shadowOffset: { width: 2, height: 3 },
+  shadowOpacity: 0.15,
+  shadowRadius: 16.5,
+  elevation: 6,
+};
+
 type Props = {
   completedStep?: number;
   totalSteps?: number;
@@ -19,6 +27,7 @@ type Props = {
   label?: string;
   stepProgressContainerClassName?: string;
   isStepProgressVisible?: boolean;
+  isEditNotificationVisible?: boolean;
   rightComponent?: React.ReactNode;
   onHandleBackPress?: () => void;
   headerClassName?: string;
@@ -31,6 +40,7 @@ export const Header: React.FC<Props> = ({
   label,
   stepProgressContainerClassName,
   isStepProgressVisible = true,
+  isEditNotificationVisible = false,
   rightComponent = null,
   onHandleBackPress,
   headerClassName,
@@ -82,6 +92,27 @@ export const Header: React.FC<Props> = ({
       {isStepProgressVisible ? (
         <View className="mt-[24px]">
           <StepProgress {...stepProgressProps} />
+        </View>
+      ) : null}
+
+      {isEditNotificationVisible ? (
+        <View
+          className="mt-[12px] flex-row items-start gap-[8px] rounded-[12px] border border-[#EAB306] bg-[#FFF8F0] p-[16px]"
+          accessibilityRole="alert"
+          style={EDIT_NOTIFICATION_SHADOW}>
+          <Ionicons
+            name="information-circle-outline"
+            size={20}
+            color="#EAB306"
+          />
+          <View className="min-w-0 flex-1 gap-[4px]">
+            <ThemedText className="text-[14px] font-bold leading-[17px] text-[#111111]">
+              {t('announcement.edit_notification_title')}
+            </ThemedText>
+            <ThemedText className="text-[12px] font-normal leading-[12px] text-[#303030]">
+              {t('announcement.edit_notification_description')}
+            </ThemedText>
+          </View>
         </View>
       ) : null}
     </View>

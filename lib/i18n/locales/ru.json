@@ -388,6 +388,8 @@
   "announcement.subtitle": "Создавайте и управляйте вашими объявлениями о недвижимости",
   "announcement.create": "Создать объявление",
   "announcement.add": "Добавить объявление",
+  "announcement.edit_notification_title": "Некоторые изменения требуют подтверждения администратора",
+  "announcement.edit_notification_description": "Изменения заголовка, описания, цены, аренды, депозита или загрузка новых изображений и файлов будут проверены администратором перед публикацией.",
 
   "announcement.listing_type.for_rent": "В аренду",
   "announcement.listing_type.for_sale": "На продажу",

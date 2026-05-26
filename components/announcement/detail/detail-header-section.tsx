@@ -8,6 +8,8 @@ import { AnnouncementCard } from '@/components/announcement/announcement-card';
 import { PlacedByItem } from '@/components/announcement/placed-by-item';
 import { ThemedText } from '@/components/themed-text';
 
+import { cn } from '@/lib/utils';
+import { ListingType } from '@/types/announcement';
 import { detailStyles } from './announcement-detail.styles';
 
 type DetailHeaderSectionProps = {
@@ -15,6 +17,7 @@ type DetailHeaderSectionProps = {
   publicId: string;
   typeLabel: string;
   price: string;
+  listingType: ListingType;
   statusLabel?: string;
   statusCode?: string;
   postedDate?: string;
@@ -36,6 +39,7 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
   title,
   publicId,
   typeLabel,
+  listingType,
   price,
   statusLabel,
   statusCode,
@@ -48,9 +52,7 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
   const isActive = !statusCode || statusCode === 'ACTIVE';
   const displayStatus = statusLabel || t('announcement.detail.status_active');
 
-  const badgeBg = isActive
-    ? 'bg-[#E3FEDE]'
-    : 'border border-red-400 bg-white';
+  const badgeBg = isActive ? 'bg-[#E3FEDE]' : 'border border-red-400 bg-white';
   const badgeTextColor = isActive ? 'text-[#5EBC39]' : 'text-red-500';
 
   return (
@@ -75,11 +77,7 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
           ) : null}
           <ThemedText className={`text-[12px] ${badgeTextColor}`}>{displayStatus}</ThemedText>
           {onStatusPress ? (
-            <Ionicons
-              name="chevron-down"
-              size={12}
-              color={isActive ? '#5EBC39' : '#EF4444'}
-            />
+            <Ionicons name="chevron-down" size={12} color={isActive ? '#5EBC39' : '#EF4444'} />
           ) : null}
         </Pressable>
       </View>
@@ -93,7 +91,12 @@ export const DetailHeaderSection: React.FC<DetailHeaderSectionProps> = ({
         </ThemedText>
         {typeLabel ? (
           <View className="shrink-0 flex-row items-center gap-[8px]">
-            <View className="h-[16px] w-[16px] rounded-full bg-destructive" />
+            <View
+              className={cn(
+                'h-[16px] w-[16px] rounded-full',
+                listingType === 'FOR_RENT' ? 'bg-green-500' : 'bg-destructive'
+              )}
+            />
             <ThemedText className="text-[14px] leading-[20px] text-[#303030]" numberOfLines={1}>
               {typeLabel}
             </ThemedText>

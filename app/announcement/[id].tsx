@@ -100,14 +100,14 @@ export default function AnnouncementDetailScreen() {
   const isActive = announcement?.status?.code === 'ACTIVE';
   const closureReason = announcement?.closureReason;
 
-
   const canReopen = useMemo(() => {
     return !!(closureReason?.code && REOPENABLE_REASONS.includes(closureReason.code));
   }, [closureReason]);
 
-  const createdById = typeof announcement?.createdBy === 'object'
-    ? (announcement.createdBy as any)?.id
-    : announcement?.createdBy;
+  const createdById =
+    typeof announcement?.createdBy === 'object'
+      ? (announcement.createdBy as any)?.id
+      : announcement?.createdBy;
 
   const isOwner = !!(userInfo?.id && createdById && userInfo.id === createdById);
 
@@ -168,6 +168,7 @@ export default function AnnouncementDetailScreen() {
             title={announcement.title}
             publicId={announcement.publicId}
             typeLabel={typeLabel}
+            listingType={announcement.listingType}
             price={getPriceLabel(announcement)}
             statusLabel={announcement.status?.name}
             statusCode={announcement.status?.code}

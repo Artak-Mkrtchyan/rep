@@ -173,8 +173,12 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
           ) : null}
         </View>
         <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1">
-          <ThemedText className="text-[14px] font-semibold text-foreground">
-            {id ? `ID: ${id}` : ''}
+          <ThemedText
+            className={cn(
+              'text-[14px] font-semibold text-foreground',
+              id ? 'text-foreground' : 'text-transparent'
+            )}>
+            {`ID: ${id}`}
           </ThemedText>
 
           {typeLabel ? (

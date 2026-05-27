@@ -31,7 +31,7 @@ export function useHandleNextPress() {
   const nextStep = useAnnouncementForRentFormStore((state) => state.nextStep);
   const pathname = usePathname();
 
-  return (isBroker?: boolean) => {
+  return (isBroker?: boolean, isRent?: boolean) => {
     if (pathname === ANNOUNCEMENT_ROUTES.RENT_BASIC_INFO.path && isBroker) {
       router.push(ANNOUNCEMENT_ROUTES.RENT_BROKER_LIST.path);
       return;
@@ -44,6 +44,17 @@ export function useHandleNextPress() {
 
     if (pathname === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_FIRST.path) {
       router.push(ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path);
+      return;
+    }
+
+    if (pathname === ANNOUNCEMENT_ROUTES.RENT_PROPERTY_INFO_SECOND.path) {
+      if (isRent) {
+        router.push(ANNOUNCEMENT_ROUTES.RENT_RENT_DETAILS.path);
+      } else {
+        router.push(ANNOUNCEMENT_ROUTES.RENT_SALE_DETAILS.path);
+      }
+
+      nextStep();
       return;
     }
 

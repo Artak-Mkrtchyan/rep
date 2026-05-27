@@ -65,7 +65,7 @@ export default function PropertyInfoSecondScreen() {
     }
 
     if (isNext) {
-      nextStep();
+      nextStep(false, formData.listingType === 'FOR_RENT');
     } else {
       try {
         await sendFormData();

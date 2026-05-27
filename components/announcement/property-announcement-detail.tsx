@@ -173,9 +173,9 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
           ) : null}
         </View>
         <View className="mb-2 flex-row flex-wrap items-center justify-between gap-x-4 gap-y-1">
-          {id ? (
-            <ThemedText className="text-[14px] font-semibold text-foreground">ID: {id}</ThemedText>
-          ) : null}
+          <ThemedText className="text-[14px] font-semibold text-foreground">
+            {id ? `ID: ${id}` : ''}
+          </ThemedText>
 
           {typeLabel ? (
             <View className="flex-row items-center gap-1.5">
@@ -315,12 +315,7 @@ export const PropertyAnnouncementDetail: React.FC<PropertyAnnouncementDetailProp
                 );
               })}
             </View>
-            <ViewOnMapButton
-              lat={mapLat}
-              lng={mapLng}
-              label={mapLabel}
-              style={{ marginTop: 20 }}
-            />
+            <ViewOnMapButton lat={mapLat} lng={mapLng} label={mapLabel} style={{ marginTop: 20 }} />
           </>
         ) : (
           <ThemedText className="text-[14px] text-muted-foreground">—</ThemedText>

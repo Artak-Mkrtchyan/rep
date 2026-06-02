@@ -11,15 +11,14 @@ import {
 import { ConstructionCompanyCard } from '@/components/home/construction-company-card';
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
-import { useHomeMetrics } from '@/hooks/use-home-metrics';
-import { useHomeConstructionCompanies } from '@/hooks/api/use-home-partners';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
+import { useHomeConstructionCompanies } from '@/hooks/api/use-home-partners';
+import { useHomeMetrics } from '@/hooks/use-home-metrics';
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: HOME_DESIGN.layout.sectionGap,
+    marginTop: HOME_DESIGN.layout.sectionGap - 8,
     gap: HOME_DESIGN.layout.headerToCarousel,
-    paddingBottom: 24,
   },
   header: {
     paddingHorizontal: HOME_DESIGN.layout.affordabilityPaddingH,
@@ -81,20 +80,20 @@ export const ConstructionCompaniesSection: React.FC<ConstructionCompaniesSection
           onScroll={handleScroll}
           scrollEventThrottle={16}>
           {companies.map((company, index) => (
-              <View
-                key={company.id}
-                style={{
-                  width: metrics.companyCardWidth,
-                  marginRight: index < companies.length - 1 ? metrics.gap : 0,
-                }}>
-                <ConstructionCompanyCard
-                  name={company.name}
-                  rating="4.9"
-                  logoUri={company.avatarInfo?.thumbnailUrl || company.avatarInfo?.url}
-                  onPress={onCardPress}
-                />
-              </View>
-            ))}
+            <View
+              key={company.id}
+              style={{
+                width: metrics.companyCardWidth,
+                marginRight: index < companies.length - 1 ? metrics.gap : 0,
+              }}>
+              <ConstructionCompanyCard
+                name={company.name}
+                rating="4.9"
+                logoUri={company.avatarInfo?.thumbnailUrl || company.avatarInfo?.url}
+                onPress={onCardPress}
+              />
+            </View>
+          ))}
         </ScrollView>
       </View>
 

@@ -17,6 +17,7 @@ type HeroSectionProps = {
   onNotificationsPress?: () => void;
   isAuthenticated?: boolean;
   onLoginPress?: () => void;
+  isCompactHeaderVisible?: boolean;
 };
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -25,6 +26,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   onNotificationsPress,
   isAuthenticated = true,
   onLoginPress,
+  isCompactHeaderVisible,
 }) => {
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
@@ -68,18 +70,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             )}
           </View>
 
-          <ThemedText className="mt-6 text-center text-[32px] font-bold leading-tight text-white">
-            {t('home.hero_title')}
-          </ThemedText>
+          {isCompactHeaderVisible ? null : (
+            <ThemedText className="mt-6 text-center text-[32px] font-bold leading-tight text-white">
+              {t('home.hero_title')}
+            </ThemedText>
+          )}
 
           <Pressable
             onPress={onSearchPress}
             className="mt-6 h-[42px] flex-row items-center rounded-[8px] border border-[#e2e2e2] bg-white px-4"
             accessibilityLabel={t('home.search_properties')}
             accessibilityRole="button">
-            <ThemedText
-              className="flex-1 text-[12px]"
-              style={{ color: HOME_DESIGN.neutral200 }}>
+            <ThemedText className="flex-1 text-[12px]" style={{ color: HOME_DESIGN.neutral200 }}>
               {t('home.search_placeholder')}
             </ThemedText>
             <ReIcon name="settings" size={20} color="#a1a1a1" />

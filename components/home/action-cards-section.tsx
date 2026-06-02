@@ -12,8 +12,8 @@ import {
 import { ActionCard } from '@/components/home/action-card';
 import { HOME_DESIGN } from '@/components/home/home-design-tokens';
 import { SectionHeaderRow } from '@/components/home/section-header-row';
-import { HOME_ACTION_CARDS, type ActionCardConfig } from '@/constants/action-cards';
 import { PaginationIndicator } from '@/components/ui/pagination-indicator';
+import { HOME_ACTION_CARDS, type ActionCardConfig } from '@/constants/action-cards';
 import type { SearchFilters } from '@/types/search';
 
 type ActionCardsSectionProps = {
@@ -103,7 +103,7 @@ export const ActionCardsSection: React.FC<ActionCardsSectionProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: HOME_DESIGN.layout.sectionGap,
+    marginTop: HOME_DESIGN.layout.sectionGap - 8,
     gap: HOME_DESIGN.layout.headerToCarousel,
   },
   header: {
